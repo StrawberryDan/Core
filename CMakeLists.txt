@@ -1,3 +1,15 @@
+cmake_minimum_required(VERSION 3.0)
+project(Standard)
+set(CMAKE_CXX_STANDARD 20)
+
+
+
+if(NOT WIN32)
+include_directories(/usr/local/include)
+link_directories(/usr/local/lib)
+endif()
+
+
 add_library(LibreSSL INTERFACE)
 target_link_libraries(LibreSSL INTERFACE $ENV{LibreSSL_ROOT}/lib/libssl.a $ENV{LibreSSL_ROOT}/lib/libtls.a)
 target_include_directories(LibreSSL INTERFACE $ENV{LibreSSL_ROOT}/include)
