@@ -64,6 +64,6 @@ target_link_libraries(Standard PRIVATE LibreSSL fmt)
 
 
 
-add_executable(Util_Test
+add_executable(Standard_Test
         test/Main.cpp)
-target_link_libraries(Util_Test PRIVATE Standard)
+target_link_libraries(Standard_Test PRIVATE Standard)
