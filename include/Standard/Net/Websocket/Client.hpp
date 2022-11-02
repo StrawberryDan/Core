@@ -22,11 +22,7 @@
 
 namespace Strawberry::Standard::Net::Websocket
 {
-	using namespace Socket;
-
-
-
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	class ClientImpl
 	{
 	public:
@@ -97,7 +93,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	enum class ClientImpl<S, PORT>::Error
 	{
 		Unknown,
@@ -108,8 +104,8 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	using WSClient  = ClientImpl<TCPClient, 80>;
-	using WSSClient = ClientImpl<TLSClient, 443>;
+	using WSClient  = ClientImpl<Socket::TCPClient, 80>;
+	using WSSClient = ClientImpl<Socket::TLSClient, 443>;
 }
 
 

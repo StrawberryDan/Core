@@ -19,7 +19,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	Result<ClientImpl<S, PORT>, typename ClientImpl<S, PORT>::Error>
 	ClientImpl<S, PORT>::Connect(const std::string& host, const std::string& resource)
 	{
@@ -46,7 +46,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	ClientImpl<S, PORT>::ClientImpl(ClientImpl<S, PORT>&& rhs) noexcept
 	{
 		if (this != &rhs)
@@ -58,7 +58,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	ClientImpl<S, PORT>& ClientImpl<S, PORT>::operator=(ClientImpl<S, PORT>&& rhs) noexcept
 	{
 		if (this != &rhs)
@@ -72,7 +72,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	ClientImpl<S, PORT>::~ClientImpl()
 	{
 		if (mSocket)
@@ -93,7 +93,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	void ClientImpl<S, PORT>::SendMessage(const Message& message)
 	{
 		TransmitFrame(message).Unwrap();
@@ -101,7 +101,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	Result<Message, typename ClientImpl<S, PORT>::Error> ClientImpl<S, PORT>::ReadMessage()
 	{
 		return ReceiveFrame();
@@ -109,7 +109,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	Result<Message, typename ClientImpl<S, PORT>::Error> ClientImpl<S, PORT>::WaitMessage()
 	{
 		while (true)
@@ -132,7 +132,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	std::string ClientImpl<S, PORT>::GenerateNonce()
 	{
 		std::random_device randomDevice;
@@ -154,7 +154,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	uint8_t ClientImpl<S, PORT>::GetOpcodeMask(Message::Opcode opcode)
 	{
 		switch (opcode)
@@ -178,7 +178,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	Option<Message::Opcode> ClientImpl<S, PORT>::GetOpcodeFromByte(uint8_t byte)
 	{
 		using Opcode = Message::Opcode;
@@ -204,7 +204,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	uint32_t ClientImpl<S, PORT>::GenerateMaskingKey()
 	{
 		std::random_device rd;
@@ -218,7 +218,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	typename ClientImpl<S, PORT>::Error ClientImpl<S, PORT>::ErrorFromSocketError(typename S::Error err)
 	{
 		switch (err)
@@ -234,7 +234,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	Result<size_t, typename ClientImpl<S, PORT>::Error>
 	ClientImpl<S, PORT>::TransmitFrame(const Message& message)
 	{
@@ -279,7 +279,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	Result<Message, typename ClientImpl<S, PORT>::Error> ClientImpl<S, PORT>::ReceiveFrame()
 	{
 		if (mError == Error::Closed)
@@ -324,7 +324,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	Result<typename ClientImpl<S, PORT>::Fragment, typename ClientImpl<S, PORT>::Error>
 	ClientImpl<S, PORT>::ReceiveFragment()
 	{

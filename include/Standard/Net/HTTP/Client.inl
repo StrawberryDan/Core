@@ -7,7 +7,7 @@
 
 namespace Strawberry::Standard::Net::HTTP
 {
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	ClientImpl<S, PORT>::ClientImpl(const std::string& hostname)
 			: mSocket(hostname, PORT)
 	{
@@ -15,7 +15,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	void ClientImpl<S, PORT>::SendRequest(const Request& request)
 	{
 		std::string headerLine = fmt::format(
@@ -56,7 +56,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	Response ClientImpl<S, PORT>::Receive()
 	{
 		static const auto statusLinePattern = std::regex(R"(HTTP\/([^\s]+)\s+(\d{3})\s+([^\r]*)\r\n)");
@@ -113,7 +113,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	ChunkedPayload ClientImpl<S, PORT>::ReadChunkedPayload()
 	{
 		std::string line;
@@ -143,7 +143,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	std::string ClientImpl<S, PORT>::ReadLine()
 	{
 		std::string line;

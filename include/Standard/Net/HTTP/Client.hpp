@@ -13,11 +13,7 @@
 
 namespace Strawberry::Standard::Net::HTTP
 {
-	using namespace Socket;
-
-
-
-	template<SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S, uint16_t PORT>
 	class ClientImpl
 	{
 	public:
@@ -43,8 +39,8 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	using HTTPClient  = ClientImpl<TCPClient, 80>;
-	using HTTPSClient = ClientImpl<TLSClient, 443>;
+	using HTTPClient  = ClientImpl<Socket::TCPClient, 80>;
+	using HTTPSClient = ClientImpl<Socket::TLSClient, 443>;
 }
 
 
