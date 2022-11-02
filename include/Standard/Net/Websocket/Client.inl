@@ -25,11 +25,11 @@ namespace Strawberry::Standard::Net::Websocket
 	{
 		HTTP::ClientImpl<S, PORT> handshaker(host);
 		HTTP::Request upgradeRequest(HTTP::Verb::GET, resource);
-		upgradeRequest.GetHeader().Add("Host", "gateway.discord.gg");
+		upgradeRequest.GetHeader().Add("Host", host);
 		upgradeRequest.GetHeader().Add("Upgrade", "websocket");
 		upgradeRequest.GetHeader().Add("Connection", "Upgrade");
 		upgradeRequest.GetHeader().Add("Sec-WebSocket-Key", GenerateNonce());
-		upgradeRequest.GetHeader().Add("Sec-WebSocket-GetVersion", "13");
+		upgradeRequest.GetHeader().Add("Sec-WebSocket-Version", "13");
 		handshaker.SendRequest(upgradeRequest);
 		auto response = handshaker.Receive();
 		if (response.GetStatus() != 101)

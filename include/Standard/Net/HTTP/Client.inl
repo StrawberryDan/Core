@@ -80,7 +80,8 @@ namespace Strawberry::Standard::Net::HTTP
 			if (currentLine == "\r\n")
 			{
 				break;
-			} else if (std::regex_match(currentLine, matchResults, headerLinePattern))
+			}
+			else if (std::regex_match(currentLine, matchResults, headerLinePattern))
 			{
 				response.GetHeader().Add(matchResults[1], matchResults[2]);
 			}
@@ -94,17 +95,22 @@ namespace Strawberry::Standard::Net::HTTP
 			if (transferEncoding == "chunked")
 			{
 				payload = ReadChunkedPayload();
-			} else
+			}
+			else
 			{
 				fmt::print(stderr, "Unsupported value for Transfer-Encoding: {}\n", transferEncoding);
 			}
-		} else if (response.GetHeader().Contains("Content-Length"))
+		}
+		else if (response.GetHeader().Contains("Content-Length"))
 		{
 			SimplePayload simplePayload;
 			unsigned long contentLength = std::stoul(response.GetHeader().Get("Content-Length"));
-			std::vector<uint8_t> data = mSocket.template ReadVector<uint8_t>(contentLength).Unwrap();
-			simplePayload.Write(data.data(), data.size());
-			payload = simplePayload;
+			if (contentLength > 0)
+			{
+				std::vector<uint8_t> data = mSocket.template ReadVector<uint8_t>(contentLength).Unwrap();
+				simplePayload.Write(data.data(), data.size());
+				payload = simplePayload;
+			}
 		}
 		response.SetPayload(payload);
 
