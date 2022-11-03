@@ -114,7 +114,9 @@ namespace Strawberry::Standard::Net::Socket
 	        return Result<size_t, SocketBase::Error>::Ok(static_cast<size_t>(bytesRead));
 	    }
 #elif __APPLE__ || __linux__
-	    auto bytesRead = recv(mSocket, data, len, IsBlocking() ? MSG_WAITALL : MSG_DONTWAIT);
+		auto blocking = IsBlocking();
+		auto flags = blocking ? MSG_WAITALL : MSG_DONTWAIT;
+	    auto bytesRead = recv(mSocket, data, len, flags);
 	    if (bytesRead >= 0)
 	    {
 	        return bytesRead;
@@ -190,9 +192,10 @@ namespace Strawberry::Standard::Net::Socket
 #elif __APPLE__ || __linux__
 		auto flags = fcntl(mSocket, F_GETFL);
 		Assert(flags >= 0);
-		flags = blocking ? FNONBLOCK : ~FNONBLOCK;
+		flags = blocking ? ~FNONBLOCK : FNONBLOCK;
 		auto result = fcntl(mSocket, F_SETFL, flags);
 		Assert(result >= 0);
+		Assert(IsBlocking() == blocking);
 #else
 #warning "No Implementation for platform"
 #endif

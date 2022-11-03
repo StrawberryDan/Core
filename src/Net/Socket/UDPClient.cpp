@@ -177,6 +177,7 @@ namespace Strawberry::Standard::Net::Socket
 		flags &= blocking ? ~FNONBLOCK : FNONBLOCK;
 		auto result = fcntl(mSocket, F_SETFL, flags);
 		Assert(result >= 0);
+		Assert(IsBlocking() == blocking);
 #else
 	#warning "No Implementation for platform"
 #endif
