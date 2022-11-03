@@ -141,6 +141,9 @@ namespace Strawberry::Standard
 
 	    Option<MutexGuard<T, false>> TryLock()       { return mPayload->TryLock(); }
 	    Option<MutexGuard<T,  true>> TryLock() const { return mPayload->TryLock(); }
+
+
+
 	private:
 	    std::shared_ptr<Mutex<T>> mPayload;
 	};
