@@ -86,9 +86,6 @@ namespace Strawberry::Standard::Net::Websocket
 
 		Option<S> mSocket;
 		Option<Error> mError;
-
-		std::future<void> mReceiver;
-		std::future<void> mTransmitter;
 	};
 
 
