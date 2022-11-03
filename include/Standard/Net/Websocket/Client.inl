@@ -13,12 +13,15 @@
 
 
 
+namespace
+{
+	using Strawberry::Standard::Assert;
+};
+
+
+
 namespace Strawberry::Standard::Net::Websocket
 {
-	using namespace Strawberry::Standard::Net;
-
-
-
 	template<Socket::SocketImpl S, uint16_t PORT>
 	Result<ClientImpl<S, PORT>, typename ClientImpl<S, PORT>::Error>
 	ClientImpl<S, PORT>::Connect(const std::string& host, const std::string& resource)
@@ -337,15 +340,7 @@ namespace Strawberry::Standard::Net::Websocket
 		if (auto byte = mSocket->template ReadType<uint8_t>())
 		{
 			final = *byte & 0b10000000;
-			if (auto op = GetOpcodeFromByte(*byte & 0b00001111))
-			{
-				opcode = *op;
-			}
-			else
-			{
-				std::cout << "Invalid Opcode Bytes: " << *byte << std::endl;
-				return Error::Unknown;
-			}
+			opcode = GetOpcodeFromByte(*byte & 0b00001111).Unwrap();
 		}
 		else
 		{
