@@ -80,7 +80,11 @@ namespace Strawberry::Standard::Net::Websocket
 	{
 		if (mSocket)
 		{
-			SendMessage(Message(Message::Opcode::Close));
+			auto code = ToBigEndian<uint16_t>(1000);
+			Websocket::Message::Payload payload;
+			payload.push_back(reinterpret_cast<uint8_t*>(&code)[0]);
+			payload.push_back(reinterpret_cast<uint8_t*>(&code)[1]);
+			SendMessage(Message(Message::Opcode::Close, payload));
 			while (true)
 			{
 				auto msg = ReadMessage();
