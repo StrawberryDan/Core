@@ -148,6 +148,15 @@ namespace Strawberry::Standard
 		const T* operator->() const { Assert(mHasValue); return  reinterpret_cast<const T*>(mData); }
 
 
+
+		T Unwrap()
+		{
+			Assert(mHasValue);
+			return std::move(**this);
+		}
+
+
+
 		bool operator==(const Option<T>& rhs) const requires ( std::equality_comparable<T> )
 		{
 			if (!HasValue() && !rhs.HasValue())
