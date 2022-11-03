@@ -74,7 +74,6 @@ namespace Strawberry::Standard::Net::Socket
 		Unknown,
 		Closed,
 		WouldBlock,
-		WouldCock,
 	};
 }
 
