@@ -1,3 +1,7 @@
+#pragma once
+
+
+
 #include <regex>
 #include "Standard/Assert.hpp"
 #include <iostream>
@@ -7,16 +11,16 @@
 
 namespace Strawberry::Standard::Net::HTTP
 {
-	template<Socket::SocketImpl S, uint16_t PORT>
-	ClientImpl<S, PORT>::ClientImpl(const std::string& hostname)
-			: mSocket(hostname, PORT)
+	template<Socket::SocketImpl S>
+	ClientImpl<S>::ClientImpl(const std::string& hostname, uint16_t port)
+			: mSocket(hostname, port)
 	{
 	}
 
 
 
-	template<Socket::SocketImpl S, uint16_t PORT>
-	void ClientImpl<S, PORT>::SendRequest(const Request& request)
+	template<Socket::SocketImpl S>
+	void ClientImpl<S>::SendRequest(const Request& request)
 	{
 		std::string headerLine = fmt::format(
 				"{} {} HTTP/{}\r\n",
@@ -56,8 +60,8 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<Socket::SocketImpl S, uint16_t PORT>
-	Response ClientImpl<S, PORT>::Receive()
+	template<Socket::SocketImpl S>
+	Response ClientImpl<S>::Receive()
 	{
 		static const auto statusLinePattern = std::regex(R"(HTTP\/([^\s]+)\s+(\d{3})\s+([^\r]*)\r\n)");
 		static const auto headerLinePattern = std::regex(R"(([^:]+)\s*:\s*([^\r]+)\r\n)");
@@ -119,8 +123,8 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<Socket::SocketImpl S, uint16_t PORT>
-	ChunkedPayload ClientImpl<S, PORT>::ReadChunkedPayload()
+	template<Socket::SocketImpl S>
+	ChunkedPayload ClientImpl<S>::ReadChunkedPayload()
 	{
 		std::string line;
 		std::smatch matchResults;
@@ -149,8 +153,8 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<Socket::SocketImpl S, uint16_t PORT>
-	std::string ClientImpl<S, PORT>::ReadLine()
+	template<Socket::SocketImpl S>
+	std::string ClientImpl<S>::ReadLine()
 	{
 		std::string line;
 		while (!line.ends_with("\r\n"))

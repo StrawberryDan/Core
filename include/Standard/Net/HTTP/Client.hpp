@@ -13,11 +13,11 @@
 
 namespace Strawberry::Standard::Net::HTTP
 {
-	template<Socket::SocketImpl S, uint16_t PORT>
+	template<Socket::SocketImpl S>
 	class ClientImpl
 	{
 	public:
-		explicit ClientImpl(const std::string& hostname);
+		explicit ClientImpl(const std::string& hostname, uint16_t port);
 
 
 
@@ -26,21 +26,42 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
+	public:
 		void SendRequest(const Request& request);
 		Response Receive();
+
+
 
 	private:
 		std::string ReadLine();
 		ChunkedPayload ReadChunkedPayload();
 
+
+
 	private:
 		S mSocket;
+
+
+
 	};
 
 
 
-	using HTTPClient  = ClientImpl<Socket::TCPClient, 80>;
-	using HTTPSClient = ClientImpl<Socket::TLSClient, 443>;
+	class HTTPClient
+		: public ClientImpl<Socket::TCPClient>
+	{
+	public:
+		HTTPClient(const std::string& hostname, uint16_t port = 80);
+	};
+
+
+
+	class HTTPSClient
+		: public ClientImpl<Socket::TLSClient>
+	{
+	public:
+		HTTPSClient(const std::string& hostname, uint16_t port = 443);
+	};
 }
 
 

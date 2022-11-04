@@ -22,16 +22,20 @@
 
 namespace Strawberry::Standard::Net::Websocket
 {
-	template<Socket::SocketImpl S, uint16_t PORT>
+	enum class Error
+	{
+		Unknown,
+		NoMessage,
+		Closed,
+		Refused,
+	};
+
+
+
+	template<Socket::SocketImpl S>
 	class ClientImpl
 	{
 	public:
-		enum class Error;
-
-
-	public:
-		static Result<ClientImpl, Error> Connect(const std::string& host, const std::string& resource);
-
 		ClientImpl(const ClientImpl&) = delete;
 		ClientImpl& operator=(const ClientImpl&) = delete;
 		ClientImpl(ClientImpl&& rhs) noexcept;
@@ -59,15 +63,13 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	private:
+	protected:
+		using MessageBuffer = Mutex<std::vector<Message>>;
 		using Fragment = std::pair<bool, Message>;
 
 
-	private:
-		ClientImpl() = default;
 
-
-
+	protected:
 		[[nodiscard]] Result<Message, Error> ReceiveFrame();
 		[[nodiscard]] Result<Fragment, Error> ReceiveFragment();
 		[[nodiscard]] Result<size_t, Error> TransmitFrame(const Message& frame);
@@ -81,28 +83,36 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	private:
-		using MessageBuffer = Mutex<std::vector<Message>>;
+	protected:
+		ClientImpl() = default;
 
+
+
+	protected:
 		Option<S> mSocket;
 		Option<Error> mError;
+
+
+
 	};
 
 
 
-	template<Socket::SocketImpl S, uint16_t PORT>
-	enum class ClientImpl<S, PORT>::Error
+	class WSClient
+		: public ClientImpl<Socket::TCPClient>
 	{
-		Unknown,
-		NoMessage,
-		Closed,
-		Refused,
+	public:
+		static Result<WSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 80);
 	};
 
 
 
-	using WSClient  = ClientImpl<Socket::TCPClient, 80>;
-	using WSSClient = ClientImpl<Socket::TLSClient, 443>;
+	class WSSClient
+		: public ClientImpl<Socket::TLSClient>
+	{
+	public:
+		static Result<WSSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 443);
+	};
 }
 
 
