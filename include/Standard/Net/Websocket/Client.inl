@@ -52,6 +52,14 @@ namespace Strawberry::Standard::Net::Websocket
 	template<Socket::SocketImpl S>
 	ClientImpl<S>::~ClientImpl()
 	{
+		Disconnect();
+	}
+
+
+
+	template<Socket::SocketImpl S>
+	void ClientImpl<S>::Disconnect()
+	{
 		if (mSocket)
 		{
 			auto code = ToBigEndian<uint16_t>(1000);
@@ -318,7 +326,15 @@ namespace Strawberry::Standard::Net::Websocket
 		if (auto byte = mSocket->template ReadType<uint8_t>())
 		{
 			final = *byte & 0b10000000;
-			opcode = GetOpcodeFromByte(*byte & 0b00001111).Unwrap();
+			auto opcodeIn = GetOpcodeFromByte(*byte & 0b00001111);
+			if (opcodeIn)
+			{
+				opcode = opcodeIn.Unwrap();
+			}
+			else
+			{
+				return Error::BadOp;
+			}
 		}
 		else
 		{

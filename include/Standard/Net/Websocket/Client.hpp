@@ -28,6 +28,7 @@ namespace Strawberry::Standard::Net::Websocket
 		NoMessage,
 		Closed,
 		Refused,
+		BadOp,
 	};
 
 
@@ -40,8 +41,11 @@ namespace Strawberry::Standard::Net::Websocket
 		ClientImpl& operator=(const ClientImpl&) = delete;
 		ClientImpl(ClientImpl&& rhs) noexcept;
 		ClientImpl& operator=(ClientImpl&& rhs) noexcept;
-
 		~ClientImpl();
+
+
+
+		void Disconnect();
 
 
 
