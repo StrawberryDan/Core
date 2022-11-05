@@ -57,7 +57,7 @@ add_library(Standard STATIC
         include/Standard/Option.hpp
         include/Standard/Assert.hpp
         include/Standard/Concepts.hpp
-        include/Standard/Markers.hpp src/Markers.cpp src/Net/Websocket/Client.cpp src/Net/HTTP/Client.cpp)
+        include/Standard/Markers.hpp src/Markers.cpp src/Net/Websocket/Client.cpp src/Net/HTTP/Client.cpp include/Standard/Net/Address.hpp src/Net/Address.cpp)
 
 target_include_directories(Standard PUBLIC include)
 target_link_libraries(Standard PRIVATE LibreSSL fmt)
