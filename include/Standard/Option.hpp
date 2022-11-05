@@ -110,7 +110,7 @@ namespace Strawberry::Standard
 		{
 			if (mHasValue)
 			{
-				(*this)->~T();
+				reinterpret_cast<T*>(mData)->~T();
 			}
 		}
 
@@ -131,7 +131,7 @@ namespace Strawberry::Standard
 		{
 			if (mHasValue)
 			{
-				(*this)->~T();
+				reinterpret_cast<T*>(mData)->~T();
 				mHasValue = false;
 			}
 		}
@@ -144,8 +144,10 @@ namespace Strawberry::Standard
 			  T& operator *()       { Assert(mHasValue); return *reinterpret_cast<      T*>(mData); }
 		const T& operator *() const { Assert(mHasValue); return *reinterpret_cast<const T*>(mData); }
 
-			  T* operator->()       { Assert(mHasValue); return  reinterpret_cast<      T*>(mData); }
-		const T* operator->() const { Assert(mHasValue); return  reinterpret_cast<const T*>(mData); }
+			  T* operator->()       requires (!std::is_pointer_v<T>) { Assert(mHasValue); return  reinterpret_cast<      T*>(mData); }
+		const T* operator->() const requires (!std::is_pointer_v<T>) { Assert(mHasValue); return  reinterpret_cast<const T*>(mData); }
+		      T  operator->()       requires ( std::is_pointer_v<T>) { Assert(mHasValue); return  reinterpret_cast<      T >(mData); }
+		const T  operator->() const requires ( std::is_pointer_v<T>) { Assert(mHasValue); return  reinterpret_cast<const T >(mData); }
 
 
 
