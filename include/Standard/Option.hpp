@@ -8,6 +8,7 @@
 
 
 #include "Standard/Assert.hpp"
+#include "Standard/Concepts.hpp"
 #include "Standard/Utilities.hpp"
 
 
@@ -159,6 +160,51 @@ namespace Strawberry::Standard
 
 
 
+		T UnwrapOr(T&& value)
+		{
+			if (HasValue())
+			{
+				return Unwrap();
+			}
+			else
+			{
+				return value;
+			}
+		}
+
+
+
+
+		template <typename R, typename F>
+		R Map(F functor) requires Callable<R, F, T>
+		{
+			if (HasValue())
+			{
+				return Option<R>(F(Unwrap()));
+			}
+			else
+			{
+				return {};
+			}
+		}
+
+
+
+		template <typename R, typename F>
+		R MapOr(F functor, R&& value) requires Callable<R, F, T>
+		{
+			if (HasValue())
+			{
+				return Option<R>(F(Unwrap()));
+			}
+			else
+			{
+				return value;
+			}
+		}
+
+
+
 		bool operator==(const Option<T>& rhs) const requires ( std::equality_comparable<T> )
 		{
 			if (!HasValue() && !rhs.HasValue())
@@ -222,10 +268,6 @@ namespace Strawberry::Standard
 	private:
 		bool    mHasValue;
 		uint8_t mData[sizeof(T)];
-
-	#if !NDEBUG
-		const T* mView = reinterpret_cast<T*>(mData);
-	#endif // !NDEBUG
 	};
 
 
