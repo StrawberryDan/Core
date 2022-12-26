@@ -8,52 +8,52 @@
 
 namespace Strawberry::Standard
 {
-	static Option<LogLevel>      sLogLevel   = {};
-	static Option<std::ofstream> sOutputFile = {};
+	static Option<Logging::Level>      sLogLevel   = {};
+	static Option<std::ofstream>       sOutputFile = {};
 
 
 
-	std::string ToString(LogLevel logLevel)
+	std::string Logging::LevelToString(Level logLevel)
 	{
 		switch (logLevel)
 		{
-			case LogLevel::Trace:
+			case Level::Trace:
 				return "TRACE";
-			case LogLevel::Debug:
+			case Level::Debug:
 				return "DEBUG";
-			case LogLevel::Info:
+			case Level::Info:
 				return "INFO";
-			case LogLevel::Warning:
+			case Level::Warning:
 				return "WARNING";
-			case LogLevel::Error:
+			case Level::Error:
 				return "ERROR";
 		}
 	}
 
 
 
-	LogLevel GetLogLevel()
+	Logging::Level Logging::GetLevel()
 	{
-		return sLogLevel.UnwrapOr(LogLevel::Warning);
+		return sLogLevel.UnwrapOr(Level::Warning);
 	}
 
 
 
-	void SetLogLevel(LogLevel logLevel)
+	void Logging::SetLevel(Level logLevel)
 	{
 		sLogLevel = logLevel;
 	}
 
 
 
-	void SetOutputFile(std::string message)
+	void Logging::SetOutputFile(std::string message)
 	{
 		sOutputFile.Emplace(std::move(message));
 	}
 
 
 
-	void LogRaw(std::string message)
+	void Logging::LogRaw(const std::string& message)
 	{
 		std::cout << message << std::endl;
 		if (sOutputFile)

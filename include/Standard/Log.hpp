@@ -12,72 +12,86 @@
 
 namespace Strawberry::Standard
 {
-	enum class LogLevel
+	class Logging
 	{
-		Trace,
-		Debug,
-		Info,
-		Warning,
-		Error,
-	};
-
-
-
-	std::string ToString(LogLevel logLevel);
-
-
-
-	LogLevel GetLogLevel();
-	void     SetLogLevel(LogLevel logLevel);
-	void     SetOutputFile(std::string filename);
-
-
-
-	void LogRaw(std::string message);
-
-
-	template <typename... Args>
-	void Log(LogLevel level, std::string message, Args... args)
-	{
-		if (GetLogLevel() > level)
+	public:
+		enum class Level
 		{
-			return;
+			Trace,
+			Debug,
+			Info,
+			Warning,
+			Error,
+		};
+
+
+
+		static std::string LevelToString(Logging::Level logLevel);
+
+
+
+		template <typename... Args>
+		static void Log(Level level, std::string message, Args... args)
+		{
+			if (GetLevel() > level)
+			{
+				return;
+			}
+
+			std::string formatted = fmt::format(message, args...);
+
+			std::stringstream out;
+			out << "[" << LevelToString(level) << "]\t" << formatted;
+			LogRaw(out.str());
 		}
 
-		std::string formatted = fmt::format(message, args...);
 
-		std::stringstream out;
-		out << "[" << ToString(level) << "]\t" << formatted;
-		LogRaw(out.str());
-	}
 
-	template <typename... Args>
-	void LogTrace(std::string message, Args... args)
-	{
-		Log(LogLevel::Trace, message, args...);
-	}
+		template <typename... Args>
+		static void Trace(std::string message, Args... args)
+		{
+			Log(Level::Trace, message, args...);
+		}
 
-	template <typename... Args>
-	void LogDebug(std::string message, Args... args)
-	{
-		Log(LogLevel::Debug, message, args...);
-	}
 
-	template <typename... Args>
-	void LogInfo(std::string message, Args... args)
-	{
-		Log(LogLevel::Info, message, args...);
-	}
 
-	template <typename... Args>
-	void LogWarning(std::string message, Args... args)
-	{
-		Log(LogLevel::Warning, message, args...);
-	}
+		template <typename... Args>
+		static void Debug(std::string message, Args... args)
+		{
+			Log(Level::Debug, message, args...);
+		}
 
-	template <typename... Args>
-	void LogError(std::string message, Args... args)
-	{
-		Log(LogLevel::Error, message, args...);
-	}
+
+
+		template <typename... Args>
+		static void Info(std::string message, Args... args)
+		{
+			Log(Level::Info, message, args...);
+		}
+
+
+
+		template <typename... Args>
+		static void Warning(std::string message, Args... args)
+		{
+			Log(Level::Warning, message, args...);
+		}
+
+		template <typename... Args>
+		static void Error(std::string message, Args... args)
+		{
+			Log(Level::Error, message, args...);
+		}
+
+
+
+		static Level    GetLevel();
+		static void     SetLevel(Level logLevel);
+		static void     SetOutputFile(std::string filename);
+
+
+
+	private:
+		static void LogRaw(const std::string& message);
+	};
 }
