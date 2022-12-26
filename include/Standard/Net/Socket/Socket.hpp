@@ -16,7 +16,7 @@
 
 namespace Strawberry::Standard::Net::Socket
 {
-	class SocketBase
+	class Socket
 	{
 	public:
 		enum class Error;
@@ -64,12 +64,12 @@ namespace Strawberry::Standard::Net::Socket
 	concept SocketImpl =
 	requires(T t, std::string hostname, uint16_t port)
 	{
-		std::is_base_of_v<SocketBase, T>;
+		std::is_base_of_v<Socket, T>;
 	};
 
 
 
-	enum class SocketBase::Error
+	enum class Socket::Error
 	{
 		Unknown,
 		Closed,
@@ -79,4 +79,4 @@ namespace Strawberry::Standard::Net::Socket
 
 
 
-#include "SocketBase.inl"
+#include "Socket.inl"

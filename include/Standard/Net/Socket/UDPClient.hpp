@@ -2,7 +2,7 @@
 
 
 
-#include "SocketBase.hpp"
+#include "Socket.hpp"
 #include <string>
 
 
@@ -19,7 +19,7 @@ namespace Strawberry::Standard::Net::Socket
 
 
 
-	class UDPClient : public SocketBase
+	class UDPClient : public Socket
 	{
 	public:
 	    UDPClient(const std::string& hostname, uint16_t port);
@@ -29,8 +29,8 @@ namespace Strawberry::Standard::Net::Socket
 	    UDPClient& operator=(UDPClient&& other) noexcept;
 	    ~UDPClient();
 
-	    Result<size_t, SocketBase::Error> Read(uint8_t* data, size_t len) const override;
-	    Result<size_t, SocketBase::Error> Write(const uint8_t* data, size_t len) const override;
+	    Result<size_t, Socket::Error> Read(uint8_t* data, size_t len) const override;
+	    Result<size_t, Socket::Error> Write(const uint8_t* data, size_t len) const override;
 
 
 

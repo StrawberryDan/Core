@@ -29,8 +29,8 @@ add_library(Standard STATIC
         include/Standard/Net/HTTP/Request.hpp
         include/Standard/Net/HTTP/Response.hpp
         include/Standard/Net/HTTP/SimplePayload.hpp
-        include/Standard/Net/Socket/SocketBase.hpp
-        include/Standard/Net/Socket/SocketBase.inl
+        include/Standard/Net/Socket/Socket.hpp
+        include/Standard/Net/Socket/Socket.inl
         include/Standard/Net/Socket/TCPClient.hpp
         include/Standard/Net/Socket/TLSClient.hpp
         include/Standard/Net/Socket/UDPClient.hpp

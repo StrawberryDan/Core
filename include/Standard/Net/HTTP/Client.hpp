@@ -3,7 +3,7 @@
 
 
 #include "Standard/Utilities.hpp"
-#include "Standard/Net/Socket/SocketBase.hpp"
+#include "Standard/Net/Socket/Socket.hpp"
 #include "Response.hpp"
 #include "Request.hpp"
 #include "Standard/Net/Socket/TCPClient.hpp"

@@ -13,7 +13,7 @@
 #include "Standard/Option.hpp"
 #include "Standard/Result.hpp"
 #include "Standard/Mutex.hpp"
-#include "Standard/Net/Socket/SocketBase.hpp"
+#include "Standard/Net/Socket/Socket.hpp"
 #include "Standard/Net/Socket/TCPClient.hpp"
 #include "Standard/Net/Socket/TLSClient.hpp"
 #include "Standard/Net/Websocket/Message.hpp"

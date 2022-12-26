@@ -86,7 +86,7 @@ namespace Strawberry::Standard::Net::Socket
 
 
 
-	Result<size_t, SocketBase::Error> UDPClient::Read(uint8_t* data, size_t len) const
+	Result<size_t, Socket::Error> UDPClient::Read(uint8_t* data, size_t len) const
 	{
 #if _WIN32
 	    auto bytesRead = recv(mSocket, reinterpret_cast<char*>(data), len, 0);
@@ -117,7 +117,7 @@ namespace Strawberry::Standard::Net::Socket
 
 
 
-	Result<size_t, SocketBase::Error> UDPClient::Write(const uint8_t* data, size_t len) const
+	Result<size_t, Socket::Error> UDPClient::Write(const uint8_t* data, size_t len) const
 	{
 #if _WIN32
 	    auto bytesSent = send(mSocket, reinterpret_cast<const char*>(data), len, 0);

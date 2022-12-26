@@ -5,7 +5,7 @@
 #include "tls.h"
 #include <string>
 #include <memory>
-#include "SocketBase.hpp"
+#include "Socket.hpp"
 #include "TCPClient.hpp"
 #include "Standard/Option.hpp"
 
@@ -13,7 +13,7 @@
 
 namespace Strawberry::Standard::Net::Socket
 {
-	class TLSClient : public SocketBase
+	class TLSClient : public Socket
 	{
 	public:
 	    TLSClient(const std::string& host, uint16_t port);
@@ -34,7 +34,7 @@ namespace Strawberry::Standard::Net::Socket
 
 
 	private:
-		using CallbackArg = std::tuple<TCPClient, Option<Result<size_t, SocketBase::Error>>, Option<Result<size_t, SocketBase::Error>>>;
+		using CallbackArg = std::tuple<TCPClient, Option<Result<size_t, Socket::Error>>, Option<Result<size_t, Socket::Error>>>;
 
 
 

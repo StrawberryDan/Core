@@ -99,7 +99,7 @@ namespace Strawberry::Standard::Net::Socket
 	
 	
 	
-	Result<size_t, SocketBase::Error> TCPClient::Read(uint8_t* data, size_t len) const
+	Result<size_t, Socket::Error> TCPClient::Read(uint8_t* data, size_t len) const
 	{
 #if _WIN32
 	    auto bytesRead = recv(mSocket, reinterpret_cast<char*>(data), static_cast<int>(len), 0);
@@ -136,7 +136,7 @@ namespace Strawberry::Standard::Net::Socket
 	
 	
 	
-	Result<size_t, SocketBase::Error> TCPClient::Write(const uint8_t* data, size_t len) const
+	Result<size_t, Socket::Error> TCPClient::Write(const uint8_t* data, size_t len) const
 	{
 #if _WIN32
 	    auto bytesSent = send(mSocket, reinterpret_cast<const char*>(data), static_cast<int>(len), 0);

@@ -3,9 +3,8 @@
 
 
 #include "Standard/Assert.hpp"
-#include <iostream>
+#include "Standard/Log.hpp"
 #include "Standard/Utilities.hpp"
-#include "Standard/Markers.hpp"
 
 
 
@@ -13,7 +12,7 @@ namespace Strawberry::Standard::Net::Socket
 {
 	TLSClient::TLSClient(const std::string& host, uint16_t port)
 			: mTLS(nullptr), mConfig(nullptr), mCallbackArgs(std::make_unique<CallbackArg>(
-			std::make_tuple<TCPClient, Option<Result<size_t, SocketBase::Error>>, Option<Result<size_t, SocketBase::Error>>>(
+			std::make_tuple<TCPClient, Option<Result<size_t, Socket::Error>>, Option<Result<size_t, Socket::Error>>>(
 					{host, port}, {}, {})))
 	{
 		auto result = tls_init();
@@ -68,7 +67,7 @@ namespace Strawberry::Standard::Net::Socket
 
 
 
-	Result<size_t, SocketBase::Error> TLSClient::Read(uint8_t* data, size_t len) const
+	Result<size_t, Socket::Error> TLSClient::Read(uint8_t* data, size_t len) const
 	{
 		tls_read(mTLS, data, len);
 		Assert(std::get<1>(*mCallbackArgs).HasValue());
@@ -78,7 +77,7 @@ namespace Strawberry::Standard::Net::Socket
 
 
 
-	Result<size_t, SocketBase::Error> TLSClient::Write(const uint8_t* data, size_t len) const
+	Result<size_t, Socket::Error> TLSClient::Write(const uint8_t* data, size_t len) const
 	{
 		tls_write(mTLS, data, len);
 		Assert(std::get<2>(*mCallbackArgs).HasValue());

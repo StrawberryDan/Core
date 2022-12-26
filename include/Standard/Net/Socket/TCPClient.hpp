@@ -3,7 +3,7 @@
 
 
 #include <string>
-#include "SocketBase.hpp"
+#include "Socket.hpp"
 
 
 
@@ -19,7 +19,7 @@ using SOCKET_HANDLE = int;
 
 namespace Strawberry::Standard::Net::Socket
 {
-	class TCPClient : public SocketBase
+	class TCPClient : public Socket
 	{
 	public:
 		TCPClient(const std::string& hostname, uint16_t port);
