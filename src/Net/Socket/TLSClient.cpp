@@ -15,6 +15,7 @@ namespace Strawberry::Standard::Net::Socket
 			std::make_tuple<TCPClient, Option<Result<size_t, Socket::Error>>, Option<Result<size_t, Socket::Error>>>(
 					{host, port}, {}, {})))
 	{
+		Logging::Info("Starting TLS connection with {} : {}", host, port);
 		auto result = tls_init();
 		Assert(result >= 0);
 		mTLS = tls_client();
@@ -30,6 +31,7 @@ namespace Strawberry::Standard::Net::Socket
 		Assert(result >= 0);
 		result = tls_handshake(mTLS);
 		Assert(result >= 0);
+		Logging::Info("Successfully started TLS connection with {} : {}", host, port);
 	}
 
 

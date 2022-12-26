@@ -60,15 +60,6 @@ namespace Strawberry::Standard::Net::Socket
 
 
 
-	template<typename T>
-	concept SocketImpl =
-	requires(T t, std::string hostname, uint16_t port)
-	{
-		std::is_base_of_v<Socket, T>;
-	};
-
-
-
 	enum class Socket::Error
 	{
 		Unknown,

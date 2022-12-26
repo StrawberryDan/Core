@@ -11,7 +11,7 @@
 
 namespace Strawberry::Standard::Net::HTTP
 {
-	template<Socket::SocketImpl S>
+	template<typename S> requires std::derived_from<S, Socket::Socket>
 	ClientImpl<S>::ClientImpl(const std::string& hostname, uint16_t port)
 			: mSocket(hostname, port)
 	{
@@ -19,7 +19,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<Socket::SocketImpl S>
+	template<typename S> requires std::derived_from<S, Socket::Socket>
 	void ClientImpl<S>::SendRequest(const Request& request)
 	{
 		std::string headerLine = fmt::format(
@@ -60,7 +60,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<Socket::SocketImpl S>
+	template<typename S> requires std::derived_from<S, Socket::Socket>
 	Response ClientImpl<S>::Receive()
 	{
 		static const auto statusLinePattern = std::regex(R"(HTTP\/([^\s]+)\s+(\d{3})\s+([^\r]*)\r\n)");
@@ -123,7 +123,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<Socket::SocketImpl S>
+	template<typename S> requires std::derived_from<S, Socket::Socket>
 	ChunkedPayload ClientImpl<S>::ReadChunkedPayload()
 	{
 		std::string line;
@@ -153,7 +153,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<Socket::SocketImpl S>
+	template<typename S> requires std::derived_from<S, Socket::Socket>
 	std::string ClientImpl<S>::ReadLine()
 	{
 		std::string line;

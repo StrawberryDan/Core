@@ -33,7 +33,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<Socket::SocketImpl S>
+	template<typename S> requires std::derived_from<S, Socket::Socket>
 	class ClientImpl
 	{
 	public:
