@@ -22,7 +22,7 @@
 
 
 
-namespace Strawberry::Standard::Net::Socket
+namespace Strawberry::Standard::Net::Sockets
 {
 	TCPClient::TCPClient(const std::string& hostname, uint16_t port)
 	    : mSocket{}

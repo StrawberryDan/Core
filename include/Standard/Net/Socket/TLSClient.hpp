@@ -11,7 +11,7 @@
 
 
 
-namespace Strawberry::Standard::Net::Socket
+namespace Strawberry::Standard::Net::Sockets
 {
 	class TLSClient : public Socket
 	{

@@ -2,7 +2,7 @@
 
 
 
-namespace Strawberry::Standard::Net::Socket
+namespace Strawberry::Standard::Net::Sockets
 {
 	template<typename T>
 	Result<T, Socket::Error> Socket::ReadType() const requires ( std::is_fundamental_v<T> )

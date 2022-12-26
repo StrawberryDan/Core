@@ -7,7 +7,7 @@
 
 
 
-namespace Strawberry::Standard::Net::Socket
+namespace Strawberry::Standard::Net::Sockets
 {
 #if _WIN32
 	using SOCKET_HANDLE = uintptr_t;

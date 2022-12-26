@@ -13,7 +13,7 @@
 
 namespace Strawberry::Standard::Net::HTTP
 {
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	class ClientImpl
 	{
 	public:
@@ -48,7 +48,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 	class HTTPClient
-		: public ClientImpl<Socket::TCPClient>
+		: public ClientImpl<Sockets::TCPClient>
 	{
 	public:
 		HTTPClient(const std::string& hostname, uint16_t port = 80);
@@ -57,7 +57,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 	class HTTPSClient
-		: public ClientImpl<Socket::TLSClient>
+		: public ClientImpl<Sockets::TLSClient>
 	{
 	public:
 		HTTPSClient(const std::string& hostname, uint16_t port = 443);

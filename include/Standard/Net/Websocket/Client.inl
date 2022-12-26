@@ -23,7 +23,7 @@ namespace
 
 namespace Strawberry::Standard::Net::Websocket
 {
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	ClientImpl<S>::ClientImpl(ClientImpl<S>&& rhs) noexcept
 	{
 		if (this != &rhs)
@@ -35,7 +35,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	ClientImpl<S>& ClientImpl<S>::operator=(ClientImpl<S>&& rhs) noexcept
 	{
 		if (this != &rhs)
@@ -49,7 +49,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	ClientImpl<S>::~ClientImpl()
 	{
 		Disconnect();
@@ -57,7 +57,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	void ClientImpl<S>::Disconnect()
 	{
 		if (mSocket)
@@ -82,7 +82,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	void ClientImpl<S>::SendMessage(const Message& message)
 	{
 		TransmitFrame(message).Unwrap();
@@ -90,7 +90,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	Result<Message, Error> ClientImpl<S>::ReadMessage()
 	{
 		return ReceiveFrame();
@@ -98,7 +98,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	Result<Message, Error> ClientImpl<S>::WaitMessage()
 	{
 		while (true)
@@ -121,7 +121,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	std::string ClientImpl<S>::GenerateNonce()
 	{
 		std::random_device randomDevice;
@@ -143,7 +143,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	uint8_t ClientImpl<S>::GetOpcodeMask(Message::Opcode opcode)
 	{
 		switch (opcode)
@@ -167,7 +167,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	Option<Message::Opcode> ClientImpl<S>::GetOpcodeFromByte(uint8_t byte)
 	{
 		using Opcode = Message::Opcode;
@@ -193,7 +193,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	uint32_t ClientImpl<S>::GenerateMaskingKey()
 	{
 		std::random_device rd;
@@ -207,7 +207,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	Error ClientImpl<S>::ErrorFromSocketError(typename S::Error err)
 	{
 		switch (err)
@@ -223,7 +223,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	Result<size_t, Error>
 	ClientImpl<S>::TransmitFrame(const Message& message)
 	{
@@ -268,7 +268,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	Result<Message, Error> ClientImpl<S>::ReceiveFrame()
 	{
 		if (mError == Error::Closed)
@@ -313,7 +313,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	Result<typename ClientImpl<S>::Fragment, Error>
 	ClientImpl<S>::ReceiveFragment()
 	{

@@ -5,7 +5,7 @@
 namespace Strawberry::Standard::Net::HTTP
 {
 	HTTPClient::HTTPClient(const std::string& hostname, uint16_t port)
-			: ClientImpl<Socket::TCPClient>(hostname, port)
+			: ClientImpl<Sockets::TCPClient>(hostname, port)
 	{
 
 	};
@@ -13,7 +13,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 	HTTPSClient::HTTPSClient(const std::string& hostname, uint16_t port)
-			: ClientImpl<Socket::TLSClient>(hostname, port)
+			: ClientImpl<Sockets::TLSClient>(hostname, port)
 	{
 
 	}

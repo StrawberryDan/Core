@@ -17,7 +17,7 @@ using SOCKET_HANDLE = int;
 
 
 
-namespace Strawberry::Standard::Net::Socket
+namespace Strawberry::Standard::Net::Sockets
 {
 	class TCPClient : public Socket
 	{

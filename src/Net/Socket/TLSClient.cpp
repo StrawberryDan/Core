@@ -8,7 +8,7 @@
 
 
 
-namespace Strawberry::Standard::Net::Socket
+namespace Strawberry::Standard::Net::Sockets
 {
 	TLSClient::TLSClient(const std::string& host, uint16_t port)
 			: mTLS(nullptr), mConfig(nullptr), mCallbackArgs(std::make_unique<CallbackArg>(

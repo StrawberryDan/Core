@@ -33,7 +33,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Socket::Socket>
+	template<typename S> requires std::derived_from<S, Sockets::Socket>
 	class ClientImpl
 	{
 	public:
@@ -103,7 +103,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 	class WSClient
-		: public ClientImpl<Socket::TCPClient>
+		: public ClientImpl<Sockets::TCPClient>
 	{
 	public:
 		static Result<WSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 80);
@@ -112,7 +112,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 	class WSSClient
-		: public ClientImpl<Socket::TLSClient>
+		: public ClientImpl<Sockets::TLSClient>
 	{
 	public:
 		static Result<WSSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 443);

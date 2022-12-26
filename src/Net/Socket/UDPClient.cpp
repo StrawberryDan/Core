@@ -21,7 +21,7 @@
 
 
 
-namespace Strawberry::Standard::Net::Socket
+namespace Strawberry::Standard::Net::Sockets
 {
 	UDPClient::UDPClient(const std::string& hostname, uint16_t port)
 	    : mSocket{}
