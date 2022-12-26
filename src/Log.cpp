@@ -13,6 +13,25 @@ namespace Strawberry::Standard
 
 
 
+	std::string ToString(LogLevel logLevel)
+	{
+		switch (logLevel)
+		{
+			case LogLevel::Trace:
+				return "TRACE";
+			case LogLevel::Debug:
+				return "DEBUG";
+			case LogLevel::Info:
+				return "INFO";
+			case LogLevel::Warning:
+				return "WARNING";
+			case LogLevel::Error:
+				return "ERROR";
+		}
+	}
+
+
+
 	LogLevel GetLogLevel()
 	{
 		return sLogLevel.UnwrapOr(LogLevel::Warning);
@@ -34,75 +53,12 @@ namespace Strawberry::Standard
 
 
 
-	void Log(LogLevel level, std::string message)
+	void LogRaw(std::string message)
 	{
-		if (GetLogLevel() > level)
-		{
-			return;
-		}
-
-		std::string logLevelStr;
-		switch (level)
-		{
-			case LogLevel::Trace:
-				logLevelStr = "TRACE";
-				break;
-			case LogLevel::Debug:
-				logLevelStr = "DEBUG";
-				break;
-			case LogLevel::Info:
-				logLevelStr = "INFO";
-				break;
-			case LogLevel::Warning:
-				logLevelStr = "WARNING";
-				break;
-				logLevelStr = "ERROR";
-			case LogLevel::Error:
-				break;
-		}
-
-		std::stringstream out;
-		out << "[" << logLevelStr  << "]\t" << message;
-
-		std::cout << out.str() << std::endl;
+		std::cout << message << std::endl;
 		if (sOutputFile)
 		{
-			*sOutputFile << out.str() << std::endl;
+			*sOutputFile << message << std::endl;
 		}
-	}
-
-
-
-	void LogTrace(std::string message)
-	{
-		Log(LogLevel::Trace, std::move(message));
-	}
-
-
-
-	void LogDebug(std::string message)
-	{
-		Log(LogLevel::Debug, std::move(message));
-	}
-
-
-
-	void LogInfo(std::string message)
-	{
-		Log(LogLevel::Info, std::move(message));
-	}
-
-
-
-	void LogWarning(std::string message)
-	{
-		Log(LogLevel::Warning, std::move(message));
-	}
-
-
-
-	void LogError(std::string message)
-	{
-		Log(LogLevel::Error, std::move(message));
 	}
 }
