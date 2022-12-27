@@ -8,7 +8,7 @@
 
 namespace Strawberry::Standard
 {
-	template <typename R, typename F, typename ...Args>
+	template <typename F, typename R, typename ...Args>
 	concept Callable = requires
 	{
 	    requires std::invocable<F, Args...>;

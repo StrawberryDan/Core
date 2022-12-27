@@ -90,7 +90,7 @@ namespace Strawberry::Standard
 
 
 
-	    template<typename U, typename F> requires Callable<U, F, D&&>
+	    template<typename U, Callable<U, D&&> F>
 	    Result<U, E> Map(F f)
 	    {
 	        if (*this)

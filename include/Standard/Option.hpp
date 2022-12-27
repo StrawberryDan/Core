@@ -175,12 +175,12 @@ namespace Strawberry::Standard
 
 
 
-		template <typename R, typename F>
-		R Map(F functor) requires Callable<R, F, T>
+		template <typename R, Callable<R, T&&> F>
+		R Map(F functor)
 		{
 			if (HasValue())
 			{
-				return Option<R>(F(Unwrap()));
+				return Option<R>(functor(std::move(Unwrap())));
 			}
 			else
 			{
