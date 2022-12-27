@@ -5,10 +5,8 @@
 namespace Strawberry::Standard
 {
 	Clock::Clock(bool run)
-	    : mIsRunning(run)
-	    , mBuffer{}
-	    , mStart(std::chrono::system_clock::now())
-	    , mEnd(mStart)
+	    : mBuffer{}
+	    , mStartTime()
 	{
 
 	}
@@ -17,9 +15,9 @@ namespace Strawberry::Standard
 
 	void Clock::Start()
 	{
-	    if (!mIsRunning)
+	    if (!mStartTime)
 	    {
-	        mStart = std::chrono::system_clock::now();
+	        mStartTime = std::chrono::system_clock::now();
 	    }
 	}
 
@@ -27,10 +25,10 @@ namespace Strawberry::Standard
 
 	double Clock::Stop()
 	{
-	    if (mIsRunning)
+	    if (mStartTime)
 	    {
-	        mEnd = std::chrono::system_clock::now();
-	        mBuffer += (mEnd - mStart);
+	        auto now = std::chrono::system_clock::now();
+	        mBuffer += (now - *mStartTime);
 	    }
 	    return mBuffer.count();
 	}
@@ -39,9 +37,11 @@ namespace Strawberry::Standard
 
 	double Clock::Read() const
 	{
-	    if (mIsRunning)
+	    if (mStartTime)
 	    {
-	        return (std::chrono::duration_cast<Duration>(std::chrono::system_clock::now() - mStart) + mBuffer).count();
+			auto now = std::chrono::system_clock::now();
+			auto currentRun = std::chrono::duration_cast<Duration>(now - *mStartTime);
+	        return (currentRun + mBuffer).count();
 	    }
 	    else
 	    {
@@ -54,6 +54,6 @@ namespace Strawberry::Standard
 	void Clock::Restart()
 	{
 	    mBuffer = {};
-	    mStart  = std::chrono::system_clock::now();
+	    mStartTime  = std::chrono::system_clock::now();
 	}
 }

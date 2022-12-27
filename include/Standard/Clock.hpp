@@ -6,8 +6,16 @@
 
 
 
+#include "Standard/Option.hpp"
+
+
+
 namespace Strawberry::Standard
 {
+	using Seconds = double;
+
+
+
 	class Clock
 	{
 	public:
@@ -17,17 +25,16 @@ namespace Strawberry::Standard
 
 	    double Stop();
 
-	    [[nodiscard]] double      Read() const;
-	    double operator*() const { return Read(); }
-	    operator  double() const { return Read(); }
+	    Seconds      Read() const;
+	    Seconds operator*() const { return Read(); }
+	    operator  Seconds() const { return Read(); }
 
 	    void Restart();
 	private:
 	    using Duration = std::chrono::duration<double, std::ratio<1>>;
-	    using Instant = std::chrono::time_point<std::chrono::system_clock, Duration>;
+	    using Instant  = std::chrono::time_point<std::chrono::system_clock, Duration>;
 
-	    bool mIsRunning;
-	    Duration mBuffer;
-	    Instant  mStart, mEnd;
+	    Duration        mBuffer;
+	    Option<Instant> mStartTime;
 	};
 }
