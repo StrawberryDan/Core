@@ -26,9 +26,17 @@ target_include_directories(LibreSSL INTERFACE ${TLS_INCLUDE_DIR})
 
 
 add_library(Standard STATIC
+        include/Standard/Assert.hpp
         include/Standard/Base64.hpp
+        include/Standard/Clock.hpp
+        include/Standard/Concepts.hpp
+        include/Standard/Endian.hpp
+        include/Standard/Log.hpp
+        include/Standard/Markers.hpp
         include/Standard/Math/Math.hpp
         include/Standard/Math/Math.inl
+        include/Standard/Mutex.hpp
+        include/Standard/Net/Address.hpp
         include/Standard/Net/HTTP/ChunkedPayload.hpp
         include/Standard/Net/HTTP/Client.hpp
         include/Standard/Net/HTTP/Client.inl
@@ -44,9 +52,18 @@ add_library(Standard STATIC
         include/Standard/Net/Socket/TLSClient.hpp
         include/Standard/Net/Socket/UDPClient.hpp
         include/Standard/Net/Websocket/Client.hpp
+        include/Standard/Net/Websocket/Client.inl
+        include/Standard/Net/Websocket/Message.hpp
+        include/Standard/Option.hpp
+        include/Standard/Result.hpp
         include/Standard/Utilities.hpp
         src/Base64.cpp
+        src/Clock.cpp
+        src/Log.cpp
+        src/Markers.cpp
+        src/Net/Address.cpp
         src/Net/HTTP/ChunkedPayload.cpp
+        src/Net/HTTP/Client.cpp
         src/Net/HTTP/Constants.cpp
         src/Net/HTTP/Header.cpp
         src/Net/HTTP/Request.cpp
@@ -55,25 +72,8 @@ add_library(Standard STATIC
         src/Net/Socket/TCPClient.cpp
         src/Net/Socket/TLSClient.cpp
         src/Net/Socket/UDPClient.cpp
-        include/Standard/Net/Websocket/Client.inl
-        include/Standard/Mutex.hpp
-        src/Net/Websocket/Message.cpp
-        include/Standard/Net/Websocket/Message.hpp
-        include/Standard/Result.hpp
-        src/Clock.cpp
-        include/Standard/Clock.hpp
-        include/Standard/Endian.hpp
-        include/Standard/Option.hpp
-        include/Standard/Assert.hpp
-        include/Standard/Concepts.hpp
-        include/Standard/Markers.hpp
-        src/Markers.cpp
         src/Net/Websocket/Client.cpp
-        src/Net/HTTP/Client.cpp
-        include/Standard/Net/Address.hpp
-        src/Net/Address.cpp
-        include/Standard/Log.hpp
-        src/Log.cpp)
+        src/Net/Websocket/Message.cpp)
 
 target_include_directories(Standard PUBLIC include PRIVATE  ${JSON_INCLUDE_DIR})
 target_link_libraries(Standard PRIVATE LibreSSL ${FMT_LIBRARY})
