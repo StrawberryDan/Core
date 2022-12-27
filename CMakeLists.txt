@@ -3,16 +3,25 @@ project(Standard)
 set(CMAKE_CXX_STANDARD 20)
 
 
+find_library(FMT_LIBRARY
+        NAMES libfmt.a)
 
-if(NOT WIN32)
-include_directories(/usr/local/include)
-link_directories(/usr/local/lib)
-endif()
+find_library(SSL_LIBRARY,
+        NAMES libssl.a)
+
+find_library(TLS_LIBRARY
+        NAMES libtls.a)
+
+find_path(TLS_INCLUDE_DIR
+        NAMES tls.h)
+
+find_path(JSON_INCLUDE_DIR
+        NAMES nlohmann/json.hpp)
 
 
 add_library(LibreSSL INTERFACE)
-target_link_libraries(LibreSSL INTERFACE $ENV{LibreSSL_ROOT}/lib/libssl.a $ENV{LibreSSL_ROOT}/lib/libtls.a)
-target_include_directories(LibreSSL INTERFACE $ENV{LibreSSL_ROOT}/include)
+target_link_libraries(LibreSSL INTERFACE ${SSL_LIBRARY} ${TLS_LIBRARY})
+target_include_directories(LibreSSL INTERFACE ${TLS_INCLUDE_DIR})
 
 
 
@@ -66,8 +75,8 @@ add_library(Standard STATIC
         include/Standard/Log.hpp
         src/Log.cpp)
 
-target_include_directories(Standard PUBLIC include)
-target_link_libraries(Standard PRIVATE LibreSSL fmt)
+target_include_directories(Standard PUBLIC include PRIVATE  ${JSON_INCLUDE_DIR})
+target_link_libraries(Standard PRIVATE LibreSSL ${FMT_LIBRARY})
 
 
 
