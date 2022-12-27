@@ -176,7 +176,7 @@ namespace Strawberry::Standard
 
 
 		template <typename R, Callable<R, T&&> F>
-		R Map(F functor)
+		Option<R> Map(F functor)
 		{
 			if (HasValue())
 			{

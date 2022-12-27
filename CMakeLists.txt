@@ -73,7 +73,9 @@ add_library(Standard STATIC
         src/Net/Socket/TLSClient.cpp
         src/Net/Socket/UDPClient.cpp
         src/Net/Websocket/Client.cpp
-        src/Net/Websocket/Message.cpp)
+        src/Net/Websocket/Message.cpp
+        include/Standard/Iter.hpp
+        )
 
 target_include_directories(Standard PUBLIC include inline ${JSON_INCLUDE_DIR})
 target_link_libraries(Standard PRIVATE LibreSSL ${FMT_LIBRARY})
