@@ -121,4 +121,4 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-#include "Client.inl"
+#include "Standard/Net/Websocket/Client.inl"

@@ -66,4 +66,4 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-#include "Client.inl"
+#include "Standard/Net/HTTP/Client.inl"

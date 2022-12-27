@@ -70,4 +70,4 @@ namespace Strawberry::Standard::Net::Sockets
 
 
 
-#include "Socket.inl"
+#include "Standard/Net/Socket/Socket.inl"

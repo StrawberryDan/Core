@@ -34,12 +34,12 @@ add_library(Standard STATIC
         include/Standard/Log.hpp
         include/Standard/Markers.hpp
         include/Standard/Math/Math.hpp
-        include/Standard/Math/Math.inl
+        inline/Standard/Math/Math.inl
         include/Standard/Mutex.hpp
         include/Standard/Net/Address.hpp
         include/Standard/Net/HTTP/ChunkedPayload.hpp
         include/Standard/Net/HTTP/Client.hpp
-        include/Standard/Net/HTTP/Client.inl
+        inline/Standard/Net/HTTP/Client.inl
         include/Standard/Net/HTTP/Constants.hpp
         include/Standard/Net/HTTP/Header.hpp
         include/Standard/Net/HTTP/Payload.hpp
@@ -47,12 +47,12 @@ add_library(Standard STATIC
         include/Standard/Net/HTTP/Response.hpp
         include/Standard/Net/HTTP/SimplePayload.hpp
         include/Standard/Net/Socket/Socket.hpp
-        include/Standard/Net/Socket/Socket.inl
+        inline/Standard/Net/Socket/Socket.inl
         include/Standard/Net/Socket/TCPClient.hpp
         include/Standard/Net/Socket/TLSClient.hpp
         include/Standard/Net/Socket/UDPClient.hpp
         include/Standard/Net/Websocket/Client.hpp
-        include/Standard/Net/Websocket/Client.inl
+        inline/Standard/Net/Websocket/Client.inl
         include/Standard/Net/Websocket/Message.hpp
         include/Standard/Option.hpp
         include/Standard/Result.hpp
@@ -75,7 +75,7 @@ add_library(Standard STATIC
         src/Net/Websocket/Client.cpp
         src/Net/Websocket/Message.cpp)
 
-target_include_directories(Standard PUBLIC include PRIVATE  ${JSON_INCLUDE_DIR})
+target_include_directories(Standard PUBLIC include inline ${JSON_INCLUDE_DIR})
 target_link_libraries(Standard PRIVATE LibreSSL ${FMT_LIBRARY})
 
 
