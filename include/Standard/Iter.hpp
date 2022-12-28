@@ -205,9 +205,7 @@ namespace Strawberry::Standard::Iter
 			}
 			else
 			{
-				Option<V> value = *mPosition;
-				mPosition++;
-				return value;
+				return *mPosition++;
 			}
 		}
 
