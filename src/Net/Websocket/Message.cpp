@@ -3,6 +3,7 @@
 
 
 #include "Standard/Endian.hpp"
+#include "Standard/Assert.hpp"
 
 
 
@@ -35,9 +36,9 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	std::u8string Message::AsString() const
+	std::string Message::AsString() const
 	{
-	    return std::u8string(mPayload.data(), mPayload.data() + mPayload.size());
+	    return std::string(mPayload.data(), mPayload.data() + mPayload.size());
 	}
 
 

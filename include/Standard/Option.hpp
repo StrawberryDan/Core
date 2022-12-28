@@ -28,8 +28,8 @@ namespace Strawberry::Standard
 
 		template<typename ...Args>
 		Option(Args ...args) requires ( std::is_constructible_v<T, Args...> )
-		: mHasValue(true)
-		, mData{}
+			: mHasValue(true)
+			, mData{}
 		{
 			new (mData) T(std::forward<Args>(args)...);
 		}
@@ -37,8 +37,8 @@ namespace Strawberry::Standard
 
 
 		Option(const Option& rhs) requires ( std::is_copy_constructible_v<T> )
-		: mHasValue(rhs.mHasValue)
-		, mData{}
+			: mHasValue(rhs.mHasValue)
+			, mData{}
 		{
 			if (rhs)
 			{
@@ -49,8 +49,8 @@ namespace Strawberry::Standard
 
 
 		Option(Option&& rhs)  noexcept requires ( std::is_move_constructible_v<T> )
-		: mHasValue(false)
-		, mData{}
+			: mHasValue(false)
+			, mData{}
 		{
 			if (rhs)
 			{
@@ -200,6 +200,34 @@ namespace Strawberry::Standard
 			else
 			{
 				return value;
+			}
+		}
+
+
+
+		Option<T*> AsPtr()
+		{
+			if (HasValue())
+			{
+				return reinterpret_cast<T*>(mData);
+			}
+			else
+			{
+				return {};
+			}
+		}
+
+
+
+		Option<const T*> AsPtr() const
+		{
+			if (HasValue())
+			{
+				return reinterpret_cast<const T*>(mData);
+			}
+			else
+			{
+				return {};
 			}
 		}
 

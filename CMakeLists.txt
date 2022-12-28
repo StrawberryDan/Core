@@ -1,45 +1,39 @@
 cmake_minimum_required(VERSION 3.0)
 project(Standard)
 set(CMAKE_CXX_STANDARD 20)
-
+find_package(PkgConfig REQUIRED)
 
 find_library(FMT_LIBRARY
         NAMES libfmt.a)
 
-find_library(SSL_LIBRARY,
-        NAMES libssl.a)
-
-find_library(TLS_LIBRARY
-        NAMES libtls.a)
-
-find_path(TLS_INCLUDE_DIR
-        NAMES tls.h)
+pkg_check_modules(LIBRESSL libtls)
 
 find_path(JSON_INCLUDE_DIR
         NAMES nlohmann/json.hpp)
 
 
 add_library(LibreSSL INTERFACE)
-target_link_libraries(LibreSSL INTERFACE ${SSL_LIBRARY} ${TLS_LIBRARY})
-target_include_directories(LibreSSL INTERFACE ${TLS_INCLUDE_DIR})
+target_link_libraries(LibreSSL INTERFACE ${LIBRESSL_LIBRARIES} ${LIBRESSL_LDFLAGS} ${LIBRESSL_LDFLAGS_OTHER})
+target_include_directories(LibreSSL INTERFACE ${LIBRESSL_INCLUDE_DIRS})
+target_link_directories(LibreSSL INTERFACE ${LIBRESSL_LIBRARY_DIRS})
 
 
 
 add_library(Standard STATIC
         include/Standard/Assert.hpp
         include/Standard/Base64.hpp
+        include/Standard/ByteBuffer.hpp
         include/Standard/Clock.hpp
         include/Standard/Concepts.hpp
         include/Standard/Endian.hpp
-        include/Standard/Log.hpp
+        include/Standard/Iter.hpp
+        include/Standard/Iter.hpp
         include/Standard/Markers.hpp
         include/Standard/Math/Math.hpp
-        inline/Standard/Math/Math.inl
         include/Standard/Mutex.hpp
         include/Standard/Net/Address.hpp
         include/Standard/Net/HTTP/ChunkedPayload.hpp
         include/Standard/Net/HTTP/Client.hpp
-        inline/Standard/Net/HTTP/Client.inl
         include/Standard/Net/HTTP/Constants.hpp
         include/Standard/Net/HTTP/Header.hpp
         include/Standard/Net/HTTP/Payload.hpp
@@ -47,17 +41,20 @@ add_library(Standard STATIC
         include/Standard/Net/HTTP/Response.hpp
         include/Standard/Net/HTTP/SimplePayload.hpp
         include/Standard/Net/Socket/Socket.hpp
-        inline/Standard/Net/Socket/Socket.inl
         include/Standard/Net/Socket/TCPClient.hpp
         include/Standard/Net/Socket/TLSClient.hpp
         include/Standard/Net/Socket/UDPClient.hpp
         include/Standard/Net/Websocket/Client.hpp
-        inline/Standard/Net/Websocket/Client.inl
         include/Standard/Net/Websocket/Message.hpp
         include/Standard/Option.hpp
         include/Standard/Result.hpp
         include/Standard/Utilities.hpp
+        inline/Standard/Math/Math.inl
+        inline/Standard/Net/HTTP/Client.inl
+        inline/Standard/Net/Socket/Socket.inl
+        inline/Standard/Net/Websocket/Client.inl
         src/Base64.cpp
+        src/ByteBuffer.cpp
         src/Clock.cpp
         src/Log.cpp
         src/Markers.cpp
@@ -69,12 +66,12 @@ add_library(Standard STATIC
         src/Net/HTTP/Request.cpp
         src/Net/HTTP/Response.cpp
         src/Net/HTTP/SimplePayload.cpp
+        src/Net/RTP/Header.cpp
         src/Net/Socket/TCPClient.cpp
         src/Net/Socket/TLSClient.cpp
         src/Net/Socket/UDPClient.cpp
         src/Net/Websocket/Client.cpp
         src/Net/Websocket/Message.cpp
-        include/Standard/Iter.hpp
         )
 
 target_include_directories(Standard PUBLIC include inline ${JSON_INCLUDE_DIR})

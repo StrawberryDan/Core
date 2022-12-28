@@ -31,7 +31,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 	    inline Opcode GetOpcode() const { return mOpcode; }
 	    inline std::vector<uint8_t>         AsBytes() const { return mPayload; }
-	    std::u8string                       AsString() const;
+	    std::string                         AsString() const;
 	    Result<nlohmann::json, std::string> AsJSON() const;
 	    uint16_t GetCloseStatusCode() const;
 
