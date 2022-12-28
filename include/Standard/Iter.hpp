@@ -21,6 +21,7 @@ namespace Strawberry::Standard::Iter
 		requires std::forward_iterator<typename T::iterator>;
 		{ t.begin() } -> std::forward_iterator;
 		{ t.end()   } -> std::forward_iterator;
+		{ t.size()  } -> std::same_as<size_t>;
 	};
 
 
@@ -110,7 +111,7 @@ namespace Strawberry::Standard::Iter
 
 
 	template <typename T>
-	class Dropped : public Iterator<T>
+	class Skipped : public Iterator<T>
 	{
 	public:
 		Option<T> Next() override
@@ -128,7 +129,7 @@ namespace Strawberry::Standard::Iter
 		friend class Iterator;
 
 
-		Dropped(Iterator<T>* base, unsigned int dropCount)
+		Skipped(Iterator<T>* base, unsigned int dropCount)
 			: mBase(base)
 			, mDropCount(dropCount)
 		{}
@@ -149,6 +150,13 @@ namespace Strawberry::Standard::Iter
 
 
 
+		virtual Option<size_t> Size()
+		{
+			return {};
+		}
+
+
+
 		template<typename R, Callable<R, T> Functor>
 		Mapped<R, T, Functor> Map(Functor functor)
 		{
@@ -165,9 +173,9 @@ namespace Strawberry::Standard::Iter
 
 
 
-		Dropped<T> Drop(unsigned int count)
+		Skipped<T> Drop(unsigned int count)
 		{
-			return Dropped<T>(this, count);
+			return Skipped<T>(this, count);
 		}
 
 
@@ -176,6 +184,10 @@ namespace Strawberry::Standard::Iter
 		Container Collect()
 		{
 			std::vector<T> mValues;
+			if (auto size = Size())
+			{
+				mValues.reserve(*size);
+			}
 			while (auto v = this->Next())
 			{
 				mValues.push_back(*v);
@@ -208,6 +220,15 @@ namespace Strawberry::Standard::Iter
 				return *mPosition++;
 			}
 		}
+
+
+
+		virtual Option<size_t> Size() override
+		{
+			return mContainer->size();
+		}
+
+
 
 	private:
 		Container*                   mContainer;
