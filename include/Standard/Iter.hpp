@@ -16,6 +16,24 @@
 namespace Strawberry::Standard::Iter
 {
 	template <typename T>
+	concept STLIterable = requires(T t)
+	{
+		requires std::forward_iterator<typename T::iterator>;
+		{ t.begin() } -> std::forward_iterator;
+		{ t.end()   } -> std::forward_iterator;
+	};
+
+
+
+	template <typename T, typename V>
+	concept STLIteratorConstructible = requires (T t)
+	{
+		requires std::constructible_from<T, decltype(std::declval<std::vector<V>>().begin()), decltype(std::declval<std::vector<V>>().end())>;
+	};
+
+
+
+	template <typename T>
 	class Iterator;
 
 
@@ -151,16 +169,19 @@ namespace Strawberry::Standard::Iter
 		{
 			return Dropped<T>(this, count);
 		}
-	};
 
 
 
-	template <typename T>
-	concept STLIterable = requires(T t)
-	{
-		requires std::forward_iterator<typename T::iterator>;
-		{ t.begin() } -> std::forward_iterator;
-		{ t.end()   } -> std::forward_iterator;
+		template <STLIteratorConstructible<T> Container>
+		Container Collect()
+		{
+			std::vector<T> mValues;
+			while (auto v = this->Next())
+			{
+				mValues.push_back(*v);
+			}
+			return Container(mValues.begin(), mValues.end());
+		}
 	};
 
 

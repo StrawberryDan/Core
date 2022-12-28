@@ -2,6 +2,8 @@
 
 
 #include <cstring>
+#include <vector>
+#include <map>
 #include <random>
 
 
@@ -121,6 +123,19 @@ namespace Test
 		Assert(dropped.Next() == 3);
 		Assert(dropped.Next() == 4);
 		Assert(dropped.Next() == 5);
+
+
+
+		auto fifteens = STLWrapper(numbers).Map<int>([](int x) { return 15 * x; } );
+		auto fifteens_vector = fifteens.Collect<std::vector<int>>();
+		Assert(fifteens_vector == std::vector<int>{15, 30, 45, 60, 75});
+
+		auto pairs = std::vector<std::pair<int, int>>{{1, 2}, {3, 4}, {5, 6}};
+		auto pairs_iter = STLWrapper(pairs);
+		auto pairs_map = pairs_iter.Collect<std::map<int, int>>();
+		Assert(pairs_map[1] == 2);
+		Assert(pairs_map[3] == 4);
+		Assert(pairs_map[5] == 6);
 	}
 }
 
