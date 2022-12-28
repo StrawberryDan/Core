@@ -115,6 +115,12 @@ namespace Test
 				.Filter([](int x) { return x % 2 == 0; });
 		Assert(even_threes.Next() == 6);
 		Assert(even_threes.Next() == 12);
+
+
+		auto dropped = STLWrapper(numbers).Drop(2);
+		Assert(dropped.Next() == 3);
+		Assert(dropped.Next() == 4);
+		Assert(dropped.Next() == 5);
 	}
 }
 

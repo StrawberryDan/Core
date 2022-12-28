@@ -91,6 +91,38 @@ namespace Strawberry::Standard::Iter
 
 
 
+	template <typename T>
+	class Dropped : public Iterator<T>
+	{
+	public:
+		Option<T> Next() override
+		{
+			while (mDropCount > 0)
+			{
+				mBase->Next();
+				mDropCount--;
+			}
+
+			return mBase->Next();
+		}
+	private:
+		template <typename>
+		friend class Iterator;
+
+
+		Dropped(Iterator<T>* base, unsigned int dropCount)
+			: mBase(base)
+			, mDropCount(dropCount)
+		{}
+
+
+
+		unsigned int mDropCount;
+		Iterator<T>* mBase;
+	};
+
+
+
 	template<typename T>
 	class Iterator
 	{
@@ -111,6 +143,13 @@ namespace Strawberry::Standard::Iter
 		Filtered<T, Predicate> Filter(Predicate predicate)
 		{
 			return Filtered<T, Predicate>(this, predicate);
+		}
+
+
+
+		Dropped<T> Drop(unsigned int count)
+		{
+			return Dropped<T>(this, count);
 		}
 	};
 
