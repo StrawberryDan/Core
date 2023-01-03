@@ -22,10 +22,11 @@ target_link_directories(LibreSSL INTERFACE ${LIBRESSL_LIBRARY_DIRS})
 add_library(Standard STATIC
         include/Standard/Assert.hpp
         include/Standard/Base64.hpp
-        include/Standard/ByteBuffer.hpp
         include/Standard/Clock.hpp
         include/Standard/Concepts.hpp
         include/Standard/Endian.hpp
+        include/Standard/IO/ByteBuffer.hpp
+        include/Standard/IO/DynamicByteBuffer.hpp
         include/Standard/Iter.hpp
         include/Standard/Iter.hpp
         include/Standard/Markers.hpp
@@ -54,8 +55,9 @@ add_library(Standard STATIC
         inline/Standard/Net/Socket/Socket.inl
         inline/Standard/Net/Websocket/Client.inl
         src/Base64.cpp
-        src/ByteBuffer.cpp
         src/Clock.cpp
+        src/IO/ByteBuffer.cpp
+        src/IO/DynamicByteBuffer.cpp
         src/Log.cpp
         src/Markers.cpp
         src/Net/Address.cpp
@@ -72,7 +74,7 @@ add_library(Standard STATIC
         src/Net/Socket/UDPClient.cpp
         src/Net/Websocket/Client.cpp
         src/Net/Websocket/Message.cpp
-        )
+)
 
 target_include_directories(Standard PUBLIC include inline ${JSON_INCLUDE_DIR})
 target_link_libraries(Standard PRIVATE LibreSSL ${FMT_LIBRARY})

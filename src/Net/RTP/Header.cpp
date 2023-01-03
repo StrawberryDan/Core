@@ -19,9 +19,9 @@ namespace Strawberry::Standard::Net::RTP
 
 
 
-	ByteBuffer Header::AsBytes() const
+	IO::DynamicByteBuffer Header::AsBytes() const
 	{
-		ByteBuffer bytes;
+		IO::DynamicByteBuffer bytes;
 
 		uint8_t byte = 0b10000000;
 		bytes.Push(byte);

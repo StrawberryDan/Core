@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <vector>
-#include "Standard/ByteBuffer.hpp"
+#include "Standard/IO/DynamicByteBuffer.hpp"
 
 
 
@@ -24,7 +24,7 @@ namespace Strawberry::Standard::Net::RTP
 
 
 
-		ByteBuffer AsBytes() const;
+		IO::DynamicByteBuffer AsBytes() const;
 
 
 
