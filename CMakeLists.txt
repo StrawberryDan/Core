@@ -21,14 +21,18 @@ target_link_directories(LibreSSL INTERFACE ${LIBRESSL_LIBRARY_DIRS})
 
 add_library(Standard STATIC
         include/Standard/Assert.hpp
-        include/Standard/IO/Base64.hpp
         include/Standard/Clock.hpp
         include/Standard/Concepts.hpp
         include/Standard/Endian.hpp
+        include/Standard/IO/Base64.hpp
         include/Standard/IO/ByteBuffer.hpp
         include/Standard/IO/DynamicByteBuffer.hpp
-        include/Standard/Iter.hpp
-        include/Standard/Iter.hpp
+        include/Standard/Iter/Filter.hpp
+        include/Standard/Iter/Iterator.hpp
+        include/Standard/Iter/Map.hpp
+        include/Standard/Iter/STLWrapper.hpp
+        include/Standard/Iter/STLWrapper.hpp
+        include/Standard/Iter/Skip.hpp
         include/Standard/Markers.hpp
         include/Standard/Math/Math.hpp
         include/Standard/Mutex.hpp
@@ -54,8 +58,8 @@ add_library(Standard STATIC
         inline/Standard/Net/HTTP/Client.inl
         inline/Standard/Net/Socket/Socket.inl
         inline/Standard/Net/Websocket/Client.inl
-        src/IO/Base64.cpp
         src/Clock.cpp
+        src/IO/Base64.cpp
         src/IO/ByteBuffer.cpp
         src/IO/DynamicByteBuffer.cpp
         src/Log.cpp
