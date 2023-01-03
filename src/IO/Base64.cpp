@@ -1,4 +1,4 @@
-#include "Standard/Base64.hpp"
+#include "Standard/IO/Base64.hpp"
 #include "Standard/Math/Math.hpp"
 #include "Standard/Markers.hpp"
 
@@ -37,17 +37,17 @@ static const std::map<char, uint8_t> decodingTable =
 
 
 
-std::string Strawberry::Standard::Base64::Encode(const std::vector<uint8_t>& bytes)
+std::string Strawberry::Standard::IO::Base64::Encode(const Strawberry::Standard::IO::DynamicByteBuffer& bytes)
 {
 	using namespace Math;
 
 
 
     std::string encoded;
-    unsigned int encodedSize = RoundUpToNearestMultiple(CeilDiv(8 * bytes.size(), 6), 3);
+    unsigned int encodedSize = RoundUpToNearestMultiple(CeilDiv(8 * bytes.Size(), 6), 3);
 
-    std::vector<uint8_t> fullSegments(bytes.data(), bytes.data() + (3 * (bytes.size() / 3)));
-    std::vector<uint8_t> stragglers(bytes.data() + (3 * (bytes.size() / 3)), bytes.data() + bytes.size());
+    std::vector<uint8_t> fullSegments(bytes.Data(), bytes.Data() + (3 * (bytes.Size() / 3)));
+    std::vector<uint8_t> stragglers(bytes.Data() + (3 * (bytes.Size() / 3)), bytes.Data() + bytes.Size());
 
 
     // Encode 3 byte segments
@@ -104,7 +104,7 @@ std::string Strawberry::Standard::Base64::Encode(const std::vector<uint8_t>& byt
 
 
 
-std::vector<uint8_t> Strawberry::Standard::Base64::Decode(std::string encoded)
+Strawberry::Standard::IO::DynamicByteBuffer Strawberry::Standard::IO::Base64::Decode(std::string encoded)
 {
     // Delete Padding
     while (encoded.ends_with('='))
@@ -114,7 +114,7 @@ std::vector<uint8_t> Strawberry::Standard::Base64::Decode(std::string encoded)
 
     size_t fullChunks = (4 * (encoded.size() / 4));
     uint_fast8_t stragglers = encoded.size() % 4;
-    std::vector<uint8_t> compressed;
+    DynamicByteBuffer compressed;
 
 
     std::vector<uint8_t> uncompressed;
@@ -128,7 +128,7 @@ std::vector<uint8_t> Strawberry::Standard::Base64::Decode(std::string encoded)
         uint8_t a = uncompressed[i + 0] << 2 | uncompressed[i + 1] >> 4;
         uint8_t b = uncompressed[i + 1] << 4 | uncompressed[i + 2] >> 2;
         uint8_t c = uncompressed[i + 2] << 6 | uncompressed[i + 3] >> 0;
-        compressed.push_back(a); compressed.push_back(b); compressed.push_back(c);
+        compressed.Push<uint8_t>(a); compressed.Push<uint8_t>(b); compressed.Push<uint8_t>(c);
     }
 
 
@@ -139,20 +139,20 @@ std::vector<uint8_t> Strawberry::Standard::Base64::Decode(std::string encoded)
 
         case 1:
         {
-            compressed.push_back(uncompressed[fullChunks + 0] << 6);
+            compressed.Push<uint8_t>(uncompressed[fullChunks + 0] << 6);
             break;
         }
 
         case 2:
         {
-            compressed.push_back(uncompressed[fullChunks + 0] << 2 | uncompressed[fullChunks + 1] >> 4);
+            compressed.Push<uint8_t>(uncompressed[fullChunks + 0] << 2 | uncompressed[fullChunks + 1] >> 4);
             break;
         }
 
         case 3:
         {
-            compressed.push_back(uncompressed[fullChunks + 0] << 2 | uncompressed[fullChunks + 1] >> 4);
-            compressed.push_back(uncompressed[fullChunks + 1] << 4 | uncompressed[fullChunks + 2] >> 2);
+            compressed.Push<uint8_t>(uncompressed[fullChunks + 0] << 2 | uncompressed[fullChunks + 1] >> 4);
+            compressed.Push<uint8_t>(uncompressed[fullChunks + 1] << 4 | uncompressed[fullChunks + 2] >> 2);
             break;
         }
 

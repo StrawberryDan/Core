@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <cstdint>
+#include <compare>
 #include "Standard/Assert.hpp"
 #include "Standard/Result.hpp"
 
@@ -16,6 +17,7 @@ namespace Strawberry::Standard::IO
 	public:
 		// Constructors
 		DynamicByteBuffer() = default;
+		DynamicByteBuffer(const uint8_t* data, size_t len);
 		DynamicByteBuffer(size_t capacity);
 
 
@@ -41,6 +43,17 @@ namespace Strawberry::Standard::IO
 
 		      uint8_t& operator[](size_t i)       { return mData[i]; }
 		const uint8_t& operator[](size_t i) const { return mData[i]; }
+
+
+
+		// Comparison
+		std::strong_ordering operator<=>(const DynamicByteBuffer& rhs) const;
+		bool operator==(const DynamicByteBuffer& rhs) const = default;
+		bool operator!=(const DynamicByteBuffer& rhs) const = default;
+		bool operator >(const DynamicByteBuffer& rhs) const = default;
+		bool operator <(const DynamicByteBuffer& rhs) const = default;
+		bool operator>=(const DynamicByteBuffer& rhs) const = default;
+		bool operator<=(const DynamicByteBuffer& rhs) const = default;
 
 
 

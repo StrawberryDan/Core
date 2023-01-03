@@ -1,4 +1,4 @@
-#include "Standard/Base64.hpp"
+#include "Standard/IO/Base64.hpp"
 
 
 #include <cstring>
@@ -24,13 +24,13 @@ namespace Test
 
 
 
-	void CheckBytes(const std::vector<uint8_t>& bytes)
+	void CheckBytes(const IO::DynamicByteBuffer& bytes)
 	{
-		auto encoded = Base64::Encode(bytes);
-		auto decoded = Base64::Decode(encoded);
-		unsigned long long expectedSize = RoundUpToNearestMultiple(CeilDiv(8 * bytes.size(), 6), 3);
+		auto encoded = IO::Base64::Encode(bytes);
+		auto decoded = IO::Base64::Decode(encoded);
+		unsigned long long expectedSize = RoundUpToNearestMultiple(CeilDiv(8 * bytes.Size(), 6), 3);
 		Assert(encoded.size() == expectedSize);
-		Assert(decoded.size() == bytes.size());
+		Assert(decoded.Size() == bytes.Size());
 		Assert(decoded == bytes);
 	}
 
@@ -39,15 +39,15 @@ namespace Test
 	void Base64()
 	{
 		const char* sample = "Many hands make light work.";
-		std::vector<uint8_t> sampleBytes(sample, sample + strlen(sample));
+		IO::DynamicByteBuffer sampleBytes(reinterpret_cast<const uint8_t*>(sample), strlen(sample));
 		CheckBytes(sampleBytes);
 
 		sample = "light wo";
-		sampleBytes = std::vector<uint8_t>(sample, sample + strlen(sample));
+		sampleBytes = IO::DynamicByteBuffer(reinterpret_cast<const uint8_t*>(sample), strlen(sample));
 		CheckBytes(sampleBytes);
 
 		sample = "light w";
-		sampleBytes = std::vector<uint8_t>(sample, sample + strlen(sample));
+		sampleBytes = IO::DynamicByteBuffer(reinterpret_cast<const uint8_t*>(sample), strlen(sample));
 		CheckBytes(sampleBytes);
 
 		std::random_device randomDevice;
@@ -58,12 +58,13 @@ namespace Test
 		for (int iterations = 0; iterations < 1024; iterations++)
 		{
 			unsigned int len = lengthDistribution(randgen);
-			std::vector<uint8_t> randomBytes;
+			IO::DynamicByteBuffer randomBytes;
 			for (int i = 0; i < len; ++i)
 			{
-				randomBytes.push_back(byteDistribution(randgen));
+				randomBytes.Push(byteDistribution(randgen));
 			}
 
+			Assert(randomBytes.Size() == len);
 			CheckBytes(randomBytes);
 		}
 	}

@@ -19,6 +19,7 @@ namespace Strawberry::Standard::IO
 
 
 
+		// Accessors
 		size_t Size() const { return S; }
 
 		      uint8_t* Data()       { return mData; }
@@ -26,6 +27,17 @@ namespace Strawberry::Standard::IO
 
 		      uint8_t& operator[](size_t i)       { return mData[i]; }
 		const uint8_t& operator[](size_t i) const { return mData[i]; }
+
+
+
+		// Comparison
+		std::strong_ordering operator<=>(const ByteBuffer<S>& rhs) const;
+		bool operator==(const ByteBuffer<S>& rhs) const = default;
+		bool operator!=(const ByteBuffer<S>& rhs) const = default;
+		bool operator >(const ByteBuffer<S>& rhs) const = default;
+		bool operator <(const ByteBuffer<S>& rhs) const = default;
+		bool operator>=(const ByteBuffer<S>& rhs) const = default;
+		bool operator<=(const ByteBuffer<S>& rhs) const = default;
 
 
 
@@ -45,6 +57,26 @@ namespace Strawberry::Standard::IO
 	};
 
 
+
+
+
+	template<size_t S>
+	std::strong_ordering ByteBuffer<S>::operator<=>(const ByteBuffer<S>& rhs) const
+	{
+		for (int i = 0; i < S; ++i)
+		{
+			if ((*this)[i] < rhs[i])
+			{
+				return std::strong_ordering::less;
+			}
+			else if ((*this)[i] > rhs[i])
+			{
+				return std::strong_ordering::greater;
+			}
+		}
+
+		return std::strong_ordering::equal;
+	}
 
 
 

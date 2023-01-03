@@ -8,7 +8,7 @@
 
 
 #include "Standard/Net/HTTP/Client.hpp"
-#include "Standard/Base64.hpp"
+#include "Standard/IO/Base64.hpp"
 #include "Standard/Endian.hpp"
 #include "Standard/Markers.hpp"
 
@@ -125,18 +125,17 @@ namespace Strawberry::Standard::Net::Websocket
 	std::string ClientImpl<S>::GenerateNonce()
 	{
 		std::random_device randomDevice;
-		std::vector<uint8_t> nonce;
-		nonce.reserve(16);
-		while (nonce.size() < 16)
+		IO::DynamicByteBuffer nonce(16);
+		while (nonce.Size() < 16)
 		{
 			auto val = randomDevice();
-			for (int i = 0; i < sizeof(val) && nonce.size() < 16; i++)
+			for (int i = 0; i < sizeof(val) && nonce.Size() < 16; i++)
 			{
-				nonce.push_back(reinterpret_cast<uint8_t*>(&val)[i]);
+				nonce.Push(reinterpret_cast<uint8_t*>(&val)[i]);
 			}
 		}
-		Assert(nonce.size() == 16);
-		auto base64 = Base64::Encode(nonce);
+		Assert(nonce.Size() == 16);
+		auto base64 = IO::Base64::Encode(nonce);
 		Assert(base64.size() == 24);
 		return base64;
 	}
