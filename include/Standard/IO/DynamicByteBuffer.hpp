@@ -2,23 +2,31 @@
 
 
 
-#include <vector>
-#include <cstdint>
-#include <compare>
 #include "Standard/Assert.hpp"
 #include "Standard/Result.hpp"
+#include <compare>
+#include <concepts>
+#include <cstdint>
+#include <vector>
 
 
 
 namespace Strawberry::Standard::IO
 {
+	template <size_t S>
+	class ByteBuffer;
+
+
+
 	class DynamicByteBuffer
 	{
 	public:
 		// Constructors
 		DynamicByteBuffer() = default;
-		DynamicByteBuffer(const uint8_t* data, size_t len);
-		DynamicByteBuffer(size_t capacity);
+		template <typename T>
+		DynamicByteBuffer(const T* data, size_t len);
+		template <typename T>
+		DynamicByteBuffer(const T& object);
 
 
 
@@ -59,10 +67,13 @@ namespace Strawberry::Standard::IO
 
 		// Casting
 		template <typename T> requires std::copyable<T> || std::movable<T>
-		T IntoType() const;
+		T Into() const;
 
 		template <typename T>
-		void IntoType(T& data) const;
+		void Into(T& data) const;
+
+		template <size_t S>
+		ByteBuffer<S> AsStatic() const;
 
 		template <size_t N>
 		std::array<uint8_t, N> AsArray() const;
@@ -75,6 +86,24 @@ namespace Strawberry::Standard::IO
 	private:
 		std::vector<uint8_t> mData;
 	};
+}
+
+
+
+template<typename T>
+Strawberry::Standard::IO::DynamicByteBuffer::DynamicByteBuffer(const T* data, size_t len)
+	: mData(reinterpret_cast<const uint8_t*>(data), reinterpret_cast<const uint8_t*>(data) + len)
+{
+
+}
+
+
+
+template<typename T>
+Strawberry::Standard::IO::DynamicByteBuffer::DynamicByteBuffer(const T& object)
+	: mData(reinterpret_cast<const uint8_t*>(&object), reinterpret_cast<const uint8_t*>(&object) + sizeof(T))
+{
+
 }
 
 
@@ -122,19 +151,27 @@ std::array<uint8_t, N> Strawberry::Standard::IO::DynamicByteBuffer::AsArray() co
 
 
 template<typename T> requires std::copyable<T> || std::movable<T>
-T Strawberry::Standard::IO::DynamicByteBuffer::IntoType() const
+T Strawberry::Standard::IO::DynamicByteBuffer::Into() const
 {
 	Assert(Size() == sizeof(T));
 	T value;
-	IntoType<T>(value);
+	Into<T>(value);
 	return value;
 }
 
 
 
 template<typename T>
-void Strawberry::Standard::IO::DynamicByteBuffer::IntoType(T& data) const
+void Strawberry::Standard::IO::DynamicByteBuffer::Into(T& data) const
 {
 	Assert(Size() == sizeof(T));
 	memcpy(reinterpret_cast<void*>(&data), reinterpret_cast<const void*>(Data()), sizeof(T));
+}
+
+
+
+template<size_t S>
+Strawberry::Standard::IO::ByteBuffer<S> Strawberry::Standard::IO::DynamicByteBuffer::AsStatic() const
+{
+	return ByteBuffer<S>(Data(), std::min(S, Size()));
 }

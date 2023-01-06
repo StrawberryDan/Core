@@ -4,21 +4,6 @@
 
 
 
-Strawberry::Standard::IO::DynamicByteBuffer::DynamicByteBuffer(size_t capacity)
-{
-	mData.reserve(capacity);
-}
-
-
-
-Strawberry::Standard::IO::DynamicByteBuffer::DynamicByteBuffer(const uint8_t* data, size_t len)
-	: DynamicByteBuffer(len)
-{
-	memcpy(mData.data(), data, len);
-}
-
-
-
 size_t Strawberry::Standard::IO::DynamicByteBuffer::Size() const
 {
 	return mData.size();

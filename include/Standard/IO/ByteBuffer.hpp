@@ -2,9 +2,9 @@
 
 
 
-#include <cstdlib>
+#include "DynamicByteBuffer.hpp"
 #include <array>
-
+#include <cstdlib>
 
 
 namespace Strawberry::Standard::IO
@@ -15,15 +15,20 @@ namespace Strawberry::Standard::IO
 	public:
 		// Constructors
 		ByteBuffer() = default;
-		ByteBuffer(const uint8_t* data, size_t len);
+
+		template <typename T>
+		ByteBuffer(const T* data, size_t len);
+
+		template <typename T> requires (sizeof(T) == S)
+		ByteBuffer(const T& object);
 
 
 
 		// Accessors
 		size_t Size() const { return S; }
 
-		      uint8_t* Data()       { return mData; }
-		const uint8_t* Data() const { return mData; }
+		      uint8_t* Data()       { return mData.data(); }
+		const uint8_t* Data() const { return mData.data(); }
 
 		      uint8_t& operator[](size_t i)       { return mData[i]; }
 		const uint8_t& operator[](size_t i) const { return mData[i]; }
@@ -42,10 +47,12 @@ namespace Strawberry::Standard::IO
 
 
 		template <typename T> requires (sizeof(T) == S) && (std::copyable<T> || std::movable<T>)
-		T IntoType();
+		T Into();
 
 		template <typename T> requires (sizeof(T) == S)
-		void IntoType(T& data);
+		void Into(T& data);
+
+		DynamicByteBuffer ToDynamic() const;
 
 
 
@@ -57,6 +64,24 @@ namespace Strawberry::Standard::IO
 	};
 
 
+
+	template<size_t S>
+	template<typename T>
+	ByteBuffer<S>::ByteBuffer(const T* data, size_t len)
+		: mData()
+	{
+		memcpy(mData.data(), reinterpret_cast<const void*>(data), len);
+	}
+
+
+
+	template<size_t S>
+	template<typename T> requires (sizeof(T) == S)
+	ByteBuffer<S>::ByteBuffer(const T& object)
+		: mData()
+	{
+		memcpy(mData.data(), reinterpret_cast<const void*>(&object), sizeof(T));
+	}
 
 
 
@@ -82,10 +107,10 @@ namespace Strawberry::Standard::IO
 
 	template<size_t S>
 	template<typename T> requires (sizeof(T) == S) && (std::copyable<T> || std::movable<T>)
-	T ByteBuffer<S>::IntoType()
+	T ByteBuffer<S>::Into()
 	{
 		T value;
-		IntoType(value);
+		Into(value);
 		return value;
 	}
 
@@ -93,8 +118,16 @@ namespace Strawberry::Standard::IO
 
 	template<size_t S>
 	template<typename T> requires (sizeof(T) == S)
-	void ByteBuffer<S>::IntoType(T& data)
+	void ByteBuffer<S>::Into(T& data)
 	{
 		memcpy(reinterpret_cast<void*>(&data), reinterpret_cast<const void*>(mData.data()), sizeof(T));
+	}
+
+
+
+	template<size_t S>
+	DynamicByteBuffer ByteBuffer<S>::ToDynamic() const
+	{
+		return DynamicByteBuffer(Data(), S);
 	}
 }
