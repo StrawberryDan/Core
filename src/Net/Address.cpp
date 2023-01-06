@@ -2,10 +2,17 @@
 
 
 
-#include <regex>
-#include <sstream>
-#include <numeric>
 #include "Standard/Assert.hpp"
+#include <numeric>
+
+
+
+#if defined(_WIN32)
+
+#elif defined(__APPLE__) || defined(__linux__)
+#include <arpa/inet.h>
+#include <netdb.h>
+#endif
 
 
 
@@ -13,52 +20,67 @@ namespace Strawberry::Standard::Net
 {
 	Option<IPv4Address> IPv4Address::Parse(const std::string& data)
 	{
-		std::regex pattern(R"(^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$)");
-		std::smatch match;
-		if (!std::regex_match(data, match, pattern))
+		uint8_t buffer[sizeof(in_addr)] = {0};
+		auto result = inet_pton(AF_INET, data.data(), buffer);
+		if (result == 1)
+		{
+			IO::ByteBuffer<4> bytes(buffer, 4);
+			return IPv4Address(bytes);
+		}
+		else
 		{
 			return {};
 		}
-		Assert(match.size() == 5);
-
-
-		std::vector<std::string> bytesStrs;
-		for (int i = 1; i < match.size(); i++)
-		{
-			bytesStrs.push_back(match[i]);
-		}
-
-
-		std::vector<uint8_t> bytes;
-		for (auto str : bytesStrs)
-		{
-			auto val = std::stoul(str);
-			if (val > 255)
-			{
-				return {};
-			}
-
-			bytes.push_back(static_cast<uint8_t>(val));
-		}
-
-		IPv4Address addr;
-		std::copy(bytes.begin(), bytes.end(), addr.mData);
-		return addr;
 	}
 
 
 
-	std::vector<uint8_t> IPv4Address::AsBytes()
+	IO::ByteBuffer<4> IPv4Address::AsBytes()
 	{
-		return {mData, mData + 4};
+		return mData;
 	}
 
 
 
 	std::string IPv4Address::AsString()
 	{
-		return std::reduce(
-				mData + 1, mData + 4, std::to_string(mData[0]),
-		        [](auto a, auto b) { return a + "." + std::to_string(b); } );
+		char buffer[INET_ADDRSTRLEN] = {0};
+		auto result = inet_ntop(AF_INET, mData.Data(), buffer, INET_ADDRSTRLEN);
+		Assert(result != nullptr);
+		return {buffer};
+	}
+
+
+
+	Option<IPv6Address> IPv6Address::Parse(const std::string& string)
+	{
+		uint8_t buffer[sizeof(in6_addr)] = {0};
+		auto result = inet_pton(AF_INET6, string.data(), buffer);
+		if (result == 1)
+		{
+			IO::ByteBuffer<16> bytes(buffer, 16);
+			return IPv6Address(bytes);
+		}
+		else
+		{
+			return {};
+		}
+	}
+
+
+
+	const IO::ByteBuffer<16>& IPv6Address::AsBytes() const
+	{
+		return mData;
+	}
+
+
+
+	std::string IPv6Address::AsString() const
+	{
+		char buffer[INET6_ADDRSTRLEN] = {0};
+		auto result = inet_ntop(AF_INET6, mData.Data(), buffer, INET6_ADDRSTRLEN);
+		Assert(result != nullptr);
+		return {buffer};
 	}
 }
