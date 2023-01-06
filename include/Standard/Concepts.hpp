@@ -15,6 +15,8 @@ namespace Strawberry::Standard
 		{ t[i] } -> std::same_as<V>;
 	};
 
+
+
 	template <typename F, typename R, typename ...Args>
 	concept Callable = requires
 	{
