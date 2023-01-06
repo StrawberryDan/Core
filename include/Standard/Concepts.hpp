@@ -3,11 +3,18 @@
 
 
 #include <concepts>
+#include <iterator>
 
 
 
 namespace Strawberry::Standard
 {
+	template <typename T>
+	concept Indexable = requires(T t, size_t i)
+	{
+		{ t[i] } -> std::destructible;
+	};
+
 	template <typename F, typename R, typename ...Args>
 	concept Callable = requires
 	{
