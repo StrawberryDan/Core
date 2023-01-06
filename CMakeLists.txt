@@ -3,19 +3,13 @@ project(Standard)
 set(CMAKE_CXX_STANDARD 20)
 find_package(PkgConfig REQUIRED)
 
+find_package(OpenSSL REQUIRED)
+
 find_library(FMT_LIBRARY
         NAMES libfmt.a)
 
-pkg_check_modules(LIBRESSL libtls)
-
 find_path(JSON_INCLUDE_DIR
         NAMES nlohmann/json.hpp)
-
-
-add_library(LibreSSL INTERFACE)
-target_link_libraries(LibreSSL INTERFACE ${LIBRESSL_LIBRARIES} ${LIBRESSL_LDFLAGS} ${LIBRESSL_LDFLAGS_OTHER})
-target_include_directories(LibreSSL INTERFACE ${LIBRESSL_INCLUDE_DIRS})
-target_link_directories(LibreSSL INTERFACE ${LIBRESSL_LIBRARY_DIRS})
 
 
 
@@ -84,7 +78,7 @@ add_library(Standard STATIC
         )
 
 target_include_directories(Standard PUBLIC include inline ${JSON_INCLUDE_DIR})
-target_link_libraries(Standard PRIVATE LibreSSL ${FMT_LIBRARY})
+target_link_libraries(Standard PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY})
 
 
 
