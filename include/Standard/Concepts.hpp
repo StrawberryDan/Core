@@ -9,10 +9,10 @@
 
 namespace Strawberry::Standard
 {
-	template <typename T>
+	template <typename T, typename V>
 	concept Indexable = requires(T t, size_t i)
 	{
-		{ t[i] } -> std::destructible;
+		{ t[i] } -> std::same_as<V>;
 	};
 
 	template <typename F, typename R, typename ...Args>
