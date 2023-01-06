@@ -80,9 +80,9 @@ namespace Strawberry::Standard
 
 
 
-	    D        Unwrap() { Assert(IsOk());  return std::move(std::get<D>(mPayload)); }
-	    D        UnwrapOr(D value) { if (IsOk()) { return Unwrap(); } else { return value; }}
-	    const E&    Err() { Assert(IsErr()); return std::move(std::get<E>(mPayload)); }
+	    D          Unwrap()        { Assert(IsOk());  return std::move(std::get<D>(mPayload)); }
+	    D        UnwrapOr(D value) { return IsOk() ? Unwrap() : value; }
+	    const E&      Err()        { Assert(IsErr()); return std::move(std::get<E>(mPayload)); }
 
 
 
@@ -95,11 +95,11 @@ namespace Strawberry::Standard
 	    {
 	        if (*this)
 	        {
-	            return Ok(f(std::move(Unwrap())));
+	            return Result<U, E>::Ok(f(std::move(Unwrap())));
 	        }
 	        else
 	        {
-	            return Err(std::move(Err()));
+	            return Result<U, E>::Err(std::move(Err()));
 	        }
 	    }
 
