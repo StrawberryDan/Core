@@ -26,7 +26,9 @@ add_library(Standard STATIC
         include/Standard/Endian.hpp
         include/Standard/IO/Base64.hpp
         include/Standard/IO/ByteBuffer.hpp
+        include/Standard/IO/Concepts.hpp
         include/Standard/IO/DynamicByteBuffer.hpp
+        include/Standard/IO/Error.hpp
         include/Standard/Iter/Filter.hpp
         include/Standard/Iter/Iterator.hpp
         include/Standard/Iter/Map.hpp
@@ -37,6 +39,8 @@ add_library(Standard STATIC
         include/Standard/Math/Math.hpp
         include/Standard/Mutex.hpp
         include/Standard/Net/Address.hpp
+        include/Standard/Net/Endpoint.hpp
+        include/Standard/Net/Error.hpp
         include/Standard/Net/HTTP/ChunkedPayload.hpp
         include/Standard/Net/HTTP/Client.hpp
         include/Standard/Net/HTTP/Constants.hpp
@@ -45,7 +49,6 @@ add_library(Standard STATIC
         include/Standard/Net/HTTP/Request.hpp
         include/Standard/Net/HTTP/Response.hpp
         include/Standard/Net/HTTP/SimplePayload.hpp
-        include/Standard/Net/Socket/Socket.hpp
         include/Standard/Net/Socket/TCPClient.hpp
         include/Standard/Net/Socket/TLSClient.hpp
         include/Standard/Net/Socket/UDPClient.hpp
@@ -60,11 +63,11 @@ add_library(Standard STATIC
         inline/Standard/Net/Websocket/Client.inl
         src/Clock.cpp
         src/IO/Base64.cpp
-        src/IO/ByteBuffer.cpp
         src/IO/DynamicByteBuffer.cpp
         src/Log.cpp
         src/Markers.cpp
         src/Net/Address.cpp
+        src/Net/Endpoint.cpp
         src/Net/HTTP/ChunkedPayload.cpp
         src/Net/HTTP/Client.cpp
         src/Net/HTTP/Constants.cpp
@@ -78,7 +81,7 @@ add_library(Standard STATIC
         src/Net/Socket/UDPClient.cpp
         src/Net/Websocket/Client.cpp
         src/Net/Websocket/Message.cpp
-)
+        )
 
 target_include_directories(Standard PUBLIC include inline ${JSON_INCLUDE_DIR})
 target_link_libraries(Standard PRIVATE LibreSSL ${FMT_LIBRARY})
