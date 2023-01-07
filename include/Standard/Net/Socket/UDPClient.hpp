@@ -13,7 +13,7 @@ namespace Strawberry::Standard::Net::Socket
 	class UDPClient
 	{
 	public:
-		static Result<UDPClient, Error> Connect(const Endpoint& endpoint);
+		static Result<UDPClient, Error> Create(uint16_t port);
 
 
 
@@ -28,8 +28,8 @@ namespace Strawberry::Standard::Net::Socket
 
 
 	public:
-		Result<IO::DynamicByteBuffer, IO::Error> Read();
-		Result<size_t, IO::Error>                Write(const IO::DynamicByteBuffer& bytes);
+		Result<std::tuple<Endpoint, IO::DynamicByteBuffer>, IO::Error> Read();
+		Result<size_t, IO::Error>                Write(const Endpoint& endpoint, const IO::DynamicByteBuffer& bytes);
 
 
 

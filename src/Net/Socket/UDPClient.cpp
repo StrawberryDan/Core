@@ -21,37 +21,28 @@
 
 namespace Strawberry::Standard::Net::Socket
 {
-	Result<UDPClient, Error> UDPClient::Connect(const Endpoint& endpoint)
+	Result<UDPClient, Error> UDPClient::Create(uint16_t port)
 	{
-		UDPClient client;
-
-		addrinfo hints {.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_DGRAM,.ai_protocol = IPPROTO_UDP};
-		if      (endpoint.GetAddress().IsIPv4()) hints.ai_family = AF_INET;
-		else if (endpoint.GetAddress().IsIPv6()) hints.ai_family = AF_INET6;
-		else                                     Unreachable();
-		addrinfo* peerAddress = nullptr;
-		auto addrResult = getaddrinfo(endpoint.GetAddress().AsString().c_str(),
-		                              std::to_string(endpoint.GetPort()).c_str(),
-		                              &hints, &peerAddress);
-		if (addrResult != 0)
+		addrinfo hints{.ai_flags = AI_ADDRCONFIG,.ai_socktype = SOCK_DGRAM, .ai_protocol = IPPROTO_UDP};
+		addrinfo* peer = nullptr;
+		auto getAddrResult = getaddrinfo("127.0.0.1", std::to_string(port).c_str(), &hints, &peer);
+		if (getAddrResult != 0)
 		{
+			freeaddrinfo(peer);
 			return Error::AddressResolution;
 		}
 
-		auto handle = socket(peerAddress->ai_family, peerAddress->ai_socktype, peerAddress->ai_protocol);
+		auto handle = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol);
 		if (handle == -1)
 		{
+			freeaddrinfo(peer);
 			return Error::SocketCreation;
 		}
 
-		auto connection = connect(handle, peerAddress->ai_addr, peerAddress->ai_addrlen);
-		if (connection == -1)
-		{
-			return Error::EstablishConnection;
-		}
-
-		freeaddrinfo(peerAddress);
+		UDPClient client;
 		client.mSocket = handle;
+
+		freeaddrinfo(peer);
 		return client;
 	}
 
@@ -94,13 +85,31 @@ namespace Strawberry::Standard::Net::Socket
 
 
 
-	Result<IO::DynamicByteBuffer, IO::Error> UDPClient::Read()
+	Result<std::tuple<Endpoint, IO::DynamicByteBuffer>, IO::Error> UDPClient::Read()
 	{
-		auto bytesRead = recv(mSocket, mBuffer.Data(), BUFFER_SIZE, 0);
+		sockaddr_storage peer{};
+		socklen_t peerLen = 0;
+		auto bytesRead = recvfrom(mSocket, mBuffer.Data(), mBuffer.Size(), 0, reinterpret_cast<sockaddr*>(&peer), &peerLen);
 
 		if (bytesRead >= 0)
 		{
-			return IO::DynamicByteBuffer(mBuffer.Data(), bytesRead);
+			Option<Endpoint> endpoint;
+			if (peer.ss_family == AF_INET)
+			{
+				auto* sockaddr = reinterpret_cast<sockaddr_in*>(&peer);
+				endpoint.Emplace(
+						IPv4Address(IO::ByteBuffer<4>(sockaddr->sin_addr)),
+						sockaddr->sin_port);
+			}
+			else if (peer.ss_family == AF_INET6)
+			{
+				auto* sockaddr = reinterpret_cast<sockaddr_in6*>(&peer);
+				endpoint.Emplace(
+						IPv6Address(IO::ByteBuffer<16>(sockaddr->sin6_addr)),
+						sockaddr->sin6_port);
+			}
+
+			return std::make_tuple(endpoint.Unwrap(), IO::DynamicByteBuffer(mBuffer.Data(), bytesRead));
 		}
 		else
 		{
@@ -110,17 +119,26 @@ namespace Strawberry::Standard::Net::Socket
 
 
 
-	Result<size_t, IO::Error> UDPClient::Write(const IO::DynamicByteBuffer& bytes)
+	Result<size_t, IO::Error> UDPClient::Write(const Endpoint& endpoint, const IO::DynamicByteBuffer& bytes)
 	{
-		auto bytesWritten = send(mSocket, bytes.Data(), bytes.Size(), 0);
+		addrinfo hints{.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_DGRAM, .ai_protocol = IPPROTO_UDP};
+		addrinfo* peer = nullptr;
+		getaddrinfo(endpoint.GetAddress().AsString().c_str(),
+					std::to_string(endpoint.GetPort()).c_str(),
+					&hints,
+					&peer);
 
-		if (bytesWritten >= 0)
+
+		auto bytesSent = sendto(mSocket, bytes.Data(), bytes.Size(), 0, peer->ai_addr, peer->ai_addrlen);
+		freeaddrinfo(peer);
+		if (bytesSent >= 0)
 		{
-			return bytesWritten;
+			return bytesSent;
 		}
 		else
 		{
 			Unreachable();
 		}
+
 	}
 }
