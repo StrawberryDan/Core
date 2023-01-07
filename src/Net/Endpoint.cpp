@@ -17,7 +17,7 @@ namespace Strawberry::Standard::Net
 		auto dnsResult = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &peer);
 		if (dnsResult != 0)
 		{
-			return Error::DNSResolutionFailure;
+			return Error::DNSResolution;
 		}
 
 		Option<Endpoint> result;
@@ -47,7 +47,7 @@ namespace Strawberry::Standard::Net
 		}
 		else
 		{
-			return Error::DNSResolutionFailure;
+			return Error::DNSResolution;
 		}
 	}
 

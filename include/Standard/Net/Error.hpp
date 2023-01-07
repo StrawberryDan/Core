@@ -6,6 +6,11 @@ namespace Strawberry::Standard::Net
 {
 	enum class Error
 	{
-		DNSResolutionFailure,
+		DNSResolution,
+		SocketCreation,
+		AddressResolution,
+		EstablishConnection,
+		SSLAllocation,
+		SSLHandshake,
 	};
 }
