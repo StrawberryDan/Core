@@ -25,8 +25,15 @@ namespace Strawberry::Standard::Net
 		Endpoint(IPAddress address, uint16_t port);
 
 
+
+		inline Option<std::string> GetHostname() const { return mHostName; };
+		inline const IPAddress&    GetAddress()  const { return mAddress;  }
+		inline        uint16_t     GetPort()     const { return mPort;     }
+
+
 	private:
-		IPAddress mAddress;
-		uint16_t  mPort;
+		Option<std::string> mHostName;
+		IPAddress           mAddress;
+		uint16_t            mPort;
 	};
 }

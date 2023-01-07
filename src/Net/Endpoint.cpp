@@ -14,13 +14,13 @@ namespace Strawberry::Standard::Net
 	{
 		addrinfo hints { .ai_flags = AI_ALL | AI_ADDRCONFIG };
 		addrinfo* peer = nullptr;
-		auto result = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &peer);
-
-		if (result != 0)
+		auto dnsResult = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &peer);
+		if (dnsResult != 0)
 		{
 			return Error::DNSResolutionFailure;
 		}
 
+		Option<Endpoint> result;
 		addrinfo* cursor = peer;
 		while (cursor != nullptr)
 		{
@@ -28,19 +28,27 @@ namespace Strawberry::Standard::Net
 			{
 				auto ipData = reinterpret_cast<sockaddr_in*>(cursor->ai_addr);
 				IPv4Address addr(ipData->sin_addr.s_addr);
-				return Endpoint(addr, port);
+				result = Endpoint(addr, port);
 			}
 			else if (cursor->ai_family == AF_INET6)
 			{
 				auto ipData = reinterpret_cast<sockaddr_in6*>(cursor->ai_addr);
 				IPv6Address addr({&ipData->sin6_addr, 16});
-				return Endpoint(addr, port);
+				result = Endpoint(addr, port);
 			}
 
 			cursor = cursor->ai_next;
 		}
 
-		return Error::DNSResolutionFailure;
+		if (result)
+		{
+			result->mHostName = hostname;
+			return *result;
+		}
+		else
+		{
+			return Error::DNSResolutionFailure;
+		}
 	}
 
 
