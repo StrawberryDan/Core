@@ -88,3 +88,12 @@ const std::vector<uint8_t>& Strawberry::Standard::IO::DynamicByteBuffer::AsVecto
 	return mData;
 }
 
+
+
+std::string Strawberry::Standard::IO::DynamicByteBuffer::AsString() const
+{
+
+	std::string string(Size() + 1, 0);
+	memcpy(string.data(), Data(), Size());
+	return string;
+}

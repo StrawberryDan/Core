@@ -98,6 +98,8 @@ namespace Strawberry::Standard::IO
 		      std::vector<uint8_t>& AsVector();
 		const std::vector<uint8_t>& AsVector() const;
 
+		std::string AsString() const;
+
 
 
 	private:
