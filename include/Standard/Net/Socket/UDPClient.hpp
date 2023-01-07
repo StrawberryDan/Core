@@ -2,43 +2,43 @@
 
 
 
-#include "Socket.hpp"
-#include <string>
+#include "Standard/IO/Error.hpp"
+#include "Standard/Result.hpp"
+#include "Standard/Net/Endpoint.hpp"
 
 
 
-namespace Strawberry::Standard::Net::Sockets
+namespace Strawberry::Standard::Net::Socket
 {
-#if _WIN32
-	using SOCKET_HANDLE = uintptr_t;
-#elif __APPLE__ || __linux__
-	using SOCKET_HANDLE = int;
-#else
-#error "NO SOCKET IMPLEMENTATION FOR PLATFORM"
-#endif // _WIN32
-
-
-
-	class UDPClient : public Socket
+	class UDPClient
 	{
 	public:
-	    UDPClient(const std::string& hostname, uint16_t port);
-	    UDPClient(const UDPClient&) = delete;
-	    UDPClient& operator=(const UDPClient&) = delete;
-	    UDPClient(UDPClient&& other) noexcept;
-	    UDPClient& operator=(UDPClient&& other) noexcept;
-	    ~UDPClient();
-
-	    Result<size_t, Socket::Error> Read(uint8_t* data, size_t len) const override;
-	    Result<size_t, Socket::Error> Write(const uint8_t* data, size_t len) const override;
+		static Result<UDPClient, Error> Connect(const Endpoint& endpoint);
 
 
 
-		bool IsBlocking() const override;
-		void SetBlocking(bool blocking) override;
+	public:
+		UDPClient();
+		UDPClient(const UDPClient& other) = delete;
+		UDPClient(UDPClient&& other);
+		UDPClient& operator=(const UDPClient& other) = delete;
+		UDPClient& operator=(UDPClient&& other);
+		~UDPClient();
+
+
+
+	public:
+		Result<IO::DynamicByteBuffer, IO::Error> Read();
+		Result<size_t, IO::Error>                Write(const IO::DynamicByteBuffer& bytes);
+
 
 
 	private:
-	    SOCKET_HANDLE mSocket;
+#if defined(__APPLE__) || defined(__linux__)
+		int    mSocket;
+#endif
+
+		static constexpr size_t BUFFER_SIZE = 25536;
+		IO::ByteBuffer<BUFFER_SIZE> mBuffer;
 	};
 }

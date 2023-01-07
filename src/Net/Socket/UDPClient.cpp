@@ -1,4 +1,3 @@
-
 #include "Standard/Net/Socket/UDPClient.hpp"
 
 
@@ -15,171 +14,113 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <fcntl.h>
-#else
-#error "NO SOCKET IMPLEMENTATION FOR PLATFORM"
+#include <unistd.h>
 #endif // _WIN32
 
 
 
-namespace Strawberry::Standard::Net::Sockets
+namespace Strawberry::Standard::Net::Socket
 {
-	UDPClient::UDPClient(const std::string& hostname, uint16_t port)
-	    : mSocket{}
+	Result<UDPClient, Error> UDPClient::Connect(const Endpoint& endpoint)
 	{
-#if _WIN32
-	    WSAData wsaData;
-	    WSAStartup(MAKEWORD(2,2), &wsaData);
-	    mSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	    Assert(mSocket != INVALID_SOCKET);
+		UDPClient client;
 
-	    std::string portAsString = std::to_string(port);
-	    addrinfo* addressInfo;
-	    auto result = getaddrinfo(hostname.c_str(), portAsString.c_str(), nullptr, &addressInfo);
-	    Assert(result == 0);
+		addrinfo hints {.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_DGRAM,.ai_protocol = IPPROTO_UDP};
+		if      (endpoint.GetAddress().IsIPv4()) hints.ai_family = AF_INET;
+		else if (endpoint.GetAddress().IsIPv6()) hints.ai_family = AF_INET6;
+		else                                     Unreachable();
+		addrinfo* peerAddress = nullptr;
+		auto addrResult = getaddrinfo(endpoint.GetAddress().AsString().c_str(),
+		                              std::to_string(endpoint.GetPort()).c_str(),
+		                              &hints, &peerAddress);
+		if (addrResult != 0)
+		{
+			return Error::AddressResolution;
+		}
 
-	    result = connect(mSocket, addressInfo->ai_addr, static_cast<int>(addressInfo->ai_addrlen));
-	    Assert(result == 0);
-#elif __APPLE__ || __linux__
-		mSocket = socket(AF_INET, SOCK_DGRAM, 0);
-		Assert(mSocket != -1);
-		auto host = gethostbyname(hostname.c_str());
-		Assert(host != nullptr);
-		sockaddr_in address{};
-		address.sin_family = AF_INET;
-		address.sin_port = htons(port);
-		memcpy(&address.sin_addr.s_addr, host->h_addr_list[0], host->h_length);
-		auto result = connect(mSocket, reinterpret_cast<sockaddr*>(&address), sizeof(address));
-		Assert(result == 0);
-#endif // _WIN32
+		auto handle = socket(peerAddress->ai_family, peerAddress->ai_socktype, peerAddress->ai_protocol);
+		if (handle == -1)
+		{
+			return Error::SocketCreation;
+		}
+
+		auto connection = connect(handle, peerAddress->ai_addr, peerAddress->ai_addrlen);
+		if (connection == -1)
+		{
+			return Error::EstablishConnection;
+		}
+
+		freeaddrinfo(peerAddress);
+		client.mSocket = handle;
+		return client;
 	}
 
 
 
-	UDPClient::UDPClient(UDPClient&& other) noexcept
-	    : mSocket(Take(other.mSocket))
+	UDPClient::UDPClient()
+			: mSocket(-1)
+	{}
+
+
+
+	UDPClient::UDPClient(UDPClient&& other)
+		: mSocket(Replace(other.mSocket, -1))
 	{
 
 	}
 
 
 
-	UDPClient& UDPClient::operator=(UDPClient&& other) noexcept
+	UDPClient& UDPClient::operator=(UDPClient&& other)
 	{
-	    mSocket = Take(other.mSocket);
-	    return (*this);
+		if (this != &other)
+		{
+			this->~UDPClient();
+			mSocket = Replace(other.mSocket, -1);
+		}
+
+		return *this;
 	}
 
 
 
 	UDPClient::~UDPClient()
 	{
-#if _WIN32
-	    closesocket(mSocket);
-#elif __APPLE__ || __linux__
-		if (mSocket)
+		if (mSocket != -1)
 		{
-			auto err = shutdown(mSocket, SHUT_RDWR);
-			Assert(err == 0);
+			close(mSocket);
 		}
-#endif // _WIN32
 	}
 
 
 
-	Result<size_t, Socket::Error> UDPClient::Read(uint8_t* data, size_t len) const
+	Result<IO::DynamicByteBuffer, IO::Error> UDPClient::Read()
 	{
-#if _WIN32
-	    auto bytesRead = recv(mSocket, reinterpret_cast<char*>(data), len, 0);
-	    if (bytesRead == SOCKET_ERROR)
-	    {
-	        return Result<size_t, SocketBase::Error>::Err(SocketBase::ErrorFromWSACode(WSAGetLastError()));
-	    }
-	    else
-	    {
-	        return Result<size_t, SocketBase::Error>::Ok(static_cast<size_t>(bytesRead));
-	    }
-#elif __APPLE__ || __linux__
-		auto bytesRead = recv(mSocket, data, len, IsBlocking() ? MSG_WAITALL : MSG_DONTWAIT);
+		auto bytesRead = recv(mSocket, mBuffer.Data(), BUFFER_SIZE, 0);
+
 		if (bytesRead >= 0)
 		{
-			return bytesRead;
+			return IO::DynamicByteBuffer(mBuffer.Data(), bytesRead);
 		}
 		else
 		{
-			switch (bytesRead)
-			{
-				default:
-					Unreachable();
-			}
+			Unreachable();
 		}
-#endif // _WIN32
 	}
 
 
 
-	Result<size_t, Socket::Error> UDPClient::Write(const uint8_t* data, size_t len) const
+	Result<size_t, IO::Error> UDPClient::Write(const IO::DynamicByteBuffer& bytes)
 	{
-#if _WIN32
-	    auto bytesSent = send(mSocket, reinterpret_cast<const char*>(data), len, 0);
-	    if (bytesSent == SOCKET_ERROR)
-	    {
-	        return Result<size_t, SocketBase::Error>::Err(SocketBase::ErrorFromWSACode(WSAGetLastError()));
-	    }
-	    else
-	    {
-	        return Result<size_t, SocketBase::Error>::Ok(static_cast<size_t>(bytesSent));
-	    }
-#elif __APPLE__ || __linux__
-		auto bytesSent = send(mSocket, data, len, 0);
-		if (bytesSent >= 0)
+		auto bytesWritten = send(mSocket, bytes.Data(), bytes.Size(), 0);
+
+		if (bytesWritten >= 0)
 		{
-			return bytesSent;
+			return bytesWritten;
 		}
 		else
 		{
-			switch (bytesSent)
-			{
-				default:
-					Unreachable();
-			}
+			Unreachable();
 		}
-#endif // _WIN32
-	}
-
-
-
-
-
-
-
-	bool UDPClient::IsBlocking() const
-	{
-#if _WIN32
-
-#elif __APPLE__ || __linux__
-		auto flags = fcntl(mSocket, F_GETFL);
-		Assert(flags >= 0);
-		return !(flags & FNONBLOCK);
-#else
-	#warning "No Implementation for platform"
-#endif
-	}
-
-
-
-	void UDPClient::SetBlocking(bool blocking)
-	{
-#if _WIN32
-
-#elif __APPLE__ || __linux__
-		auto flags = fcntl(mSocket, F_GETFL);
-		Assert(flags >= 0);
-		flags &= blocking ? ~FNONBLOCK : FNONBLOCK;
-		auto result = fcntl(mSocket, F_SETFL, flags);
-		Assert(result >= 0);
-		Assert(IsBlocking() == blocking);
-#else
-	#warning "No Implementation for platform"
-#endif
 	}
 }

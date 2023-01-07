@@ -5,135 +5,158 @@
 #include "Standard/Assert.hpp"
 #include "Standard/Log.hpp"
 #include "Standard/Utilities.hpp"
+#include "Standard/Markers.hpp"
+#include <memory>
+#include <openssl/tls1.h>
 
 
 
-namespace Strawberry::Standard::Net::Sockets
+
+class TLSContext
 {
-	TLSClient::TLSClient(const std::string& host, uint16_t port)
-			: mTLS(nullptr), mConfig(nullptr), mCallbackArgs(std::make_unique<CallbackArg>(
-			std::make_tuple<TCPClient, Option<Result<size_t, Socket::Error>>, Option<Result<size_t, Socket::Error>>>(
-					{host, port}, {}, {})))
+public:
+	static SSL_CTX* Get()
 	{
-		Logging::Info("Starting TLS connection with {} : {}", host, port);
-		auto result = tls_init();
-		Assert(result >= 0);
-		mTLS = tls_client();
-		Assert(mTLS != nullptr);
-		mConfig = tls_config_new();
-		Assert(mConfig != nullptr);
-		result = tls_config_set_protocols(mConfig, TLS_PROTOCOL_TLSv1_2);
-		Assert(result >= 0);
-		result = tls_configure(mTLS, mConfig);
-		Assert(result >= 0);
-		auto portAsString = std::to_string(port);
-		result = tls_connect_cbs(mTLS, RecvData, SendData, mCallbackArgs.get(), host.c_str());
-		Assert(result >= 0);
-		result = tls_handshake(mTLS);
-		Assert(result >= 0);
-		Logging::Info("Successfully started TLS connection with {} : {}", host, port);
-	}
-
-
-
-	TLSClient::TLSClient(TLSClient&& rhs) noexcept
-			: mTLS(Take(rhs.mTLS)), mConfig(Take(rhs.mConfig)), mCallbackArgs(Take(rhs.mCallbackArgs))
-	{
-	}
-
-
-
-	TLSClient& TLSClient::operator=(TLSClient&& rhs) noexcept
-	{
-		if (this != &rhs)
+		if (!mInstance)
 		{
-			mTLS = Take(rhs.mTLS);
-			mConfig = Take(rhs.mConfig);
-			mCallbackArgs = Take(rhs.mCallbackArgs);
+			mInstance = std::unique_ptr<TLSContext>(new TLSContext());
 		}
 
-		return (*this);
+		return mInstance.get()->mSSL_CONTEXT;
 	}
 
 
 
-	TLSClient::~TLSClient()
+	~TLSContext()
 	{
-		if (mConfig) tls_config_free(mConfig);
-		if (mTLS)
+		SSL_CTX_free(mSSL_CONTEXT);
+	}
+
+
+
+private:
+	TLSContext()
+		: mSSL_CONTEXT(nullptr)
+	{
+		SSL_library_init();
+		OpenSSL_add_all_algorithms();
+		SSL_load_error_strings();
+
+		mSSL_CONTEXT = SSL_CTX_new(TLS_client_method());
+		Strawberry::Standard::Assert(mSSL_CONTEXT != nullptr);
+	}
+
+	SSL_CTX* mSSL_CONTEXT;
+
+	static std::unique_ptr<TLSContext> mInstance;
+};
+
+
+
+std::unique_ptr<TLSContext> TLSContext::mInstance = nullptr;
+
+
+
+namespace Strawberry::Standard::Net::Socket
+{
+	Result<TLSClient, Error> TLSClient::Connect(const Endpoint& endpoint)
+	{
+		auto tcp = TCPClient::Connect(endpoint);
+		if (!tcp)
 		{
-			tls_close(mTLS);
-			tls_free(mTLS);
+			return tcp.Err();
+		}
+
+		auto ssl = SSL_new(TLSContext::Get());
+		if (ssl == nullptr)
+		{
+			return Error::SSLAllocation;
+		}
+
+		if (endpoint.GetHostname())
+		{
+			auto hostnameResult = SSL_set_tlsext_host_name(ssl, endpoint.GetHostname()->c_str());
+			Assert(hostnameResult);
+		}
+
+		SSL_set_fd(ssl, tcp->mSocket);
+		auto connectResult = SSL_connect(ssl);
+		if (connectResult == -1)
+		{
+			return Error::SSLHandshake;
+		}
+
+		TLSClient tls;
+		tls.mTCP = tcp.Unwrap();
+		tls.mSSL = ssl;
+		return tls;
+	}
+
+
+
+	TLSClient::TLSClient()
+		: mSSL(nullptr)
+	{
+		if (mSSL)
+		{
+			SSL_shutdown(mSSL);
+			SSL_free(mSSL);
 		}
 	}
 
 
 
-	Result<size_t, Socket::Error> TLSClient::Read(uint8_t* data, size_t len) const
+	TLSClient::TLSClient(TLSClient&& other)
 	{
-		tls_read(mTLS, data, len);
-		Assert(std::get<1>(*mCallbackArgs).HasValue());
-		auto ret = *std::get<1>(*mCallbackArgs);
-		return ret;
+		mSSL = Take(other.mSSL);
+		mTCP = Take(other.mTCP);
 	}
 
 
 
-	Result<size_t, Socket::Error> TLSClient::Write(const uint8_t* data, size_t len) const
+	TLSClient& TLSClient::operator=(TLSClient&& other)
 	{
-		tls_write(mTLS, data, len);
-		Assert(std::get<2>(*mCallbackArgs).HasValue());
-		auto ret = *std::get<2>(*mCallbackArgs);
-		return ret;
-	}
-
-
-
-	bool TLSClient::IsBlocking() const
-	{
-		return std::get<TCPClient>(*mCallbackArgs).IsBlocking();
-	}
-
-
-
-	void TLSClient::SetBlocking(bool blocking)
-	{
-		std::get<TCPClient>(*mCallbackArgs).SetBlocking(blocking);
-	}
-
-
-
-	ssize_t TLSClient::SendData(tls* tls, const void* data, size_t len, void* _args)
-	{
-		auto args = reinterpret_cast<CallbackArg*>(_args);
-		auto& [socket, read, write] = *args;
-		write = socket.Write(static_cast<const uint8_t*>(data), len);
-
-		if (*write)
+		if (this != &other)
 		{
-			return static_cast<ssize_t>(**write);
+			this->~TLSClient();
+			mSSL = Take(other.mSSL);
+			mTCP = Take(other.mTCP);
+		}
+
+		return *this;
+	}
+
+
+
+	Result<IO::DynamicByteBuffer, IO::Error> TLSClient::Read(size_t length)
+	{
+		auto buffer = IO::DynamicByteBuffer::Zeroes(length);
+		auto bytesRead = SSL_read(mSSL, reinterpret_cast<void*>(buffer.Data()), length);
+
+		if (bytesRead >= 0)
+		{
+			buffer.Resize(bytesRead);
+			return buffer;
 		}
 		else
 		{
-			return 0;
+			Unreachable();
 		}
 	}
 
 
 
-	ssize_t TLSClient::RecvData(tls* tls, void* data, size_t len, void* _args)
+	Result<size_t, IO::Error> TLSClient::Write(const IO::DynamicByteBuffer& bytes)
 	{
-		auto args = reinterpret_cast<CallbackArg*>(_args);
-		auto& [socket, read, write] = *args;
-		read = socket.Read(static_cast<uint8_t*>(data), len);
+		auto bytesSent = SSL_write(mSSL, bytes.Data(), bytes.Size());
 
-		if (*read)
+		if (bytesSent >= 0)
 		{
-			return static_cast<ssize_t>(**read);
+			return bytesSent;
 		}
 		else
 		{
-			return 0;
+			Unreachable();
 		}
 	}
 }

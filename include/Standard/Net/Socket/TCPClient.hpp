@@ -3,44 +3,46 @@
 
 
 #include <string>
-#include "Socket.hpp"
 
 
 
-#if _WIN32
-using SOCKET_HANDLE = uintptr_t;
-#elif __APPLE__ || __linux__
-using SOCKET_HANDLE = int;
-#else
-#error "NO SOCKET IMPLEMENTATION FOR PLATFORM"
-#endif // _WIN32
+#include "Standard/Net/Error.hpp"
+#include "Standard/Result.hpp"
+#include "Standard/Net/Endpoint.hpp"
+#include "Standard/IO/DynamicByteBuffer.hpp"
+#include "Standard/IO/Error.hpp"
 
 
 
-namespace Strawberry::Standard::Net::Sockets
+namespace Strawberry::Standard::Net::Socket
 {
-	class TCPClient : public Socket
+	class TCPClient
 	{
+		friend class TLSClient;
 	public:
-		TCPClient(const std::string& hostname, uint16_t port);
-		TCPClient(const TCPClient&) = delete;
-		TCPClient& operator=(const TCPClient&) = delete;
-		TCPClient(TCPClient&& other) noexcept;
-		TCPClient& operator=(TCPClient&& other) noexcept;
+		static Result<TCPClient, Error> Connect(const Endpoint& endpoint);
+
+
+
+	public:
+		TCPClient();
+		TCPClient(const TCPClient& other) = delete;
+		TCPClient(TCPClient&& other);
+		TCPClient& operator=(const TCPClient& other) = delete;
+		TCPClient& operator=(TCPClient&& other);
 		~TCPClient();
 
-		Result<size_t, Error> Read(uint8_t* data, size_t len) const override;
-
-		Result<size_t, Error> Write(const uint8_t* data, size_t len) const override;
 
 
-
-		bool IsBlocking() const override;
-		void SetBlocking(bool blocking) override;
+	public:
+		Result<IO::DynamicByteBuffer, IO::Error> Read(size_t length);
+		Result<size_t, IO::Error>                Write(const IO::DynamicByteBuffer& bytes);
 
 
 
 	private:
-		SOCKET_HANDLE mSocket;
+#if defined(__APPLE__) || defined(__linux__)
+		int    mSocket;
+#endif
 	};
 }

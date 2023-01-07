@@ -3,7 +3,6 @@
 
 
 #include "Standard/Utilities.hpp"
-#include "Standard/Net/Socket/Socket.hpp"
 #include "Response.hpp"
 #include "Request.hpp"
 #include "Standard/Net/Socket/TCPClient.hpp"
@@ -13,11 +12,11 @@
 
 namespace Strawberry::Standard::Net::HTTP
 {
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	class ClientImpl
+	template<typename S>
+	class ClientBase
 	{
 	public:
-		explicit ClientImpl(const std::string& hostname, uint16_t port);
+		explicit ClientBase(const std::string& hostname, uint16_t port);
 
 
 
@@ -48,7 +47,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 	class HTTPClient
-		: public ClientImpl<Sockets::TCPClient>
+		: public ClientBase<Socket::TCPClient>
 	{
 	public:
 		HTTPClient(const std::string& hostname, uint16_t port = 80);
@@ -57,7 +56,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 	class HTTPSClient
-		: public ClientImpl<Sockets::TLSClient>
+		: public ClientBase<Socket::TLSClient>
 	{
 	public:
 		HTTPSClient(const std::string& hostname, uint16_t port = 443);

@@ -2,51 +2,41 @@
 
 
 
-#include "tls.h"
-#include <string>
-#include <memory>
-#include "Socket.hpp"
-#include "TCPClient.hpp"
+#include "Standard/Net/Error.hpp"
 #include "Standard/Option.hpp"
+#include "TCPClient.hpp"
+#include <memory>
+#include <string>
+#include <openssl/ssl.h>
 
 
-
-namespace Strawberry::Standard::Net::Sockets
+namespace Strawberry::Standard::Net::Socket
 {
-	class TLSClient : public Socket
+	class TLSClient
 	{
 	public:
-	    TLSClient(const std::string& host, uint16_t port);
-	    TLSClient(const TLSClient&) = delete;
-	    TLSClient& operator=(const TLSClient&) = delete;
-	    TLSClient(TLSClient&& rhs) noexcept ;
-	    TLSClient& operator=(TLSClient&& other) noexcept ;
-	    ~TLSClient();
-
-
-	    Result<size_t, Error> Read(uint8_t* data, size_t len) const override;
-	    Result<size_t, Error> Write(const uint8_t* data, size_t len) const override;
-
-
-		bool IsBlocking() const override;
-		void SetBlocking(bool blocking) override;
+		static Result<TLSClient, Error> Connect(const Endpoint& endpoint);
 
 
 
-	private:
-		using CallbackArg = std::tuple<TCPClient, Option<Result<size_t, Socket::Error>>, Option<Result<size_t, Socket::Error>>>;
+	public:
+		TLSClient();
+		TLSClient(const TLSClient& other) = delete;
+		TLSClient(TLSClient&& other);
+		TLSClient& operator=(const TLSClient& other) = delete;
+		TLSClient& operator=(TLSClient&& other);
 
 
 
-	private:
-		static ssize_t SendData(tls* tls, const void* data, size_t len, void* args);
-		static ssize_t RecvData(tls* tls,       void* data, size_t len, void* args);
+
+	public:
+		Result<IO::DynamicByteBuffer, IO::Error> Read(size_t length);
+		Result<size_t, IO::Error>                Write(const IO::DynamicByteBuffer& bytes);
 
 
 
 	private:
-	    tls*                         mTLS;
-	    tls_config*                  mConfig;
-		std::unique_ptr<CallbackArg> mCallbackArgs;
+		TCPClient mTCP;
+		SSL*      mSSL;
 	};
 }

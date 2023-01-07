@@ -77,7 +77,7 @@ add_library(Standard STATIC
         src/Net/Websocket/Message.cpp
         )
 
-target_include_directories(Standard PUBLIC include inline ${JSON_INCLUDE_DIR})
+target_include_directories(Standard PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
 target_link_libraries(Standard PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY})
 
 

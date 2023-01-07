@@ -11,20 +11,14 @@
 #include "Standard/IO/Base64.hpp"
 #include "Standard/Endian.hpp"
 #include "Standard/Markers.hpp"
-
-
-
-namespace
-{
-	using Strawberry::Standard::Assert;
-};
+#include "Standard/IO/Concepts.hpp"
 
 
 
 namespace Strawberry::Standard::Net::Websocket
 {
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	ClientImpl<S>::ClientImpl(ClientImpl<S>&& rhs) noexcept
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	ClientBase<S>::ClientBase(ClientBase<S>&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{
@@ -35,8 +29,8 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	ClientImpl<S>& ClientImpl<S>::operator=(ClientImpl<S>&& rhs) noexcept
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	ClientBase<S>& ClientBase<S>::operator=(ClientBase<S>&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{
@@ -49,16 +43,16 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	ClientImpl<S>::~ClientImpl()
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	ClientBase<S>::~ClientBase()
 	{
 		Disconnect();
 	}
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	void ClientImpl<S>::Disconnect()
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	void ClientBase<S>::Disconnect()
 	{
 		if (mSocket)
 		{
@@ -82,24 +76,24 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	void ClientImpl<S>::SendMessage(const Message& message)
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	void ClientBase<S>::SendMessage(const Message& message)
 	{
 		TransmitFrame(message).Unwrap();
 	}
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	Result<Message, Error> ClientImpl<S>::ReadMessage()
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	Result<Message, Error> ClientBase<S>::ReadMessage()
 	{
 		return ReceiveFrame();
 	}
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	Result<Message, Error> ClientImpl<S>::WaitMessage()
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	Result<Message, Error> ClientBase<S>::WaitMessage()
 	{
 		while (true)
 		{
@@ -121,8 +115,8 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	std::string ClientImpl<S>::GenerateNonce()
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	std::string ClientBase<S>::GenerateNonce()
 	{
 		std::random_device randomDevice;
 		IO::DynamicByteBuffer nonce(16);
@@ -142,8 +136,8 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	uint8_t ClientImpl<S>::GetOpcodeMask(Message::Opcode opcode)
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	uint8_t ClientBase<S>::GetOpcodeMask(Message::Opcode opcode)
 	{
 		switch (opcode)
 		{
@@ -166,8 +160,8 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	Option<Message::Opcode> ClientImpl<S>::GetOpcodeFromByte(uint8_t byte)
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	Option<Message::Opcode> ClientBase<S>::GetOpcodeFromByte(uint8_t byte)
 	{
 		using Opcode = Message::Opcode;
 
@@ -192,8 +186,8 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	uint32_t ClientImpl<S>::GenerateMaskingKey()
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	uint32_t ClientBase<S>::GenerateMaskingKey()
 	{
 		std::random_device rd;
 		uint32_t key;
@@ -206,60 +200,44 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	Error ClientImpl<S>::ErrorFromSocketError(typename S::Error err)
-	{
-		switch (err)
-		{
-			case S::Error::Closed:
-				return Error::Closed;
-			case S::Error::WouldBlock:
-				return Error::NoMessage;
-			default:
-				Unreachable();
-		}
-	}
-
-
-
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
+	template<typename S> requires IO::Read<S> && IO::Write<S>
 	Result<size_t, Error>
-	ClientImpl<S>::TransmitFrame(const Message& message)
+	ClientBase<S>::TransmitFrame(const Message& message)
 	{
 		size_t bytesTransmitted = 0;
 
 		uint8_t byte = 0b10000000;
 		byte |= GetOpcodeMask(message.GetOpcode());
-		bytesTransmitted += mSocket->WriteType(byte).Unwrap();
+		bytesTransmitted += mSocket->Write({&byte, sizeof(byte)}).Unwrap();
 
 		byte = 0b10000000;
 		auto bytes = message.AsBytes();
 		if (bytes.size() <= 125)
 		{
 			byte |= static_cast<uint8_t>(bytes.size());
-			bytesTransmitted += mSocket->WriteType(byte).Unwrap();
+			bytesTransmitted += mSocket->Write({&byte, sizeof(byte)}).Unwrap();
 		}
 		else if (bytes.size() <= std::numeric_limits<uint16_t>::max())
 		{
 			byte |= 126;
-			bytesTransmitted += mSocket->WriteType(byte).Unwrap();
-			bytesTransmitted += mSocket->WriteType(ToBigEndian(static_cast<uint16_t>(bytes.size()))).Unwrap();
+			bytesTransmitted += mSocket->Write({&byte, sizeof(byte)}).Unwrap();
+			bytesTransmitted += mSocket->Write(ToBigEndian(static_cast<uint16_t>(bytes.size()))).Unwrap();
 		}
 		else if (bytes.size() <= std::numeric_limits<uint64_t>::max())
 		{
 			byte |= 127;
-			bytesTransmitted += mSocket->WriteType(byte).Unwrap();
-			bytesTransmitted += mSocket->WriteType(ToBigEndian(static_cast<uint64_t>(bytes.size()))).Unwrap();
+			bytesTransmitted += mSocket->Write(byte).Unwrap();
+			bytesTransmitted += mSocket->Write(ToBigEndian(static_cast<uint64_t>(bytes.size()))).Unwrap();
 		}
 
 		uint32_t maskingKey = ToBigEndian(GenerateMaskingKey());
 		static_assert(sizeof(maskingKey) == 4);
-		bytesTransmitted += mSocket->WriteType(maskingKey).Unwrap();
+		bytesTransmitted += mSocket->Write(maskingKey).Unwrap();
 
 		for (int i = 0; i < bytes.size(); i++)
 		{
 			auto mask = reinterpret_cast<uint8_t*>(&maskingKey)[i % sizeof(maskingKey)];
-			bytesTransmitted += mSocket->template WriteType<uint8_t>(bytes[i] ^ mask).Unwrap();
+			bytesTransmitted += mSocket->Write(bytes[i] ^ mask).Unwrap();
 		}
 
 		return Result<size_t, Error>::Ok(bytesTransmitted);
@@ -267,8 +245,8 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	Result<Message, Error> ClientImpl<S>::ReceiveFrame()
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	Result<Message, Error> ClientBase<S>::ReceiveFrame()
 	{
 		if (mError == Error::Closed)
 		{
@@ -312,17 +290,15 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	Result<typename ClientImpl<S>::Fragment, Error>
-	ClientImpl<S>::ReceiveFragment()
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	Result<typename ClientBase<S>::Fragment, Error>
+	ClientBase<S>::ReceiveFragment()
 	{
 		using Opcode = Message::Opcode;
 
-		mSocket->SetBlocking(false);
-
 		bool final;
 		Opcode opcode;
-		if (auto byte = mSocket->template ReadType<uint8_t>())
+		if (auto byte = mSocket->Read(1).template Map<uint8_t>([](auto x) -> uint8_t { return x.template Into<uint8_t>(); }))
 		{
 			final = *byte & 0b10000000;
 			auto opcodeIn = GetOpcodeFromByte(*byte & 0b00001111);
@@ -337,25 +313,23 @@ namespace Strawberry::Standard::Net::Websocket
 		}
 		else
 		{
-			return Result<Fragment, Error>::Err(ErrorFromSocketError(byte.Err()));
+			Unreachable();
 		}
-
-		mSocket->SetBlocking(true);
 
 		bool masked;
 		size_t size;
-		if (auto byte = mSocket->template ReadType<uint8_t>())
+		if (auto byte = mSocket->Read(1).template Map<uint8_t>([](auto x) { return x.template Into<uint8_t>(); }))
 		{
 			masked = *byte & 0b10000000;
 			Assert(!masked);
 			uint8_t sizeByte = *byte & 0b01111111;
 			if (sizeByte == 126)
 			{
-				size = FromBigEndian(mSocket->template ReadType<uint16_t>().Unwrap());
+				size = FromBigEndian(mSocket->Read(sizeof(uint16_t)).Unwrap().template Into<uint16_t>());
 			}
 			else if (sizeByte == 127)
 			{
-				size = FromBigEndian(mSocket->template ReadType<uint64_t>().Unwrap());
+				size = FromBigEndian(mSocket->Read(sizeof(uint64_t)).Unwrap().template Into<uint64_t>());
 			}
 			else
 			{
@@ -364,14 +338,14 @@ namespace Strawberry::Standard::Net::Websocket
 		}
 		else
 		{
-			return Result<Fragment, Error>::Err(ErrorFromSocketError(byte.Err()));
+			Unreachable();
 		}
 
 
 		std::vector<uint8_t> payload;
 		if (size > 0)
 		{
-			payload = mSocket->template ReadVector<uint8_t>(size).Unwrap();
+			payload = mSocket->Read(size).Unwrap().AsVector();
 		}
 
 		return Result<Fragment, Error>::Ok(final, Message(opcode, payload));

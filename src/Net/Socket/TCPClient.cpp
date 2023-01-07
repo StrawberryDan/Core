@@ -16,188 +16,114 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <fcntl.h>
-#else
-#error "NO SOCKET IMPLEMENTATION FOR PLATFORM"
+#include <unistd.h>
 #endif // _WIN32
 
 
 
-namespace Strawberry::Standard::Net::Sockets
+namespace Strawberry::Standard::Net::Socket
 {
-	TCPClient::TCPClient(const std::string& hostname, uint16_t port)
-	    : mSocket{}
+	Result<TCPClient, Error> TCPClient::Connect(const Endpoint& endpoint)
 	{
-#if _WIN32
-	    WSAData wsaData;
-	    WSAStartup(MAKEWORD(2,2), &wsaData);
-	    mSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	    Assert(mSocket != INVALID_SOCKET);
-	
-	    std::string portAsString = std::to_string(port);
-	    addrinfo* addressInfo;
-	    auto result = getaddrinfo(hostname.c_str(), portAsString.c_str(), nullptr, &addressInfo);
-	    Assert(result == 0);
-	
-	    result = connect(mSocket, addressInfo->ai_addr, static_cast<int>(addressInfo->ai_addrlen));
-	    Assert(result == 0);
-	
-	    unsigned long iMode = 0;
-	    result = ioctlsocket(mSocket, FIONBIO, &iMode);
-	    Assert(result == 0);
-	
-	    int timeout = 1000;
-	    result = setsockopt(mSocket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<const char*>(&timeout), sizeof(timeout));
-	    Assert(result >= 0);
-#elif __APPLE__ || __linux__
-	    mSocket = socket(AF_INET, SOCK_STREAM, 0);
-	    Assert(mSocket != -1);
-	    auto host = gethostbyname(hostname.c_str());
-	    Assert(host != nullptr);
-	    sockaddr_in address{};
-	    address.sin_family = AF_INET;
-	    address.sin_port = htons(port);
-	    memcpy(&address.sin_addr.s_addr, host->h_addr_list[0], host->h_length);
-	    auto result = connect(mSocket, reinterpret_cast<sockaddr*>(&address), sizeof(address));
-		Assert(result == 0);
-#endif // _WIN32
+		TCPClient client;
+
+		addrinfo hints {.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_STREAM,.ai_protocol = IPPROTO_TCP};
+		if      (endpoint.GetAddress().IsIPv4()) hints.ai_family = AF_INET;
+		else if (endpoint.GetAddress().IsIPv6()) hints.ai_family = AF_INET6;
+		else                                     Unreachable();
+		addrinfo* peerAddress = nullptr;
+		auto addrResult = getaddrinfo(endpoint.GetAddress().AsString().c_str(),
+									  std::to_string(endpoint.GetPort()).c_str(),
+									  &hints, &peerAddress);
+		if (addrResult != 0)
+		{
+			return Error::AddressResolution;
+		}
+
+		auto handle = socket(peerAddress->ai_family, peerAddress->ai_socktype, peerAddress->ai_protocol);
+		if (handle == -1)
+		{
+			return Error::SocketCreation;
+		}
+
+		auto connection = connect(handle, peerAddress->ai_addr, peerAddress->ai_addrlen);
+		if (connection == -1)
+		{
+			return Error::EstablishConnection;
+		}
+
+		freeaddrinfo(peerAddress);
+		client.mSocket = handle;
+		return client;
 	}
-	
-	
-	
-	TCPClient::TCPClient(TCPClient&& other) noexcept
-	    : mSocket(Take(other.mSocket))
+
+
+
+	TCPClient::TCPClient()
+			: mSocket(-1)
+	{}
+
+
+
+	TCPClient::TCPClient(TCPClient&& other)
 	{
-	
+		mSocket = Replace(other.mSocket, -1);
 	}
-	
-	
-	
-	TCPClient& TCPClient::operator=(TCPClient&& other) noexcept
+
+
+
+	TCPClient& TCPClient::operator=(TCPClient&& other)
 	{
-	    mSocket = Take(other.mSocket);
-	    return (*this);
+		if (this != &other)
+		{
+			this->~TCPClient();
+			mSocket = Replace(other.mSocket, -1);
+		}
+
+		return *this;
 	}
-	
-	
-	
+
+
+
 	TCPClient::~TCPClient()
 	{
-#if _WIN32
-	    if (mSocket)
-	    {
-	        shutdown(mSocket, SD_BOTH);
-	        closesocket(mSocket);
-	    }
-#elif __APPLE__ || __linux__
-	    if (mSocket)
-	    {
-	        auto err = shutdown(mSocket, SHUT_RDWR);
-	        Assert(err == 0 || errno == ENOTCONN);
-	    }
-#endif // _WIN32
+		if (mSocket != -1)
+		{
+			close(mSocket);
+		}
 	}
-	
-	
-	
-	Result<size_t, Socket::Error> TCPClient::Read(uint8_t* data, size_t len) const
+
+
+
+	Result<IO::DynamicByteBuffer, IO::Error> TCPClient::Read(size_t length)
 	{
-#if _WIN32
-	    auto bytesRead = recv(mSocket, reinterpret_cast<char*>(data), static_cast<int>(len), 0);
-	    if (bytesRead == SOCKET_ERROR)
-	    {
-	
-	        int wsaError = WSAGetLastError();
-	        return Result<size_t, SocketBase::Error>::Err(SocketBase::ErrorFromWSACode(wsaError));
-	    }
-	    else
-	    {
-	        return Result<size_t, SocketBase::Error>::Ok(static_cast<size_t>(bytesRead));
-	    }
-#elif __APPLE__ || __linux__
-		auto blocking = IsBlocking();
-		auto flags = blocking ? MSG_WAITALL : MSG_DONTWAIT;
-	    auto bytesRead = recv(mSocket, data, len, flags);
-	    if (bytesRead >= 0)
-	    {
-	        return bytesRead;
-	    }
+		auto buffer = IO::DynamicByteBuffer::Zeroes(length);
+		auto bytesRead = recv(mSocket, reinterpret_cast<void*>(buffer.Data()), length, 0);
+
+		if (bytesRead >= 0)
+		{
+			buffer.Resize(bytesRead);
+			return buffer;
+		}
 		else
-	    {
-			switch (errno)
-			{
-				case EWOULDBLOCK:
-					return Error::WouldBlock;
-				default:
-					Unreachable();
-			}
-	    }
-#endif // _WIN32
+		{
+			Unreachable();
+		}
 	}
-	
-	
-	
-	Result<size_t, Socket::Error> TCPClient::Write(const uint8_t* data, size_t len) const
+
+
+
+	Result<size_t, IO::Error> TCPClient::Write(const IO::DynamicByteBuffer& bytes)
 	{
-#if _WIN32
-	    auto bytesSent = send(mSocket, reinterpret_cast<const char*>(data), static_cast<int>(len), 0);
-	    if (bytesSent == SOCKET_ERROR)
-	    {
-	        int wsaError = WSAGetLastError();
-	        return Result<size_t, SocketBase::Error>::Err(SocketBase::ErrorFromWSACode(wsaError));
-	    }
-	    else
-	    {
-	        return Result<size_t, SocketBase::Error>::Ok(static_cast<size_t>(bytesSent));
-	    }
-#elif __APPLE__ || __linux__
-		auto bytesSent = send(mSocket, data, len, 0);
+		auto bytesSent = send(mSocket, bytes.Data(), bytes.Size(), 0);
+
 		if (bytesSent >= 0)
 		{
 			return bytesSent;
 		}
 		else
 		{
-			switch (errno)
-			{
-				case EAGAIN:
-					return Error::WouldBlock;
-				default:
-					Unreachable();
-			}
+			Unreachable();
 		}
-#endif // _WIN32
-	}
-	
-	
-	
-	bool TCPClient::IsBlocking() const
-	{
-#if _WIN32
-	
-#elif __APPLE__ || __linux__
-		auto flags = fcntl(mSocket, F_GETFL);
-		Assert(flags >= 0);
-		return !(flags & FNONBLOCK);
-#else
-#warning "No Implementation for platform"
-#endif
-	}
-	
-	
-	
-	void TCPClient::SetBlocking(bool blocking)
-	{
-#if _WIN32
-	
-#elif __APPLE__ || __linux__
-		auto flags = fcntl(mSocket, F_GETFL);
-		Assert(flags >= 0);
-		flags = blocking ? ~FNONBLOCK : FNONBLOCK;
-		auto result = fcntl(mSocket, F_SETFL, flags);
-		Assert(result >= 0);
-		Assert(IsBlocking() == blocking);
-#else
-#warning "No Implementation for platform"
-#endif
 	}
 }

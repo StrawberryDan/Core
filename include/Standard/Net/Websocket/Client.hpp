@@ -13,10 +13,10 @@
 #include "Standard/Option.hpp"
 #include "Standard/Result.hpp"
 #include "Standard/Mutex.hpp"
-#include "Standard/Net/Socket/Socket.hpp"
 #include "Standard/Net/Socket/TCPClient.hpp"
 #include "Standard/Net/Socket/TLSClient.hpp"
 #include "Standard/Net/Websocket/Message.hpp"
+#include "Standard/IO/Concepts.hpp"
 
 
 
@@ -33,15 +33,15 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	class ClientImpl
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	class ClientBase
 	{
 	public:
-		ClientImpl(const ClientImpl&) = delete;
-		ClientImpl& operator=(const ClientImpl&) = delete;
-		ClientImpl(ClientImpl&& rhs) noexcept;
-		ClientImpl& operator=(ClientImpl&& rhs) noexcept;
-		~ClientImpl();
+		ClientBase(const ClientBase&) = delete;
+		ClientBase& operator=(const ClientBase&) = delete;
+		ClientBase(ClientBase&& rhs) noexcept;
+		ClientBase& operator=(ClientBase&& rhs) noexcept;
+		~ClientBase();
 
 
 
@@ -83,12 +83,11 @@ namespace Strawberry::Standard::Net::Websocket
 		[[nodiscard]] static uint8_t GetOpcodeMask(Message::Opcode opcode);
 		[[nodiscard]] static Option<Message::Opcode> GetOpcodeFromByte(uint8_t byte);
 		[[nodiscard]] static uint32_t GenerateMaskingKey();
-		[[nodiscard]] static Error ErrorFromSocketError(typename S::Error err);
 
 
 
 	protected:
-		ClientImpl() = default;
+		ClientBase() = default;
 
 
 
@@ -103,7 +102,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 	class WSClient
-		: public ClientImpl<Sockets::TCPClient>
+		: public ClientBase<Socket::TCPClient>
 	{
 	public:
 		static Result<WSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 80);
@@ -112,7 +111,7 @@ namespace Strawberry::Standard::Net::Websocket
 
 
 	class WSSClient
-		: public ClientImpl<Sockets::TLSClient>
+		: public ClientBase<Socket::TLSClient>
 	{
 	public:
 		static Result<WSSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 443);

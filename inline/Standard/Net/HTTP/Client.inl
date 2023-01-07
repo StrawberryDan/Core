@@ -11,32 +11,32 @@
 
 namespace Strawberry::Standard::Net::HTTP
 {
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	ClientImpl<S>::ClientImpl(const std::string& hostname, uint16_t port)
-			: mSocket(hostname, port)
+	template<typename S>
+	ClientBase<S>::ClientBase(const std::string& hostname, uint16_t port)
+			: mSocket(S::Connect(Endpoint::Resolve(hostname, port).Unwrap()).Unwrap())
 	{
 	}
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	void ClientImpl<S>::SendRequest(const Request& request)
+	template<typename S>
+	void ClientBase<S>::SendRequest(const Request& request)
 	{
 		std::string headerLine = fmt::format(
 				"{} {} HTTP/{}\r\n",
 				ToString(request.GetVerb()), request.GetURI(), ToString(request.GetVersion()));
-		mSocket.WriteArray(headerLine.data(), headerLine.length()).Unwrap();
+		mSocket.Write({headerLine.data(), headerLine.length()}).Unwrap();
 		for (const auto& [key, values]: *request.GetHeader())
 		{
 			for (const auto& value: values)
 			{
 				std::string formatted = fmt::format("{}: {}\r\n", key, value);
-				mSocket.WriteArray(formatted.data(), formatted.length()).Unwrap();
+				mSocket.Write({formatted.data(), formatted.length()}).Unwrap();
 			}
 		}
 
 		std::vector<char> blankLine = {'\r', '\n'};
-		mSocket.WriteVector(blankLine).Unwrap();
+		mSocket.Write({blankLine.data(), blankLine.size()}).Unwrap();
 
 		if (request.GetPayload())
 		{
@@ -45,14 +45,14 @@ namespace Strawberry::Standard::Net::HTTP
 				const auto& payload = std::get<SimplePayload>(*request.GetPayload());
 				if (payload.Size() > 0)
 				{
-					mSocket.WriteVector(*payload).Unwrap();
+					mSocket.Write({payload.Data(), payload.Size()}).Unwrap();
 				}
 			} else if (std::holds_alternative<ChunkedPayload>(*request.GetPayload()))
 			{
 				const auto& payload = std::get<ChunkedPayload>(*request.GetPayload());
 				for (const auto& chunk: *payload)
 				{
-					mSocket.WriteVector(*chunk).Unwrap();
+					mSocket.Write({chunk.Data(), chunk.Size()}).Unwrap();
 				}
 			}
 		}
@@ -60,8 +60,8 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	Response ClientImpl<S>::Receive()
+	template<typename S>
+	Response ClientBase<S>::Receive()
 	{
 		static const auto statusLinePattern = std::regex(R"(HTTP\/([^\s]+)\s+(\d{3})\s+([^\r]*)\r\n)");
 		static const auto headerLinePattern = std::regex(R"(([^:]+)\s*:\s*([^\r]+)\r\n)");
@@ -111,8 +111,8 @@ namespace Strawberry::Standard::Net::HTTP
 			unsigned long contentLength = std::stoul(response.GetHeader().Get("Content-Length"));
 			if (contentLength > 0)
 			{
-				std::vector<uint8_t> data = mSocket.template ReadVector<uint8_t>(contentLength).Unwrap();
-				simplePayload.Write(data.data(), data.size());
+				auto data = mSocket.Read(contentLength).Unwrap();
+				simplePayload.Write(data.Data(), data.Size());
 				payload = simplePayload;
 			}
 		}
@@ -123,8 +123,8 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	ChunkedPayload ClientImpl<S>::ReadChunkedPayload()
+	template<typename S>
+	ChunkedPayload ClientBase<S>::ReadChunkedPayload()
 	{
 		std::string line;
 		std::smatch matchResults;
@@ -142,7 +142,7 @@ namespace Strawberry::Standard::Net::HTTP
 			auto bytesToRead = std::stoul(matchResults[1], nullptr, 16);
 			if (bytesToRead > 0)
 			{
-				ChunkedPayload::Chunk chunk(this->mSocket.template ReadVector<uint8_t>(bytesToRead).Unwrap());
+				ChunkedPayload::Chunk chunk(this->mSocket.Read(bytesToRead).Unwrap().AsVector());
 				Assert(chunk.Size() == bytesToRead);
 				payload.AddChunk(chunk);
 			}
@@ -153,13 +153,13 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-	template<typename S> requires std::derived_from<S, Sockets::Socket>
-	std::string ClientImpl<S>::ReadLine()
+	template<typename S>
+	std::string ClientBase<S>::ReadLine()
 	{
 		std::string line;
 		while (!line.ends_with("\r\n"))
 		{
-			line += mSocket.template ReadType<char>().Unwrap();
+			line += mSocket.Read(1).Unwrap().template Into<char>();
 		}
 		return line;
 	}
