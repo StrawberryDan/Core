@@ -26,9 +26,9 @@ namespace Strawberry::Standard::Net
 
 
 
-		inline Option<std::string> GetHostname() const { return mHostName; };
-		inline const IPAddress&    GetAddress()  const { return mAddress;  }
-		inline        uint16_t     GetPort()     const { return mPort;     }
+		inline const Option<std::string>& GetHostname() const { return mHostName; };
+		inline const IPAddress&           GetAddress()  const { return mAddress;  }
+		inline        uint16_t            GetPort()     const { return mPort;     }
 
 
 	private:
