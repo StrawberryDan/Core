@@ -38,23 +38,9 @@ namespace Strawberry::Standard::Net::HTTP
 		std::vector<char> blankLine = {'\r', '\n'};
 		mSocket.Write({blankLine.data(), blankLine.size()}).Unwrap();
 
-		if (request.GetPayload())
+		if (request.GetPayload().Size() > 0)
 		{
-			if (std::holds_alternative<SimplePayload>(*request.GetPayload()))
-			{
-				const auto& payload = std::get<SimplePayload>(*request.GetPayload());
-				if (payload.Size() > 0)
-				{
-					mSocket.Write({payload.Data(), payload.Size()}).Unwrap();
-				}
-			} else if (std::holds_alternative<ChunkedPayload>(*request.GetPayload()))
-			{
-				const auto& payload = std::get<ChunkedPayload>(*request.GetPayload());
-				for (const auto& chunk: *payload)
-				{
-					mSocket.Write({chunk.Data(), chunk.Size()}).Unwrap();
-				}
-			}
+			mSocket.Write({request.GetPayload().Data(), request.GetPayload().Size()}).Unwrap();
 		}
 	}
 
@@ -91,7 +77,7 @@ namespace Strawberry::Standard::Net::HTTP
 			}
 		}
 
-		Payload payload;
+		IO::DynamicByteBuffer payload;
 		if (response.GetHeader().Contains("Transfer-Encoding"))
 		{
 			auto transferEncoding = response.GetHeader().Get("Transfer-Encoding");
@@ -107,13 +93,11 @@ namespace Strawberry::Standard::Net::HTTP
 		}
 		else if (response.GetHeader().Contains("Content-Length"))
 		{
-			SimplePayload simplePayload;
 			unsigned long contentLength = std::stoul(response.GetHeader().Get("Content-Length"));
 			if (contentLength > 0)
 			{
 				auto data = mSocket.Read(contentLength).Unwrap();
-				simplePayload.Write(data.Data(), data.Size());
-				payload = simplePayload;
+				payload.Push(data.Data(), data.Size());
 			}
 		}
 		response.SetPayload(payload);
@@ -124,13 +108,13 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 	template<typename S>
-	ChunkedPayload ClientBase<S>::ReadChunkedPayload()
+	IO::DynamicByteBuffer ClientBase<S>::ReadChunkedPayload()
 	{
 		std::string line;
 		std::smatch matchResults;
 		static const auto chunkSizeLine = std::regex(R"((\d+)\r\n)");
 
-		ChunkedPayload payload;
+		IO::DynamicByteBuffer payload;
 		while (true)
 		{
 			line = this->ReadLine();
@@ -142,9 +126,9 @@ namespace Strawberry::Standard::Net::HTTP
 			auto bytesToRead = std::stoul(matchResults[1], nullptr, 16);
 			if (bytesToRead > 0)
 			{
-				ChunkedPayload::Chunk chunk(this->mSocket.Read(bytesToRead).Unwrap().AsVector());
+				auto chunk = this->mSocket.Read(bytesToRead).Unwrap();
 				Assert(chunk.Size() == bytesToRead);
-				payload.AddChunk(chunk);
+				payload.Push(chunk);
 			}
 		}
 

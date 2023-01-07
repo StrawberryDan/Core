@@ -35,14 +35,11 @@ add_library(Standard STATIC
         include/Standard/Net/Address.hpp
         include/Standard/Net/Endpoint.hpp
         include/Standard/Net/Error.hpp
-        include/Standard/Net/HTTP/ChunkedPayload.hpp
         include/Standard/Net/HTTP/Client.hpp
         include/Standard/Net/HTTP/Constants.hpp
         include/Standard/Net/HTTP/Header.hpp
-        include/Standard/Net/HTTP/Payload.hpp
         include/Standard/Net/HTTP/Request.hpp
         include/Standard/Net/HTTP/Response.hpp
-        include/Standard/Net/HTTP/SimplePayload.hpp
         include/Standard/Net/Socket/TCPClient.hpp
         include/Standard/Net/Socket/TLSClient.hpp
         include/Standard/Net/Socket/UDPClient.hpp
@@ -62,13 +59,11 @@ add_library(Standard STATIC
         src/Markers.cpp
         src/Net/Address.cpp
         src/Net/Endpoint.cpp
-        src/Net/HTTP/ChunkedPayload.cpp
         src/Net/HTTP/Client.cpp
         src/Net/HTTP/Constants.cpp
         src/Net/HTTP/Header.cpp
         src/Net/HTTP/Request.cpp
         src/Net/HTTP/Response.cpp
-        src/Net/HTTP/SimplePayload.cpp
         src/Net/RTP/Header.cpp
         src/Net/Socket/TCPClient.cpp
         src/Net/Socket/TLSClient.cpp

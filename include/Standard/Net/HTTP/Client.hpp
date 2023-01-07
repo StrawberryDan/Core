@@ -33,7 +33,7 @@ namespace Strawberry::Standard::Net::HTTP
 
 	private:
 		std::string ReadLine();
-		ChunkedPayload ReadChunkedPayload();
+		IO::DynamicByteBuffer ReadChunkedPayload();
 
 
 

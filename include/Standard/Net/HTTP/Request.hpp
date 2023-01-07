@@ -4,7 +4,7 @@
 
 #include "Constants.hpp"
 #include "Header.hpp"
-#include "Payload.hpp"
+#include "Standard/IO/DynamicByteBuffer.hpp"
 #include <string>
 
 
@@ -43,21 +43,21 @@ namespace Strawberry::Standard::Net::HTTP
 
 
 
-		[[nodiscard]] inline const Payload& GetPayload() const
+		[[nodiscard]] inline const IO::DynamicByteBuffer& GetPayload() const
 		{ return mPayload; }
 
 
 
-		inline void SetPayload(const Payload& payload)
+		inline void SetPayload(const IO::DynamicByteBuffer& payload)
 		{ mPayload = payload; }
 
 
 
 	private:
-		Verb        mVerb;
-		std::string mURI;
-		Version     mVersion;
-		Header  mHeader;
-		Payload     mPayload;
+		Verb                  mVerb;
+		std::string           mURI;
+		Version               mVersion;
+		Header                mHeader;
+		IO::DynamicByteBuffer mPayload;
 	};
 }
