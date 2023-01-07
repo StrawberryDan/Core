@@ -47,6 +47,11 @@ namespace Strawberry::Standard::IO
 		template <typename T>
 		void Push(const std::vector<T>& data);
 
+		inline void Push(const IO::DynamicByteBuffer& bytes) { Push(bytes.Data(), bytes.Size()); }
+
+		template <size_t S>
+		inline void Push(const IO::ByteBuffer<S>& bytes) { Push(bytes.Data(), bytes.Size()); }
+
 
 
 		// Accessors
