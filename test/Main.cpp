@@ -12,6 +12,8 @@
 #include "Standard/Math/Math.hpp"
 #include "Standard/Iter/STLWrapper.hpp"
 #include "Standard/Net/Endpoint.hpp"
+#include "Standard/Net/Socket/TCPClient.hpp"
+#include "Standard/Net/Socket/TLSClient.hpp"
 
 
 
@@ -156,6 +158,28 @@ namespace Test
 		auto google = Strawberry::Standard::Net::Endpoint::Resolve("google.com", 80);
 		Assert(google || justnoise);
 	}
+
+
+
+	void TCP()
+	{
+		auto google = Strawberry::Standard::Net::Endpoint::Resolve("google.com", 80).Unwrap();
+		auto client = Strawberry::Standard::Net::Socket::TCPClient::Connect(google).Unwrap();
+	}
+
+
+
+	void TLS()
+	{
+		{
+			auto google = Strawberry::Standard::Net::Endpoint::Resolve("google.com", 443).Unwrap();
+			auto client = Strawberry::Standard::Net::Socket::TLSClient::Connect(google).Unwrap();
+		}
+		{
+			auto google = Strawberry::Standard::Net::Endpoint::Resolve("google.com", 443).Unwrap();
+			auto client = Strawberry::Standard::Net::Socket::TLSClient::Connect(google).Unwrap();
+		}
+	}
 }
 
 
@@ -166,4 +190,6 @@ int main()
 	Test::Iterators();
 	Test::ParseIP();
 	Test::DNS();
+	Test::TCP();
+	Test::TLS();
 }
