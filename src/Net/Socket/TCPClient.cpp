@@ -37,18 +37,21 @@ namespace Strawberry::Standard::Net::Socket
 									  &hints, &peerAddress);
 		if (addrResult != 0)
 		{
+			freeaddrinfo(peerAddress);
 			return Error::AddressResolution;
 		}
 
 		auto handle = socket(peerAddress->ai_family, peerAddress->ai_socktype, peerAddress->ai_protocol);
 		if (handle == -1)
 		{
+			freeaddrinfo(peerAddress);
 			return Error::SocketCreation;
 		}
 
 		auto connection = connect(handle, peerAddress->ai_addr, peerAddress->ai_addrlen);
 		if (connection == -1)
 		{
+			freeaddrinfo(peerAddress);
 			return Error::EstablishConnection;
 		}
 
