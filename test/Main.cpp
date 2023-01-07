@@ -11,6 +11,7 @@
 #include "Standard/Assert.hpp"
 #include "Standard/Math/Math.hpp"
 #include "Standard/Iter/STLWrapper.hpp"
+#include "Standard/Net/Endpoint.hpp"
 
 
 
@@ -138,6 +139,23 @@ namespace Test
 		Assert(pairs_map[3] == 4);
 		Assert(pairs_map[5] == 6);
 	}
+
+
+
+	void ParseIP()
+	{
+		auto ip = Net::IPv4Address::Parse("255.255.255.255").Unwrap();
+		Assert(ip.AsString() == "255.255.255.255");
+	}
+
+
+
+	void DNS()
+	{
+		auto justnoise = Strawberry::Standard::Net::Endpoint::Resolve("justnoise.net", 80);
+		auto google = Strawberry::Standard::Net::Endpoint::Resolve("google.com", 80);
+		Assert(google || justnoise);
+	}
 }
 
 
@@ -146,4 +164,6 @@ int main()
 {
 	Test::Base64();
 	Test::Iterators();
+	Test::ParseIP();
+	Test::DNS();
 }
