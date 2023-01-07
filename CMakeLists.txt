@@ -70,6 +70,8 @@ add_library(Standard STATIC
         src/Net/Socket/UDPClient.cpp
         src/Net/Websocket/Client.cpp
         src/Net/Websocket/Message.cpp
+        include/Standard/Collection/CircularBuffer.hpp
+        inline/Standard/Collection/CircularBuffer.inl
         )
 
 target_include_directories(Standard PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
