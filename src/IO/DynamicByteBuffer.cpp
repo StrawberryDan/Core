@@ -2,6 +2,22 @@
 
 
 
+Strawberry::Standard::IO::DynamicByteBuffer Strawberry::Standard::IO::DynamicByteBuffer::Zeroes(size_t len)
+{
+	DynamicByteBuffer result;
+	result.mData = std::vector<uint8_t>(len, 0);
+	return result;
+}
+
+
+
+Strawberry::Standard::IO::DynamicByteBuffer Strawberry::Standard::IO::DynamicByteBuffer::WithCapacity(size_t len)
+{
+	DynamicByteBuffer result;
+	result.mData.reserve(len);
+	return result;
+}
+
 
 
 size_t Strawberry::Standard::IO::DynamicByteBuffer::Size() const
@@ -21,6 +37,20 @@ uint8_t* Strawberry::Standard::IO::DynamicByteBuffer::Data()
 const uint8_t* Strawberry::Standard::IO::DynamicByteBuffer::Data() const
 {
 	return mData.data();
+}
+
+
+
+void Strawberry::Standard::IO::DynamicByteBuffer::Reserve(size_t len)
+{
+	mData.reserve(len);
+}
+
+
+
+void Strawberry::Standard::IO::DynamicByteBuffer::Resize(size_t len)
+{
+	mData.resize(len);
 }
 
 

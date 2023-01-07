@@ -21,6 +21,12 @@ namespace Strawberry::Standard::IO
 	class DynamicByteBuffer
 	{
 	public:
+		// Static Methods
+		static DynamicByteBuffer Zeroes(size_t len);
+		static DynamicByteBuffer WithCapacity(size_t len);
+
+
+
 		// Constructors
 		DynamicByteBuffer() = default;
 		template <typename T>
@@ -51,6 +57,12 @@ namespace Strawberry::Standard::IO
 
 		      uint8_t& operator[](size_t i)       { return mData[i]; }
 		const uint8_t& operator[](size_t i) const { return mData[i]; }
+
+
+
+		// Sizing
+		void Reserve(size_t len);
+		void Resize(size_t len);
 
 
 
