@@ -70,5 +70,29 @@ namespace Strawberry::Standard::Net
 
 
 
-	using IPAddress = std::variant<IPv4Address, IPv6Address>;
+	class IPAddress
+	{
+	public:
+		IPAddress(IPv4Address address);
+		IPAddress(IPv6Address address);
+
+
+
+		// Checking
+		inline bool IsIPv4() const { return std::holds_alternative<IPv4Address>(mPayload); }
+		inline bool IsIPv6() const { return std::holds_alternative<IPv6Address>(mPayload); }
+
+
+
+		// Casting
+		Option<IPv4Address> AsIPv4() const;
+		Option<IPv6Address> AsIPv6() const;
+		const IO::DynamicByteBuffer AsBytes() const;
+		std::string                 AsString() const;
+
+
+
+	private:
+		std::variant<IPv4Address, IPv6Address> mPayload;
+	};
 }

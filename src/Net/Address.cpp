@@ -3,6 +3,7 @@
 
 
 #include "Standard/Assert.hpp"
+#include "Standard/Markers.hpp"
 #include <numeric>
 
 
@@ -82,5 +83,71 @@ namespace Strawberry::Standard::Net
 		auto result = inet_ntop(AF_INET6, mData.Data(), buffer, INET6_ADDRSTRLEN);
 		Assert(result != nullptr);
 		return {buffer};
+	}
+
+
+
+	IPAddress::IPAddress(IPv4Address address)
+		: mPayload(address)
+	{}
+
+
+
+	IPAddress::IPAddress(IPv6Address address)
+		: mPayload(address)
+	{}
+
+
+
+	Option<IPv4Address> IPAddress::AsIPv4() const
+	{
+		if (IsIPv4())
+			return std::get<IPv4Address>(mPayload);
+		else
+			return {};
+	}
+
+
+
+	Option<IPv6Address> IPAddress::AsIPv6() const
+	{
+		if (IsIPv6())
+			return std::get<IPv6Address>(mPayload);
+		else
+			return {};
+	}
+
+
+
+	const IO::DynamicByteBuffer IPAddress::AsBytes() const
+	{
+		if (auto addr = AsIPv4())
+		{
+			return addr->AsBytes();
+		} else if (auto addr = AsIPv6())
+		{
+			return addr->AsBytes();
+		}
+		else
+		{
+			Unreachable();
+		}
+	}
+
+
+
+	std::string IPAddress::AsString() const
+	{
+		if (auto addr = AsIPv4())
+		{
+			return addr->AsString();
+		} else if (auto addr = AsIPv6())
+		{
+			return addr->AsString();
+		}
+		else
+		{
+			Unreachable();
+		}
 	}
 }
