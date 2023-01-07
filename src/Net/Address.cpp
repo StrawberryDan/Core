@@ -35,14 +35,14 @@ namespace Strawberry::Standard::Net
 
 
 
-	IO::ByteBuffer<4> IPv4Address::AsBytes()
+	IO::ByteBuffer<4> IPv4Address::AsBytes() const
 	{
 		return mData;
 	}
 
 
 
-	std::string IPv4Address::AsString()
+	std::string IPv4Address::AsString() const
 	{
 		char buffer[INET_ADDRSTRLEN] = {0};
 		auto result = inet_ntop(AF_INET, mData.Data(), buffer, INET_ADDRSTRLEN);

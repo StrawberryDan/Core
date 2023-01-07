@@ -33,8 +33,8 @@ namespace Strawberry::Standard::Net
 
 
 		// Casting
-		IO::ByteBuffer<4> AsBytes();
-		std::string       AsString();
+		IO::ByteBuffer<4> AsBytes() ;
+		std::string       AsString() const;
 
 	private:
 		IO::ByteBuffer<4> mData;
@@ -62,7 +62,7 @@ namespace Strawberry::Standard::Net
 
 		// Casting
 		const IO::ByteBuffer<16>& AsBytes() const;
-		std::string         AsString() const;
+		std::string              AsString() const;
 
 	private:
 		IO::ByteBuffer<16> mData;
