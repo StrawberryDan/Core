@@ -21,28 +21,31 @@
 
 namespace Strawberry::Standard::Net::Socket
 {
-	Result<UDPClient, Error> UDPClient::Create(uint16_t port)
+	Result<UDPClient, Error> UDPClient::CreateIPv4()
 	{
-		addrinfo hints{.ai_flags = AI_ADDRCONFIG,.ai_socktype = SOCK_DGRAM, .ai_protocol = IPPROTO_UDP};
-		addrinfo* peer = nullptr;
-		auto getAddrResult = getaddrinfo("127.0.0.1", std::to_string(port).c_str(), &hints, &peer);
-		if (getAddrResult != 0)
-		{
-			freeaddrinfo(peer);
-			return Error::AddressResolution;
-		}
-
-		auto handle = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol);
+		auto handle = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 		if (handle == -1)
 		{
-			freeaddrinfo(peer);
 			return Error::SocketCreation;
 		}
 
 		UDPClient client;
 		client.mSocket = handle;
+		return client;
+	}
 
-		freeaddrinfo(peer);
+
+
+	Result<UDPClient, Error> UDPClient::CreateIPv6()
+	{
+		auto handle = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+		if (handle == -1)
+		{
+			return Error::SocketCreation;
+		}
+
+		UDPClient client;
+		client.mSocket = handle;
 		return client;
 	}
 
