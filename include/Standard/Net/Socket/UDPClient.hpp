@@ -13,6 +13,7 @@ namespace Strawberry::Standard::Net::Socket
 	class UDPClient
 	{
 	public:
+		static Result<UDPClient, Error> Create();
 		static Result<UDPClient, Error> CreateIPv4();
 		static Result<UDPClient, Error> CreateIPv6();
 

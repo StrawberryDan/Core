@@ -21,6 +21,25 @@
 
 namespace Strawberry::Standard::Net::Socket
 {
+	Result<UDPClient, Error> UDPClient::Create()
+	{
+		auto handle = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+		if (handle == -1)
+		{
+			return Error::SocketCreation;
+		}
+
+		int ipv6Only = 0;
+		auto optSetResult = setsockopt(handle, IPPROTO_IPV6, IPV6_V6ONLY, &ipv6Only, sizeof(ipv6Only));
+		Assert(optSetResult == 0);
+
+		UDPClient client;
+		client.mSocket = handle;
+		return client;
+	}
+
+
+
 	Result<UDPClient, Error> UDPClient::CreateIPv4()
 	{
 		auto handle = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
