@@ -27,12 +27,6 @@ add_library(Standard STATIC
         include/Standard/IO/Concepts.hpp
         include/Standard/IO/DynamicByteBuffer.hpp
         include/Standard/IO/Error.hpp
-        include/Standard/Iter/Filter.hpp
-        include/Standard/Iter/Iterator.hpp
-        include/Standard/Iter/Map.hpp
-        include/Standard/Iter/STLWrapper.hpp
-        include/Standard/Iter/STLWrapper.hpp
-        include/Standard/Iter/Skip.hpp
         include/Standard/Markers.hpp
         include/Standard/Math/Math.hpp
         include/Standard/Mutex.hpp
