@@ -25,7 +25,11 @@ namespace Strawberry::Standard::IO
 
 		inline size_t Size() const { return mSize; }
 		inline size_t Capacity() const { return mBuffer.Size(); }
-		inline size_t RemainingCapacity() const { return Capacity() - Size(); };
+		inline size_t RemainingCapacity() const { return Capacity() - Size(); }
+
+
+	private:
+		void Expand();
 
 
 

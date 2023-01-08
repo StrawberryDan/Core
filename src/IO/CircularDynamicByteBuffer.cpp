@@ -13,7 +13,6 @@ namespace Strawberry::Standard::IO
 
 	Result<DynamicByteBuffer, Error> CircularDynamicByteBuffer::Read(size_t len)
 	{
-		Assert(len <= Capacity());
 		if (mSize == 0 || mSize < len)
 		{
 			return Error::NotEnoughData;
@@ -55,25 +54,7 @@ namespace Strawberry::Standard::IO
 	{
 		if (RemainingCapacity() < bytes.Size())
 		{
-			DynamicByteBuffer newBuffer = DynamicByteBuffer::Zeroes(Capacity() * 2);
-
-			if (mHead < mTail)
-			{
-				memcpy(newBuffer.Data(), mBuffer.Data() + mHead, mSize);
-			}
-			else
-			{
-				memcpy(newBuffer.Data(), mBuffer.Data() + mHead, std::min(Capacity() - mHead, mSize));
-				auto bytesCopied = std::min(Capacity() - mHead, mSize);
-				if (bytesCopied < mSize)
-				{
-					memcpy(newBuffer.Data(), mBuffer.Data(), mSize - bytesCopied);
-				}
-			}
-
-			mHead = 0;
-			mTail = mSize;
-			mBuffer = std::move(newBuffer);
+			Expand();
 		}
 
 		size_t bytesWritten = 0;
@@ -90,6 +71,36 @@ namespace Strawberry::Standard::IO
 			mSize += remainder;
 		}
 
+		if (RemainingCapacity() == 0)
+		{
+			Expand();
+		}
+
 		return bytesWritten;
+	}
+
+
+
+	void CircularDynamicByteBuffer::Expand()
+	{
+		DynamicByteBuffer newBuffer = DynamicByteBuffer::Zeroes(Capacity() * 2);
+
+		if (mHead < mTail)
+		{
+			memcpy(newBuffer.Data(), mBuffer.Data() + mHead, mSize);
+		}
+		else
+		{
+			memcpy(newBuffer.Data(), mBuffer.Data() + mHead, std::min(Capacity() - mHead, mSize));
+			auto bytesCopied = std::min(Capacity() - mHead, mSize);
+			if (bytesCopied < mSize)
+			{
+				memcpy(newBuffer.Data(), mBuffer.Data(), mSize - bytesCopied);
+			}
+		}
+
+		mHead = 0;
+		mTail = mSize;
+		mBuffer = std::move(newBuffer);
 	}
 }
