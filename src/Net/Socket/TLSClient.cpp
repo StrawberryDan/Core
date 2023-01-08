@@ -11,6 +11,12 @@
 
 
 
+#if defined(__APPLE__) || defined(__linux__)
+#include <sys/socket.h>
+#include <unistd.h>
+#endif
+
+
 
 class TLSContext
 {
@@ -96,13 +102,7 @@ namespace Strawberry::Standard::Net::Socket
 
 	TLSClient::TLSClient()
 		: mSSL(nullptr)
-	{
-		if (mSSL)
-		{
-			SSL_shutdown(mSSL);
-			SSL_free(mSSL);
-		}
-	}
+	{}
 
 
 
@@ -128,6 +128,19 @@ namespace Strawberry::Standard::Net::Socket
 
 
 
+	TLSClient::~TLSClient()
+	{
+		if (mSSL)
+		{
+			SSL_shutdown(mSSL);
+			shutdown(mTCP.mSocket, SHUT_RDWR);
+			close(mTCP.mSocket);
+			SSL_free(mSSL);
+		}
+	}
+
+
+
 	Result<IO::DynamicByteBuffer, IO::Error> TLSClient::Read(size_t length)
 	{
 		auto buffer = IO::DynamicByteBuffer::Zeroes(length);
@@ -140,7 +153,11 @@ namespace Strawberry::Standard::Net::Socket
 		}
 		else
 		{
-			Unreachable();
+			switch (SSL_get_error(mSSL, bytesRead))
+			{
+				default:
+					return IO::Error::Unknown;
+			}
 		}
 	}
 
@@ -156,7 +173,11 @@ namespace Strawberry::Standard::Net::Socket
 		}
 		else
 		{
-			Unreachable();
+			switch (SSL_get_error(mSSL, bytesSent))
+			{
+				default:
+					return IO::Error::Unknown;
+			}
 		}
 	}
 }

@@ -14,6 +14,9 @@
 #include "Standard/Net/Endpoint.hpp"
 #include "Standard/Net/Socket/TCPClient.hpp"
 #include "Standard/Net/Socket/TLSClient.hpp"
+#include "Standard/Collection/CircularBuffer.hpp"
+#include "Standard/IO/BufferedIO.hpp"
+#include "Standard/Net/HTTP/Client.hpp"
 
 
 
@@ -180,6 +183,16 @@ namespace Test
 			auto client = Strawberry::Standard::Net::Socket::TLSClient::Connect(google).Unwrap();
 		}
 	}
+
+
+
+	void HTTP()
+	{
+		auto http = Strawberry::Standard::Net::HTTP::HTTPSClient("api.agify.io");
+		Strawberry::Standard::Net::HTTP::Request request(Strawberry::Standard::Net::HTTP::Verb::GET, "/?name=dan");
+		http.SendRequest(request);
+		auto response = http.Receive();
+	}
 }
 
 
@@ -192,4 +205,5 @@ int main()
 	Test::DNS();
 	Test::TCP();
 	Test::TLS();
+	Test::HTTP();
 }

@@ -16,9 +16,13 @@ find_path(JSON_INCLUDE_DIR
 add_library(Standard STATIC
         include/Standard/Assert.hpp
         include/Standard/Clock.hpp
+        include/Standard/Collection/CircularBuffer.hpp
         include/Standard/Concepts.hpp
         include/Standard/Endian.hpp
         include/Standard/IO/Base64.hpp
+        include/Standard/IO/BufferedIO.hpp
+        include/Standard/IO/BufferedReader.hpp
+        include/Standard/IO/BufferedWriter.hpp
         include/Standard/IO/ByteBuffer.hpp
         include/Standard/IO/Concepts.hpp
         include/Standard/IO/DynamicByteBuffer.hpp
@@ -48,6 +52,7 @@ add_library(Standard STATIC
         include/Standard/Option.hpp
         include/Standard/Result.hpp
         include/Standard/Utilities.hpp
+        inline/Standard/Collection/CircularBuffer.inl
         inline/Standard/Math/Math.inl
         inline/Standard/Net/HTTP/Client.inl
         inline/Standard/Net/Socket/Socket.inl
@@ -70,9 +75,7 @@ add_library(Standard STATIC
         src/Net/Socket/UDPClient.cpp
         src/Net/Websocket/Client.cpp
         src/Net/Websocket/Message.cpp
-        include/Standard/Collection/CircularBuffer.hpp
-        inline/Standard/Collection/CircularBuffer.inl
-        )
+        include/Standard/IO/CircularByteBuffer.hpp include/Standard/IO/CircularDynamicByteBuffer.hpp src/IO/CircularDynamicByteBuffer.cpp)
 
 target_include_directories(Standard PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
 target_link_libraries(Standard PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY})

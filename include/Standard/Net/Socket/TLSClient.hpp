@@ -25,6 +25,7 @@ namespace Strawberry::Standard::Net::Socket
 		TLSClient(TLSClient&& other);
 		TLSClient& operator=(const TLSClient& other) = delete;
 		TLSClient& operator=(TLSClient&& other);
+		~TLSClient();
 
 
 
