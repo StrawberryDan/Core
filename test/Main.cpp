@@ -188,10 +188,19 @@ namespace Test
 
 	void HTTP()
 	{
-		auto http = Strawberry::Standard::Net::HTTP::HTTPSClient("api.agify.io");
-		Strawberry::Standard::Net::HTTP::Request request(Strawberry::Standard::Net::HTTP::Verb::GET, "/?name=dan");
-		http.SendRequest(request);
-		auto response = http.Receive();
+		{
+			auto http = Strawberry::Standard::Net::HTTP::HTTPSClient("google.com");
+			Strawberry::Standard::Net::HTTP::Request request(Strawberry::Standard::Net::HTTP::Verb::GET, "/");
+			http.SendRequest(request);
+			auto response = http.Receive();
+		}
+
+		{
+			auto http = Strawberry::Standard::Net::HTTP::HTTPSClient("api.agify.io");
+			Strawberry::Standard::Net::HTTP::Request request(Strawberry::Standard::Net::HTTP::Verb::GET, "/?name=dan");
+			http.SendRequest(request);
+			auto response = http.Receive();
+		}
 	}
 }
 
