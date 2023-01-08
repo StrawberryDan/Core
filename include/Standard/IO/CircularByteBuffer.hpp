@@ -49,7 +49,7 @@ namespace Strawberry::Standard::IO
 		Assert(len <= Capacity());
 		if (mSize == 0 || mSize < len)
 		{
-			return Error::NotEnoughData;
+			return Error::WouldBlock;
 		}
 
 		size_t bytesRead = 0;

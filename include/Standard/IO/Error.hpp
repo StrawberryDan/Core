@@ -7,7 +7,7 @@ namespace Strawberry::Standard::IO
 	enum class Error
 	{
 		Unknown,
-		NotEnoughData,
+		WouldBlock,
 		BufferOverflow,
 		NoIO,
 	};

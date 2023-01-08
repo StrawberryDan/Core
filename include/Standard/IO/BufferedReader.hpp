@@ -33,9 +33,15 @@ namespace Strawberry::Standard::IO
 
 
 
-	private:
-		using Buffer = std::conditional_t<Size == 0, CircularDynamicByteBuffer, CircularByteBuffer<Size>>;
+		inline bool IsBlocking() const { return mBlocking; }
+		inline void SetBlocking(bool blocking) { mBlocking = blocking; }
 
+
+
+	private:
+		using Buffer = std::conditional_t<Size == 0, CircularByteBuffer<Size>, CircularDynamicByteBuffer>;
+
+		bool                           mBlocking;
 		std::unique_ptr<bool>          mRunning;
 		Option<std::thread>            mThread;
 		std::unique_ptr<Mutex<Buffer>> mBuffer;
@@ -46,7 +52,8 @@ namespace Strawberry::Standard::IO
 
 	template<typename T, size_t Size> requires Read<T> && std::movable<T>
 	BufferedReader<T, Size>::BufferedReader(T&& source)
-		: mRunning(std::make_unique<bool>(true))
+		: mBlocking(true)
+		, mRunning(std::make_unique<bool>(true))
 		, mThread()
 		, mBuffer(std::make_unique<Mutex<Buffer>>())
 		, mSource(std::make_unique<T>(std::forward<T>(source)))
@@ -125,6 +132,17 @@ namespace Strawberry::Standard::IO
 	template<typename T, size_t Size> requires Read<T> && std::movable<T>
 	Result<DynamicByteBuffer, Error> BufferedReader<T, Size>::Read(size_t len)
 	{
-		return mBuffer->Lock()->Read(len);
+		while (true)
+		{
+			auto result = mBuffer->Lock()->Read(len);
+
+			if (mBlocking && !result && result.Err() == IO::Error::WouldBlock)
+			{
+				std::this_thread::yield();
+				continue;
+			}
+
+			return result;
+		}
 	}
 }
