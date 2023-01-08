@@ -4,6 +4,7 @@
 
 #include "Standard/IO/ByteBuffer.hpp"
 #include "Standard/IO/CircularDynamicByteBuffer.hpp"
+#include "Standard/Markers.hpp"
 #include "Standard/Mutex.hpp"
 #include <concepts>
 #include <memory>
@@ -60,10 +61,18 @@ namespace Strawberry::Standard::IO
 					}
 				}
 
-				auto write = source->Write(data);
-				if (!write)
+				size_t bytesWritten = 0;
+				while (bytesWritten < data.Size())
 				{
-					break;
+					auto write = source->Write({data.Data() + bytesWritten, data.Size() - bytesWritten});
+					if (write)
+					{
+						bytesWritten += write.Unwrap();
+					}
+					else
+					{
+						Unreachable();
+					}
 				}
 
 				std::this_thread::yield();
