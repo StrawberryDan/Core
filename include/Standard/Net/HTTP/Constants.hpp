@@ -15,7 +15,7 @@ namespace Strawberry::Standard::Net::HTTP
 		GET,
 		PUT,
 		PATCH,
-		DELETE
+		DEL,
 	};
 
 

@@ -2,9 +2,17 @@
 
 
 
+#include "Standard/IO/DynamicByteBuffer.hpp"
 #include "Standard/IO/Error.hpp"
-#include "Standard/Result.hpp"
 #include "Standard/Net/Endpoint.hpp"
+#include "Standard/Result.hpp"
+#include <tuple>
+
+
+
+#if defined(_WIN32)
+#include <winsock2.h>
+#endif
 
 
 
@@ -38,6 +46,8 @@ namespace Strawberry::Standard::Net::Socket
 	private:
 #if defined(__APPLE__) || defined(__linux__)
 		int    mSocket;
+#elif defined(_WIN32)
+		SOCKET mSocket;
 #endif
 
 		static constexpr size_t BUFFER_SIZE = 25536;

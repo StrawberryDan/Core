@@ -2,9 +2,10 @@
 
 
 
-#include "Standard/Utilities.hpp"
 #include "Standard/Assert.hpp"
 #include "Standard/Markers.hpp"
+#include "Standard/Net/Socket/API.hpp"
+#include "Standard/Utilities.hpp"
 #include <iostream>
 
 
@@ -25,6 +26,8 @@ namespace Strawberry::Standard::Net::Socket
 {
 	Result<TCPClient, Error> TCPClient::Connect(const Endpoint& endpoint)
 	{
+		Socket::API::Initialise();
+
 		TCPClient client;
 
 		addrinfo hints {.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_STREAM,.ai_protocol = IPPROTO_TCP};
@@ -92,7 +95,11 @@ namespace Strawberry::Standard::Net::Socket
 	{
 		if (mSocket != -1)
 		{
+#if defined(__APPLE__) || defined(__linux__)
 			close(mSocket);
+#elif defined(__WIN32)
+			closesocket(mSocket);
+#endif
 		}
 	}
 
@@ -101,7 +108,7 @@ namespace Strawberry::Standard::Net::Socket
 	Result<IO::DynamicByteBuffer, IO::Error> TCPClient::Read(size_t length)
 	{
 		auto buffer = IO::DynamicByteBuffer::Zeroes(length);
-		auto bytesRead = recv(mSocket, reinterpret_cast<void*>(buffer.Data()), length, 0);
+		auto bytesRead = recv(mSocket, reinterpret_cast<char*>(buffer.Data()), length, 0);
 
 		if (bytesRead >= 0)
 		{
@@ -118,7 +125,7 @@ namespace Strawberry::Standard::Net::Socket
 
 	Result<size_t, IO::Error> TCPClient::Write(const IO::DynamicByteBuffer& bytes)
 	{
-		auto bytesSent = send(mSocket, bytes.Data(), bytes.Size(), 0);
+		auto bytesSent = send(mSocket, reinterpret_cast<const char*>(bytes.Data()), bytes.Size(), 0);
 
 		if (bytesSent >= 0)
 		{

@@ -2,9 +2,10 @@
 
 
 
-#include "Standard/Utilities.hpp"
 #include "Standard/Assert.hpp"
 #include "Standard/Markers.hpp"
+#include "Standard/Net/Socket/API.hpp"
+#include "Standard/Utilities.hpp"
 
 
 #if _WIN32
@@ -23,6 +24,9 @@ namespace Strawberry::Standard::Net::Socket
 {
 	Result<UDPClient, Error> UDPClient::Create()
 	{
+		API::Initialise();
+
+
 		auto handle = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 		if (handle == -1)
 		{
@@ -30,7 +34,7 @@ namespace Strawberry::Standard::Net::Socket
 		}
 
 		int ipv6Only = 0;
-		auto optSetResult = setsockopt(handle, IPPROTO_IPV6, IPV6_V6ONLY, &ipv6Only, sizeof(ipv6Only));
+		auto optSetResult = setsockopt(handle, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char*>(&ipv6Only), sizeof(ipv6Only));
 		Assert(optSetResult == 0);
 
 		UDPClient client;
@@ -101,7 +105,11 @@ namespace Strawberry::Standard::Net::Socket
 	{
 		if (mSocket != -1)
 		{
+#if defined(__APPLE__) || defined(__linux__)
 			close(mSocket);
+#elif defined(_WIN32)
+			closesocket(mSocket);
+#endif
 		}
 	}
 
@@ -111,7 +119,7 @@ namespace Strawberry::Standard::Net::Socket
 	{
 		sockaddr_storage peer{};
 		socklen_t peerLen = 0;
-		auto bytesRead = recvfrom(mSocket, mBuffer.Data(), mBuffer.Size(), 0, reinterpret_cast<sockaddr*>(&peer), &peerLen);
+		auto bytesRead = recvfrom(mSocket, reinterpret_cast<char*>(mBuffer.Data()), mBuffer.Size(), 0, reinterpret_cast<sockaddr*>(&peer), &peerLen);
 
 		if (bytesRead >= 0)
 		{
@@ -151,7 +159,7 @@ namespace Strawberry::Standard::Net::Socket
 					&peer);
 
 
-		auto bytesSent = sendto(mSocket, bytes.Data(), bytes.Size(), 0, peer->ai_addr, peer->ai_addrlen);
+		auto bytesSent = sendto(mSocket, reinterpret_cast<const char*>(bytes.Data()), bytes.Size(), 0, peer->ai_addr, peer->ai_addrlen);
 		freeaddrinfo(peer);
 		if (bytesSent >= 0)
 		{

@@ -4,6 +4,7 @@
 
 #include "Standard/Assert.hpp"
 #include "Standard/Result.hpp"
+#include <array>
 #include <compare>
 #include <concepts>
 #include <cstdint>

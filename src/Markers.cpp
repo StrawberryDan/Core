@@ -2,6 +2,10 @@
 
 
 
+#include <cstdlib>
+
+
+
 namespace Strawberry::Standard
 {
 	[[noreturn]] void Unreachable()
@@ -11,7 +15,7 @@ namespace Strawberry::Standard
 #elif __clang__
 		__builtin_unreachable();
 #else
-		#error "Unimplemented!"
+		std::abort();
 #endif
-}
+	}
 }

@@ -24,6 +24,8 @@ add_library(Standard STATIC
         include/Standard/IO/BufferedReader.hpp
         include/Standard/IO/BufferedWriter.hpp
         include/Standard/IO/ByteBuffer.hpp
+        include/Standard/IO/CircularByteBuffer.hpp
+        include/Standard/IO/CircularDynamicByteBuffer.hpp
         include/Standard/IO/Concepts.hpp
         include/Standard/IO/DynamicByteBuffer.hpp
         include/Standard/IO/Error.hpp
@@ -38,6 +40,7 @@ add_library(Standard STATIC
         include/Standard/Net/HTTP/Header.hpp
         include/Standard/Net/HTTP/Request.hpp
         include/Standard/Net/HTTP/Response.hpp
+        include/Standard/Net/Socket/API.hpp
         include/Standard/Net/Socket/TCPClient.hpp
         include/Standard/Net/Socket/TLSClient.hpp
         include/Standard/Net/Socket/UDPClient.hpp
@@ -53,6 +56,7 @@ add_library(Standard STATIC
         inline/Standard/Net/Websocket/Client.inl
         src/Clock.cpp
         src/IO/Base64.cpp
+        src/IO/CircularDynamicByteBuffer.cpp
         src/IO/DynamicByteBuffer.cpp
         src/Log.cpp
         src/Markers.cpp
@@ -64,16 +68,20 @@ add_library(Standard STATIC
         src/Net/HTTP/Request.cpp
         src/Net/HTTP/Response.cpp
         src/Net/RTP/Header.cpp
+        src/Net/Socket/API.cpp
         src/Net/Socket/TCPClient.cpp
         src/Net/Socket/TLSClient.cpp
         src/Net/Socket/UDPClient.cpp
         src/Net/Websocket/Client.cpp
         src/Net/Websocket/Message.cpp
-        include/Standard/IO/CircularByteBuffer.hpp include/Standard/IO/CircularDynamicByteBuffer.hpp src/IO/CircularDynamicByteBuffer.cpp)
+        )
 
 target_include_directories(Standard PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
 target_link_libraries(Standard PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY})
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    target_link_libraries(Standard PRIVATE ws2_32)
+endif()
 
 
 add_executable(Standard_Test

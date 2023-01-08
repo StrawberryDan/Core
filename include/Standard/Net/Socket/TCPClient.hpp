@@ -14,6 +14,12 @@
 
 
 
+#if defined(_WIN32)
+#include <winsock2.h>
+#endif
+
+
+
 namespace Strawberry::Standard::Net::Socket
 {
 	class TCPClient
@@ -43,6 +49,8 @@ namespace Strawberry::Standard::Net::Socket
 	private:
 #if defined(__APPLE__) || defined(__linux__)
 		int    mSocket;
+#elif defined(_WIN32)
+		SOCKET mSocket;
 #endif
 	};
 }

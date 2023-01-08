@@ -3,9 +3,8 @@
 
 
 #include "Standard/Assert.hpp"
-#include "Standard/Log.hpp"
+#include "Standard/Net/Socket/API.hpp"
 #include "Standard/Utilities.hpp"
-#include "Standard/Markers.hpp"
 #include <memory>
 #include <openssl/tls1.h>
 
@@ -67,6 +66,9 @@ namespace Strawberry::Standard::Net::Socket
 {
 	Result<TLSClient, Error> TLSClient::Connect(const Endpoint& endpoint)
 	{
+		API::Initialise();
+
+
 		auto tcp = TCPClient::Connect(endpoint);
 		if (!tcp)
 		{
@@ -133,8 +135,13 @@ namespace Strawberry::Standard::Net::Socket
 		if (mSSL)
 		{
 			SSL_shutdown(mSSL);
-			shutdown(mTCP.mSocket, SHUT_RDWR);
+
+#if defined(__APPLE__) || defined(__linux__)
 			close(mTCP.mSocket);
+#elif defined(_WIN32)
+			closesocket(mTCP.mSocket);
+#endif
+
 			SSL_free(mSSL);
 		}
 	}
