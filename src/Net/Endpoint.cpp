@@ -8,7 +8,7 @@
 
 #if defined(__APPLE__) || defined(__linux__)
 #include <netdb.h>
-#else defined(_WIN32)
+#elif defined(_WIN32)
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #endif
