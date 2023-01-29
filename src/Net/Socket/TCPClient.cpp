@@ -1,11 +1,11 @@
-#include "Standard/Net/Socket/TCPClient.hpp"
+#include "Core/Net/Socket/TCPClient.hpp"
 
 
 
-#include "Standard/Assert.hpp"
-#include "Standard/Markers.hpp"
-#include "Standard/Net/Socket/API.hpp"
-#include "Standard/Utilities.hpp"
+#include "Core/Assert.hpp"
+#include "Core/Markers.hpp"
+#include "Core/Net/Socket/API.hpp"
+#include "Core/Utilities.hpp"
 #include <iostream>
 
 
@@ -22,7 +22,7 @@
 
 
 
-namespace Strawberry::Standard::Net::Socket
+namespace Strawberry::Core::Net::Socket
 {
 	Result<TCPClient, Error> TCPClient::Connect(const Endpoint& endpoint)
 	{

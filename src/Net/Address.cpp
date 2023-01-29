@@ -1,9 +1,9 @@
-#include "Standard/Net/Address.hpp"
+#include "Core/Net/Address.hpp"
 
 
 
-#include "Standard/Assert.hpp"
-#include "Standard/Markers.hpp"
+#include "Core/Assert.hpp"
+#include "Core/Markers.hpp"
 #include <numeric>
 
 
@@ -18,7 +18,7 @@
 
 
 
-namespace Strawberry::Standard::Net
+namespace Strawberry::Core::Net
 {
 	Option<IPv4Address> IPv4Address::Parse(const std::string& data)
 	{

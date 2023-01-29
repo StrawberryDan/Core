@@ -1,4 +1,4 @@
-#include "Standard/Markers.hpp"
+#include "Core/Markers.hpp"
 
 
 
@@ -6,7 +6,7 @@
 
 
 
-namespace Strawberry::Standard
+namespace Strawberry::Core
 {
 	[[noreturn]] void Unreachable()
 	{

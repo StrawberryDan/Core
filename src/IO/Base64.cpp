@@ -1,6 +1,6 @@
-#include "Standard/IO/Base64.hpp"
-#include "Standard/Math/Math.hpp"
-#include "Standard/Markers.hpp"
+#include "Core/IO/Base64.hpp"
+#include "Core/Math/Math.hpp"
+#include "Core/Markers.hpp"
 
 
 #include <utility>
@@ -37,7 +37,7 @@ static const std::map<char, uint8_t> decodingTable =
 
 
 
-std::string Strawberry::Standard::IO::Base64::Encode(const Strawberry::Standard::IO::DynamicByteBuffer& bytes)
+std::string Strawberry::Core::IO::Base64::Encode(const Strawberry::Core::IO::DynamicByteBuffer& bytes)
 {
 	using namespace Math;
 
@@ -104,7 +104,7 @@ std::string Strawberry::Standard::IO::Base64::Encode(const Strawberry::Standard:
 
 
 
-Strawberry::Standard::IO::DynamicByteBuffer Strawberry::Standard::IO::Base64::Decode(std::string encoded)
+Strawberry::Core::IO::DynamicByteBuffer Strawberry::Core::IO::Base64::Decode(std::string encoded)
 {
     // Delete Padding
     while (encoded.ends_with('='))

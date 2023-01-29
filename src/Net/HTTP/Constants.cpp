@@ -1,15 +1,15 @@
-#include "Standard/Net/HTTP/Constants.hpp"
+#include "Core/Net/HTTP/Constants.hpp"
 
 
 
-#include "Standard/Utilities.hpp"
+#include "Core/Utilities.hpp"
 
 
 #include <map>
 
 
 
-namespace Strawberry::Standard::Net::HTTP
+namespace Strawberry::Core::Net::HTTP
 {
 	std::string ToString(Verb verb)
 	{

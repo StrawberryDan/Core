@@ -1,8 +1,8 @@
-#include "Standard/Clock.hpp"
+#include "Core/Clock.hpp"
 
 
 
-namespace Strawberry::Standard
+namespace Strawberry::Core
 {
 	Clock::Clock(bool run)
 	    : mBuffer{}

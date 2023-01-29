@@ -1,10 +1,10 @@
-#include "Standard/Net/Socket/TLSClient.hpp"
+#include "Core/Net/Socket/TLSClient.hpp"
 
 
 
-#include "Standard/Assert.hpp"
-#include "Standard/Net/Socket/API.hpp"
-#include "Standard/Utilities.hpp"
+#include "Core/Assert.hpp"
+#include "Core/Net/Socket/API.hpp"
+#include "Core/Utilities.hpp"
 #include <memory>
 #include <openssl/tls1.h>
 
@@ -48,7 +48,7 @@ private:
 		SSL_load_error_strings();
 
 		mSSL_CONTEXT = SSL_CTX_new(TLS_client_method());
-		Strawberry::Standard::Assert(mSSL_CONTEXT != nullptr);
+		Strawberry::Core::Assert(mSSL_CONTEXT != nullptr);
 	}
 
 	SSL_CTX* mSSL_CONTEXT;
@@ -62,7 +62,7 @@ std::unique_ptr<TLSContext> TLSContext::mInstance = nullptr;
 
 
 
-namespace Strawberry::Standard::Net::Socket
+namespace Strawberry::Core::Net::Socket
 {
 	Result<TLSClient, Error> TLSClient::Connect(const Endpoint& endpoint)
 	{

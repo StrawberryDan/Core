@@ -1,13 +1,13 @@
-#include "Standard/Net/Websocket/Message.hpp"
+#include "Core/Net/Websocket/Message.hpp"
 
 
 
-#include "Standard/Endian.hpp"
-#include "Standard/Assert.hpp"
+#include "Core/Endian.hpp"
+#include "Core/Assert.hpp"
 
 
 
-namespace Strawberry::Standard::Net::Websocket
+namespace Strawberry::Core::Net::Websocket
 {
 	Message::Message(Message::Opcode opcode, Payload payload)
 	    : mOpcode(opcode)

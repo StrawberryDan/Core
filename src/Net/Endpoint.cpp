@@ -1,8 +1,8 @@
-#include "Standard/Net/Endpoint.hpp"
+#include "Core/Net/Endpoint.hpp"
 
 
 
-#include "Standard/Net/Socket/API.hpp"
+#include "Core/Net/Socket/API.hpp"
 
 
 
@@ -15,7 +15,7 @@
 
 
 
-namespace Strawberry::Standard::Net
+namespace Strawberry::Core::Net
 {
 	Result<Endpoint, Error> Endpoint::Resolve(const std::string& hostname, uint16_t port)
 	{

@@ -1,13 +1,13 @@
-#include "Standard/Net/HTTP/Header.hpp"
+#include "Core/Net/HTTP/Header.hpp"
 
 
 
-#include "Standard/Assert.hpp"
-#include "Standard/Utilities.hpp"
+#include "Core/Assert.hpp"
+#include "Core/Utilities.hpp"
 
 
 
-namespace Strawberry::Standard::Net::HTTP
+namespace Strawberry::Core::Net::HTTP
 {
 	void Header::Add(const Header::Key& key, const Header::Value& value)
 	{

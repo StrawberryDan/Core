@@ -1,11 +1,11 @@
-#include "Standard/Net/Socket/UDPClient.hpp"
+#include "Core/Net/Socket/UDPClient.hpp"
 
 
 
-#include "Standard/Assert.hpp"
-#include "Standard/Markers.hpp"
-#include "Standard/Net/Socket/API.hpp"
-#include "Standard/Utilities.hpp"
+#include "Core/Assert.hpp"
+#include "Core/Markers.hpp"
+#include "Core/Net/Socket/API.hpp"
+#include "Core/Utilities.hpp"
 
 
 #if _WIN32
@@ -20,7 +20,7 @@
 
 
 
-namespace Strawberry::Standard::Net::Socket
+namespace Strawberry::Core::Net::Socket
 {
 	Result<UDPClient, Error> UDPClient::Create()
 	{

@@ -1,12 +1,12 @@
-#include "Standard/Log.hpp"
+#include "Core/Log.hpp"
 
-#include "Standard/Option.hpp"
+#include "Core/Option.hpp"
 #include <fstream>
 #include <sstream>
 #include <utility>
 
 
-namespace Strawberry::Standard
+namespace Strawberry::Core
 {
 	static Option<Logging::Level>      sLogLevel   = {};
 	static Option<std::ofstream>       sOutputFile = {};

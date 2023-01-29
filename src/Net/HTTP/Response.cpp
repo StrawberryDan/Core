@@ -1,9 +1,9 @@
 #include <utility>
 
-#include "Standard/Net/HTTP/Response.hpp"
+#include "Core/Net/HTTP/Response.hpp"
 
 
-namespace Strawberry::Standard::Net::HTTP
+namespace Strawberry::Core::Net::HTTP
 {
 	Response::Response(Version mVersion, unsigned int mStatus, std::string mStatusText)
 	    : mVersion(mVersion)

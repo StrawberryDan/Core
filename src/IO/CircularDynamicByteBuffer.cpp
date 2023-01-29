@@ -1,8 +1,8 @@
-#include "Standard/IO/CircularDynamicByteBuffer.hpp"
+#include "Core/IO/CircularDynamicByteBuffer.hpp"
 
 
 
-namespace Strawberry::Standard::IO
+namespace Strawberry::Core::IO
 {
 	CircularDynamicByteBuffer::CircularDynamicByteBuffer()
 			: mHead(0), mTail(0), mSize(0), mBuffer(DynamicByteBuffer::Zeroes(1024))

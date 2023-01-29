@@ -1,4 +1,4 @@
-#include "Standard/IO/Base64.hpp"
+#include "Core/IO/Base64.hpp"
 
 
 #include <cstring>
@@ -8,18 +8,18 @@
 
 
 
-#include "Standard/Assert.hpp"
-#include "Standard/Math/Math.hpp"
-#include "Standard/Net/Endpoint.hpp"
-#include "Standard/Net/Socket/TCPClient.hpp"
-#include "Standard/Net/Socket/TLSClient.hpp"
-#include "Standard/Collection/CircularBuffer.hpp"
-#include "Standard/IO/BufferedIO.hpp"
-#include "Standard/Net/HTTP/Client.hpp"
+#include "Core/Assert.hpp"
+#include "Core/Math/Math.hpp"
+#include "Core/Net/Endpoint.hpp"
+#include "Core/Net/Socket/TCPClient.hpp"
+#include "Core/Net/Socket/TLSClient.hpp"
+#include "Core/Collection/CircularBuffer.hpp"
+#include "Core/IO/BufferedIO.hpp"
+#include "Core/Net/HTTP/Client.hpp"
 
 
 
-using namespace Strawberry::Standard;
+using namespace Strawberry::Core;
 
 
 
@@ -86,8 +86,8 @@ namespace Test
 
 	void DNS()
 	{
-		auto justnoise = Strawberry::Standard::Net::Endpoint::Resolve("justnoise.net", 80);
-		auto google = Strawberry::Standard::Net::Endpoint::Resolve("google.com", 80);
+		auto justnoise = Strawberry::Core::Net::Endpoint::Resolve("justnoise.net", 80);
+		auto google = Strawberry::Core::Net::Endpoint::Resolve("google.com", 80);
 		Assert(google || justnoise);
 	}
 
@@ -95,8 +95,8 @@ namespace Test
 
 	void TCP()
 	{
-		auto google = Strawberry::Standard::Net::Endpoint::Resolve("google.com", 80).Unwrap();
-		auto client = Strawberry::Standard::Net::Socket::TCPClient::Connect(google).Unwrap();
+		auto google = Strawberry::Core::Net::Endpoint::Resolve("google.com", 80).Unwrap();
+		auto client = Strawberry::Core::Net::Socket::TCPClient::Connect(google).Unwrap();
 	}
 
 
@@ -104,12 +104,12 @@ namespace Test
 	void TLS()
 	{
 		{
-			auto google = Strawberry::Standard::Net::Endpoint::Resolve("google.com", 443).Unwrap();
-			auto client = Strawberry::Standard::Net::Socket::TLSClient::Connect(google).Unwrap();
+			auto google = Strawberry::Core::Net::Endpoint::Resolve("google.com", 443).Unwrap();
+			auto client = Strawberry::Core::Net::Socket::TLSClient::Connect(google).Unwrap();
 		}
 		{
-			auto google = Strawberry::Standard::Net::Endpoint::Resolve("google.com", 443).Unwrap();
-			auto client = Strawberry::Standard::Net::Socket::TLSClient::Connect(google).Unwrap();
+			auto google = Strawberry::Core::Net::Endpoint::Resolve("google.com", 443).Unwrap();
+			auto client = Strawberry::Core::Net::Socket::TLSClient::Connect(google).Unwrap();
 		}
 	}
 
@@ -118,15 +118,15 @@ namespace Test
 	void HTTP()
 	{
 		{
-			auto http = Strawberry::Standard::Net::HTTP::HTTPSClient("google.com");
-			Strawberry::Standard::Net::HTTP::Request request(Strawberry::Standard::Net::HTTP::Verb::GET, "/");
+			auto http = Strawberry::Core::Net::HTTP::HTTPSClient("google.com");
+			Strawberry::Core::Net::HTTP::Request request(Strawberry::Core::Net::HTTP::Verb::GET, "/");
 			http.SendRequest(request);
 			auto response = http.Receive();
 		}
 
 		{
-			auto http = Strawberry::Standard::Net::HTTP::HTTPSClient("api.agify.io");
-			Strawberry::Standard::Net::HTTP::Request request(Strawberry::Standard::Net::HTTP::Verb::GET, "/?name=dan");
+			auto http = Strawberry::Core::Net::HTTP::HTTPSClient("api.agify.io");
+			Strawberry::Core::Net::HTTP::Request request(Strawberry::Core::Net::HTTP::Verb::GET, "/?name=dan");
 			http.SendRequest(request);
 			auto response = http.Receive();
 		}

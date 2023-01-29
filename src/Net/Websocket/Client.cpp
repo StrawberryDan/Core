@@ -1,8 +1,8 @@
-#include "Standard/Net/Websocket/Client.hpp"
+#include "Core/Net/Websocket/Client.hpp"
 
 
 
-namespace Strawberry::Standard::Net::Websocket
+namespace Strawberry::Core::Net::Websocket
 {
 	Result<WSClient, Error> WSClient::Connect(const std::string& host, const std::string& resource, uint16_t port)
 	{

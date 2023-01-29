@@ -1,12 +1,12 @@
-#include "Standard/Net/RTP/Header.hpp"
+#include "Core/Net/RTP/Header.hpp"
 
 
 
-#include "Standard/Endian.hpp"
+#include "Core/Endian.hpp"
 
 
 
-namespace Strawberry::Standard::Net::RTP
+namespace Strawberry::Core::Net::RTP
 {
 	Header::Header(PayloadType payloadType, SSRC ssrc, SequenceNumber seq, Timestamp time)
 		: mPayloadType(payloadType & 0b01111111)
@@ -29,13 +29,13 @@ namespace Strawberry::Standard::Net::RTP
 		byte = 0 | mPayloadType;
 		bytes.Push(byte);
 
-		auto seq = Standard::ToBigEndian(mSequenceNumber);
+		auto seq = Core::ToBigEndian(mSequenceNumber);
 		bytes.Push(seq);
 
-		auto time = Standard::ToBigEndian(mTimestamp);
+		auto time = Core::ToBigEndian(mTimestamp);
 		bytes.Push(time);
 
-		auto ssrc = Standard::ToBigEndian(mSSRC);
+		auto ssrc = Core::ToBigEndian(mSSRC);
 		bytes.Push(ssrc);
 
 		Assert(bytes.Size() == 12);

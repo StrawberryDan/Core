@@ -1,8 +1,8 @@
-#include "Standard/IO/DynamicByteBuffer.hpp"
+#include "Core/IO/DynamicByteBuffer.hpp"
 
 
 
-Strawberry::Standard::IO::DynamicByteBuffer Strawberry::Standard::IO::DynamicByteBuffer::Zeroes(size_t len)
+Strawberry::Core::IO::DynamicByteBuffer Strawberry::Core::IO::DynamicByteBuffer::Zeroes(size_t len)
 {
 	DynamicByteBuffer result;
 	result.mData = std::vector<uint8_t>(len, 0);
@@ -11,7 +11,7 @@ Strawberry::Standard::IO::DynamicByteBuffer Strawberry::Standard::IO::DynamicByt
 
 
 
-Strawberry::Standard::IO::DynamicByteBuffer Strawberry::Standard::IO::DynamicByteBuffer::WithCapacity(size_t len)
+Strawberry::Core::IO::DynamicByteBuffer Strawberry::Core::IO::DynamicByteBuffer::WithCapacity(size_t len)
 {
 	DynamicByteBuffer result;
 	result.mData.reserve(len);
@@ -20,35 +20,35 @@ Strawberry::Standard::IO::DynamicByteBuffer Strawberry::Standard::IO::DynamicByt
 
 
 
-size_t Strawberry::Standard::IO::DynamicByteBuffer::Size() const
+size_t Strawberry::Core::IO::DynamicByteBuffer::Size() const
 {
 	return mData.size();
 }
 
 
 
-uint8_t* Strawberry::Standard::IO::DynamicByteBuffer::Data()
+uint8_t* Strawberry::Core::IO::DynamicByteBuffer::Data()
 {
 	return mData.data();
 }
 
 
 
-const uint8_t* Strawberry::Standard::IO::DynamicByteBuffer::Data() const
+const uint8_t* Strawberry::Core::IO::DynamicByteBuffer::Data() const
 {
 	return mData.data();
 }
 
 
 
-void Strawberry::Standard::IO::DynamicByteBuffer::Reserve(size_t len)
+void Strawberry::Core::IO::DynamicByteBuffer::Reserve(size_t len)
 {
 	mData.reserve(len);
 }
 
 
 
-void Strawberry::Standard::IO::DynamicByteBuffer::Resize(size_t len)
+void Strawberry::Core::IO::DynamicByteBuffer::Resize(size_t len)
 {
 	mData.resize(len);
 }
@@ -56,7 +56,7 @@ void Strawberry::Standard::IO::DynamicByteBuffer::Resize(size_t len)
 
 
 std::strong_ordering
-Strawberry::Standard::IO::DynamicByteBuffer::operator<=>(const Strawberry::Standard::IO::DynamicByteBuffer& rhs) const
+Strawberry::Core::IO::DynamicByteBuffer::operator<=>(const Strawberry::Core::IO::DynamicByteBuffer& rhs) const
 {
 	Assert(Size() == rhs.Size());
 	for (int i = 0; i < Size(); i++)
@@ -76,21 +76,21 @@ Strawberry::Standard::IO::DynamicByteBuffer::operator<=>(const Strawberry::Stand
 
 
 
-std::vector<uint8_t>& Strawberry::Standard::IO::DynamicByteBuffer::AsVector()
+std::vector<uint8_t>& Strawberry::Core::IO::DynamicByteBuffer::AsVector()
 {
 	return mData;
 }
 
 
 
-const std::vector<uint8_t>& Strawberry::Standard::IO::DynamicByteBuffer::AsVector() const
+const std::vector<uint8_t>& Strawberry::Core::IO::DynamicByteBuffer::AsVector() const
 {
 	return mData;
 }
 
 
 
-std::string Strawberry::Standard::IO::DynamicByteBuffer::AsString() const
+std::string Strawberry::Core::IO::DynamicByteBuffer::AsString() const
 {
 
 	std::string string(Size() + 1, 0);

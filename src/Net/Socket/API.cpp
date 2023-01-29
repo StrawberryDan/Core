@@ -1,9 +1,9 @@
-#include "Standard/Net/Socket/API.hpp"
+#include "Core/Net/Socket/API.hpp"
 
 
 
 #include <memory>
-#include "Standard/Assert.hpp"
+#include "Core/Assert.hpp"
 
 
 
@@ -13,7 +13,7 @@
 
 
 
-namespace Strawberry::Standard::Net::Socket
+namespace Strawberry::Core::Net::Socket
 {
 	static std::unique_ptr<API> sInstance = nullptr;
 
