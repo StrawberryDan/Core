@@ -46,7 +46,7 @@ namespace Strawberry::Core::IO
 			, mBuffer(std::make_unique<Mutex<CircularDynamicByteBuffer>>())
 			, mSource(std::make_unique<T>(std::forward<T>(source)))
 	{
-		mThread = std::thread([running = mRunning.get(), source = mSource.get(), buffer = mBuffer.get()]()
+		mThread.Emplace([running = mRunning.get(), source = mSource.get(), buffer = mBuffer.get()]()
 		{
 			while (*running)
 			{
