@@ -57,9 +57,9 @@ namespace Strawberry::Core::Net::HTTP
 		auto matched = std::regex_match(currentLine, matchResults, statusLinePattern);
 		Assert(matched);
 
-		std::string version = matchResults[1],
-				status = matchResults[2],
-				statusText = matchResults[3];
+		std::string version    = matchResults[1],
+					status     = matchResults[2],
+					statusText = matchResults[3];
 
 		Response response(*ParseVersion(version), std::stoul(status), statusText);
 
