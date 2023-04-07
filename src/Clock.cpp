@@ -53,7 +53,7 @@ namespace Strawberry::Core
 
 	void Clock::Restart()
 	{
-	    mBuffer = {};
-	    mStartTime  = std::chrono::system_clock::now();
+	    mBuffer    = {};
+	    mStartTime = std::chrono::system_clock::now();
 	}
 }
