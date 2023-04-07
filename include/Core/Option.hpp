@@ -21,7 +21,6 @@ namespace Strawberry::Core
 	public:
 		Option()
 			: mHasValue(false)
-			, mData{}
 		{}
 
 
@@ -29,20 +28,17 @@ namespace Strawberry::Core
 		template<typename ...Args>
 		Option(Args ...args) requires ( std::is_constructible_v<T, Args...> )
 			: mHasValue(true)
-			, mData{}
-		{
-			new (mData) T(std::forward<Args>(args)...);
-		}
+			, mPayload(std::forward<Args>(args)...)
+		{}
 
 
 
 		Option(const Option& rhs) requires ( std::is_copy_constructible_v<T> )
 			: mHasValue(rhs.mHasValue)
-			, mData{}
 		{
 			if (rhs)
 			{
-				new(mData) T(*rhs);
+				std::construct_at(&mPayload, *rhs);
 			}
 		}
 
@@ -50,13 +46,11 @@ namespace Strawberry::Core
 
 		Option(Option&& rhs)  noexcept requires ( std::is_move_constructible_v<T> )
 			: mHasValue(false)
-			, mData{}
 		{
 			if (rhs)
 			{
-				new (mData) T(std::move(*rhs));
+				std::construct_at(&mPayload, std::move(*rhs));
 				mHasValue = Replace(rhs.mHasValue, false);
-				std::fill(rhs.mData, rhs.mData + sizeof(T), 0);
 			}
 		}
 
@@ -66,16 +60,8 @@ namespace Strawberry::Core
 		{
 			if (this != &rhs)
 			{
-				if (mHasValue)
-				{
-					(*this)->~T();
-				}
-
-				mHasValue = rhs.mHasValue;
-				if (mHasValue)
-				{
-					new(mData) T(*rhs);
-				}
+				std::destroy_at(this);
+				std::construct_at(this, rhs);
 			}
 
 			return *this;
@@ -87,18 +73,16 @@ namespace Strawberry::Core
 		{
 			if (this != &rhs)
 			{
-				if (mHasValue)
-				{
-					(*this)->~T();
-					std::fill(mData, mData + sizeof(T), 0);
-				}
+				std::destroy_at(this);
 
-				mHasValue = rhs.mHasValue;
-				if (mHasValue)
+				if (rhs)
 				{
-					new (mData) T(std::move(*rhs));
-					rhs.mHasValue = false;
-					std::fill(rhs.mData, rhs.mData + sizeof(T), 0);
+					mHasValue = true;
+					mPayload = std::move(rhs.Unwrap());
+				}
+				else
+				{
+					std::construct_at(this);
 				}
 			}
 
@@ -111,7 +95,7 @@ namespace Strawberry::Core
 		{
 			if (mHasValue)
 			{
-				reinterpret_cast<T*>(mData)->~T();
+				std::destroy_at(&mPayload);
 			}
 		}
 
@@ -121,10 +105,10 @@ namespace Strawberry::Core
 		{
 			if (mHasValue)
 			{
-				(*this)->~T();
+				std::destroy_at(&mPayload);
 			}
 
-			new (mData) T(std::forward<Args>(args)...);
+			std::construct_at(&mPayload, std::forward<Args>(args)...);
 			mHasValue = true;
 		}
 
@@ -132,7 +116,7 @@ namespace Strawberry::Core
 		{
 			if (mHasValue)
 			{
-				reinterpret_cast<T*>(mData)->~T();
+				std::destroy_at(&mPayload);
 				mHasValue = false;
 			}
 		}
@@ -142,20 +126,19 @@ namespace Strawberry::Core
 		explicit inline operator bool() const { return mHasValue; }
 
 
-			  T& operator *()       { Assert(mHasValue); return *reinterpret_cast<      T*>(mData); }
-		const T& operator *() const { Assert(mHasValue); return *reinterpret_cast<const T*>(mData); }
+			  T& operator *()       { Assert(mHasValue); return mPayload; }
+		const T& operator *() const { Assert(mHasValue); return mPayload; }
 
-			  T* operator->()       requires (!std::is_pointer_v<T>) { Assert(mHasValue); return  reinterpret_cast<      T*>(mData); }
-		const T* operator->() const requires (!std::is_pointer_v<T>) { Assert(mHasValue); return  reinterpret_cast<const T*>(mData); }
-		      T  operator->()       requires ( std::is_pointer_v<T>) { Assert(mHasValue); return  reinterpret_cast<      T >(mData); }
-		const T  operator->() const requires ( std::is_pointer_v<T>) { Assert(mHasValue); return  reinterpret_cast<const T >(mData); }
+			  T* operator->()       { Assert(mHasValue); return &mPayload; }
+		const T* operator->() const { Assert(mHasValue); return &mPayload; }
 
 
 
 		T Unwrap()
 		{
 			Assert(mHasValue);
-			return std::move(**this);
+			mHasValue = false;
+			return std::move(mPayload);
 		}
 
 
@@ -209,7 +192,7 @@ namespace Strawberry::Core
 		{
 			if (HasValue())
 			{
-				return reinterpret_cast<T*>(mData);
+				return &mPayload;
 			}
 			else
 			{
@@ -223,7 +206,7 @@ namespace Strawberry::Core
 		{
 			if (HasValue())
 			{
-				return reinterpret_cast<const T*>(mData);
+				return &mPayload;
 			}
 			else
 			{
@@ -295,7 +278,10 @@ namespace Strawberry::Core
 
 	private:
 		bool    mHasValue;
-		uint8_t mData[sizeof(T)];
+		union
+		{
+			T mPayload;
+		};
 	};
 
 
