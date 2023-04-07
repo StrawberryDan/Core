@@ -61,7 +61,7 @@ namespace Strawberry::Core
 	        if (this != &other)
 			{
 				std::destroy_at(this);
-				*Lock() = other.Take();
+				*Lock() = std::move(other).Take();
 			}
 
 			return *this;
