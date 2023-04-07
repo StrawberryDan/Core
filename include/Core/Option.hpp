@@ -25,8 +25,22 @@ namespace Strawberry::Core
 
 
 
+		Option(const T& value) requires ( std::is_copy_constructible_v<T> )
+			: mHasValue(true)
+			, mPayload(value)
+		{}
+
+
+
+		Option(T&& value) requires ( std::is_move_constructible_v<T> )
+				: mHasValue(true)
+				, mPayload(std::move(value))
+		{}
+
+
+
 		template<typename ...Args>
-		Option(Args ...args) requires ( std::is_constructible_v<T, Args...> )
+		explicit Option(Args ...args) requires ( std::is_constructible_v<T, Args...> )
 			: mHasValue(true)
 			, mPayload(std::forward<Args>(args)...)
 		{}
@@ -56,13 +70,36 @@ namespace Strawberry::Core
 
 
 
+		Option& operator=(const T& rhs) requires ( std::is_copy_assignable_v<T> )
+		{
+			std::destroy_at(this);
+			mHasValue = true;
+			mPayload  = rhs;
+
+			return *this;
+		}
+
+
+
 		Option& operator=(const Option& rhs) requires ( std::is_copy_assignable_v<T> )
 		{
 			if (this != &rhs)
 			{
 				std::destroy_at(this);
-				std::construct_at(this, rhs);
+				std::construct_at(&mPayload, rhs);
 			}
+
+			return *this;
+		}
+
+
+
+		Option& operator=(T&& rhs) noexcept requires ( std::is_move_assignable_v<T> )
+		{
+			std::destroy_at(this);
+
+			mHasValue = true;
+			mPayload = std::move(rhs);
 
 			return *this;
 		}
@@ -77,7 +114,7 @@ namespace Strawberry::Core
 
 				if (rhs)
 				{
-					mHasValue = true;
+					mHasValue = std::exchange(rhs.mHasValue, false);
 					mPayload = std::move(rhs.Unwrap());
 				}
 				else
@@ -95,6 +132,7 @@ namespace Strawberry::Core
 		{
 			if (mHasValue)
 			{
+				mHasValue = false;
 				std::destroy_at(&mPayload);
 			}
 		}
