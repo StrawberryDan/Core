@@ -133,7 +133,7 @@ void Strawberry::Core::IO::DynamicByteBuffer::Push(const T* data, size_t count)
 {
 	for (int i = 0; i < count; i++)
 	{
-		Push(data[count]);
+		Push(data[i]);
 	}
 }
 
