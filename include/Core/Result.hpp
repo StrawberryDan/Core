@@ -26,7 +26,7 @@ namespace Strawberry::Core
 
 		Result(D&& value) requires ( std::move_constructible<D> && !std::is_trivially_copyable_v<D> )
 			: mIsOk(true)
-			, mPayload(std::forward<D>(value))
+			, mPayload(std::move(value))
 		{}
 
 		Result(E value) requires ( std::is_trivially_copyable_v<E> )
@@ -41,7 +41,7 @@ namespace Strawberry::Core
 
 		Result(E&& value) requires ( std::move_constructible<E> && !std::is_trivially_copyable_v<E> )
 		: mIsOk(false)
-		, mPayload(std::forward<D>(value))
+		, mPayload(std::move(value))
 		{}
 
 	    static Result Ok(const D& value) requires ( std::copy_constructible<D> )
@@ -73,8 +73,8 @@ namespace Strawberry::Core
 
 
 
-	          D& operator *()        { Assert(IsOk()); return  std::get<D>(mPayload); }
-	    const D& operator *()  const { Assert(IsOk()); return  std::get<D>(mPayload); }
+	          D& operator *()       { Assert(IsOk()); return  std::get<D>(mPayload); }
+	    const D& operator *() const { Assert(IsOk()); return  std::get<D>(mPayload); }
 	          D* operator->()       { Assert(IsOk()); return &std::get<D>(mPayload); }
 	    const D* operator->() const { Assert(IsOk()); return &std::get<D>(mPayload); }
 
