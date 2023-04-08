@@ -123,8 +123,7 @@ namespace Strawberry::Core
 			{
 				if (rhs)
 				{
-					mHasValue = std::exchange(rhs.mHasValue, false);
-					mPayload  = std::move(rhs.Unwrap());
+					mPayload  = std::move(rhs.Take());
 				}
 				else
 				{
