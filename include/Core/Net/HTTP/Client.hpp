@@ -21,8 +21,7 @@ namespace Strawberry::Core::Net::HTTP
 
 
 
-		inline IO::BufferedIO<S> TakeSocket()
-		{ return Take(mSocket); }
+		inline IO::BufferedIO<S>&& TakeSocket() { return std::move(mSocket); }
 
 
 
