@@ -19,16 +19,45 @@ namespace Strawberry::Core::IO
 	class BufferedReader
 	{
 	public:
-		BufferedReader(T&& source);
+		BufferedReader(T&& source)
+			: mBlocking(true)
+			, mRunning(std::make_unique<std::atomic<bool>>(false))
+			, mBuffer(std::make_unique<Mutex<Buffer>>())
+			, mSource(std::make_unique<T>(std::move(source)))
+		{
+			StartThread();
+		}
+
 		BufferedReader(const BufferedReader& other)				= delete;
 		BufferedReader& operator=(const BufferedReader& other)	= delete;
 		BufferedReader(BufferedReader&& other)					= default;
 		BufferedReader& operator=(BufferedReader&& other)		= default;
-		~BufferedReader();
 
 
 
-		Result<DynamicByteBuffer, Error> Read(size_t len);
+		~BufferedReader()
+		{
+			StopThread();
+		}
+
+
+
+		Result<DynamicByteBuffer, Error> Read(size_t len)
+		{
+			while (true)
+			{
+				auto result = mBuffer->Lock()->Read(len);
+
+				if (mBlocking && !result && result.Err() == IO::Error::WouldBlock)
+				{
+					std::this_thread::yield();
+					continue;
+				}
+
+				return result;
+			}
+		}
+
 		inline Result<size_t, Error> Write(const DynamicByteBuffer& bytes) { if (mSource) return mSource->Write(bytes); else return Error::NoIO; }
 
 
@@ -39,82 +68,53 @@ namespace Strawberry::Core::IO
 
 
 	private:
+		void StartThread()
+		{
+			*mRunning = true;
+			if (!mThread)
+			{
+				mThread = std::make_unique<std::thread>([running = mRunning.get(), source = mSource.get(), buffer = mBuffer.get()]()
+				{
+					while (*running && source)
+					{
+						auto len = buffer->Lock()->RemainingCapacity();
+						auto read = source->Read(len);
+						if (read)
+						{
+							buffer->Lock()->Write(*read).Unwrap();
+						}
+						else
+						{
+							break;
+						}
+
+						std::this_thread::yield();
+					}
+				});
+			}
+		}
+
+		void StopThread()
+		{
+			if (mThread)
+			{
+				*mRunning = false;
+				mSource.reset();
+				mThread->join();
+				mThread.reset();
+			}
+		}
+
+
+
+	private:
 		using Buffer = std::conditional_t<Size == 0, CircularByteBuffer<Size>, CircularDynamicByteBuffer>;
 
-		bool                           mBlocking;
-		std::unique_ptr<bool>          mRunning;
-		Option<std::thread>            mThread;
-		std::unique_ptr<Mutex<Buffer>> mBuffer;
-		std::unique_ptr<T>             mSource;
+		bool								mBlocking;
+		std::unique_ptr<std::atomic<bool>>	mRunning;
+		std::unique_ptr<std::thread>		mThread;
+		std::unique_ptr<Mutex<Buffer>>		mBuffer;
+		std::unique_ptr<T>					mSource;
 	};
 
-
-
-	template<typename T, size_t Size> requires Read<T> && std::movable<T>
-	BufferedReader<T, Size>::BufferedReader(T&& source)
-		: mBlocking(true)
-		, mRunning(std::make_unique<bool>(true))
-		, mThread()
-		, mBuffer(std::make_unique<Mutex<Buffer>>())
-		, mSource(std::make_unique<T>(std::forward<T>(source)))
-	{
-		mThread.Emplace([running = mRunning.get(), source = mSource.get(), buffer = mBuffer.get()]()
-		{
-			while (running)
-			{
-				auto len = buffer->Lock()->RemainingCapacity();
-				auto read = source->Read(len);
-				if (read)
-				{
-					buffer->Lock()->Write(*read).Unwrap();
-				}
-				else
-				{
-					break;
-				}
-
-				std::this_thread::yield();
-			}
-		});
-	}
-
-
-
-	template<typename T, size_t Size> requires Read<T> && std::movable<T>
-	BufferedReader<T, Size>::~BufferedReader()
-	{
-		if (mSource)
-		{
-			mSource.reset();
-		}
-
-		if (mRunning)
-		{
-			*mRunning = false;
-		}
-
-		if (mThread)
-		{
-			mThread->join();
-		}
-	}
-
-
-
-	template<typename T, size_t Size> requires Read<T> && std::movable<T>
-	Result<DynamicByteBuffer, Error> BufferedReader<T, Size>::Read(size_t len)
-	{
-		while (true)
-		{
-			auto result = mBuffer->Lock()->Read(len);
-
-			if (mBlocking && !result && result.Err() == IO::Error::WouldBlock)
-			{
-				std::this_thread::yield();
-				continue;
-			}
-
-			return result;
-		}
-	}
 }

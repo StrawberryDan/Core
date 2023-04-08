@@ -18,94 +18,97 @@ namespace Strawberry::Core::IO
 	class BufferedWriter
 	{
 	public:
-		BufferedWriter(T&& source);
+		BufferedWriter(T&& source)
+			: mRunning(std::make_unique<bool>(false))
+			, mBuffer(std::make_unique<Mutex<Buffer>>())
+			, mSource(std::make_unique<T>(std::move(source)))
+		{
+			StartThread();
+		}
+
 		BufferedWriter(const BufferedWriter& other)				= delete;
 		BufferedWriter& operator=(const BufferedWriter& other)	= delete;
 		BufferedWriter(BufferedWriter&& other)					= default;
 		BufferedWriter& operator=(BufferedWriter&& other)		= default;
-		~BufferedWriter();
+
+
+
+		~BufferedWriter()
+		{
+			StopThread();
+		}
 
 
 
 		inline Result<DynamicByteBuffer, Error> Read(size_t len) { if (mSource) return mSource->Read(len); else return Error::NoIO; }
-		inline Result<size_t, Error> Write(const DynamicByteBuffer& bytes);
+		inline Result<size_t, Error> Write(const DynamicByteBuffer& bytes)
+		{
+			return mBuffer->Lock()->Write(bytes);
+		}
+
+
 
 	private:
-		std::unique_ptr<bool>                             mRunning;
-		Option<std::thread>                               mThread;
-		std::unique_ptr<Mutex<CircularDynamicByteBuffer>> mBuffer;
-		std::unique_ptr<T>                                mSource;
-	};
-
-
-
-	template<typename T> requires Read<T> && std::movable<T>
-	BufferedWriter<T>::BufferedWriter(T&& source)
-			: mRunning(std::make_unique<bool>(true))
-			, mThread()
-			, mBuffer(std::make_unique<Mutex<CircularDynamicByteBuffer>>())
-			, mSource(std::make_unique<T>(std::forward<T>(source)))
-	{
-		mThread.Emplace([running = mRunning.get(), source = mSource.get(), buffer = mBuffer.get()]()
+		void StartThread()
 		{
-			while (*running)
+			*mRunning = true;
+			if (!mThread)
 			{
-				DynamicByteBuffer data;
-				size_t len = 0;
+				mThread = std::make_unique<std::thread>([running = mRunning.get(), source = mSource.get(), buffer = mBuffer.get()]()
 				{
-					auto locked = buffer->Lock();
-					len = locked->Size();
-					if (len > 0)
+					while (*running)
 					{
-						data = locked->Read(len).Unwrap();
-					}
-				}
+						DynamicByteBuffer data;
+						size_t len = 0;
+						{
+							auto locked = buffer->Lock();
+							len = locked->Size();
+							if (len > 0)
+							{
+								data = locked->Read(len).Unwrap();
+							}
+						}
 
-				size_t bytesWritten = 0;
-				while (bytesWritten < data.Size())
-				{
-					auto write = source->Write({data.Data() + bytesWritten, data.Size() - bytesWritten});
-					if (write)
-					{
-						bytesWritten += write.Unwrap();
-					}
-					else
-					{
-						Unreachable();
-					}
-				}
+						size_t bytesWritten = 0;
+						while (source && bytesWritten < data.Size())
+						{
+							auto write = source->Write(
+									{data.Data() + bytesWritten, data.Size() - bytesWritten});
+							if (write)
+							{
+								bytesWritten += write.Unwrap();
+							}
+							else
+							{
+								Unreachable();
+							}
+						}
 
-				std::this_thread::yield();
+						std::this_thread::yield();
+					}
+				});
 			}
-		});
-	}
-
-
-
-	template<typename T> requires Read<T> && std::movable<T>
-	BufferedWriter<T>::~BufferedWriter()
-	{
-		if (mSource)
-		{
-			mSource.reset();
 		}
 
-		if (mRunning)
+		void StopThread()
 		{
-			*mRunning = false;
+			if (mThread)
+			{
+				*mRunning = false;
+				mSource.reset();
+				mThread->join();
+				mThread.reset();
+			}
 		}
 
-		if (mThread)
-		{
-			mThread->join();
-		}
-	}
 
 
+	private:
+		using Buffer = CircularDynamicByteBuffer;
 
-	template<typename T> requires Read<T> && std::movable<T>
-	Result<size_t, Error> BufferedWriter<T>::Write(const DynamicByteBuffer& bytes)
-	{
-		return mBuffer->Lock()->Write(bytes);
-	}
+		std::unique_ptr<bool>							mRunning;
+		std::unique_ptr<std::thread>					mThread;
+		std::unique_ptr<Mutex<Buffer>>					mBuffer;
+		std::unique_ptr<T>								mSource;
+	};
 }
