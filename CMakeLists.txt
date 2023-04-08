@@ -20,9 +20,6 @@ add_library(Strawberry_Core STATIC
         include/Core/Concepts.hpp
         include/Core/Endian.hpp
         include/Core/IO/Base64.hpp
-        include/Core/IO/BufferedIO.hpp
-        include/Core/IO/BufferedReader.hpp
-        include/Core/IO/BufferedWriter.hpp
         include/Core/IO/ByteBuffer.hpp
         include/Core/IO/CircularByteBuffer.hpp
         include/Core/IO/CircularDynamicByteBuffer.hpp

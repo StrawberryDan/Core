@@ -15,7 +15,6 @@
 #include "Core/Mutex.hpp"
 #include "Core/Net/Socket/TCPClient.hpp"
 #include "Core/Net/Socket/TLSClient.hpp"
-#include "Core/IO/BufferedIO.hpp"
 #include "Core/Net/Websocket/Message.hpp"
 #include "Core/IO/Concepts.hpp"
 
@@ -63,8 +62,8 @@ namespace Strawberry::Core::Net::Websocket
 
 
 
-		inline IO::BufferedReader<S> TakeSocket()
-		{ return Take(mSocket); }
+		inline S TakeSocket()
+		{ return std::move(mSocket); }
 
 
 
@@ -93,7 +92,7 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	protected:
-		Option<IO::BufferedIO<S>>	mSocket;
+		Option<S>					mSocket;
 		Option<Error>				mError;
 	};
 

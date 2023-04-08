@@ -126,8 +126,15 @@ namespace Strawberry::Core::Net::HTTP
 			auto bytesToRead = std::stoul(matchResults[1], nullptr, 16);
 			if (bytesToRead > 0)
 			{
-				auto chunk = this->mSocket.Read(bytesToRead).Unwrap();
-				Assert(chunk.Size() == bytesToRead);
+				IO::DynamicByteBuffer chunk;
+				chunk.Reserve(bytesToRead);
+
+				do
+				{
+					chunk.Push(this->mSocket.Read(bytesToRead - chunk.Size()).Unwrap());
+				}
+				while (chunk.Size() < bytesToRead);
+
 				payload.Push(chunk);
 			}
 		}

@@ -7,7 +7,6 @@
 #include "Request.hpp"
 #include "Core/Net/Socket/TCPClient.hpp"
 #include "Core/Net/Socket/TLSClient.hpp"
-#include "Core/IO/BufferedIO.hpp"
 
 
 
@@ -21,7 +20,7 @@ namespace Strawberry::Core::Net::HTTP
 
 
 
-		inline IO::BufferedIO<S>&& TakeSocket() { return std::move(mSocket); }
+		inline S&& TakeSocket() { return std::move(mSocket); }
 
 
 
@@ -38,7 +37,7 @@ namespace Strawberry::Core::Net::HTTP
 
 
 	private:
-		IO::BufferedIO<S> mSocket;
+		S mSocket;
 
 
 

@@ -250,7 +250,7 @@ namespace Strawberry::Core::Net::Websocket
 
 			if (message.GetOpcode() == Message::Opcode::Close)
 			{
-				mSocket = {};
+				mSocket.Reset();
 				mError = Error::Closed;
 			}
 
@@ -285,9 +285,12 @@ namespace Strawberry::Core::Net::Websocket
 				return Error::BadOp;
 			}
 		}
-		else
+		else switch (byte.Err())
 		{
-			Unreachable();
+			case IO::Error::Closed:
+				return Error::Closed;
+			default:
+				Unreachable();
 		}
 
 		bool masked;
