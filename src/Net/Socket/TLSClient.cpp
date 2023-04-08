@@ -120,9 +120,8 @@ namespace Strawberry::Core::Net::Socket
 	{
 		if (this != &other)
 		{
-			this->~TLSClient();
-			mSSL = Take(other.mSSL);
-			mTCP = Take(other.mTCP);
+			std::destroy_at(this);
+			std::construct_at(this, std::move(other));
 		}
 
 		return *this;
