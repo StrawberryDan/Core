@@ -25,29 +25,19 @@ namespace Strawberry::Core
 
 
 
-		Option(const T& value) requires ( std::is_copy_constructible_v<T> )
-			: mHasValue(true)
-			, mPayload(value)
+		Option(const T& value) requires (std::is_copy_constructible_v<T>)
+			: mHasValue(true), mPayload(value)
 		{}
 
 
 
-		Option(T&& value) requires ( std::is_move_constructible_v<T> )
-				: mHasValue(true)
-				, mPayload(std::move(value))
+		Option(T&& value) requires (std::is_move_constructible_v<T>)
+			: mHasValue(true), mPayload(std::move(value))
 		{}
 
 
 
-		template<typename ...Args>
-		explicit Option(Args ...args) requires ( std::is_constructible_v<T, Args...> )
-			: mHasValue(true)
-			, mPayload(std::forward<Args>(args)...)
-		{}
-
-
-
-		Option(const Option& rhs) requires ( std::is_copy_constructible_v<T> )
+		Option(const Option& rhs) requires (std::is_copy_constructible_v<T>)
 			: mHasValue(rhs.mHasValue)
 		{
 			if (rhs)
@@ -58,35 +48,45 @@ namespace Strawberry::Core
 
 
 
-		Option(Option&& rhs)  noexcept requires ( std::is_move_constructible_v<T> )
-			: mHasValue(false)
+		Option(Option&& rhs) requires(std::is_move_constructible_v<T>)
+			: mHasValue(rhs.mHasValue)
 		{
 			if (rhs)
 			{
 				std::construct_at(&mPayload, std::move(*rhs));
-				mHasValue = Replace(rhs.mHasValue, false);
+				rhs.mHasValue = false;
 			}
 		}
 
 
 
-		Option& operator=(const T& rhs) requires ( std::is_copy_assignable_v<T> )
+		Option& operator=(const T& rhs) requires(std::is_copy_assignable_v<T>)
 		{
-			std::destroy_at(this);
 			mHasValue = true;
-			mPayload  = rhs;
+			mPayload = rhs;
 
 			return *this;
 		}
 
 
 
-		Option& operator=(const Option& rhs) requires ( std::is_copy_assignable_v<T> )
+		Option& operator=(const Option& rhs) requires(std::is_copy_assignable_v<T>)
 		{
 			if (this != &rhs)
 			{
-				std::destroy_at(this);
-				std::construct_at(&mPayload, rhs);
+				if (rhs)
+				{
+					mHasValue = true;
+					mPayload = *rhs;
+				}
+				else
+				{
+					if (mHasValue)
+					{
+						mHasValue = false;
+						std::destroy_at(&mPayload);
+					}
+				}
 			}
 
 			return *this;
@@ -94,24 +94,25 @@ namespace Strawberry::Core
 
 
 
-		Option& operator=(T&& rhs) noexcept requires ( std::is_move_assignable_v<T> )
+		Option& operator=(T&& rhs) requires(std::is_move_assignable_v<T>)
 		{
-			std::destroy_at(this);
+			if (mHasValue)
+			{
+				std::destroy_at(&mPayload);
+			}
 
 			mHasValue = true;
-			mPayload = std::move(rhs);
+			mPayload  = std::move(rhs);
 
 			return *this;
 		}
 
 
 
-		Option& operator=(Option&& rhs) noexcept requires ( std::is_move_assignable_v<T> )
+		Option& operator=(Option&& rhs) requires(std::is_move_assignable_v<T>)
 		{
 			if (this != &rhs)
 			{
-				std::destroy_at(this);
-
 				if (rhs)
 				{
 					mHasValue = std::exchange(rhs.mHasValue, false);
@@ -119,7 +120,11 @@ namespace Strawberry::Core
 				}
 				else
 				{
-					std::construct_at(this);
+					if (mHasValue)
+					{
+						std::destroy_at(&mPayload);
+					}
+					mHasValue = false;
 				}
 			}
 
@@ -138,6 +143,7 @@ namespace Strawberry::Core
 		}
 
 
+
 		template<typename ...Args>
 		void Emplace(Args ...args)
 		{
@@ -150,6 +156,8 @@ namespace Strawberry::Core
 			mHasValue = true;
 		}
 
+
+
 		void Reset()
 		{
 			if (mHasValue)
@@ -160,15 +168,46 @@ namespace Strawberry::Core
 		}
 
 
-		inline bool HasValue() const { return mHasValue; }
-		explicit inline operator bool() const { return mHasValue; }
+
+		inline bool HasValue() const
+		{ return mHasValue; }
 
 
-			  T& operator *()       { Assert(mHasValue); return mPayload; }
-		const T& operator *() const { Assert(mHasValue); return mPayload; }
 
-			  T* operator->()       { Assert(mHasValue); return &mPayload; }
-		const T* operator->() const { Assert(mHasValue); return &mPayload; }
+		explicit inline operator bool() const
+		{ return mHasValue; }
+
+
+
+		T& operator*()
+		{
+			Assert(mHasValue);
+			return mPayload;
+		}
+
+
+
+		const T& operator*() const
+		{
+			Assert(mHasValue);
+			return mPayload;
+		}
+
+
+
+		T* operator->()
+		{
+			Assert(mHasValue);
+			return &mPayload;
+		}
+
+
+
+		const T* operator->() const
+		{
+			Assert(mHasValue);
+			return &mPayload;
+		}
 
 
 
@@ -195,8 +234,7 @@ namespace Strawberry::Core
 
 
 
-
-		template <typename R, Callable<R, T&&> F>
+		template<typename R, Callable<R, T&&> F>
 		Option<R> Map(F functor)
 		{
 			if (HasValue())
@@ -211,8 +249,9 @@ namespace Strawberry::Core
 
 
 
-		template <typename R, typename F>
-		R MapOr(F functor, R&& value) requires Callable<R, F, T>
+		template<typename R, typename F>
+		R MapOr(F functor, R&& value)
+		requires Callable<R, F, T>
 		{
 			if (HasValue())
 			{
@@ -250,6 +289,14 @@ namespace Strawberry::Core
 			{
 				return {};
 			}
+		}
+
+
+
+		T&& Take()
+		{
+			mHasValue = false;
+			return std::move(mPayload);
 		}
 
 
