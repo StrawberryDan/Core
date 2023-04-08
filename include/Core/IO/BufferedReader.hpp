@@ -20,10 +20,10 @@ namespace Strawberry::Core::IO
 	{
 	public:
 		BufferedReader(T&& source);
-		BufferedReader(const BufferedReader& other) = delete;
-		BufferedReader& operator=(const BufferedReader& other) = delete;
-		BufferedReader(BufferedReader&& other);
-		BufferedReader& operator=(BufferedReader&& other);
+		BufferedReader(const BufferedReader& other)				= delete;
+		BufferedReader& operator=(const BufferedReader& other)	= delete;
+		BufferedReader(BufferedReader&& other)					= default;
+		BufferedReader& operator=(BufferedReader&& other)		= default;
 		~BufferedReader();
 
 
@@ -76,34 +76,6 @@ namespace Strawberry::Core::IO
 				std::this_thread::yield();
 			}
 		});
-	}
-
-
-
-	template<typename T, size_t Size> requires Read<T> && std::movable<T>
-	BufferedReader<T, Size>::BufferedReader(BufferedReader&& other)
-		: mRunning(Take(other.mRunning))
-		, mThread(Take(other.mThread))
-		, mSource(Take(other.mSource))
-		, mBuffer(Take(other.mBuffer))
-	{
-
-	}
-
-
-
-	template<typename T, size_t Size> requires Read<T> && std::movable<T>
-	BufferedReader<T, Size>& BufferedReader<T, Size>::operator=(BufferedReader&& other)
-	{
-		if (this != &other)
-		{
-			mRunning = Take(other.mRunning);
-			mThread = Take(other.mThread);
-			mSource = Take(other.mSource);
-			mBuffer = Take(other.mBuffer);
-		}
-
-		return *this;
 	}
 
 
