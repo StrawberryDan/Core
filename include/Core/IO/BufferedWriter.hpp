@@ -41,6 +41,7 @@ namespace Strawberry::Core::IO
 
 
 		inline Result<DynamicByteBuffer, Error> Read(size_t len) { if (mSource) return mSource->Read(len); else return Error::NoIO; }
+        
 		inline Result<size_t, Error> Write(const DynamicByteBuffer& bytes)
 		{
 			return mBuffer->Lock()->Write(bytes);

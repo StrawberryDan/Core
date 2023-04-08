@@ -61,7 +61,7 @@ namespace Strawberry::Core::Net::HTTP
 					status     = matchResults[2],
 					statusText = matchResults[3];
 
-		Response response(*ParseVersion(version), std::stoul(status), statusText);
+		Response response(*ParseVersion(version), std::stoi(status), statusText);
 
 		while (true)
 		{
