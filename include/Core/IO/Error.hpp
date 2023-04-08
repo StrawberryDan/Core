@@ -10,5 +10,7 @@ namespace Strawberry::Core::IO
 		WouldBlock,
 		BufferOverflow,
 		NoIO,
+        Closed,
+        Syscall,
 	};
 }

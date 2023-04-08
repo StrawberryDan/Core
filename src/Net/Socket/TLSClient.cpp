@@ -110,8 +110,8 @@ namespace Strawberry::Core::Net::Socket
 
 	TLSClient::TLSClient(TLSClient&& other)
 	{
-		mSSL = Take(other.mSSL);
-		mTCP = Take(other.mTCP);
+        mTCP = std::move(other.mTCP);
+		mSSL = std::exchange(other.mSSL, nullptr);
 	}
 
 
@@ -150,7 +150,7 @@ namespace Strawberry::Core::Net::Socket
 	Result<IO::DynamicByteBuffer, IO::Error> TLSClient::Read(size_t length)
 	{
 		auto buffer = IO::DynamicByteBuffer::Zeroes(length);
-		auto bytesRead = SSL_read(mSSL, reinterpret_cast<void*>(buffer.Data()), length);
+		auto bytesRead = SSL_read(mSSL, reinterpret_cast<void*>(buffer.Data()), static_cast<int>(length));
 
 		if (bytesRead > 0)
 		{
@@ -159,10 +159,17 @@ namespace Strawberry::Core::Net::Socket
 		}
 		else
 		{
-			switch (SSL_get_error(mSSL, bytesRead))
+            auto error = SSL_get_error(mSSL, bytesRead);
+			switch (error)
 			{
+                case SSL_ERROR_ZERO_RETURN:
+                    return IO::Error::Closed;
+                case SSL_ERROR_SYSCALL:
+                    std::cerr << "SSL read error. Syscall: " << strerror(errno) << std::endl;
+                    return IO::Error::Syscall;
 				default:
-					return IO::Error::Unknown;
+                    std::cerr << "Unknown SSL_read error code: " << error << std::endl;
+                    return IO::Error::Unknown;
 			}
 		}
 	}
@@ -171,7 +178,7 @@ namespace Strawberry::Core::Net::Socket
 
 	Result<size_t, IO::Error> TLSClient::Write(const IO::DynamicByteBuffer& bytes)
 	{
-		auto bytesSent = SSL_write(mSSL, bytes.Data(), bytes.Size());
+		auto bytesSent = SSL_write(mSSL, bytes.Data(), static_cast<int>(bytes.Size()));
 
 		if (bytesSent >= 0)
 		{

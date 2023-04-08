@@ -72,9 +72,8 @@ namespace Strawberry::Core::Net::Socket
 
 
 	TCPClient::TCPClient(TCPClient&& other)
-	{
-		mSocket = Replace(other.mSocket, -1);
-	}
+        : mSocket(std::exchange(other.mSocket, -1))
+    {}
 
 
 
@@ -82,8 +81,8 @@ namespace Strawberry::Core::Net::Socket
 	{
 		if (this != &other)
 		{
-			this->~TCPClient();
-			mSocket = Replace(other.mSocket, -1);
+            std::destroy_at(this);
+            std::construct_at(this, std::move(other));
 		}
 
 		return *this;
