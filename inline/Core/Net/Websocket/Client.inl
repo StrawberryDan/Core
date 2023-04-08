@@ -18,32 +18,6 @@
 namespace Strawberry::Core::Net::Websocket
 {
 	template<typename S> requires IO::Read<S> && IO::Write<S>
-	ClientBase<S>::ClientBase(ClientBase<S>&& rhs) noexcept
-	{
-		if (this != &rhs)
-		{
-			mSocket = Take(rhs.mSocket);
-			mError = Take(rhs.mError);
-		}
-	}
-
-
-
-	template<typename S> requires IO::Read<S> && IO::Write<S>
-	ClientBase<S>& ClientBase<S>::operator=(ClientBase<S>&& rhs) noexcept
-	{
-		if (this != &rhs)
-		{
-			mSocket = Take(rhs.mSocket);
-			mError = Take(rhs.mError);
-		}
-
-		return (*this);
-	}
-
-
-
-	template<typename S> requires IO::Read<S> && IO::Write<S>
 	ClientBase<S>::~ClientBase()
 	{
 		Disconnect();

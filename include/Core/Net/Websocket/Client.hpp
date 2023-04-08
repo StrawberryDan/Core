@@ -38,10 +38,10 @@ namespace Strawberry::Core::Net::Websocket
 	class ClientBase
 	{
 	public:
-		ClientBase(const ClientBase&) = delete;
-		ClientBase& operator=(const ClientBase&) = delete;
-		ClientBase(ClientBase&& rhs) noexcept;
-		ClientBase& operator=(ClientBase&& rhs) noexcept;
+		ClientBase(const ClientBase&)				= delete;
+		ClientBase& operator=(const ClientBase&)	= delete;
+		ClientBase(ClientBase&& rhs) 				= default;
+		ClientBase& operator=(ClientBase&& rhs)		= default;
 		~ClientBase();
 
 
@@ -93,11 +93,8 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	protected:
-		Option<IO::BufferedIO<S>> mSocket;
-		Option<Error> mError;
-
-
-
+		Option<IO::BufferedIO<S>>	mSocket;
+		Option<Error>				mError;
 	};
 
 
