@@ -152,7 +152,7 @@ namespace Strawberry::Core::Net::Socket
 		auto buffer = IO::DynamicByteBuffer::Zeroes(length);
 		auto bytesRead = SSL_read(mSSL, reinterpret_cast<void*>(buffer.Data()), length);
 
-		if (bytesRead >= 0)
+		if (bytesRead > 0)
 		{
 			buffer.Resize(bytesRead);
 			return buffer;
