@@ -37,6 +37,14 @@ namespace Strawberry::Core
 
 
 
+		template <typename... Ts>
+		explicit Option(Ts... ts) requires ( std::constructible_from<T, Ts...> )
+			: mHasValue(true)
+			, mPayload(std::forward<Ts>(ts)...)
+		{}
+
+
+
 		Option(const Option& rhs) requires (std::is_copy_constructible_v<T>)
 			: mHasValue(rhs.mHasValue)
 		{
