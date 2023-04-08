@@ -7,6 +7,7 @@
 #include "Core/IO/CircularDynamicByteBuffer.hpp"
 #include "Core/IO/Concepts.hpp"
 #include "Core/Mutex.hpp"
+#include "Core/Markers.hpp"
 #include <concepts>
 #include <memory>
 #include <thread>
@@ -83,9 +84,14 @@ namespace Strawberry::Core::IO
 						{
 							buffer->Lock()->Write(*read).Unwrap();
 						}
-						else
+						else switch(read.Err())
 						{
-							break;
+                            case Error::Closed:
+                                return;
+                            case Error::WouldBlock:
+                                break;
+                            default:
+                                Unreachable();
 						}
 
 						std::this_thread::yield();
