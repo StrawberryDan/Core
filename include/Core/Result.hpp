@@ -14,32 +14,22 @@ namespace Strawberry::Core
 	class [[nodiscard]] Result
 	{
 	public:
-		Result(D value) requires ( std::is_trivially_copyable_v<D> )
+		Result(const D& value) requires ( std::copy_constructible<D> )
 			: mIsOk(true)
 			, mPayload(value)
 		{}
 
-		Result(const D& value) requires ( std::copy_constructible<D> && !std::is_trivially_copyable_v<D> )
-			: mIsOk(true)
-			, mPayload(value)
-		{}
-
-		Result(D&& value) requires ( std::move_constructible<D> && !std::is_trivially_copyable_v<D> )
+		Result(D&& value) requires ( std::move_constructible<D> )
 			: mIsOk(true)
 			, mPayload(std::move(value))
 		{}
 
-		Result(E value) requires ( std::is_trivially_copyable_v<E> )
-				: mIsOk(false)
-				, mPayload(value)
-		{}
-
-		Result(const E& value) requires ( std::copy_constructible<E> && !std::is_trivially_copyable_v<E> )
+		Result(const E& value) requires ( std::copy_constructible<E> )
 		: mIsOk(false)
 		, mPayload(value)
 		{}
 
-		Result(E&& value) requires ( std::move_constructible<E> && !std::is_trivially_copyable_v<E> )
+		Result(E&& value) requires ( std::move_constructible<E> )
 		: mIsOk(false)
 		, mPayload(std::move(value))
 		{}

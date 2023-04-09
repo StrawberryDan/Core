@@ -57,13 +57,13 @@ namespace Strawberry::Core::Net::Websocket
 	            }
 	            catch (std::exception& e)
 	            {
-	                return Result<nlohmann::json, std::string>::Err("Parse Error");
+	                return std::string("Parse Error");
 	            }
 	            return Result<nlohmann::json, std::string>::Ok(std::forward<nlohmann::json>(json));
 	        }
 
 	        default:
-	            return Result<nlohmann::json, std::string>::Err("Invalid Message Type");
+	            return std::string("Invalid Message Type");
 	    }
 	}
 
