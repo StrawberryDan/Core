@@ -18,7 +18,7 @@ namespace Strawberry::Core
 	    {
 	        origin = 0;
 	    }
-	    return result;
+	    return std::move(result);
 	}
 
 
