@@ -34,7 +34,7 @@ namespace Strawberry::Core::Net::Websocket
 			Websocket::Message::Payload payload;
 			payload.push_back(reinterpret_cast<uint8_t*>(&code)[0]);
 			payload.push_back(reinterpret_cast<uint8_t*>(&code)[1]);
-			SendMessage(Message(Message::Opcode::Close, payload));
+			SendMessage(Message(Message::Opcode::Close, payload)).Unwrap();
 			while (true)
 			{
 				auto msg = ReadMessage();
@@ -51,9 +51,17 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	template<typename S> requires IO::Read<S> && IO::Write<S>
-	void ClientBase<S>::SendMessage(const Message& message)
+	Result<int, Error> ClientBase<S>::SendMessage(const Message& message)
 	{
-		TransmitFrame(message).Unwrap();
+		auto result = TransmitFrame(message);
+		if (!result)
+		{
+			return result.Err();
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 
@@ -178,40 +186,47 @@ namespace Strawberry::Core::Net::Websocket
 	Result<size_t, Error>
 	ClientBase<S>::TransmitFrame(const Message& message)
 	{
+		if (!mSocket)
+		{
+			return Error::Closed;
+		}
+
+		auto socket = mSocket->Lock();
+
 		size_t bytesTransmitted = 0;
 
 		uint8_t byte = 0b10000000;
 		byte |= GetOpcodeMask(message.GetOpcode());
-		bytesTransmitted += mSocket->Write({&byte, sizeof(byte)}).Unwrap();
+		bytesTransmitted += socket->Write({&byte, sizeof(byte)}).Unwrap();
 
 		byte = 0b10000000;
 		auto bytes = message.AsBytes();
 		if (bytes.size() <= 125)
 		{
 			byte |= static_cast<uint8_t>(bytes.size());
-			bytesTransmitted += mSocket->Write({&byte, sizeof(byte)}).Unwrap();
+			bytesTransmitted += socket->Write({&byte, sizeof(byte)}).Unwrap();
 		}
 		else if (bytes.size() <= std::numeric_limits<uint16_t>::max())
 		{
 			byte |= 126;
-			bytesTransmitted += mSocket->Write({&byte, sizeof(byte)}).Unwrap();
-			bytesTransmitted += mSocket->Write(ToBigEndian(static_cast<uint16_t>(bytes.size()))).Unwrap();
+			bytesTransmitted += socket->Write({&byte, sizeof(byte)}).Unwrap();
+			bytesTransmitted += socket->Write(ToBigEndian(static_cast<uint16_t>(bytes.size()))).Unwrap();
 		}
 		else if (bytes.size() <= std::numeric_limits<uint64_t>::max())
 		{
 			byte |= 127;
-			bytesTransmitted += mSocket->Write(byte).Unwrap();
-			bytesTransmitted += mSocket->Write(ToBigEndian(static_cast<uint64_t>(bytes.size()))).Unwrap();
+			bytesTransmitted += socket->Write(byte).Unwrap();
+			bytesTransmitted += socket->Write(ToBigEndian(static_cast<uint64_t>(bytes.size()))).Unwrap();
 		}
 
 		uint32_t maskingKey = ToBigEndian(GenerateMaskingKey());
 		static_assert(sizeof(maskingKey) == 4);
-		bytesTransmitted += mSocket->Write(maskingKey).Unwrap();
+		bytesTransmitted += socket->Write(maskingKey).Unwrap();
 
 		for (int i = 0; i < bytes.size(); i++)
 		{
 			auto mask = reinterpret_cast<uint8_t*>(&maskingKey)[i % sizeof(maskingKey)];
-			bytesTransmitted += mSocket->Write(bytes[i] ^ mask).Unwrap();
+			bytesTransmitted += socket->Write(bytes[i] ^ mask).Unwrap();
 		}
 
 		return Result<size_t, Error>::Ok(bytesTransmitted);
@@ -270,9 +285,11 @@ namespace Strawberry::Core::Net::Websocket
 	{
 		using Opcode = Message::Opcode;
 
+		auto socket = mSocket->Lock();
+
 		bool final;
 		Opcode opcode;
-		if (auto byte = mSocket->Read(1).template Map<uint8_t>([](auto x) -> uint8_t { return x.template Into<uint8_t>(); }))
+		if (auto byte = socket->Read(1).template Map<uint8_t>([](auto x) -> uint8_t { return x.template Into<uint8_t>(); }))
 		{
 			final = *byte & 0b10000000;
 			auto opcodeIn = GetOpcodeFromByte(*byte & 0b00001111);
@@ -295,18 +312,18 @@ namespace Strawberry::Core::Net::Websocket
 
 		bool masked;
 		size_t size;
-		if (auto byte = mSocket->Read(1).template Map<uint8_t>([](auto x) { return x.template Into<uint8_t>(); }))
+		if (auto byte = socket->Read(1).template Map<uint8_t>([](auto x) { return x.template Into<uint8_t>(); }))
 		{
 			masked = *byte & 0b10000000;
 			Assert(!masked);
 			uint8_t sizeByte = *byte & 0b01111111;
 			if (sizeByte == 126)
 			{
-				size = FromBigEndian(mSocket->Read(sizeof(uint16_t)).Unwrap().template Into<uint16_t>());
+				size = FromBigEndian(socket->Read(sizeof(uint16_t)).Unwrap().template Into<uint16_t>());
 			}
 			else if (sizeByte == 127)
 			{
-				size = FromBigEndian(mSocket->Read(sizeof(uint64_t)).Unwrap().template Into<uint64_t>());
+				size = FromBigEndian(socket->Read(sizeof(uint64_t)).Unwrap().template Into<uint64_t>());
 			}
 			else
 			{
@@ -322,7 +339,7 @@ namespace Strawberry::Core::Net::Websocket
 		std::vector<uint8_t> payload;
 		if (size > 0)
 		{
-			payload = mSocket->Read(size).Unwrap().AsVector();
+			payload = socket->Read(size).Unwrap().AsVector();
 		}
 
 		return Result<Fragment, Error>::Ok(final, Message(opcode, payload));

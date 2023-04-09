@@ -49,7 +49,7 @@ namespace Strawberry::Core::Net::Websocket
 
 
 
-		void SendMessage(const Message& message);
+		Result<int, Error> SendMessage(const Message& message);
 
 		Result<Message, Error> ReadMessage();
 
@@ -92,7 +92,7 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	protected:
-		Option<S>					mSocket;
+		Option<Mutex<S>>			mSocket;
 		Option<Error>				mError;
 	};
 
