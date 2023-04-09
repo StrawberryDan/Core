@@ -66,7 +66,7 @@ namespace Strawberry::Core::Net::Socket
 
 
 	TCPClient::TCPClient()
-			: mSocket(-1)
+		: mSocket(-1)
 	{}
 
 
