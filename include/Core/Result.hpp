@@ -11,7 +11,7 @@
 namespace Strawberry::Core
 {
 	template<typename D, typename E> requires ( !std::same_as<D, E> )
-	class Result
+	class [[nodiscard]] Result
 	{
 	public:
 		Result(D value) requires ( std::is_trivially_copyable_v<D> )
