@@ -70,8 +70,13 @@ namespace Strawberry::Core
 
 		Option& operator=(const T& rhs) requires(std::is_copy_assignable_v<T>)
 		{
+			if (mHasValue)
+			{
+				std::destroy_at(&mPayload);
+			}
+
 			mHasValue = true;
-			mPayload = rhs;
+			std::construct_at(&mPayload, rhs);
 
 			return *this;
 		}
@@ -82,18 +87,16 @@ namespace Strawberry::Core
 		{
 			if (this != &rhs)
 			{
-				if (rhs)
+				if (!rhs.mHasValue && mHasValue)
 				{
-					mHasValue = true;
-					mPayload = *rhs;
+					std::destroy_at(&mPayload);
 				}
-				else
+
+				mHasValue = rhs.mHasValue;
+
+				if (rhs.mHasValue)
 				{
-					if (mHasValue)
-					{
-						mHasValue = false;
-						std::destroy_at(&mPayload);
-					}
+					mPayload = *rhs;
 				}
 			}
 
@@ -121,17 +124,16 @@ namespace Strawberry::Core
 		{
 			if (this != &rhs)
 			{
-				if (rhs)
+				if (!rhs.mHasValue && mHasValue)
 				{
-					mPayload  = std::move(rhs.Take());
+					std::destroy_at(&mPayload);
 				}
-				else
+
+				mHasValue = rhs.mHasValue;
+
+				if (rhs.mHasValue)
 				{
-					if (mHasValue)
-					{
-						std::destroy_at(&mPayload);
-					}
-					mHasValue = false;
+					mPayload = std::move(rhs.Take());
 				}
 			}
 
