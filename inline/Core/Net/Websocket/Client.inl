@@ -192,44 +192,49 @@ namespace Strawberry::Core::Net::Websocket
 		}
 
 		auto socket = mSocket->Lock();
+		Core::IO::DynamicByteBuffer bytesToSend;
 
-		size_t bytesTransmitted = 0;
+		uint8_t byte = 0b10000000 | GetOpcodeMask(message.GetOpcode());
+		bytesToSend.Push(byte);
 
-		uint8_t byte = 0b10000000;
-		byte |= GetOpcodeMask(message.GetOpcode());
-		bytesTransmitted += socket->Write({&byte, sizeof(byte)}).Unwrap();
-
-		byte = 0b10000000;
 		auto bytes = message.AsBytes();
 		if (bytes.size() <= 125)
 		{
-			byte |= static_cast<uint8_t>(bytes.size());
-			bytesTransmitted += socket->Write({&byte, sizeof(byte)}).Unwrap();
+			byte = 0b10000000 | static_cast<uint8_t>(bytes.size());
+			bytesToSend.Push(byte);
 		}
 		else if (bytes.size() <= std::numeric_limits<uint16_t>::max())
 		{
-			byte |= 126;
-			bytesTransmitted += socket->Write({&byte, sizeof(byte)}).Unwrap();
-			bytesTransmitted += socket->Write(ToBigEndian(static_cast<uint16_t>(bytes.size()))).Unwrap();
+			byte = 0b10000000 | 126;
+			bytesToSend.Push(byte);
+			bytesToSend.Push(ToBigEndian(static_cast<uint16_t>(bytes.size())));
 		}
 		else if (bytes.size() <= std::numeric_limits<uint64_t>::max())
 		{
-			byte |= 127;
-			bytesTransmitted += socket->Write(byte).Unwrap();
-			bytesTransmitted += socket->Write(ToBigEndian(static_cast<uint64_t>(bytes.size()))).Unwrap();
+			byte = 0b10000000 | 127;
+			bytesToSend.Push(byte);
+			bytesToSend.Push(ToBigEndian(static_cast<uint64_t>(bytes.size())));
 		}
 
 		uint32_t maskingKey = ToBigEndian(GenerateMaskingKey());
-		static_assert(sizeof(maskingKey) == 4);
-		bytesTransmitted += socket->Write(maskingKey).Unwrap();
+		bytesToSend.Push(maskingKey);
 
 		for (int i = 0; i < bytes.size(); i++)
 		{
-			auto mask = reinterpret_cast<uint8_t*>(&maskingKey)[i % sizeof(maskingKey)];
-			bytesTransmitted += socket->Write(bytes[i] ^ mask).Unwrap();
+			uint8_t mask = reinterpret_cast<uint8_t*>(&maskingKey)[i % sizeof(maskingKey)];
+			bytesToSend.Push<uint8_t>(bytes[i] ^ mask);
 		}
 
-		return Result<size_t, Error>::Ok(bytesTransmitted);
+		auto sendResult = socket->Write(bytesToSend);
+		if (sendResult)
+		{
+			return sendResult.Unwrap();
+		}
+		else switch (sendResult.Err())
+		{
+			default:
+				Unreachable();
+		}
 	}
 
 
