@@ -38,7 +38,8 @@ namespace Strawberry::Core::Net::Websocket
 			while (true)
 			{
 				auto msg = ReadMessage();
-				if (msg && msg.Unwrap().GetOpcode() == Message::Opcode::Close)
+				if (!msg && msg.Err() == Websocket::Error::Closed
+					|| msg && msg.Unwrap().GetOpcode() == Message::Opcode::Close)
 				{
 					break;
 				}
