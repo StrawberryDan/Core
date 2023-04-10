@@ -291,6 +291,10 @@ namespace Strawberry::Core::Net::Websocket
 		using Opcode = Message::Opcode;
 
 		auto socket = mSocket->Lock();
+		if (!socket->Poll())
+		{
+			return Error::NoMessage;
+		}
 
 		bool final;
 		Opcode opcode;
