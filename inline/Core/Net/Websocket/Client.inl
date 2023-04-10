@@ -80,8 +80,7 @@ namespace Strawberry::Core::Net::Websocket
 	{
 		while (true)
 		{
-			auto msg = ReadMessage();
-			if (msg)
+			if (auto msg = ReadMessage())
 			{
 				return Result<Message, Error>::Ok(msg.Unwrap());
 			}
@@ -93,6 +92,8 @@ namespace Strawberry::Core::Net::Websocket
 			{
 				return Result<Message, Error>::Err(msg.Err());
 			}
+
+			std::this_thread::yield();
 		}
 	}
 
