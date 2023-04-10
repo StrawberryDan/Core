@@ -110,7 +110,7 @@ namespace Strawberry::Core::Net::Socket
 
 	TLSClient::TLSClient(TLSClient&& other)
 	{
-        mTCP = std::move(other.mTCP);
+		mTCP = std::move(other.mTCP);
 		mSSL = std::exchange(other.mSSL, nullptr);
 	}
 
