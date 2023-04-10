@@ -16,8 +16,8 @@
 #elif __APPLE__ || __linux__
 #include <sys/socket.h>
 #include <netdb.h>
-#include <fcntl.h>
 #include <unistd.h>
+#include <poll.h>
 #endif // _WIN32
 
 
@@ -100,6 +100,25 @@ namespace Strawberry::Core::Net::Socket
 			closesocket(mSocket);
 #endif
 		}
+	}
+
+
+
+	bool TCPClient::Poll() const
+	{
+#if defined(__APPLE__) || defined(__linux__)
+		pollfd fds[] =
+		{
+				{mSocket, POLLIN, 0}
+		};
+
+		int pollResult = poll(fds, 1, 0);
+		Assert(pollResult >= 0);
+		return static_cast<bool>(fds[0].revents & POLLIN);
+#else
+		#warning "No definition for TCP::Client::Select on this platform"
+		return true;
+#endif
 	}
 
 

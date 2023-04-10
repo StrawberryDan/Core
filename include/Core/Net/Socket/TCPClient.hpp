@@ -40,9 +40,9 @@ namespace Strawberry::Core::Net::Socket
 
 
 
-	public:
-		Result<IO::DynamicByteBuffer, IO::Error> Read(size_t length);
-		Result<size_t, IO::Error>                Write(const IO::DynamicByteBuffer& bytes);
+		bool										Poll() const;
+		Result<IO::DynamicByteBuffer, IO::Error>	Read(size_t length);
+		Result<size_t, IO::Error>					Write(const IO::DynamicByteBuffer& bytes);
 
 
 

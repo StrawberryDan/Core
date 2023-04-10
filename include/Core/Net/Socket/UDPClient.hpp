@@ -37,9 +37,9 @@ namespace Strawberry::Core::Net::Socket
 
 
 
-	public:
-		Result<std::tuple<Endpoint, IO::DynamicByteBuffer>, IO::Error> Read();
-		Result<size_t, IO::Error>                Write(const Endpoint& endpoint, const IO::DynamicByteBuffer& bytes);
+		bool															Poll() const;
+		Result<std::tuple<Endpoint, IO::DynamicByteBuffer>, IO::Error>	Read();
+		Result<size_t, IO::Error>										Write(const Endpoint& endpoint, const IO::DynamicByteBuffer& bytes);
 
 
 
