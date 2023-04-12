@@ -120,7 +120,7 @@ namespace Strawberry::Core::Net::HTTP
 	{
 		std::string line;
 		std::smatch matchResults;
-		static const auto chunkSizeLine = std::regex(R"((\d+)\r\n)");
+		static const auto chunkSizeLine = std::regex(R"(([\dabcdefABCDEF]+)\r\n)");
 
 		IO::DynamicByteBuffer payload;
 		while (true)
