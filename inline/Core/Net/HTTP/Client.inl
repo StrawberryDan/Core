@@ -52,10 +52,18 @@ namespace Strawberry::Core::Net::HTTP
 		static const auto statusLinePattern = std::regex(R"(HTTP\/([^\s]+)\s+(\d{3})\s+([^\r]*)\r\n)");
 		static const auto headerLinePattern = std::regex(R"(([^:]+)\s*:\s*([^\r]+)\r\n)");
 
-		auto currentLine = ReadLine();
+		std::string currentLine;
+		bool matched;
 		std::smatch matchResults;
-		auto matched = std::regex_match(currentLine, matchResults, statusLinePattern);
-		Assert(matched);
+
+		do
+		{
+			currentLine = ReadLine();
+			matched = std::regex_match(currentLine, matchResults, statusLinePattern);
+		}
+		while (!matched);
+
+
 
 		std::string version    = matchResults[1],
 					status     = matchResults[2],
