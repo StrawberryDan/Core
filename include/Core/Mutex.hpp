@@ -133,8 +133,12 @@ namespace Strawberry::Core
 	class SharedMutex
 	{
 	public:
-		template<typename ... Ts>
-		SharedMutex(Ts ... ts) : mPayload(std::make_shared<Mutex<T>>(std::forward<Ts>(ts)...)) {}
+		SharedMutex(std::nullptr_t) : mPayload(nullptr) {}
+
+		template<typename ... Ts> requires ( std::constructible_from<T, Ts...> )
+		explicit SharedMutex(Ts ... ts) : mPayload(std::make_shared<Mutex<T>>(std::forward<Ts>(ts)...)) {}
+
+		explicit operator bool() const { return mPayload.operator bool(); }
 
 		MutexGuard<T>       Lock()       { return mPayload->Lock(); }
 		MutexGuard<const T> Lock() const { return static_cast<const Mutex<T>*>(mPayload.get())->Lock(); }
