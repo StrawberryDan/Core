@@ -92,12 +92,16 @@ namespace Strawberry::Core
 					std::destroy_at(&mPayload);
 				}
 
-				mHasValue = rhs.mHasValue;
-
-				if (rhs.mHasValue)
+				if (rhs.mHasValue && mHasValue)
 				{
 					mPayload = *rhs;
 				}
+				else if (rhs.mHasValue && !mHasValue)
+				{
+					std::construct_at(&mPayload, *rhs);
+				}
+
+				mHasValue = rhs.mHasValue;
 			}
 
 			return *this;
@@ -129,12 +133,16 @@ namespace Strawberry::Core
 					std::destroy_at(&mPayload);
 				}
 
-				mHasValue = rhs.mHasValue;
-
-				if (rhs.mHasValue)
+				if (rhs.mHasValue && mHasValue)
 				{
 					mPayload = std::move(rhs.Take());
 				}
+				else if (rhs.mHasValue && !mHasValue)
+				{
+					std::construct_at(&mPayload, std::move(rhs.Take()));
+				}
+
+				mHasValue = rhs.mHasValue;
 			}
 
 			return *this;
