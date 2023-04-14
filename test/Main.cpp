@@ -14,7 +14,6 @@
 #include "Core/Net/Socket/TCPClient.hpp"
 #include "Core/Net/Socket/TLSClient.hpp"
 #include "Core/Collection/CircularBuffer.hpp"
-#include "Core/IO/BufferedIO.hpp"
 #include "Core/Net/HTTP/Client.hpp"
 
 
