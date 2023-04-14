@@ -140,6 +140,12 @@ namespace Strawberry::Core
 
 		explicit operator bool() const { return mPayload.operator bool(); }
 
+		template <typename... Ts> requires std::constructible_from<T, Ts...>
+		void Emplace(Ts... ts) &
+		{
+			mPayload = std::make_shared<Mutex<T>>(std::forward<Ts>(ts)...);
+		}
+
 		MutexGuard<T>       Lock()       { return mPayload->Lock(); }
 		MutexGuard<const T> Lock() const { return static_cast<const Mutex<T>*>(mPayload.get())->Lock(); }
 
