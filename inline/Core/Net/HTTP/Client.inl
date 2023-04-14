@@ -24,7 +24,7 @@ namespace Strawberry::Core::Net::HTTP
 	{
 		std::string headerLine = fmt::format(
 				"{} {} HTTP/{}\r\n",
-				ToString(request.GetVerb()), request.GetURI(), ToString(request.GetVersion()));
+				request.GetVerb().ToString(), request.GetURI(), request.GetVersion().ToString());
 		mSocket.Write({headerLine.data(), headerLine.length()}).Unwrap();
 		for (const auto& [key, values]: *request.GetHeader())
 		{
@@ -69,7 +69,7 @@ namespace Strawberry::Core::Net::HTTP
 					status     = matchResults[2],
 					statusText = matchResults[3];
 
-		Response response(*ParseVersion(version), std::stoi(status), statusText);
+		Response response(*Version::Parse(version), std::stoi(status), statusText);
 
 		while (true)
 		{

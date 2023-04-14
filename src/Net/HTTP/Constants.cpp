@@ -11,11 +11,10 @@
 
 namespace Strawberry::Core::Net::HTTP
 {
-	std::string ToString(Verb verb)
+	std::string Verb::ToString() const
 	{
-		switch (verb)
+		switch (*this)
 		{
-
 			case Verb::POST:
 				return "POST";
 			case Verb::GET:
@@ -33,7 +32,7 @@ namespace Strawberry::Core::Net::HTTP
 
 
 
-	Option<Verb> ParseVerb(const std::string& string)
+	Option<Verb> Verb::Parse(const std::string& string)
 	{
 		static const std::map<std::string, Verb> mapping =
 		{
@@ -48,7 +47,8 @@ namespace Strawberry::Core::Net::HTTP
 		if (mapping.contains(upper))
 		{
 			return mapping.at(upper);
-		} else
+		}
+		else
 		{
 			return {};
 		}
@@ -56,7 +56,7 @@ namespace Strawberry::Core::Net::HTTP
 
 
 
-	Option<Version> ParseVersion(const std::string& string)
+	Option<Version> Version::Parse(const std::string& string)
 	{
 		static const std::map<std::string, Version> mapping =
 		{
@@ -69,7 +69,8 @@ namespace Strawberry::Core::Net::HTTP
 		if (mapping.contains(string))
 		{
 			return mapping.at(string);
-		} else
+		}
+		else
 		{
 			return {};
 		}
@@ -77,9 +78,9 @@ namespace Strawberry::Core::Net::HTTP
 
 
 
-	std::string ToString(Version version)
+	std::string Version::ToString() const
 	{
-		switch (version)
+		switch (*this)
 		{
 			case Version::VERSION_1_0:
 				return "1.0";
