@@ -4,7 +4,7 @@
 
 #include "Core/Assert.hpp"
 #include "Core/Markers.hpp"
-#include "Core/Net/Socket/API.hpp"
+#include "Core/Net/Socket/SocketAPI.hpp"
 #include "Core/Utilities.hpp"
 
 
@@ -21,11 +21,11 @@
 
 
 
-namespace Strawberry::Core::Net::Socket
+namespace Strawberry::Core::Net
 {
 	Result<UDPClient, Error> UDPClient::Create()
 	{
-		API::Initialise();
+		SocketAPI::Initialise();
 
 
 		auto handle = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);

@@ -99,7 +99,7 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	class WSClient
-		: public ClientBase<Socket::TCPClient>
+		: public ClientBase<TCPClient>
 	{
 	public:
 		static Result<WSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 80);
@@ -108,7 +108,7 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	class WSSClient
-		: public ClientBase<Socket::TLSClient>
+		: public ClientBase<TLSClient>
 	{
 	public:
 		static Result<WSSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 443);

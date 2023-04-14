@@ -46,7 +46,7 @@ namespace Strawberry::Core::Net::HTTP
 
 
 	class HTTPClient
-		: public ClientBase<Socket::TCPClient>
+		: public ClientBase<TCPClient>
 	{
 	public:
 		HTTPClient(const std::string& hostname, uint16_t port = 80);
@@ -55,7 +55,7 @@ namespace Strawberry::Core::Net::HTTP
 
 
 	class HTTPSClient
-		: public ClientBase<Socket::TLSClient>
+		: public ClientBase<TLSClient>
 	{
 	public:
 		HTTPSClient(const std::string& hostname, uint16_t port = 443);

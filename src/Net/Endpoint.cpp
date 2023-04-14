@@ -2,7 +2,7 @@
 
 
 
-#include "Core/Net/Socket/API.hpp"
+#include "Core/Net/Socket/SocketAPI.hpp"
 
 
 
@@ -19,7 +19,7 @@ namespace Strawberry::Core::Net
 {
 	Result<Endpoint, Error> Endpoint::Resolve(const std::string& hostname, uint16_t port)
 	{
-		Socket::API::Initialise();
+		SocketAPI::Initialise();
 
 
 		addrinfo hints { .ai_flags = AI_ALL | AI_ADDRCONFIG };

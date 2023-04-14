@@ -3,7 +3,7 @@
 
 
 #include "Core/Assert.hpp"
-#include "Core/Net/Socket/API.hpp"
+#include "Core/Net/Socket/SocketAPI.hpp"
 #include "Core/Utilities.hpp"
 #include <memory>
 #include <openssl/tls1.h>
@@ -62,11 +62,11 @@ std::unique_ptr<TLSContext> TLSContext::mInstance = nullptr;
 
 
 
-namespace Strawberry::Core::Net::Socket
+namespace Strawberry::Core::Net
 {
 	Result<TLSClient, Error> TLSClient::Connect(const Endpoint& endpoint)
 	{
-		API::Initialise();
+		SocketAPI::Initialise();
 
 
 		auto tcp = TCPClient::Connect(endpoint);

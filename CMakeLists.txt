@@ -37,7 +37,7 @@ add_library(Strawberry_Core STATIC
         include/Core/Net/HTTP/Header.hpp
         include/Core/Net/HTTP/Request.hpp
         include/Core/Net/HTTP/Response.hpp
-        include/Core/Net/Socket/API.hpp
+        include/Core/Net/Socket/SocketAPI.hpp
         include/Core/Net/Socket/TCPClient.hpp
         include/Core/Net/Socket/TLSClient.hpp
         include/Core/Net/Socket/UDPClient.hpp
@@ -65,7 +65,7 @@ add_library(Strawberry_Core STATIC
         src/Net/HTTP/Request.cpp
         src/Net/HTTP/Response.cpp
         src/Net/RTP/Header.cpp
-        src/Net/Socket/API.cpp
+        src/Net/Socket/SocketAPI.cpp
         src/Net/Socket/TCPClient.cpp
         src/Net/Socket/TLSClient.cpp
         src/Net/Socket/UDPClient.cpp
