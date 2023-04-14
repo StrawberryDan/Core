@@ -4,7 +4,7 @@
 
 #include "Core/Assert.hpp"
 #include "Core/Markers.hpp"
-#include "Core/Net/Socket/SocketAPI.hpp"
+#include "Core/Net/Socket/API.hpp"
 #include "Core/Utilities.hpp"
 #include <iostream>
 
@@ -22,11 +22,11 @@
 
 
 
-namespace Strawberry::Core::Net
+namespace Strawberry::Core::Net::Socket
 {
 	Result<TCPClient, Error> TCPClient::Connect(const Endpoint& endpoint)
 	{
-		SocketAPI::Initialise();
+		Socket::API::Initialise();
 
 		TCPClient client;
 

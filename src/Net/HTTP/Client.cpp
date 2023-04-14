@@ -5,7 +5,7 @@
 namespace Strawberry::Core::Net::HTTP
 {
 	HTTPClient::HTTPClient(const std::string& hostname, uint16_t port)
-			: ClientBase<TCPClient>(hostname, port)
+			: ClientBase<Socket::TCPClient>(hostname, port)
 	{
 
 	};
@@ -13,7 +13,7 @@ namespace Strawberry::Core::Net::HTTP
 
 
 	HTTPSClient::HTTPSClient(const std::string& hostname, uint16_t port)
-			: ClientBase<TLSClient>(hostname, port)
+			: ClientBase<Socket::TLSClient>(hostname, port)
 	{
 
 	}

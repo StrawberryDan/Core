@@ -20,7 +20,7 @@
 
 
 
-namespace Strawberry::Core::Net
+namespace Strawberry::Core::Net::Socket
 {
 	class TCPClient
 	{

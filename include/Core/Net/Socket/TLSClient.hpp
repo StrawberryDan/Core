@@ -10,7 +10,7 @@
 #include <openssl/ssl.h>
 
 
-namespace Strawberry::Core::Net
+namespace Strawberry::Core::Net::Socket
 {
 	class TLSClient
 	{
