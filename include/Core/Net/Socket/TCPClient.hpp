@@ -11,6 +11,7 @@
 #include "Core/Net/Endpoint.hpp"
 #include "Core/IO/DynamicByteBuffer.hpp"
 #include "Core/IO/Error.hpp"
+#include "Core/Net/Socket/SocketAPIUser.hpp"
 
 
 
@@ -23,6 +24,7 @@
 namespace Strawberry::Core::Net::Socket
 {
 	class TCPClient
+		: private SocketAPIUser
 	{
 		friend class TLSClient;
 	public:

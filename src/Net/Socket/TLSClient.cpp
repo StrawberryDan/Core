@@ -3,7 +3,7 @@
 
 
 #include "Core/Assert.hpp"
-#include "Core/Net/Socket/API.hpp"
+#include "Core/Net/Socket/SocketAPI.hpp"
 #include "Core/Utilities.hpp"
 #include <memory>
 #include <openssl/tls1.h>
@@ -66,9 +66,6 @@ namespace Strawberry::Core::Net::Socket
 {
 	Result<TLSClient, Error> TLSClient::Connect(const Endpoint& endpoint)
 	{
-		API::Initialise();
-
-
 		auto tcp = TCPClient::Connect(endpoint);
 		if (!tcp)
 		{

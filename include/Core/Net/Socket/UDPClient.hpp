@@ -7,6 +7,7 @@
 #include "Core/Net/Endpoint.hpp"
 #include "Core/Result.hpp"
 #include <tuple>
+#include "Core/Net/Socket/SocketAPIUser.hpp"
 
 
 
@@ -19,6 +20,7 @@
 namespace Strawberry::Core::Net::Socket
 {
 	class UDPClient
+		: private SocketAPIUser
 	{
 	public:
 		static Result<UDPClient, Error> Create();

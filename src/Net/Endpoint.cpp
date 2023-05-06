@@ -2,10 +2,6 @@
 
 
 
-#include "Core/Net/Socket/API.hpp"
-
-
-
 #if defined(__APPLE__) || defined(__linux__)
 #include <netdb.h>
 #elif defined(_WIN32)
@@ -19,9 +15,6 @@ namespace Strawberry::Core::Net
 {
 	Result<Endpoint, Error> Endpoint::Resolve(const std::string& hostname, uint16_t port)
 	{
-		Socket::API::Initialise();
-
-
 		addrinfo hints { .ai_flags = AI_ALL | AI_ADDRCONFIG };
 		addrinfo* peer = nullptr;
 		auto dnsResult = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &peer);

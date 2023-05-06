@@ -1,4 +1,4 @@
-#include "Core/Net/Socket/API.hpp"
+#include "Core/Net/Socket/SocketAPI.hpp"
 
 
 
@@ -15,22 +15,9 @@
 
 namespace Strawberry::Core::Net::Socket
 {
-	static std::unique_ptr<API> sInstance = nullptr;
-
-
-
-	void API::Initialise()
+	SocketAPI::~SocketAPI()
 	{
-		if (!sInstance)
-		{
-			sInstance = std::unique_ptr<API>(new API());
-		}
-	}
-
-
-
-	API::~API()
-	{
+		std::cout << "Terminating Socket API" << std::endl;
 #if defined(_WIN32)
 		WSACleanup();
 #endif
@@ -38,8 +25,9 @@ namespace Strawberry::Core::Net::Socket
 
 
 
-	API::API()
+	SocketAPI::SocketAPI()
 	{
+		std::cout << "Initialising Socket API" << std::endl;
 #if defined(_WIN32)
 		WSAData wsaData;
 		auto err = WSAStartup(MAKEWORD(2, 2), &wsaData);

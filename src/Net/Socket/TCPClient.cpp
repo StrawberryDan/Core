@@ -4,7 +4,7 @@
 
 #include "Core/Assert.hpp"
 #include "Core/Markers.hpp"
-#include "Core/Net/Socket/API.hpp"
+#include "Core/Net/Socket/SocketAPI.hpp"
 #include "Core/Utilities.hpp"
 #include <iostream>
 
@@ -26,8 +26,6 @@ namespace Strawberry::Core::Net::Socket
 {
 	Result<TCPClient, Error> TCPClient::Connect(const Endpoint& endpoint)
 	{
-		Socket::API::Initialise();
-
 		TCPClient client;
 
 		addrinfo hints {.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_STREAM,.ai_protocol = IPPROTO_TCP};

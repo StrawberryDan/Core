@@ -4,14 +4,15 @@
 
 namespace Strawberry::Core::Net::Socket
 {
-	class API
+	class SocketAPI
 	{
+		friend class SocketAPIUser;
+
 	public:
-		static void Initialise();
-		~API();
+		~SocketAPI();
 
 
 	private:
-		API();
+		SocketAPI();
 	};
 }
