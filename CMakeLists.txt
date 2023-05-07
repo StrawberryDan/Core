@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(Strawberry_Core)
+project(StrawberryCore)
 set(CMAKE_CXX_STANDARD 20)
 
 
@@ -13,7 +13,7 @@ find_path(JSON_INCLUDE_DIR
 
 
 
-add_library(Strawberry_Core STATIC
+add_library(StrawberryCore STATIC
         include/Core/Assert.hpp
         include/Core/Clock.hpp
         include/Core/Collection/CircularBuffer.hpp
@@ -71,17 +71,18 @@ add_library(Strawberry_Core STATIC
         src/Net/Socket/UDPClient.cpp
         src/Net/Websocket/Client.cpp
         src/Net/Websocket/Message.cpp
-        include/Core/Net/Socket/SocketAPIUser.hpp src/Net/Socket/SocketAPIUser.cpp)
+        include/Core/Net/Socket/SocketAPIUser.hpp
+        src/Net/Socket/SocketAPIUser.cpp)
 
-target_include_directories(Strawberry_Core PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
-target_link_libraries(Strawberry_Core PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY})
+target_include_directories(StrawberryCore PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
+target_link_libraries(StrawberryCore PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY})
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    target_link_libraries(Strawberry_Core PRIVATE ws2_32)
+    target_link_libraries(StrawberryCore PRIVATE ws2_32)
 endif()
 
 
 
-add_executable(Strawberry_Core_Test
+add_executable(StrawberryCore_Test
         test/Main.cpp)
-target_link_libraries(Strawberry_Core_Test PRIVATE Strawberry_Core)
+target_link_libraries(StrawberryCore_Test PRIVATE Strawberry_Core)
