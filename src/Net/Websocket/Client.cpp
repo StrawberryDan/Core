@@ -22,7 +22,7 @@ namespace Strawberry::Core::Net::Websocket
 
 
 		WSClient client;
-		client.mSocket = handshaker.TakeSocket();
+		client.mSocket = std::move(handshaker).TakeSocket();
 
 		return std::move(client);
 	}
@@ -47,7 +47,7 @@ namespace Strawberry::Core::Net::Websocket
 
 
 		WSSClient client;
-		client.mSocket = handshaker.TakeSocket();
+		client.mSocket = std::move(handshaker).TakeSocket();
 		return std::move(client);
 	}
 }
