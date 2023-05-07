@@ -1,6 +1,6 @@
 #include <utility>
 
-#include "Core/Net/HTTP/Response.hpp"
+#include "Strawberry/Core/Net/HTTP/Response.hpp"
 
 
 namespace Strawberry::Core::Net::HTTP

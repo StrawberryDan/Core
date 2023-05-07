@@ -1,18 +1,52 @@
-#include "Strawberry/Core/IO/CircularDynamicByteBuffer.hpp"
+#pragma once
+
+
+
+#include "ByteBuffer.hpp"
+#include "Error.hpp"
+#include "Strawberry/Core/Result.hpp"
+#include <cstdlib>
 
 
 
 namespace Strawberry::Core::IO
 {
-	CircularDynamicByteBuffer::CircularDynamicByteBuffer()
-			: mHead(0), mTail(0), mSize(0), mBuffer(DynamicByteBuffer::Zeroes(1024))
+	template <size_t S>
+	class CircularByteBuffer
+	{
+	public:
+		CircularByteBuffer();
+
+
+
+		Result<DynamicByteBuffer, Error> Read(size_t len);
+		Result<size_t, Error> Write(const DynamicByteBuffer& bytes);
+
+
+
+		inline size_t Size() const { return mSize; }
+		inline size_t Capacity() const { return S; }
+		inline size_t RemainingCapacity() const { return Capacity() - Size(); }
+
+	private:
+		size_t mHead, mTail, mSize;
+		ByteBuffer<S> mBuffer;
+	};
+
+
+
+	template<size_t S>
+	CircularByteBuffer<S>::CircularByteBuffer()
+		: mHead(0), mTail(0), mSize(0), mBuffer()
 	{
 	}
 
 
 
-	Result<DynamicByteBuffer, Error> CircularDynamicByteBuffer::Read(size_t len)
+	template<size_t S>
+	Result<DynamicByteBuffer, Error> CircularByteBuffer<S>::Read(size_t len)
 	{
+		Assert(len <= Capacity());
 		if (mSize == 0 || mSize < len)
 		{
 			return Error::WouldBlock;
@@ -50,16 +84,17 @@ namespace Strawberry::Core::IO
 
 
 
-	Result<size_t, Error> CircularDynamicByteBuffer::Write(const DynamicByteBuffer& bytes)
+	template<size_t S>
+	Result<size_t, Error> CircularByteBuffer<S>::Write(const DynamicByteBuffer& bytes)
 	{
 		if (RemainingCapacity() < bytes.Size())
 		{
-			Expand();
+			return Error::BufferOverflow;
 		}
 
 		size_t bytesWritten = 0;
-		memcpy(mBuffer.Data() + mTail, bytes.Data(), std::min(Capacity() - mTail, bytes.Size()));
-		bytesWritten += std::min(Capacity() - mTail, bytes.Size());
+		memcpy(mBuffer.Data() + mTail, bytes.Data(), std::min(S - mTail, bytes.Size()));
+		bytesWritten += std::min(S - mTail, bytes.Size());
 		mTail = (mTail + bytesWritten) % Capacity();
 		mSize += bytesWritten;
 
@@ -71,36 +106,6 @@ namespace Strawberry::Core::IO
 			mSize += remainder;
 		}
 
-		if (RemainingCapacity() == 0)
-		{
-			Expand();
-		}
-
 		return bytesWritten;
-	}
-
-
-
-	void CircularDynamicByteBuffer::Expand()
-	{
-		DynamicByteBuffer newBuffer = DynamicByteBuffer::Zeroes(Capacity() * 2);
-
-		if (mHead < mTail)
-		{
-			memcpy(newBuffer.Data(), mBuffer.Data() + mHead, mSize);
-		}
-		else
-		{
-			memcpy(newBuffer.Data(), mBuffer.Data() + mHead, std::min(Capacity() - mHead, mSize));
-			auto bytesCopied = std::min(Capacity() - mHead, mSize);
-			if (bytesCopied < mSize)
-			{
-				memcpy(newBuffer.Data(), mBuffer.Data(), mSize - bytesCopied);
-			}
-		}
-
-		mHead = 0;
-		mTail = mSize;
-		mBuffer = std::move(newBuffer);
 	}
 }

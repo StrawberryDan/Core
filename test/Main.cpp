@@ -1,4 +1,4 @@
-#include "Core/IO/Base64.hpp"
+#include "Strawberry/Core/IO/Base64.hpp"
 
 
 #include <cstring>
@@ -8,13 +8,13 @@
 
 
 
-#include "Core/Assert.hpp"
-#include "Core/Math/Math.hpp"
-#include "Core/Net/Endpoint.hpp"
-#include "Core/Net/Socket/TCPClient.hpp"
-#include "Core/Net/Socket/TLSClient.hpp"
-#include "Core/Collection/CircularBuffer.hpp"
-#include "Core/Net/HTTP/Client.hpp"
+#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Math/Math.hpp"
+#include "Strawberry/Core/Net/Endpoint.hpp"
+#include "Strawberry/Core/Net/Socket/TCPClient.hpp"
+#include "Strawberry/Core/Net/Socket/TLSClient.hpp"
+#include "Strawberry/Core/Collection/CircularBuffer.hpp"
+#include "Strawberry/Core/Net/HTTP/Client.hpp"
 
 
 

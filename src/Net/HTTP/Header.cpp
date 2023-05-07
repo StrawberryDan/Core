@@ -1,9 +1,9 @@
-#include "Core/Net/HTTP/Header.hpp"
+#include "Strawberry/Core/Net/HTTP/Header.hpp"
 
 
 
-#include "Core/Assert.hpp"
-#include "Core/Utilities.hpp"
+#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Utilities.hpp"
 
 
 

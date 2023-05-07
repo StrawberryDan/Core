@@ -1,11 +1,11 @@
-#include "Core/Net/Socket/TCPClient.hpp"
+#include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 
 
 
-#include "Core/Assert.hpp"
-#include "Core/Markers.hpp"
-#include "Core/Net/Socket/SocketAPI.hpp"
-#include "Core/Utilities.hpp"
+#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Markers.hpp"
+#include "Strawberry/Core/Net/Socket/SocketAPI.hpp"
+#include "Strawberry/Core/Utilities.hpp"
 #include <iostream>
 
 

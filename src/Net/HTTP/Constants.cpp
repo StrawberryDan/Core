@@ -1,8 +1,8 @@
-#include "Core/Net/HTTP/Constants.hpp"
+#include "Strawberry/Core/Net/HTTP/Constants.hpp"
 
 
 
-#include "Core/Utilities.hpp"
+#include "Strawberry/Core/Utilities.hpp"
 
 
 #include <map>

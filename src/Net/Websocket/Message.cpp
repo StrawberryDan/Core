@@ -1,9 +1,9 @@
-#include "Core/Net/Websocket/Message.hpp"
+#include "Strawberry/Core/Net/Websocket/Message.hpp"
 
 
 
-#include "Core/Endian.hpp"
-#include "Core/Assert.hpp"
+#include "Strawberry/Core/Endian.hpp"
+#include "Strawberry/Core/Assert.hpp"
 
 
 

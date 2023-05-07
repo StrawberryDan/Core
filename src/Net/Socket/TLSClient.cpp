@@ -1,10 +1,10 @@
-#include "Core/Net/Socket/TLSClient.hpp"
+#include "Strawberry/Core/Net/Socket/TLSClient.hpp"
 
 
 
-#include "Core/Assert.hpp"
-#include "Core/Net/Socket/SocketAPI.hpp"
-#include "Core/Utilities.hpp"
+#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Net/Socket/SocketAPI.hpp"
+#include "Strawberry/Core/Utilities.hpp"
 #include <memory>
 #include <openssl/tls1.h>
 
