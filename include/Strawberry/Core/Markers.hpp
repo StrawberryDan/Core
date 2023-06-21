@@ -4,5 +4,8 @@
 
 namespace Strawberry::Core
 {
-	[[noreturn]] void Unreachable();
+	void DebugBreak();
+
+	[[noreturn]]
+	void Unreachable();
 }
