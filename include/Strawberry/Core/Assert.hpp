@@ -8,6 +8,9 @@
 #include <csignal>
 
 
+#include "Markers.hpp"
+
+
 
 namespace Strawberry::Core
 {
@@ -16,10 +19,7 @@ namespace Strawberry::Core
 #if !NDEBUG
 		if (!value)
 		{
-#if __APPLE__
-			raise(SIGTRAP);
-#endif // __APPLE__
-			std::abort();
+			DebugBreak();
 		}
 		else
 		{
