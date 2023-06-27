@@ -5,6 +5,7 @@
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Net/Socket/SocketAPI.hpp"
 #include "Strawberry/Core/Utilities.hpp"
+#include "Strawberry/Core/Log.hpp"
 #include <memory>
 #include <openssl/tls1.h>
 
@@ -171,10 +172,10 @@ namespace Strawberry::Core::Net::Socket
 					case SSL_ERROR_ZERO_RETURN:
 						return IO::Error::Closed;
 					case SSL_ERROR_SYSCALL:
-						std::cerr << "SSL read error. Syscall: " << strerror(errno) << std::endl;
+						Core::Logging::Error("SSL read error. Error: {}", strerror(errno));
 						return IO::Error::Syscall;
 					default:
-						std::cerr << "Unknown SSL_read error code: " << error << std::endl;
+						Core::Logging::Error("Unknown SSL_read error code: {}", error);
 						return IO::Error::Unknown;
 				}
 			}

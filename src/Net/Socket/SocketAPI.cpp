@@ -2,8 +2,7 @@
 
 
 
-#include <memory>
-#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Log.hpp"
 
 
 
@@ -17,7 +16,7 @@ namespace Strawberry::Core::Net::Socket
 {
 	SocketAPI::~SocketAPI()
 	{
-		std::cout << "Terminating Socket API" << std::endl;
+		Logging::Info("Terminating Socket API");
 #if defined(_WIN32)
 		WSACleanup();
 #endif
@@ -27,7 +26,7 @@ namespace Strawberry::Core::Net::Socket
 
 	SocketAPI::SocketAPI()
 	{
-		std::cout << "Initialising Socket API" << std::endl;
+		Logging::Info("Initialising Socket API");
 #if defined(_WIN32)
 		WSAData wsaData;
 		auto err = WSAStartup(MAKEWORD(2, 2), &wsaData);

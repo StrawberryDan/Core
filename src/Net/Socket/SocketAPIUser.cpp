@@ -26,7 +26,5 @@ namespace Strawberry::Core::Net::Socket
 
 
 	SocketAPIUser::~SocketAPIUser()
-	{
-		std::cout << "Here " << mSocketAPI.use_count() << std::endl;
-	}
+	{}
 }
