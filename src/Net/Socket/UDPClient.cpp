@@ -107,6 +107,8 @@ namespace Strawberry::Core::Net::Socket
 			close(mSocket);
 #elif defined(_WIN32)
 			closesocket(mSocket);
+#else
+			Unreachable();
 #endif
 		}
 	}
@@ -125,8 +127,7 @@ namespace Strawberry::Core::Net::Socket
 		Assert(pollResult >= 0);
 		return static_cast<bool>(fds[0].revents & POLLIN);
 #else
-		#warning "No definition for TCP::Client::Select on this platform"
-		return true;
+		Unreachable();
 #endif
 	}
 
@@ -154,6 +155,10 @@ namespace Strawberry::Core::Net::Socket
 				endpoint.Emplace(
 						IPv6Address(IO::ByteBuffer<16>(sockaddr->sin6_addr)),
 						sockaddr->sin6_port);
+			}
+			else
+			{
+				Unreachable();
 			}
 
 			return std::make_tuple(endpoint.Unwrap(), IO::DynamicByteBuffer(mBuffer.Data(), bytesRead));
