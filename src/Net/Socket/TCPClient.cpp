@@ -4,9 +4,7 @@
 
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Markers.hpp"
-#include "Strawberry/Core/Net/Socket/SocketAPI.hpp"
 #include "Strawberry/Core/Utilities.hpp"
-#include <iostream>
 
 
 
@@ -96,6 +94,8 @@ namespace Strawberry::Core::Net::Socket
 			close(mSocket);
 #elif defined(__WIN32)
 			closesocket(mSocket);
+#else
+			Unreachable();
 #endif
 		}
 	}
@@ -114,8 +114,7 @@ namespace Strawberry::Core::Net::Socket
 		Assert(pollResult >= 0);
 		return static_cast<bool>(fds[0].revents & POLLIN);
 #else
-		#warning "No definition for TCP::Client::Select on this platform"
-		return true;
+		Unreachable();
 #endif
 	}
 
@@ -124,32 +123,43 @@ namespace Strawberry::Core::Net::Socket
 	Result<IO::DynamicByteBuffer, IO::Error> TCPClient::Read(size_t length)
 	{
 		auto buffer = IO::DynamicByteBuffer::Zeroes(length);
-		auto bytesRead = recv(mSocket, reinterpret_cast<char*>(buffer.Data()), length, 0);
+		size_t bytesRead = 0;
 
-		if (bytesRead >= 0)
+		while (bytesRead < length)
 		{
-			buffer.Resize(bytesRead);
-			return buffer;
+			auto thisRead = recv(mSocket, reinterpret_cast<char*>(buffer.Data()) + bytesRead, length - bytesRead, 0);
+			if (thisRead > 0)
+			{
+				bytesRead += thisRead;
+			}
+			else
+			{
+				Unreachable();
+			}
 		}
-		else
-		{
-			Unreachable();
-		}
+
+		return buffer;
 	}
 
 
 
 	Result<size_t, IO::Error> TCPClient::Write(const IO::DynamicByteBuffer& bytes)
 	{
-		auto bytesSent = send(mSocket, reinterpret_cast<const char*>(bytes.Data()), bytes.Size(), 0);
+		size_t bytesSent = 0;
 
-		if (bytesSent >= 0)
+		while (bytesSent < bytes.Size())
 		{
-			return bytesSent;
+			auto thisSend = send(mSocket, reinterpret_cast<const char*>(bytes.Data()) + bytesSent, bytes.Size() - bytesSent, 0);
+			if (thisSend > 0)
+			{
+				bytesSent += thisSend;
+			}
+			else
+			{
+				Unreachable();
+			}
 		}
-		else
-		{
-			Unreachable();
-		}
+
+		return bytesSent;
 	}
 }
