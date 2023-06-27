@@ -138,6 +138,7 @@ namespace Strawberry::Core::Net::Socket
 			}
 		}
 
+		Assert(bytesRead == length);
 		return buffer;
 	}
 
@@ -160,6 +161,7 @@ namespace Strawberry::Core::Net::Socket
 			}
 		}
 
+		Assert(bytesSent == bytes.Size());
 		return bytesSent;
 	}
 }
