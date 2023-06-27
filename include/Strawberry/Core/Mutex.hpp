@@ -23,7 +23,7 @@ namespace Strawberry::Core
 		friend class Mutex;
 
 	public:
-		using LockType    = std::unique_lock<std::mutex>;
+		using LockType    = std::unique_lock<std::recursive_mutex>;
 
 		MutexGuard(const MutexGuard& other) = delete;
 		MutexGuard(MutexGuard&& other) = default;
@@ -34,7 +34,7 @@ namespace Strawberry::Core
 		inline T* operator->() const { return  mPayload; }
 
 	private:
-		MutexGuard(std::mutex& mutex, T* ptr) : mLock(mutex), mPayload(ptr) {}
+		MutexGuard(std::recursive_mutex& mutex, T* ptr) : mLock(mutex), mPayload(ptr) {}
 
 		LockType     mLock;
 		T*           mPayload;
@@ -120,7 +120,7 @@ namespace Strawberry::Core
 
 
 	private:
-		mutable std::mutex mMutex;
+		mutable std::recursive_mutex mMutex;
 		union
 		{
 			T mPayload;
