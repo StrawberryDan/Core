@@ -157,7 +157,7 @@ namespace Strawberry::Core
 		{}
 
 
-		explicit operator bool() const
+		operator bool() const
 		{ return mPayload.operator bool(); }
 
 
