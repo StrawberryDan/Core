@@ -298,8 +298,8 @@ namespace Strawberry::Core::Net::Websocket
 				Unreachable();
 		}
 
-		bool masked;
-		size_t size;
+		bool masked = false;
+		size_t size = 0;
 		if (auto byte = socket->Read(1).template Map<uint8_t>([](auto x) { return x.template Into<uint8_t>(); }))
 		{
 			masked = *byte & 0b10000000;
@@ -331,7 +331,6 @@ namespace Strawberry::Core::Net::Websocket
 		}
 
 		Assert(payload.size() == size);
-
 		return Result<Fragment, Error>::Ok(final, Message(opcode, payload));
 	}
 
