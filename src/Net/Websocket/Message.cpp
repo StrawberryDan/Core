@@ -63,6 +63,7 @@ namespace Strawberry::Core::Net::Websocket
 	        }
 
 	        default:
+				DebugBreak();
 	            return std::string("Invalid Message Type");
 	    }
 	}
