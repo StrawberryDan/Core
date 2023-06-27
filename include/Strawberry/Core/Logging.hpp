@@ -42,7 +42,7 @@ namespace Strawberry::Core
 
 			std::stringstream out;
 			out << "[" << LevelToString(level) << "]\t" << formatted;
-			LogRaw(out.str());
+			LogRaw(level, out.str());
 		}
 
 
@@ -92,6 +92,6 @@ namespace Strawberry::Core
 
 
 	private:
-		static void LogRaw(const std::string& message);
+		static void LogRaw(Level level, const std::string& message);
 	};
 }

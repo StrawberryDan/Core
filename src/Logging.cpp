@@ -53,9 +53,12 @@ namespace Strawberry::Core
 
 
 
-	void Logging::LogRaw(const std::string& message)
+	void Logging::LogRaw(Level level, const std::string& message)
 	{
-		std::cout << message << std::endl;
+		auto* outputStream = &std::cout;
+		if (level == Level::Error) outputStream = &std::cerr;
+
+		*outputStream << message << std::endl;
 		if (sOutputFile)
 		{
 			*sOutputFile << message << std::endl;
