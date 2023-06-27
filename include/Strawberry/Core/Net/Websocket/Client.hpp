@@ -28,7 +28,7 @@ namespace Strawberry::Core::Net::Websocket
 		NoMessage,
 		Closed,
 		Refused,
-		BadOp,
+		ProtocolError,
 	};
 
 
@@ -42,10 +42,6 @@ namespace Strawberry::Core::Net::Websocket
 		ClientBase(ClientBase&& rhs) 				= default;
 		ClientBase& operator=(ClientBase&& rhs)		= default;
 		~ClientBase();
-
-
-
-		void Disconnect();
 
 
 
@@ -83,6 +79,8 @@ namespace Strawberry::Core::Net::Websocket
 		[[nodiscard]] static uint8_t GetOpcodeMask(Message::Opcode opcode);
 		[[nodiscard]] static Option<Message::Opcode> GetOpcodeFromByte(uint8_t byte);
 		[[nodiscard]] static uint32_t GenerateMaskingKey();
+
+		void Disconnect(int code = 1000);
 
 
 

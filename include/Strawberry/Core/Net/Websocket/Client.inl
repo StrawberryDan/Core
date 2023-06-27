@@ -26,32 +26,6 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	template<typename S> requires IO::Read<S> && IO::Write<S>
-	void ClientBase<S>::Disconnect()
-	{
-		if (mSocket)
-		{
-			auto code = ToBigEndian<uint16_t>(1000);
-			Websocket::Message::Payload payload;
-			payload.push_back(reinterpret_cast<uint8_t*>(&code)[0]);
-			payload.push_back(reinterpret_cast<uint8_t*>(&code)[1]);
-			SendMessage(Message(Message::Opcode::Close, payload)).Unwrap();
-			while (true)
-			{
-				auto msg = ReadMessage();
-				if (!msg && msg.Err() == Websocket::Error::Closed
-					|| msg && msg.Unwrap().GetOpcode() == Message::Opcode::Close)
-				{
-					break;
-				}
-			}
-
-			mSocket.Reset();
-		}
-	}
-
-
-
-	template<typename S> requires IO::Read<S> && IO::Write<S>
 	Result<int, Error> ClientBase<S>::SendMessage(const Message& message)
 	{
 		auto result = TransmitFrame(message);
@@ -312,7 +286,8 @@ namespace Strawberry::Core::Net::Websocket
 			else
 			{
 				DebugBreak();
-				return Error::BadOp;
+				Disconnect(1002);
+				return Error::ProtocolError;
 			}
 		}
 		else switch (byte.Err())
@@ -355,6 +330,34 @@ namespace Strawberry::Core::Net::Websocket
 			payload = socket->Read(size).Unwrap().AsVector();
 		}
 
+		Assert(payload.size() == size);
+
 		return Result<Fragment, Error>::Ok(final, Message(opcode, payload));
+	}
+
+
+
+	template<typename S> requires IO::Read<S> && IO::Write<S>
+	void ClientBase<S>::Disconnect(int code)
+	{
+		if (mSocket)
+		{
+			auto endianCode = ToBigEndian<uint16_t>(code);
+			Websocket::Message::Payload payload;
+			payload.push_back(reinterpret_cast<uint8_t*>(&endianCode)[0]);
+			payload.push_back(reinterpret_cast<uint8_t*>(&endianCode)[1]);
+			SendMessage(Message(Message::Opcode::Close, payload)).Unwrap();
+			while (true)
+			{
+				auto msg = ReadMessage();
+				if (!msg && msg.Err() == Websocket::Error::Closed
+					|| msg && msg.Unwrap().GetOpcode() == Message::Opcode::Close)
+				{
+					break;
+				}
+			}
+
+			mSocket.Reset();
+		}
 	}
 }
