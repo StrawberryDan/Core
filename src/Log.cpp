@@ -34,7 +34,7 @@ namespace Strawberry::Core
 
 	Logging::Level Logging::GetLevel()
 	{
-		return sLogLevel.UnwrapOr(Level::Warning);
+		return sLogLevel.UnwrapOr(Level::Trace);
 	}
 
 
