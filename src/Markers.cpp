@@ -15,6 +15,7 @@ namespace Strawberry::Core
 {
 	void DebugBreak()
 	{
+#ifndef NDEBUG
 #if defined(_WIN32)
 
 #elif defined(__UNIX) || defined(__APPLE__)
@@ -22,12 +23,15 @@ namespace Strawberry::Core
 #else
 		#warning "Debug Break not defined on this target!";
 #endif
+#endif
 	}
 
 
 
 	[[noreturn]] void Unreachable()
 	{
+		DebugBreak();
+
 #if __cpp_lib_unreachable
 		std::unreachable();
 #elif __clang__
