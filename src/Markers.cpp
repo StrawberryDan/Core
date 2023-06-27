@@ -17,7 +17,7 @@ namespace Strawberry::Core
 	{
 #ifndef NDEBUG
 #if defined(_WIN32)
-
+		__debugbreak();
 #elif defined(__UNIX) || defined(__APPLE__)
 		std::raise(SIGTRAP);
 #else
