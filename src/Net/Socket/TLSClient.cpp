@@ -5,7 +5,7 @@
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Net/Socket/SocketAPI.hpp"
 #include "Strawberry/Core/Utilities.hpp"
-#include "Strawberry/Core/Log.hpp"
+#include "Strawberry/Core/Logging.hpp"
 #include <memory>
 #include <openssl/tls1.h>
 

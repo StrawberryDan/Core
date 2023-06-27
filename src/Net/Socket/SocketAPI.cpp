@@ -2,7 +2,7 @@
 
 
 
-#include "Strawberry/Core/Log.hpp"
+#include "Strawberry/Core/Logging.hpp"
 
 
 

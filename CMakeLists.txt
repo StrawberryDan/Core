@@ -52,7 +52,7 @@ add_library(StrawberryCore STATIC
 		src/IO/Base64.cpp
 		src/IO/CircularDynamicByteBuffer.cpp
 		src/IO/DynamicByteBuffer.cpp
-		src/Log.cpp
+        src/Logging.cpp
 		src/Markers.cpp
 		src/Net/Address.cpp
 		src/Net/Endpoint.cpp

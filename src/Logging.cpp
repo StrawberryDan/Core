@@ -1,4 +1,4 @@
-#include "Strawberry/Core/Log.hpp"
+#include "Strawberry/Core/Logging.hpp"
 
 #include "Strawberry/Core/Option.hpp"
 #include <fstream>
