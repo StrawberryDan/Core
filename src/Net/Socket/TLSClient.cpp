@@ -154,28 +154,34 @@ namespace Strawberry::Core::Net::Socket
 	Result<IO::DynamicByteBuffer, IO::Error> TLSClient::Read(size_t length)
 	{
 		auto buffer = IO::DynamicByteBuffer::Zeroes(length);
-		auto bytesRead = SSL_read(mSSL, reinterpret_cast<void*>(buffer.Data()), static_cast<int>(length));
+		size_t bytesRead = 0;
 
-		if (bytesRead > 0)
+		while (bytesRead < length)
 		{
-			buffer.Resize(bytesRead);
-			return buffer;
-		}
-		else
-		{
-            auto error = SSL_get_error(mSSL, bytesRead);
-			switch (error)
+			auto thisRead = SSL_read(mSSL, reinterpret_cast<void*>(buffer.Data() + bytesRead), static_cast<int>(length - bytesRead));
+			if (thisRead > 0)
 			{
-                case SSL_ERROR_ZERO_RETURN:
-                    return IO::Error::Closed;
-                case SSL_ERROR_SYSCALL:
-                    std::cerr << "SSL read error. Syscall: " << strerror(errno) << std::endl;
-                    return IO::Error::Syscall;
-				default:
-                    std::cerr << "Unknown SSL_read error code: " << error << std::endl;
-                    return IO::Error::Unknown;
+				bytesRead += thisRead;
+			}
+			else
+			{
+				auto error = SSL_get_error(mSSL, bytesRead);
+				switch (error)
+				{
+					case SSL_ERROR_ZERO_RETURN:
+						return IO::Error::Closed;
+					case SSL_ERROR_SYSCALL:
+						std::cerr << "SSL read error. Syscall: " << strerror(errno) << std::endl;
+						return IO::Error::Syscall;
+					default:
+						std::cerr << "Unknown SSL_read error code: " << error << std::endl;
+						return IO::Error::Unknown;
+				}
 			}
 		}
+
+		Assert(bytesRead == length);
+		return buffer;
 	}
 
 
@@ -186,6 +192,7 @@ namespace Strawberry::Core::Net::Socket
 
 		if (bytesSent >= 0)
 		{
+			Assert(bytesSent == bytes.Size());
 			return bytesSent;
 		}
 		else
