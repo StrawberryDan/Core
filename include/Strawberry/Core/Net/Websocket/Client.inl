@@ -164,6 +164,7 @@ namespace Strawberry::Core::Net::Websocket
 			case 0xA:
 				return Opcode::Pong;
 			default:
+				DebugBreak();
 				return {};
 		}
 	}
@@ -310,6 +311,7 @@ namespace Strawberry::Core::Net::Websocket
 			}
 			else
 			{
+				DebugBreak();
 				return Error::BadOp;
 			}
 		}
