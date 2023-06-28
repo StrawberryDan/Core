@@ -25,9 +25,9 @@ namespace Strawberry::Core
 
 	    double Stop();
 
-	    Seconds      Read() const;
-	    Seconds operator*() const { return Read(); }
-	    operator  Seconds() const { return Read(); }
+	    Seconds              Read() const;
+	    Seconds         operator*() const { return Read(); }
+	    explicit operator Seconds() const { return Read(); }
 
 	    void Restart();
 	private:
