@@ -88,19 +88,7 @@ namespace Strawberry::Core::IO
 	template<size_t S>
 	std::strong_ordering ByteBuffer<S>::operator<=>(const ByteBuffer<S>& rhs) const
 	{
-		for (int i = 0; i < S; ++i)
-		{
-			if ((*this)[i] < rhs[i])
-			{
-				return std::strong_ordering::less;
-			}
-			else if ((*this)[i] > rhs[i])
-			{
-				return std::strong_ordering::greater;
-			}
-		}
-
-		return std::strong_ordering::equal;
+		return mData <=> rhs;
 	}
 
 
