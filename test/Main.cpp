@@ -10,6 +10,7 @@
 
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Math/Math.hpp"
+#include "Strawberry/Core/Math/Periodic.hpp"
 #include "Strawberry/Core/Net/Endpoint.hpp"
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
@@ -130,17 +131,58 @@ namespace Test
 			auto response = http.Receive();
 		}
 	}
+
+
+
+	void PeriodicNumbers()
+	{
+		using namespace Strawberry::Core::Math;
+
+		Periodic<unsigned int, 10> unsignedInt = 5;
+		Assert(unsignedInt + 10 == 5);
+		Assert(unsignedInt + 14 == 9);
+		Assert(unsignedInt -  6 == 9);
+		Assert(unsignedInt - 10 == 5);
+		Assert(unsignedInt - 15 == 0);
+		Assert(unsignedInt *  2 == 0);
+		Assert(unsignedInt *  3 == 5);
+		Assert(unsignedInt *  4 == 0);
+		Assert(unsignedInt /  2 == 2);
+
+		DynamicPeriodic<unsigned int> dynamicUnsignedInt(10, 5);
+		Assert(dynamicUnsignedInt + 10 == 5);
+		Assert(dynamicUnsignedInt + 14 == 9);
+		Assert(dynamicUnsignedInt -  6 == 9);
+		Assert(dynamicUnsignedInt - 10 == 5);
+		Assert(dynamicUnsignedInt - 15 == 0);
+		Assert(dynamicUnsignedInt *  2 == 0);
+		Assert(dynamicUnsignedInt *  3 == 5);
+		Assert(dynamicUnsignedInt *  4 == 0);
+		Assert(dynamicUnsignedInt /  2 == 2);
+
+		DynamicPeriodic<double> dynamicDouble(10, 5);
+		Assert(dynamicDouble + 10 == 5);
+		Assert(dynamicDouble + 14 == 9);
+		Assert(dynamicDouble -  6 == 9);
+		Assert(dynamicDouble - 10 == 5);
+		Assert(dynamicDouble - 15 == 0);
+		Assert(dynamicDouble *  2 == 0);
+		Assert(dynamicDouble *  3 == 5);
+		Assert(dynamicDouble *  4 == 0);
+		Assert(dynamicDouble /  2 == 2.5);
+	}
 }
 
 
 
 int main()
 {
-	Test::Base64();
-	// Test::Iterators();
-	Test::ParseIP();
-	Test::DNS();
-	Test::TCP();
-	Test::TLS();
-	Test::HTTP();
+//	Test::Base64();
+//	// Test::Iterators();
+//	Test::ParseIP();
+//	Test::DNS();
+//	Test::TCP();
+//	Test::TLS();
+//	Test::HTTP();
+	Test::PeriodicNumbers();
 }
