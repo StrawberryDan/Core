@@ -26,6 +26,7 @@ namespace Strawberry::Core::Net::Websocket
 	public:
 	    Message(Opcode opcode, Payload payload = {});
 	    Message(const std::string& string);
+        Message(const nlohmann::json& json);
 	    Message(std::vector<uint8_t> bytes);
 
 

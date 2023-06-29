@@ -26,6 +26,12 @@ namespace Strawberry::Core::Net::Websocket
 	}
 
 
+	Message::Message(const nlohmann::json &json)
+		: Message(static_cast<std::string>(json.dump()))
+	{
+
+	}
+
 
 	Message::Message(std::vector<uint8_t> bytes)
 	    : mOpcode(Opcode::Binary)
