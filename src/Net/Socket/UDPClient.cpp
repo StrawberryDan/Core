@@ -175,7 +175,7 @@ namespace Strawberry::Core::Net::Socket
 	{
 		addrinfo hints{.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_DGRAM, .ai_protocol = IPPROTO_UDP};
 		addrinfo* peer = nullptr;
-		getaddrinfo(endpoint.GetAddress().AsString().c_str(),
+		getaddrinfo(endpoint.GetAddress()->AsString().c_str(),
 					std::to_string(endpoint.GetPort()).c_str(),
 					&hints,
 					&peer);

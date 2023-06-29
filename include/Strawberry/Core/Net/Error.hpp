@@ -12,5 +12,6 @@ namespace Strawberry::Core::Net
 		EstablishConnection,
 		SSLAllocation,
 		SSLHandshake,
+		ParsingEndpoint,
 	};
 }

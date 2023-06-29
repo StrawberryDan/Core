@@ -27,11 +27,11 @@ namespace Strawberry::Core::Net::Socket
 		TCPClient client;
 
 		addrinfo hints {.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_STREAM,.ai_protocol = IPPROTO_TCP};
-		if      (endpoint.GetAddress().IsIPv4()) hints.ai_family = AF_INET;
-		else if (endpoint.GetAddress().IsIPv6()) hints.ai_family = AF_INET6;
-		else                                     Unreachable();
+		if      (endpoint.GetAddress()->IsIPv4()) hints.ai_family = AF_INET;
+		else if (endpoint.GetAddress()->IsIPv6()) hints.ai_family = AF_INET6;
+		else                                      Unreachable();
 		addrinfo* peerAddress = nullptr;
-		auto addrResult = getaddrinfo(endpoint.GetAddress().AsString().c_str(),
+		auto addrResult = getaddrinfo(endpoint.GetAddress()->AsString().c_str(),
 									  std::to_string(endpoint.GetPort()).c_str(),
 									  &hints, &peerAddress);
 		if (addrResult != 0)

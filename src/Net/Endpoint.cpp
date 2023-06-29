@@ -55,9 +55,59 @@ namespace Strawberry::Core::Net
 	}
 
 
+	Result<Endpoint, Error> Endpoint::Resolve(const std::string& endpoint)
+	{
+		auto colonPos = endpoint.find(':');
+		if (colonPos == endpoint.npos) return Error::ParsingEndpoint;
+
+		std::string hostname = endpoint.substr(0, colonPos);
+		std::string portstr  = endpoint.substr(colonPos + 1, endpoint.size());
+
+		uint16_t port = 0;
+		try
+		{
+			port = std::stoi(portstr);
+		}
+		catch (const std::exception& e)
+		{
+			return Error::ParsingEndpoint;
+		}
+
+		return Resolve(hostname, port);
+	}
+
+
+
+	Result<Endpoint, Error> Endpoint::Parse(const std::string& endpoint)
+	{
+		auto colonPos = endpoint.find(':');
+		if (colonPos == endpoint.npos) return Error::ParsingEndpoint;
+
+		std::string hostname = endpoint.substr(0, colonPos);
+		std::string portstr  = endpoint.substr(colonPos + 1, endpoint.size());
+
+		uint16_t port = 0;
+		try
+		{
+			port = std::stoi(portstr);
+		}
+		catch (const std::exception& e)
+		{
+			return Error::ParsingEndpoint;
+		}
+
+		return Endpoint(hostname, port);
+	}
+
 
 	Endpoint::Endpoint(IPAddress address, uint16_t port)
 		: mAddress(address)
+		, mPort(port)
+	{}
+
+
+	Endpoint::Endpoint(const std::string &hostname, uint16_t port)
+		: mHostName(hostname)
 		, mPort(port)
 	{}
 }
