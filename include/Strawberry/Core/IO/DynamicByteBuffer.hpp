@@ -64,6 +64,10 @@ namespace Strawberry::Core::IO
 		      uint8_t& operator[](size_t i)       { return mData[i]; }
 		const uint8_t& operator[](size_t i) const { return mData[i]; }
 
+		// Iterators
+		uint8_t* begin() { return Data(); }
+		uint8_t* end()   { return Data() + Size(); }
+
 
 
 		// Sizing
