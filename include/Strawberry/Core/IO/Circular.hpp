@@ -64,6 +64,15 @@ namespace Strawberry::Core::IO
 		}
 
 
+		void Clear()
+		{
+			while (!Empty())
+			{
+				Pop();
+			}
+		}
+
+
 		size_t Size()       const { return mSize; }
 		bool   Empty()      const { return Size() == 0; }
 		size_t Capacity()   const requires SizedContainer<Container> { return mContainer.Size(); }
