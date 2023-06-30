@@ -9,10 +9,22 @@
 namespace Strawberry::Core::IO
 {
 	/// Class Definition
-	template <typename Container, typename V> requires ReferenceIndexable<Container, V&> && (SizedContainer<Container> || std::same_as<std::vector<V>, Container>)
+	template <typename Container> requires ReferenceIndexable<Container, IndexedType<Container>> && (SizedContainer<Container> || std::same_as<std::vector<IndexedType<Container>>, Container>)
 	class Circular
 	{
 	public:
+		using ValueType = IndexedType<Container>;
+
+
+	public:
+		Circular()
+			: mContainer()
+			, mHead(Capacity(), 0)
+			, mTail(Capacity(), 0)
+			, mSize(0)
+		{}
+
+
 		Circular(Container container)
 			: mContainer(std::move(container))
 			, mHead(Capacity(), 0)
@@ -29,7 +41,7 @@ namespace Strawberry::Core::IO
 		{}
 
 
-		void Push(V value)
+		void Push(ValueType value)
 		{
 			if constexpr (ResizableContainer<Container>)
 			{
@@ -41,7 +53,7 @@ namespace Strawberry::Core::IO
 		}
 
 
-		Option<V> Pop()
+		Option<ValueType> Pop()
 		{
 			if (mSize == 0) return {};
 			mSize -= 1;
@@ -52,14 +64,14 @@ namespace Strawberry::Core::IO
 		size_t Size()       const { return mSize; }
 		bool   Empty()      const { return Size() == 0; }
 		size_t Capacity()   const requires SizedContainer<Container> { return mContainer.Size(); }
-		size_t Capacity()   const requires std::same_as<std::vector<V>, Container> { return mContainer.size(); }
+		size_t Capacity()   const requires std::same_as<std::vector<ValueType>, Container> { return mContainer.size(); }
 		bool   AtCapacity() const { Assert(Size() <= Capacity()); return Size() == Capacity(); }
 
 
 	private:
 		void Resize(size_t newSize) requires ResizableContainer<Container>
 		{
-			std::vector<V> values;
+			std::vector<ValueType> values;
 			values.reserve(Size());
 			while (!Empty())
 			{
@@ -87,6 +99,6 @@ namespace Strawberry::Core::IO
 
 
 	/// Type Deduction Guide
-	template <typename Container> requires ReferenceIndexable<Container, decltype(std::declval<Container>()[std::declval<size_t>()])> && SizedContainer<Container>
-	Circular(Container) -> Circular<Container, decltype(std::declval<Container>()[std::declval<size_t>()])>;
+	template <typename Container> requires ReferenceIndexable<Container, IndexedType<Container>> && SizedContainer<Container>
+	Circular(Container) -> Circular<Container>;
 }
