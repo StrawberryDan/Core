@@ -12,16 +12,29 @@ namespace Strawberry::Core
 	class Uninitialised
 	{
 	public:
-		Uninitialised() = default;
-		Uninitialised(T value)
-			: value(std::move(value))
+		Uninitialised() {}
+		Uninitialised(const T& value)
+			: mValue(value)
 		{}
 
-		operator T() const { return value;}
+		Uninitialised(T&& value)
+			: mValue(std::move(value))
+		{}
+
+		Uninitialised(const Uninitialised&)             = delete;
+		Uninitialised(Uninitialised&&)                  = delete;
+		Uninitialised& operator= (const Uninitialised&) = delete;
+		Uninitialised& operator= (Uninitialised&&)      = delete;
+
+		~Uninitialised() {}
+
+		T& Value() { return mValue; }
+		T& operator*() { return mValue; }
+		explicit operator T() const { return Value(); }
 	private:
 		union
 		{
-			T value;
+			T mValue;
 		};
 	};
 }
