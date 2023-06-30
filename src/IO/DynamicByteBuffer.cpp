@@ -55,14 +55,8 @@ void Strawberry::Core::IO::DynamicByteBuffer::Resize(size_t len)
 
 
 
-std::vector<uint8_t>& Strawberry::Core::IO::DynamicByteBuffer::AsVector()
-{
-	return mData;
-}
-
-
-
-const std::vector<uint8_t>& Strawberry::Core::IO::DynamicByteBuffer::AsVector() const
+template<>
+std::vector<uint8_t> Strawberry::Core::IO::DynamicByteBuffer::AsVector<uint8_t>()
 {
 	return mData;
 }

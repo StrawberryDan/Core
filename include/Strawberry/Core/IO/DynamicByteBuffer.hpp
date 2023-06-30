@@ -90,8 +90,8 @@ namespace Strawberry::Core::IO
 		template <size_t N>
 		std::array<uint8_t, N> AsArray() const;
 
-		      std::vector<uint8_t>& AsVector();
-		const std::vector<uint8_t>& AsVector() const;
+		template<typename T = uint8_t>
+		      std::vector<T> AsVector();
 
 		std::string AsString() const;
 
@@ -188,4 +188,14 @@ template<size_t S>
 Strawberry::Core::IO::ByteBuffer<S> Strawberry::Core::IO::DynamicByteBuffer::AsStatic() const
 {
 	return ByteBuffer<S>(Data(), std::min(S, Size()));
+}
+
+
+
+template <typename T>
+std::vector<T> Strawberry::Core::IO::DynamicByteBuffer::AsVector()
+{
+	Assert(Size() % sizeof(T) == 0);
+	std::vector<T> vector(Data(), Data() + Size());
+	return vector;
 }
