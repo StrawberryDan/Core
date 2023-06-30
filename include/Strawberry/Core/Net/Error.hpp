@@ -13,5 +13,6 @@ namespace Strawberry::Core::Net
 		SSLAllocation,
 		SSLHandshake,
 		ParsingEndpoint,
+		ParsingRTPPacket,
 	};
 }
