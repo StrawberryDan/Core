@@ -39,6 +39,11 @@ namespace Strawberry::Core
 
 
 
+	template <typename T> requires Indexable<T, std::decay_t<decltype(std::declval<T>()[std::declval<size_t>()])>>
+	using IndexedType = std::decay_t<decltype(std::declval<T>()[std::declval<size_t>()])>;
+
+
+
 	template <typename T>
 	concept SizedContainer = requires(T t)
 	{
