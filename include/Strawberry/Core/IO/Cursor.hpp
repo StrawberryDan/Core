@@ -6,7 +6,7 @@
 
 namespace Strawberry::Core::IO
 {
-	template <Indexable<uint8_t> Container>
+	template <ReferenceIndexable<uint8_t> Container>
 	class Cursor
 	{
 		Cursor(Container container)
@@ -18,8 +18,8 @@ namespace Strawberry::Core::IO
 
 		Result<DynamicByteBuffer, IO::Error> Read(size_t len)
 		{
-			DynamicByteBuffer buffer(&mContainer[mPosition], len);
-			mPosition += len;
+			auto buffer = DynamicByteBuffer::Zeroes(len);
+			for (int i = 0; i < len; i++) buffer.Push(mContainer[mPosition++]);
 			return buffer;
 		}
 
@@ -28,8 +28,8 @@ namespace Strawberry::Core::IO
 		Result<DynamicByteBuffer, Error> Read(size_t len) requires SizedContainer<Container> || std::same_as<Container, std::vector<uint8_t>>
 		{
 			if (mPosition + len >= Size()) return Error::OverRead;
-			DynamicByteBuffer buffer(&mContainer[mPosition], len);
-			mPosition += len;
+			auto buffer = DynamicByteBuffer::Zeroes(len);
+			for (int i = 0; i < len; i++) buffer.Push(mContainer[mPosition++]);
 			return buffer;
 		}
 
@@ -60,6 +60,6 @@ namespace Strawberry::Core::IO
 
 
 	/// Type Deduction Guide.
-	template <Indexable<uint8_t> Container>
+	template <ReferenceIndexable<uint8_t> Container>
 	Cursor(Container) -> Cursor<Container>;
 }
