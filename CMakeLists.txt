@@ -50,8 +50,7 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Net/Websocket/Client.inl
 		src/Clock.cpp
 		src/IO/Base64.cpp
-		src/IO/CircularDynamicByteBuffer.cpp
-		src/IO/DynamicByteBuffer.cpp
+        src/IO/DynamicByteBuffer.cpp
         src/Logging.cpp
 		src/Markers.cpp
 		src/Net/Address.cpp
