@@ -34,6 +34,25 @@ namespace Strawberry::Core::IO
 		}
 
 
+		void Write(DynamicByteBuffer bytes) requires ReferenceIndexable<Container, uint8_t>
+		{
+			for (auto byte : bytes)
+			{
+				mContainer[mPosition++] = bytes;
+			}
+		}
+
+
+		void Write(DynamicByteBuffer bytes) requires ReferenceIndexable<Container, uint8_t> && (SizedContainer<Container> || std::same_as<Container, std::vector<uint8_t>>)
+		{
+			Assert(mPosition + bytes.Size() < Size());
+			for (auto byte : bytes)
+			{
+				mContainer[mPosition++] = bytes;
+			}
+		}
+
+
 		size_t GetPosition() const { return mPosition; }
 		void SetPosition(size_t pos) { mPosition = pos; }
 
@@ -42,7 +61,6 @@ namespace Strawberry::Core::IO
 		{
 			return mContainer.Size();
 		}
-
 
 
 		size_t Size() const requires std::same_as<Container, std::vector<uint8_t>>
