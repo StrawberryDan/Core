@@ -104,5 +104,5 @@ namespace Strawberry::Core::IO
 
 	/// Type Deduction Guide
 	template <typename Container> requires ReferenceIndexable<Container, IndexedType<Container>> && SizedContainer<Container>
-	CircularAdapter(Container) -> Circular<Container>;
+	CircularAdapter(Container) -> CircularAdapter<Container>;
 }
