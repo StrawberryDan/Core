@@ -11,10 +11,31 @@
 namespace Strawberry::Core
 {
 	template <typename T, typename V>
-	concept Indexable = requires(T t, size_t i)
+	concept ValueIndexable = requires(T t, size_t i)
 	{
 		{ t[i] } -> std::same_as<V>;
 	};
+
+
+
+	template <typename T, typename V>
+	concept ReferenceIndexable = requires(T t, size_t i)
+	{
+		{ t[i] } -> std::same_as<V&>;
+	};
+
+
+
+	template <typename T, typename V>
+	concept ConstIndexable = requires(const T t, size_t i)
+	{
+		{ t[i] } -> std::same_as<const V&>;
+	};
+
+
+
+	template <typename T, typename V>
+	concept Indexable = ValueIndexable<T, V> || ReferenceIndexable<T, V> || ConstIndexable<T, V>;
 
 
 
