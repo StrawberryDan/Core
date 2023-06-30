@@ -64,9 +64,9 @@ namespace Strawberry::Core::Net::RTP
 		{
 			Assert(type < 128);
 			mHeader.payloadType    = type;
-			mHeader.sequenceNumber = sequenceNumber;
-			mHeader.timestamp      = timestamp;
-			mHeader.ssrc           = ssrc;
+			mHeader.sequenceNumber = Core::ToBigEndian(sequenceNumber);
+			mHeader.timestamp      = Core::ToBigEndian(timestamp);
+			mHeader.ssrc           = Core::ToBigEndian(ssrc);
 		}
 
 
