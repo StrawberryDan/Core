@@ -39,6 +39,13 @@ namespace Strawberry::Core::IO
 			{
 				Resize(Capacity() * 2);
 			}
+			else
+			{
+				if (AtCapacity())
+				{
+					std::destroy_at(&mContainer[*mHead++]);
+				}
+			}
 
 			std::construct_at(&mContainer[*mTail++], std::move(value));
 			mSize += 1;
@@ -47,7 +54,7 @@ namespace Strawberry::Core::IO
 
 		Option<ValueType> Pop()
 		{
-			if (mSize == 0) return {};
+			if (Size() == 0) return {};
 			auto value = std::move(mContainer[*mHead]);
 			std::destroy_at(&mContainer[*mHead]);
 			mHead++;
