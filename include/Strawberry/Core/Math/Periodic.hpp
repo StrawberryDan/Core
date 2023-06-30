@@ -26,34 +26,40 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		Periodic()
-				: mValue{}
+			: mValue{}
 		{}
 
 		Periodic(T value)
-				: mValue(value % N)
+			: mValue(value % N)
 		{}
 
 		auto operator<=>(const Periodic& rhs) const = default;
 
-		Periodic operator-() const { return N - mValue; }
+		Periodic operator-() { return N - mValue; }
 
-		Periodic operator++() const { *this += 1; return *this; }
-		Periodic operator--() const { *this -= 1; return *this; }
-		Periodic operator++(int) const { Periodic val = *this; *this += 1; return val; }
-		Periodic operator--(int) const { Periodic val = *this; *this -= 1; return val; }
+		Periodic operator++() { *this += 1; return *this; }
+		Periodic operator--() { *this -= 1; return *this; }
+		Periodic operator++(int) { Periodic val = *this; *this += 1; return val; }
+		Periodic operator--(int) { Periodic val = *this; *this -= 1; return val; }
 
 		Periodic operator+(Periodic rhs) const { return (mValue + rhs.mValue) % N; }
 		Periodic operator-(Periodic rhs) const { return rhs.mValue >= mValue ? (N - (rhs.mValue - mValue)) % N : (mValue - rhs.mValue) % N; }
 		Periodic operator*(Periodic rhs) const { return (mValue * rhs.mValue) % N; }
 		Periodic operator/(Periodic rhs) const { return (mValue / rhs.mValue) % N; }
 
-		void     operator+=(Periodic rhs) const { *this = *this + rhs; }
-		void     operator-=(Periodic rhs) const { *this = *this - rhs; }
-		void     operator*=(Periodic rhs) const { *this = *this * rhs; }
-		void     operator/=(Periodic rhs) const { *this = *this / rhs; }
+		void     operator+=(Periodic rhs) { *this = *this + rhs; }
+		void     operator-=(Periodic rhs) { *this = *this - rhs; }
+		void     operator*=(Periodic rhs) { *this = *this * rhs; }
+		void     operator/=(Periodic rhs) { *this = *this / rhs; }
 
 		explicit operator T() const
 		{ return mValue; }
+
+		auto operator*() const
+		{ return mValue; }
+
+		auto Value() const
+		{ return mValue(); }
 
 		explicit operator DynamicPeriodic<T>() const
 		{ return DynamicPeriodic<T>(N, mValue); }
@@ -101,24 +107,30 @@ namespace Strawberry::Core::Math
 
 		auto operator<=>(const DynamicPeriodic& rhs) const = default;
 
-		DynamicPeriodic operator-() const { return mMax - mValue; }
+		DynamicPeriodic operator-() { return mMax - mValue; }
 
-		DynamicPeriodic operator++() const { *this += 1; return *this; }
-		DynamicPeriodic operator--() const { *this -= 1; return *this; }
-		DynamicPeriodic operator++(int) const { Periodic val = *this; *this += 1; return val; }
-		DynamicPeriodic operator--(int) const { Periodic val = *this; *this -= 1; return val; }
+		DynamicPeriodic operator++() { *this += 1; return *this; }
+		DynamicPeriodic operator--() { *this -= 1; return *this; }
+		DynamicPeriodic operator++(int) { DynamicPeriodic val(*this); *this += 1; return val; }
+		DynamicPeriodic operator--(int) { DynamicPeriodic val(*this); *this -= 1; return val; }
 
 		DynamicPeriodic operator+(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return (mValue + rhs.mValue) % mMax; }
 		DynamicPeriodic operator-(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return rhs.mValue >= mValue ? (mMax - (rhs.mValue - mValue)) % mMax : (mValue - rhs.mValue) % mMax; }
 		DynamicPeriodic operator*(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return (mValue * rhs.mValue) % mMax; }
 		DynamicPeriodic operator/(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return (mValue / rhs.mValue) % mMax; }
 
-		void     operator+=(DynamicPeriodic rhs) const { *this = *this + rhs; }
-		void     operator-=(DynamicPeriodic rhs) const { *this = *this - rhs; }
-		void     operator*=(DynamicPeriodic rhs) const { *this = *this * rhs; }
-		void     operator/=(DynamicPeriodic rhs) const { *this = *this / rhs; }
+		void     operator+=(DynamicPeriodic rhs) { *this = *this + rhs; }
+		void     operator-=(DynamicPeriodic rhs) { *this = *this - rhs; }
+		void     operator*=(DynamicPeriodic rhs) { *this = *this * rhs; }
+		void     operator/=(DynamicPeriodic rhs) { *this = *this / rhs; }
 
 		explicit operator T() const
+		{ return mValue; }
+
+		T operator*() const
+		{ return mValue; }
+
+		T Value() const
 		{ return mValue; }
 
 	private:
@@ -150,19 +162,25 @@ namespace Strawberry::Core::Math
 
 		auto operator<=>(const DynamicPeriodic& rhs) const = default;
 
-		DynamicPeriodic operator-() const { return mMax - mValue; }
+		DynamicPeriodic operator-() { return mMax - mValue; }
 
 		DynamicPeriodic operator+(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return std::fmod(mValue + rhs.mValue, mMax); }
 		DynamicPeriodic operator-(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return rhs.mValue >= mValue ? std::fmod(mMax - (rhs.mValue - mValue), mMax) : std::fmod(mValue - rhs.mValue, mMax); }
 		DynamicPeriodic operator*(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return std::fmod(mValue * rhs.mValue, mMax); }
 		DynamicPeriodic operator/(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return std::fmod(mValue / rhs.mValue, mMax); }
 
-		void     operator+=(DynamicPeriodic rhs) const { *this = *this + rhs; }
-		void     operator-=(DynamicPeriodic rhs) const { *this = *this - rhs; }
-		void     operator*=(DynamicPeriodic rhs) const { *this = *this * rhs; }
-		void     operator/=(DynamicPeriodic rhs) const { *this = *this / rhs; }
+		void     operator+=(DynamicPeriodic rhs) { *this = *this + rhs; }
+		void     operator-=(DynamicPeriodic rhs) { *this = *this - rhs; }
+		void     operator*=(DynamicPeriodic rhs) { *this = *this * rhs; }
+		void     operator/=(DynamicPeriodic rhs) { *this = *this / rhs; }
 
 		explicit operator T() const
+		{ return mValue; }
+
+		T operator*() const
+		{ return mValue; }
+
+		T Value() const
 		{ return mValue; }
 
 	private:
