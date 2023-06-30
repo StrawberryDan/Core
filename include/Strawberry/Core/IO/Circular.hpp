@@ -48,7 +48,7 @@ namespace Strawberry::Core::IO
 				Resize(Capacity() * 2);
 			}
 
-			mContainer[*mTail++] = std::move(value);
+			std::construct_at(&mContainer[*mTail++], std::move(value));
 			mSize = 1;
 		}
 
@@ -57,7 +57,10 @@ namespace Strawberry::Core::IO
 		{
 			if (mSize == 0) return {};
 			mSize -= 1;
-			return std::move(mContainer[*mHead++]);
+			auto value = std::move(mContainer[*mHead]);
+			std::destroy_at(mContainer[*mHead]);
+			mHead++;
+			return value;
 		}
 
 
