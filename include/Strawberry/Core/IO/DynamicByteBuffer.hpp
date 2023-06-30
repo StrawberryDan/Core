@@ -73,13 +73,7 @@ namespace Strawberry::Core::IO
 
 
 		// Comparison
-		std::strong_ordering operator<=>(const DynamicByteBuffer& rhs) const;
-		bool operator==(const DynamicByteBuffer& rhs) const = default;
-		bool operator!=(const DynamicByteBuffer& rhs) const = default;
-		bool operator >(const DynamicByteBuffer& rhs) const = default;
-		bool operator <(const DynamicByteBuffer& rhs) const = default;
-		bool operator>=(const DynamicByteBuffer& rhs) const = default;
-		bool operator<=(const DynamicByteBuffer& rhs) const = default;
+		std::strong_ordering operator<=>(const DynamicByteBuffer& rhs) const = default;
 
 
 

@@ -55,27 +55,6 @@ void Strawberry::Core::IO::DynamicByteBuffer::Resize(size_t len)
 
 
 
-std::strong_ordering
-Strawberry::Core::IO::DynamicByteBuffer::operator<=>(const Strawberry::Core::IO::DynamicByteBuffer& rhs) const
-{
-	Assert(Size() == rhs.Size());
-	for (int i = 0; i < Size(); i++)
-	{
-		if ((*this)[i] < rhs[i])
-		{
-			return std::strong_ordering::less;
-		}
-		else if ((*this)[i] > rhs[i])
-		{
-			return std::strong_ordering::greater;
-		}
-	}
-
-	return std::strong_ordering::equal;
-}
-
-
-
 std::vector<uint8_t>& Strawberry::Core::IO::DynamicByteBuffer::AsVector()
 {
 	return mData;
