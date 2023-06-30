@@ -69,6 +69,8 @@ add_library(StrawberryCore STATIC
 		src/Net/Socket/SocketAPIUser.cpp
 		include/Strawberry/Core/Math/Periodic.hpp
         include/Strawberry/Core/IO/CircularAdapter.hpp)
+        include/Strawberry/Core/IO/CircularAdapter.hpp
+		include/Strawberry/Core/Uninitialised.hpp)
 
 target_include_directories(StrawberryCore PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
 target_link_libraries(StrawberryCore PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY})
