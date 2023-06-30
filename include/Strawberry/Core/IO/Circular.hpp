@@ -58,7 +58,7 @@ namespace Strawberry::Core::IO
 			if (mSize == 0) return {};
 			mSize -= 1;
 			auto value = std::move(mContainer[*mHead]);
-			std::destroy_at(mContainer[*mHead]);
+			std::destroy_at(&mContainer[*mHead]);
 			mHead++;
 			return value;
 		}
