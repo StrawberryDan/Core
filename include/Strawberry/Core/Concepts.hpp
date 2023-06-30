@@ -46,6 +46,13 @@ namespace Strawberry::Core
 	};
 
 
+	template <typename T>
+	concept ResizableContainer = requires(T t, size_t i)
+	{
+		{ t.Resize(i) } -> std::same_as<void>;
+	};
+
+
 
 	template <typename F, typename R, typename ...Args>
 	concept Callable = requires
