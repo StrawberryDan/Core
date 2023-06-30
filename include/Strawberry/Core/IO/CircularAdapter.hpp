@@ -10,22 +10,14 @@ namespace Strawberry::Core::IO
 {
 	/// Class Definition
 	template <typename Container> requires ReferenceIndexable<Container, IndexedType<Container>> && (SizedContainer<Container> || std::same_as<std::vector<IndexedType<Container>>, Container>)
-	class Circular
+	class CircularAdapter
 	{
 	public:
 		using ValueType = IndexedType<Container>;
 
 
 	public:
-		Circular()
-			: mContainer()
-			, mHead(Capacity(), 0)
-			, mTail(Capacity(), 0)
-			, mSize(0)
-		{}
-
-
-		Circular(Container container)
+		CircularAdapter(Container container)
 			: mContainer(std::move(container))
 			, mHead(Capacity(), 0)
 			, mTail(Capacity(), 0)
@@ -33,7 +25,7 @@ namespace Strawberry::Core::IO
 		{}
 
 
-		Circular(Container container, size_t head, size_t tail)
+		CircularAdapter(Container container, size_t head, size_t tail)
 			: mContainer(std::move(container))
 			, mHead(Capacity(), head)
 			, mTail(Capacity(), tail)
@@ -112,5 +104,5 @@ namespace Strawberry::Core::IO
 
 	/// Type Deduction Guide
 	template <typename Container> requires ReferenceIndexable<Container, IndexedType<Container>> && SizedContainer<Container>
-	Circular(Container) -> Circular<Container>;
+	CircularAdapter(Container) -> Circular<Container>;
 }
