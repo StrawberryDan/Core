@@ -6,7 +6,7 @@
 
 namespace Strawberry::Core::IO
 {
-	template <ReferenceIndexable<uint8_t> Container>
+	template <Indexable<uint8_t> Container>
 	class Cursor
 	{
 		Cursor(Container container)
@@ -78,6 +78,6 @@ namespace Strawberry::Core::IO
 
 
 	/// Type Deduction Guide.
-	template <ReferenceIndexable<uint8_t> Container>
+	template <Indexable<uint8_t> Container>
 	Cursor(Container) -> Cursor<Container>;
 }
