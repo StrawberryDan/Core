@@ -18,6 +18,14 @@ namespace Strawberry::Core
 
 
 
+	template <typename T>
+	concept SizedContainer = requires(T t)
+	{
+		{ t.Size() } -> std::same_as<size_t>;
+	};
+
+
+
 	template <typename F, typename R, typename ...Args>
 	concept Callable = requires
 	{
