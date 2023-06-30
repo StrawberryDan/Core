@@ -68,8 +68,8 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Net/Socket/SocketAPIUser.hpp
 		src/Net/Socket/SocketAPIUser.cpp
 		include/Strawberry/Core/Math/Periodic.hpp
-        include/Strawberry/Core/IO/CircularAdapter.hpp)
         include/Strawberry/Core/IO/CircularAdapter.hpp
+		include/Strawberry/Core/IO/CircularBuffer.hpp
 		include/Strawberry/Core/Uninitialised.hpp)
 
 target_include_directories(StrawberryCore PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
