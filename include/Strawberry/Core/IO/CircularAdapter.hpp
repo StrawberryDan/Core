@@ -41,17 +41,17 @@ namespace Strawberry::Core::IO
 			}
 
 			std::construct_at(&mContainer[*mTail++], std::move(value));
-			mSize = 1;
+			mSize += 1;
 		}
 
 
 		Option<ValueType> Pop()
 		{
 			if (mSize == 0) return {};
-			mSize -= 1;
 			auto value = std::move(mContainer[*mHead]);
 			std::destroy_at(&mContainer[*mHead]);
 			mHead++;
+			mSize -= 1;
 			return value;
 		}
 
