@@ -31,8 +31,8 @@ namespace Strawberry::Core::IO
 				std::destroy_at(&mData[*mHead++]);
 			}
 
-			std::construct_at(&*mData[*mTail++], std::move(value));
-			mSize += 1;
+			std::construct_at(&*mData[*(mTail++)], std::move(value));
+			if (!AtCapacity()) mSize += 1;
 		}
 
 

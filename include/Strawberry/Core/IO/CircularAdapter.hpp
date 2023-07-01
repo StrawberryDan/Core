@@ -48,7 +48,7 @@ namespace Strawberry::Core::IO
 			}
 
 			std::construct_at(&mContainer[*mTail++], std::move(value));
-			mSize += 1;
+            if (!AtCapacity()) mSize += 1;
 		}
 
 
