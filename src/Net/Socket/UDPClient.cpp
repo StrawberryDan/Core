@@ -133,7 +133,7 @@ namespace Strawberry::Core::Net::Socket
 
 
 
-	Result<std::tuple<Endpoint, IO::DynamicByteBuffer>, IO::Error> UDPClient::Read()
+	Result<std::tuple<Option<Endpoint>, IO::DynamicByteBuffer>, IO::Error> UDPClient::Read()
 	{
 		sockaddr_storage peer{};
 		socklen_t peerLen = 0;
@@ -156,12 +156,8 @@ namespace Strawberry::Core::Net::Socket
 						IPv6Address(IO::ByteBuffer<16>(sockaddr->sin6_addr)),
 						sockaddr->sin6_port);
 			}
-			else
-			{
-				Unreachable();
-			}
 
-			return std::make_tuple(endpoint.Unwrap(), IO::DynamicByteBuffer(mBuffer.Data(), bytesRead));
+			return std::make_tuple(endpoint, IO::DynamicByteBuffer(mBuffer.Data(), bytesRead));
 		}
 		else
 		{
