@@ -92,6 +92,12 @@ namespace Strawberry::Core::Math
 	class DynamicPeriodic<T>
 	{
 	public:
+		DynamicPeriodic(T value)
+			: mMax(std::numeric_limits<T>::max())
+			, mValue(value % mMax)
+		{}
+
+
 		explicit DynamicPeriodic(T max, T value)
 			: mMax(max)
 			, mValue(value)
@@ -146,6 +152,7 @@ namespace Strawberry::Core::Math
 				: mMax(std::numeric_limits<T>::max())
 				, mValue(value >= 0 ? std::fmod(value, mMax) : mMax - std::fmod(-value, mMax))
 		{}
+
 
 		explicit DynamicPeriodic(T max, T value = 0)
 				: mMax(max)
