@@ -30,6 +30,10 @@ namespace Strawberry::Core::Net
 			: mData(bytes)
 		{}
 
+		IPv4Address(const IO::DynamicByteBuffer& bytes)
+				: mData(bytes.AsStatic<4>())
+		{}
+
 
 
 		// Casting
@@ -50,8 +54,8 @@ namespace Strawberry::Core::Net
 
 
 	public:
-		IPv6Address()
-			: mData()
+		IPv6Address(const IO::ByteBuffer<16>& bytes)
+				: mData(bytes)
 		{}
 
 		IPv6Address(const IO::DynamicByteBuffer& bytes)

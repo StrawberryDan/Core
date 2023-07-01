@@ -124,10 +124,10 @@ namespace Strawberry::Core::Net
 	{
 		if (auto addr = AsIPv4())
 		{
-			return addr->AsBytes();
+			return IO::DynamicByteBuffer(addr->AsBytes());
 		} else if (auto addr = AsIPv6())
 		{
-			return addr->AsBytes();
+			return IO::DynamicByteBuffer(addr->AsBytes());
 		}
 		else
 		{

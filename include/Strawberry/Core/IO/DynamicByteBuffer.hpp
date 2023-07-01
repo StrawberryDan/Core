@@ -33,7 +33,7 @@ namespace Strawberry::Core::IO
 		template <typename T>
 		DynamicByteBuffer(const T* data, size_t len);
 		template <typename T>
-		DynamicByteBuffer(const T& object);
+		explicit DynamicByteBuffer(const T& object);
 
 
 

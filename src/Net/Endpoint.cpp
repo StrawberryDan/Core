@@ -36,7 +36,7 @@ namespace Strawberry::Core::Net
 			else if (cursor->ai_family == AF_INET6)
 			{
 				auto ipData = reinterpret_cast<sockaddr_in6*>(cursor->ai_addr);
-				IPv6Address addr({&ipData->sin6_addr, 16});
+				IPv6Address addr(IO::ByteBuffer<16>(&ipData->sin6_addr));
 				result = Endpoint(addr, port);
 			}
 

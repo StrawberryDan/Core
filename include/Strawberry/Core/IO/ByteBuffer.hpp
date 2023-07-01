@@ -17,7 +17,7 @@ namespace Strawberry::Core::IO
 		ByteBuffer() = default;
 
 		template <typename T>
-		ByteBuffer(const T* data, size_t len);
+		ByteBuffer(const T* data, size_t len = S);
 
 		template <typename T> requires (sizeof(T) == S)
 		ByteBuffer(const T& object);
