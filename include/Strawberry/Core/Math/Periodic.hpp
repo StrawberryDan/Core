@@ -92,12 +92,7 @@ namespace Strawberry::Core::Math
 	class DynamicPeriodic<T>
 	{
 	public:
-		DynamicPeriodic(T value)
-			: mMax(std::numeric_limits<T>::max())
-			, mValue(value)
-		{}
-
-		explicit DynamicPeriodic(T max, T value = 0)
+		explicit DynamicPeriodic(T max, T value)
 			: mMax(max)
 			, mValue(value)
 		{}
@@ -111,13 +106,13 @@ namespace Strawberry::Core::Math
 
 		DynamicPeriodic operator++() { *this += 1; return *this; }
 		DynamicPeriodic operator--() { *this -= 1; return *this; }
-		DynamicPeriodic operator++(int) { DynamicPeriodic val(*this); *this += 1; return val; }
-		DynamicPeriodic operator--(int) { DynamicPeriodic val(*this); *this -= 1; return val; }
+		DynamicPeriodic operator++(int) { DynamicPeriodic val(*this); *this += DynamicPeriodic(mMax, 1); return val; }
+		DynamicPeriodic operator--(int) { DynamicPeriodic val(*this); *this -= DynamicPeriodic(mMax, 1); return val; }
 
-		DynamicPeriodic operator+(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return (mValue + rhs.mValue) % mMax; }
-		DynamicPeriodic operator-(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return rhs.mValue >= mValue ? (mMax - (rhs.mValue - mValue)) % mMax : (mValue - rhs.mValue) % mMax; }
-		DynamicPeriodic operator*(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return (mValue * rhs.mValue) % mMax; }
-		DynamicPeriodic operator/(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return (mValue / rhs.mValue) % mMax; }
+		DynamicPeriodic operator+(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return DynamicPeriodic(mMax, (mValue + rhs.mValue) % mMax); }
+		DynamicPeriodic operator-(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return rhs.mValue >= mValue ? DynamicPeriodic(mMax, (mMax - (rhs.mValue - mValue)) % mMax) : DynamicPeriodic(mMax, (mValue - rhs.mValue) % mMax); }
+		DynamicPeriodic operator*(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return DynamicPeriodic(mMax, (mValue * rhs.mValue) % mMax); }
+		DynamicPeriodic operator/(DynamicPeriodic rhs) const { rhs.SetMax(mMax); return DynamicPeriodic(mMax, (mValue / rhs.mValue) % mMax); }
 
 		void     operator+=(DynamicPeriodic rhs) { *this = *this + rhs; }
 		void     operator-=(DynamicPeriodic rhs) { *this = *this - rhs; }
