@@ -182,4 +182,9 @@ namespace Strawberry::Core::Math
 		T mMax;
 		T mValue;
 	};
+
+
+
+	template <typename T>
+	DynamicPeriodic(T, T) -> DynamicPeriodic<T>;
 }
