@@ -19,7 +19,7 @@ namespace Strawberry::Core
 	class Clock
 	{
 	public:
-	    explicit Clock(bool run = true);
+	    explicit Clock(bool start = true);
 
 	    void Start();
 
