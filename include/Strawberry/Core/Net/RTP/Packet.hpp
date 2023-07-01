@@ -19,13 +19,14 @@ namespace Strawberry::Core::Net::RTP
 	class Packet {
 	public:
 #pragma pack(1)
-		struct Header {
-			uint8_t  version        :  2 = 2;
-			uint8_t  padding        :  1 = 0;
-			uint8_t  extension      :  1 = 0;
+		struct Header
+		{
 			uint8_t  csrcCount      :  4 = 0;
-			uint8_t  marker         :  1 = 0;
+			uint8_t  extension      :  1 = 0;
+			uint8_t  padding        :  1 = 0;
+			uint8_t  version        :  2 = 2;
 			uint8_t  payloadType    :  7 = 0;
+			uint8_t  marker         :  1 = 0;
 			uint16_t sequenceNumber : 16 = 0;
 			uint32_t timestamp      : 32 = 0;
 			uint32_t ssrc           : 32 = 0;
