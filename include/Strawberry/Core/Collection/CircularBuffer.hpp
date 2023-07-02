@@ -28,7 +28,7 @@ namespace Strawberry::Core::Collection
 		{
 			if (AtCapacity())
 			{
-                mData[*mHead++].Reset();
+				mData[*mHead++].Reset();
 			}
 
 			mData[*(mTail++)].Emplace(std::move(value));
@@ -115,7 +115,7 @@ namespace Strawberry::Core::Collection
 			mSize = 0;
 
 			for (auto& value: newData) Push(std::move(value));
-            mData.resize(newSize);
+			mData.resize(newSize);
 		}
 
 
