@@ -130,7 +130,7 @@ namespace Strawberry::Core
 			{
 				if (!rhs.mHasValue && mHasValue)
 				{
-					std::destroy_at(&mPayload);
+					Reset();
 				}
 
 				if (rhs.mHasValue && mHasValue)
@@ -139,10 +139,8 @@ namespace Strawberry::Core
 				}
 				else if (rhs.mHasValue && !mHasValue)
 				{
-					std::construct_at(&mPayload, std::move(rhs.Take()));
+					Emplace(std::move(rhs.Take()));
 				}
-
-				mHasValue = rhs.mHasValue;
 			}
 
 			return *this;
@@ -310,8 +308,9 @@ namespace Strawberry::Core
 
 
 
-		T&& Take()
+		T Take()
 		{
+			Core::Assert(mHasValue);
 			mHasValue = false;
 			return std::move(mPayload);
 		}
