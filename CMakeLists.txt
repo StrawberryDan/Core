@@ -69,7 +69,9 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Collection/CircularBuffer.hpp
 		include/Strawberry/Core/Uninitialised.hpp
 		include/Strawberry/Core/ScopedTimer.hpp
-		src/ScopedTimer.cpp)
+		src/ScopedTimer.cpp
+		include/Strawberry/Core/DynamicEvaluation.hpp
+)
 
 target_include_directories(StrawberryCore PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
 target_link_libraries(StrawberryCore PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY})
