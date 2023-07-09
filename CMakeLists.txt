@@ -56,7 +56,6 @@ add_library(StrawberryCore STATIC
 		src/Net/HTTP/Header.cpp
 		src/Net/HTTP/Request.cpp
 		src/Net/HTTP/Response.cpp
-		src/Net/RTP/Header.cpp
 		src/Net/Socket/SocketAPI.cpp
 		src/Net/Socket/TCPClient.cpp
 		src/Net/Socket/TLSClient.cpp
