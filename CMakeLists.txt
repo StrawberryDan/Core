@@ -14,41 +14,46 @@ find_path(JSON_INCLUDE_DIR NAMES nlohmann/json.hpp)
 add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Assert.hpp
 		include/Strawberry/Core/Clock.hpp
-        include/Strawberry/Core/Concepts.hpp
+		include/Strawberry/Core/Collection/CircularBuffer.hpp
+		include/Strawberry/Core/DynamicEvaluation.hpp
 		include/Strawberry/Core/Endian.hpp
 		include/Strawberry/Core/IO/Base64.hpp
 		include/Strawberry/Core/IO/ByteBuffer.hpp
-        include/Strawberry/Core/IO/Concepts.hpp
+		include/Strawberry/Core/IO/Consumer.hpp
 		include/Strawberry/Core/IO/DynamicByteBuffer.hpp
 		include/Strawberry/Core/IO/Error.hpp
+		include/Strawberry/Core/IO/Link.hpp
+		include/Strawberry/Core/IO/Producer.hpp
+		include/Strawberry/Core/IO/Transformer.hpp
 		include/Strawberry/Core/Markers.hpp
 		include/Strawberry/Core/Math/Math.hpp
+		include/Strawberry/Core/Math/Periodic.hpp
 		include/Strawberry/Core/Mutex.hpp
 		include/Strawberry/Core/Net/Address.hpp
 		include/Strawberry/Core/Net/Endpoint.hpp
 		include/Strawberry/Core/Net/Error.hpp
 		include/Strawberry/Core/Net/HTTP/Client.hpp
+		include/Strawberry/Core/Net/HTTP/Client.inl
 		include/Strawberry/Core/Net/HTTP/Constants.hpp
 		include/Strawberry/Core/Net/HTTP/Header.hpp
 		include/Strawberry/Core/Net/HTTP/Request.hpp
 		include/Strawberry/Core/Net/HTTP/Response.hpp
+		include/Strawberry/Core/Net/Socket/Socket.inl
 		include/Strawberry/Core/Net/Socket/SocketAPI.hpp
+		include/Strawberry/Core/Net/Socket/SocketAPIUser.hpp
 		include/Strawberry/Core/Net/Socket/TCPClient.hpp
 		include/Strawberry/Core/Net/Socket/TLSClient.hpp
 		include/Strawberry/Core/Net/Socket/UDPClient.hpp
 		include/Strawberry/Core/Net/Websocket/Client.hpp
+		include/Strawberry/Core/Net/Websocket/Client.inl
 		include/Strawberry/Core/Net/Websocket/Message.hpp
 		include/Strawberry/Core/Option.hpp
 		include/Strawberry/Core/Result.hpp
+		include/Strawberry/Core/ScopedTimer.hpp
+		include/Strawberry/Core/Uninitialised.hpp
 		include/Strawberry/Core/Utilities.hpp
-        include/Strawberry/Core/Math/Math.inl
-		include/Strawberry/Core/Net/HTTP/Client.inl
-		include/Strawberry/Core/Net/Socket/Socket.inl
-		include/Strawberry/Core/Net/Websocket/Client.inl
 		src/Clock.cpp
 		src/IO/Base64.cpp
-        src/IO/DynamicByteBuffer.cpp
-        src/Logging.cpp
 		src/Markers.cpp
 		src/Net/Address.cpp
 		src/Net/Endpoint.cpp
@@ -58,25 +63,19 @@ add_library(StrawberryCore STATIC
 		src/Net/HTTP/Request.cpp
 		src/Net/HTTP/Response.cpp
 		src/Net/Socket/SocketAPI.cpp
+		src/Net/Socket/SocketAPIUser.cpp
 		src/Net/Socket/TCPClient.cpp
 		src/Net/Socket/TLSClient.cpp
 		src/Net/Socket/UDPClient.cpp
 		src/Net/Websocket/Client.cpp
 		src/Net/Websocket/Message.cpp
-		include/Strawberry/Core/Net/Socket/SocketAPIUser.hpp
-		src/Net/Socket/SocketAPIUser.cpp
-		include/Strawberry/Core/Math/Periodic.hpp
-        include/Strawberry/Core/IO/CircularAdapter.hpp
-		include/Strawberry/Core/Collection/CircularBuffer.hpp
-		include/Strawberry/Core/Uninitialised.hpp
-		include/Strawberry/Core/ScopedTimer.hpp
 		src/ScopedTimer.cpp
-		include/Strawberry/Core/DynamicEvaluation.hpp
-		include/Strawberry/Core/IO/Consumer.hpp
-		include/Strawberry/Core/IO/Producer.hpp
-		include/Strawberry/Core/IO/Link.hpp
-		include/Strawberry/Core/IO/Graph.hpp
-		include/Strawberry/Core/IO/Transformer.hpp
+		include/Strawberry/Core/Concepts.hpp
+		include/Strawberry/Core/IO/CircularAdapter.hpp
+		include/Strawberry/Core/IO/Concepts.hpp
+		include/Strawberry/Core/Math/Math.inl
+		src/IO/DynamicByteBuffer.cpp
+		src/Logging.cpp
 )
 
 target_include_directories(StrawberryCore PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
