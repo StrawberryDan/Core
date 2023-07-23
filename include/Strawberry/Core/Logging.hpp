@@ -38,7 +38,7 @@ namespace Strawberry::Core
 				return;
 			}
 
-			std::string formatted = fmt::format(message, args...);
+			std::string formatted = fmt::format(fmt::runtime(message), args...);
 
 			std::stringstream out;
 			out << "[" << LevelToString(level) << "]\t" << formatted;
