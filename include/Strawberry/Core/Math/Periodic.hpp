@@ -2,7 +2,7 @@
 
 
 #include <concepts>
-
+#include "Strawberry/Core/Logging.hpp"
 
 
 
@@ -106,7 +106,13 @@ namespace Strawberry::Core::Math
 		T    GetMax() const { return mMax; }
 		void SetMax(T max) { mMax = max; mValue = mValue % mMax; }
 
-		auto operator<=>(const DynamicPeriodic& rhs) const = default;
+		auto operator<=>(const DynamicPeriodic& rhs) const { return mValue <=> rhs.mValue; }
+		bool operator==(const DynamicPeriodic& rhs) const  { return mValue == rhs.mValue; }
+		bool operator!=(const DynamicPeriodic& rhs) const  { return mValue != rhs.mValue; }
+		bool operator> (const DynamicPeriodic& rhs) const  { return mValue >  rhs.mValue; }
+		bool operator>=(const DynamicPeriodic& rhs) const  { return mValue >= rhs.mValue; }
+		bool operator< (const DynamicPeriodic& rhs) const  { return mValue <  rhs.mValue; }
+		bool operator<=(const DynamicPeriodic& rhs) const  { return mValue <= rhs.mValue; }
 
 		DynamicPeriodic operator-() { return mMax - mValue; }
 
