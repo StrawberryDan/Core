@@ -12,6 +12,6 @@ namespace Strawberry::Core::IO
 	class Producer
 	{
 	public:
-		Option<T> Receive() = 0;
+		virtual Option<T> Receive() = 0;
 	};
 }

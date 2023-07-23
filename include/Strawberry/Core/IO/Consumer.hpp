@@ -8,6 +8,6 @@ namespace Strawberry::Core::IO
 	class Consumer
 	{
 	public:
-		bool Feed(T&&) = 0;
+		virtual bool Feed(T&&) = 0;
 	};
 }
