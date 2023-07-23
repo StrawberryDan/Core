@@ -11,6 +11,14 @@ namespace Strawberry::Core::IO
 	class Link
 	{
 	public:
+		Link(Producer<T>* producer, Consumer<T>* consumer)
+				: mProducer(producer), mConsumer(consumer)
+		{
+			Assert(mProducer != nullptr);
+			Assert(mConsumer != nullptr);
+		}
+
+
 		bool Tick()
 		{
 			auto input = mProducer->Receive();

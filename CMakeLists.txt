@@ -75,6 +75,7 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/IO/Consumer.hpp
 		include/Strawberry/Core/IO/Producer.hpp
 		include/Strawberry/Core/IO/Link.hpp
+		include/Strawberry/Core/IO/Graph.hpp
 		include/Strawberry/Core/IO/Transformer.hpp
 )
 
