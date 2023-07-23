@@ -72,6 +72,8 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/ScopedTimer.hpp
 		src/ScopedTimer.cpp
 		include/Strawberry/Core/DynamicEvaluation.hpp
+		include/Strawberry/Core/IO/Consumer.hpp
+		include/Strawberry/Core/IO/Producer.hpp
 )
 
 target_include_directories(StrawberryCore PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
