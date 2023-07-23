@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 find_package(OpenSSL REQUIRED)
 find_library(FMT_LIBRARY NAMES libfmt.a)
+find_path(FMT_INCLUDE_DIR NAMES fmt/format.hpp)
 find_path(JSON_INCLUDE_DIR NAMES nlohmann/json.hpp)
 
 
@@ -73,7 +74,7 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/DynamicEvaluation.hpp
 )
 
-target_include_directories(StrawberryCore PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
+target_include_directories(StrawberryCore PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
 target_link_libraries(StrawberryCore PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY})
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
