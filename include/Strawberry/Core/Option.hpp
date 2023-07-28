@@ -217,6 +217,22 @@ namespace Strawberry::Core
 
 
 
+		T& Value()
+		{
+			Assert(HasValue());
+			return mPayload;
+		}
+
+
+
+		const T& Value() const
+		{
+			Assert(HasValue());
+			return mPayload;
+		}
+
+
+
 		T& operator*()
 		{
 			Assert(mHasValue);
@@ -272,12 +288,12 @@ namespace Strawberry::Core
 
 
 
-		template<typename R, Callable<R, T&&> F>
-		Option<R> Map(F functor)
+		template<std::invocable<const T&> F>
+		Option<std::invoke_result_t<F, const T&>> Map(F functor)
 		{
 			if (HasValue())
 			{
-				return Option<R>(functor(std::move(Unwrap())));
+				return Option<std::invoke_result_t<F, const T&>>(functor(Value()));
 			}
 			else
 			{
@@ -287,17 +303,16 @@ namespace Strawberry::Core
 
 
 
-		template<typename R, typename F>
-		R MapOr(F functor, R&& value)
-		requires Callable<R, F, T>
+		template<std::invocable<T&&> F>
+		Option<std::invoke_result_t<F, T&&>> Map(F functor)
 		{
 			if (HasValue())
 			{
-				return Option<R>(F(Unwrap()));
+				return Option<std::invoke_result_t<F, T&&>>(functor(std::move(Unwrap())));
 			}
 			else
 			{
-				return value;
+				return {};
 			}
 		}
 
@@ -331,16 +346,8 @@ namespace Strawberry::Core
 
 
 
-		T Take()
-		{
-			Core::Assert(mHasValue);
-			mHasValue = false;
-			return std::move(mPayload);
-		}
-
-
-
-		bool operator==(const Option<T>& rhs) const requires ( std::equality_comparable<T> )
+		template <std::equality_comparable_with<T> R>
+		bool operator==(const Option<R>& rhs)
 		{
 			if (!HasValue() && !rhs.HasValue())
 			{
@@ -356,7 +363,8 @@ namespace Strawberry::Core
 
 
 
-		inline bool operator!=(const Option<T>& rhs) const requires ( std::equality_comparable<T> )
+		template <std::equality_comparable_with<T> R>
+		inline bool operator!=(const Option<R>& rhs) const
 		{
 			if (!HasValue() && !rhs.HasValue())
 			{
@@ -372,7 +380,8 @@ namespace Strawberry::Core
 
 
 
-		inline bool operator==(const T& rhs) const requires ( std::equality_comparable<T> )
+		template <std::equality_comparable_with<T> R>
+		inline bool operator==(const R& rhs)
 		{
 			if (!HasValue())
 			{
@@ -386,7 +395,8 @@ namespace Strawberry::Core
 
 
 
-		inline bool operator!=(const T& rhs) const requires ( std::equality_comparable<T> )
+		template <std::equality_comparable_with<T> R>
+		inline bool operator!=(const R& rhs)
 		{
 			if (!HasValue())
 			{
@@ -406,6 +416,299 @@ namespace Strawberry::Core
 		{
 			T mPayload;
 		};
+	};
+
+
+
+	template<typename T> requires ( std::is_pointer_v<T> )
+	class Option<T>
+	{
+	public:
+		Option()
+			: mPayload(nullptr)
+		{}
+
+
+
+		Option(NullOpt_t)
+			: mPayload(nullptr)
+		{}
+
+
+
+		Option(T value)
+			: mPayload(value)
+		{}
+
+
+
+		Option(const Option& rhs)
+			: mPayload(rhs.HasValue() ? *rhs : nullptr)
+		{}
+
+
+
+		Option(Option&& rhs)
+			: mPayload(std::exchange(rhs.mPayload, nullptr))
+		{}
+
+
+
+		Option& operator=(NullOpt_t)
+		{
+			Reset();
+		}
+
+
+
+		Option& operator=(T rhs)
+		{
+			mPayload = rhs;
+
+			return *this;
+		}
+
+
+
+		Option& operator=(const Option& rhs) requires(std::is_copy_assignable_v<T>)
+		{
+			if (this != &rhs)
+			{
+				mPayload = rhs.mPayload;
+			}
+
+			return *this;
+		}
+
+
+
+		Option& operator=(Option&& rhs) requires(std::is_move_assignable_v<T>)
+		{
+			if (this != &rhs)
+			{
+				mPayload = std::exchange(rhs.mPayload, nullptr);
+			}
+
+			return *this;
+		}
+
+
+
+		void Reset()
+		{
+			mPayload = nullptr;
+		}
+
+
+
+		inline bool HasValue() const
+		{ return mPayload != nullptr; }
+
+
+
+		explicit inline operator bool() const
+		{ return HasValue(); }
+
+
+
+		T& Value()
+		{
+			Assert(HasValue());
+			return mPayload;
+		}
+
+
+
+		const T& Value() const
+		{
+			Assert(HasValue());
+			return mPayload;
+		}
+
+
+
+		T& operator*()
+		{
+			Assert(HasValue());
+			return mPayload;
+		}
+
+
+
+		const T& operator*() const
+		{
+			Assert(HasValue());
+			return mPayload;
+		}
+
+
+
+		T* operator->()
+		{
+			Assert(HasValue());
+			return mPayload;
+		}
+
+
+
+		const T* operator->() const
+		{
+			Assert(HasValue());
+			return mPayload;
+		}
+
+
+
+		T Unwrap()
+		{
+			Assert(HasValue());
+			return std::exchange(mPayload, nullptr);
+		}
+
+
+
+		T UnwrapOr(T&& value)
+		{
+			if (HasValue())
+			{
+				return Unwrap();
+			}
+			else
+			{
+				return value;
+			}
+		}
+
+
+
+		template<std::invocable<const T&> F>
+		Option<std::invoke_result_t<F, const T&>> Map(F functor)
+		{
+			if (HasValue())
+			{
+				return Option<std::invoke_result_t<F, const T&>>(functor(Value()));
+			}
+			else
+			{
+				return {};
+			}
+		}
+
+
+
+		template<std::invocable<T&&> F>
+		Option<std::invoke_result_t<F, T&&>> Map(F functor)
+		{
+			if (HasValue())
+			{
+				return Option<std::invoke_result_t<F, T&&>>(functor(std::move(Unwrap())));
+			}
+			else
+			{
+				return {};
+			}
+		}
+
+
+
+		Option<T*> AsPtr()
+		{
+			if (HasValue())
+			{
+				return &mPayload;
+			}
+			else
+			{
+				return {};
+			}
+		}
+
+
+
+		Option<const T*> AsPtr() const
+		{
+			if (HasValue())
+			{
+				return &mPayload;
+			}
+			else
+			{
+				return {};
+			}
+		}
+
+
+
+
+
+
+
+		template <std::equality_comparable_with<T> R>
+		bool operator==(const Option<R>& rhs)
+		{
+			if (!HasValue() && !rhs.HasValue())
+			{
+				return true;
+			}
+			else if (HasValue() && rhs.HasValue())
+			{
+				return (**this) == (*rhs);
+			}
+
+			return false;
+		}
+
+
+
+		template <std::equality_comparable_with<T> R>
+		inline bool operator!=(const Option<R>& rhs) const
+		{
+			if (!HasValue() && !rhs.HasValue())
+			{
+				return false;
+			}
+			else if (HasValue() && rhs.HasValue())
+			{
+				return (**this) != (*rhs);
+			}
+
+			return true;
+		}
+
+
+
+		template <std::equality_comparable_with<T> R>
+		inline bool operator==(const R& rhs)
+		{
+			if (!HasValue())
+			{
+				return false;
+			}
+			else
+			{
+				return (**this) == rhs;
+			}
+		}
+
+
+
+		template <std::equality_comparable_with<T> R>
+		inline bool operator!=(const R& rhs)
+		{
+			if (!HasValue())
+			{
+				return true;
+			}
+			else
+			{
+				return (**this) != rhs;
+			}
+		}
+
+
+
+	private:
+		T mPayload;
 	};
 
 
