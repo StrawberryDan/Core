@@ -15,11 +15,27 @@
 
 namespace Strawberry::Core
 {
+	class NullOpt_t
+	{
+	public:
+		NullOpt_t(int) {}
+	};
+
+
+	static const NullOpt_t NullOpt = {0};
+
+
 	template<typename T>
 	class Option
 	{
 	public:
 		Option()
+			: mHasValue(false)
+		{}
+
+
+
+		Option(NullOpt_t)
 			: mHasValue(false)
 		{}
 
@@ -64,6 +80,13 @@ namespace Strawberry::Core
 				std::construct_at(&mPayload, std::move(*rhs));
 				rhs.mHasValue = false;
 			}
+		}
+
+
+
+		Option& operator=(NullOpt_t)
+		{
+			Reset();
 		}
 
 
