@@ -76,6 +76,7 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Math/Math.inl
 		src/IO/DynamicByteBuffer.cpp
 		src/Logging.cpp
+		include/Strawberry/Core/IO/Buffer.hpp
 )
 
 target_include_directories(StrawberryCore PUBLIC include inline ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
