@@ -16,8 +16,8 @@ namespace Strawberry::Core::Collection
 	class CircularBuffer
 	{
 	public:
-		CircularBuffer()
-			: mData(16)
+		CircularBuffer(size_t capacity)
+			: mData(capacity)
 			, mHead(Capacity(), 0)
 			, mTail(Capacity(), 0)
 			, mSize(0)
