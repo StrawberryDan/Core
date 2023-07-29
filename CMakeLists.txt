@@ -19,12 +19,8 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Endian.hpp
 		include/Strawberry/Core/IO/Base64.hpp
 		include/Strawberry/Core/IO/ByteBuffer.hpp
-		include/Strawberry/Core/IO/Consumer.hpp
 		include/Strawberry/Core/IO/DynamicByteBuffer.hpp
 		include/Strawberry/Core/IO/Error.hpp
-		include/Strawberry/Core/IO/Link.hpp
-		include/Strawberry/Core/IO/Producer.hpp
-		include/Strawberry/Core/IO/Transformer.hpp
 		include/Strawberry/Core/Markers.hpp
 		include/Strawberry/Core/Math/Math.hpp
 		include/Strawberry/Core/Math/Periodic.hpp
@@ -76,7 +72,6 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Math/Math.inl
 		src/IO/DynamicByteBuffer.cpp
 		src/Logging.cpp
-		include/Strawberry/Core/IO/Buffer.hpp
 )
 
 target_include_directories(StrawberryCore PUBLIC include ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
