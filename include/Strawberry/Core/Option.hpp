@@ -18,11 +18,11 @@ namespace Strawberry::Core
 	class NullOpt_t
 	{
 	public:
-		NullOpt_t(int) {}
+		explicit NullOpt_t(int) {}
 	};
 
 
-	static const NullOpt_t NullOpt = {0};
+	static const NullOpt_t NullOpt = NullOpt_t{0};
 
 
 	template<typename T>
@@ -158,11 +158,11 @@ namespace Strawberry::Core
 
 				if (rhs.mHasValue && mHasValue)
 				{
-					mPayload = std::move(rhs.Take());
+					mPayload = std::move(rhs.Unwrap());
 				}
 				else if (rhs.mHasValue && !mHasValue)
 				{
-					Emplace(std::move(rhs.Take()));
+					Emplace(std::move(rhs.Unwrap()));
 				}
 			}
 
