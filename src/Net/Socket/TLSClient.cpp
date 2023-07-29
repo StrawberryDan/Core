@@ -173,7 +173,7 @@ namespace Strawberry::Core::Net::Socket
 						return IO::Error::Closed;
 					case SSL_ERROR_SYSCALL:
 						Core::Logging::Error("SSL read error. Error: {}", strerror(errno));
-						return IO::Error::Syscall;
+						return IO::Error::Unknown;
 					default:
 						Core::Logging::Error("Unknown SSL_read error code: {}", error);
 						return IO::Error::Unknown;

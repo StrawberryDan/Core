@@ -7,11 +7,7 @@ namespace Strawberry::Core::IO
 	enum class Error
 	{
 		Unknown,
-		WouldBlock,
-		BufferOverflow,
-		NoIO,
 		Closed,
-		Syscall,
-		OverRead,
+		EndOfFile,
 	};
 }
