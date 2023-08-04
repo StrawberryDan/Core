@@ -73,6 +73,7 @@ add_library(StrawberryCore STATIC
 		src/Net/Websocket/Client.cpp
 		src/Net/Websocket/Message.cpp
 		src/ScopedTimer.cpp
+		include/Strawberry/Core/LoopingThread.hpp
 )
 
 target_include_directories(StrawberryCore PUBLIC include ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
