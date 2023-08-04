@@ -289,7 +289,7 @@ namespace Strawberry::Core
 
 
 		template<std::invocable<const T&> F>
-		Option<std::invoke_result_t<F, const T&>> Map(F functor)
+		Option<std::invoke_result_t<F, const T&>> Map(F functor) const&
 		{
 			if (HasValue())
 			{
@@ -304,7 +304,7 @@ namespace Strawberry::Core
 
 
 		template<std::invocable<T&&> F>
-		Option<std::invoke_result_t<F, T&&>> Map(F functor)
+		Option<std::invoke_result_t<F, T&&>> Map(F functor) &&
 		{
 			if (HasValue())
 			{
@@ -581,8 +581,8 @@ namespace Strawberry::Core
 
 
 
-		template<std::invocable<const T&> F>
-		Option<std::invoke_result_t<F, const T&>> Map(F functor)
+		template<std::invocable<const T> F>
+		Option<std::invoke_result_t<F, const T>> Map(F functor) const&
 		{
 			if (HasValue())
 			{
@@ -596,8 +596,8 @@ namespace Strawberry::Core
 
 
 
-		template<std::invocable<T&&> F>
-		Option<std::invoke_result_t<F, T&&>> Map(F functor)
+		template<std::invocable<T> F>
+		Option<std::invoke_result_t<F, T>> Map(F functor) &&
 		{
 			if (HasValue())
 			{
