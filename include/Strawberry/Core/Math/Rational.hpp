@@ -19,9 +19,11 @@ namespace Strawberry::Core::Math
 		Rational(T numerator, T denominator) : mNumerator(numerator), mDenominator(denominator) { Normalize(); }
 
 
-		T&       Numerator()         { return mNumerator; }
+		void SetNumerator(T value)   { mNumerator = value; Normalize(); }
+		void SetDenominator(T value) { mDenominator = value; Normalize(); }
+
+		
 		const T& Numerator() const   { return mNumerator; }
-		T&       Denominator()       { return mDenominator; }
 		const T& Denominator() const { return mDenominator; }
 
 
