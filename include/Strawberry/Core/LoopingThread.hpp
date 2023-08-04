@@ -15,7 +15,25 @@ namespace Strawberry::Core
 	{
 	public:
 		/// Accepts a function taking no arguments.
-		explicit LoopingThread(std::function<void()> function, std::function<void()> startup = {})
+		explicit LoopingThread(std::function<void()> function)
+				: mShouldRun(true)
+				  , mStartUp()
+				  , mFunction(std::move(function))
+		{
+			mThread = std::thread([this] ()
+								  {
+									  if (mStartUp) mStartUp();
+
+									  while (mShouldRun)
+									  {
+										  mFunction();
+									  }
+								  });
+		}
+
+
+		/// Accepts a function taking no arguments.
+		explicit LoopingThread(std::function<void()> function, std::function<void()> startup)
 			: mShouldRun(true)
 			, mStartUp(std::move(startup))
 			, mFunction(std::move(function))
@@ -32,11 +50,29 @@ namespace Strawberry::Core
 		}
 
 
-		// Will pass 'this' as the first argument always.
-		explicit LoopingThread(const std::function<void(LoopingThread*)>& function, std::function<void()> startup = {})
+		/// Will pass 'this' as the first argument always.
+		explicit LoopingThread(const std::function<void(LoopingThread*)>& function)
 				: mShouldRun(true)
-				, mStartUp(std::move(startup))
-				, mFunction([function, this] { return function(this); })
+				, mStartUp()
+				, mFunction([function, this] { function(this); })
+		{
+			mThread = std::thread([this] ()
+			{
+				if (mStartUp) mStartUp();
+
+				while (mShouldRun)
+				{
+					  mFunction();
+				}
+			});
+		}
+
+
+		/// Accepts a function taking no arguments.
+		explicit LoopingThread(std::function<void()> function, std::function<void(LoopingThread*)> startup)
+				: mShouldRun(true)
+				  , mStartUp([startup, this] { startup(this); })
+				  , mFunction(std::move(function))
 		{
 			mThread = std::thread([this] ()
 			{
@@ -50,10 +86,52 @@ namespace Strawberry::Core
 		}
 
 
+		/// Will pass 'this' as the first argument always.
+		explicit LoopingThread(const std::function<void(LoopingThread*)>& function, std::function<void()> startup)
+				: mShouldRun(true)
+				, mStartUp(std::move(startup))
+				, mFunction([function, this] { function(this); })
+		{
+			mThread = std::thread([this] ()
+			{
+				if (mStartUp) mStartUp();
+
+				while (mShouldRun)
+				{
+					mFunction();
+				}
+			});
+		}
+
+
+		/// Will pass 'this' as the first argument always.
+		explicit LoopingThread(const std::function<void(LoopingThread*)>& function, std::function<void(LoopingThread*)> startup)
+				: mShouldRun(true)
+				, mStartUp([startup, this] { startup(this); })
+				, mFunction([function, this] { function(this); })
+		{
+			mThread = std::thread([this] ()
+			{
+				if (mStartUp) mStartUp();
+
+				while (mShouldRun)
+				{
+					 mFunction();
+				}
+			});
+		}
+
+
 		~LoopingThread()
 		{
 			mShouldRun = false;
 			mThread.join();
+		}
+
+
+		bool IsRunning() const
+		{
+			return mShouldRun;
 		}
 
 
