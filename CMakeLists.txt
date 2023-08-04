@@ -15,15 +15,20 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Assert.hpp
 		include/Strawberry/Core/Clock.hpp
 		include/Strawberry/Core/Collection/CircularBuffer.hpp
+		include/Strawberry/Core/Concepts.hpp
 		include/Strawberry/Core/DynamicEvaluation.hpp
 		include/Strawberry/Core/Endian.hpp
 		include/Strawberry/Core/IO/Base64.hpp
 		include/Strawberry/Core/IO/ByteBuffer.hpp
+		include/Strawberry/Core/IO/CircularAdapter.hpp
+		include/Strawberry/Core/IO/Concepts.hpp
 		include/Strawberry/Core/IO/DynamicByteBuffer.hpp
 		include/Strawberry/Core/IO/Error.hpp
 		include/Strawberry/Core/Markers.hpp
 		include/Strawberry/Core/Math/Math.hpp
+		include/Strawberry/Core/Math/Math.inl
 		include/Strawberry/Core/Math/Periodic.hpp
+		include/Strawberry/Core/Math/Rational.hpp
 		include/Strawberry/Core/Mutex.hpp
 		include/Strawberry/Core/Net/Address.hpp
 		include/Strawberry/Core/Net/Endpoint.hpp
@@ -50,6 +55,8 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Utilities.hpp
 		src/Clock.cpp
 		src/IO/Base64.cpp
+		src/IO/DynamicByteBuffer.cpp
+		src/Logging.cpp
 		src/Markers.cpp
 		src/Net/Address.cpp
 		src/Net/Endpoint.cpp
@@ -66,12 +73,6 @@ add_library(StrawberryCore STATIC
 		src/Net/Websocket/Client.cpp
 		src/Net/Websocket/Message.cpp
 		src/ScopedTimer.cpp
-		include/Strawberry/Core/Concepts.hpp
-		include/Strawberry/Core/IO/CircularAdapter.hpp
-		include/Strawberry/Core/IO/Concepts.hpp
-		include/Strawberry/Core/Math/Math.inl
-		src/IO/DynamicByteBuffer.cpp
-		src/Logging.cpp
 )
 
 target_include_directories(StrawberryCore PUBLIC include ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
