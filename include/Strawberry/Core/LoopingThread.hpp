@@ -15,12 +15,15 @@ namespace Strawberry::Core
 	{
 	public:
 		/// Accepts a function taking no arguments.
-		explicit LoopingThread(std::function<void()> function)
+		explicit LoopingThread(std::function<void()> function, std::function<void()> startup = {})
 			: mShouldRun(true)
+			, mStartUp(std::move(startup))
 			, mFunction(std::move(function))
 		{
 			mThread = std::thread([this] ()
 			{
+				if (mStartUp) mStartUp();
+
 				while (mShouldRun)
 				{
 					mFunction();
@@ -30,12 +33,15 @@ namespace Strawberry::Core
 
 
 		// Will pass 'this' as the first argument always.
-		explicit LoopingThread(std::function<void(LoopingThread*)> function)
+		explicit LoopingThread(const std::function<void(LoopingThread*)>& function, std::function<void()> startup = {})
 				: mShouldRun(true)
+				, mStartUp(std::move(startup))
 				, mFunction([function, this] { return function(this); })
 		{
 			mThread = std::thread([this] ()
 			{
+				if (mStartUp) mStartUp();
+
 				while (mShouldRun)
 				{
 					mFunction();
@@ -66,6 +72,7 @@ namespace Strawberry::Core
 	private:
 		std::atomic<bool>           mShouldRun;
 		std::thread                 mThread;
+		const std::function<void()> mStartUp;
 		const std::function<void()> mFunction;
 	};
 }
