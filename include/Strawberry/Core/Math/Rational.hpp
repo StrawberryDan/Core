@@ -4,11 +4,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Standard Library
 #include <concepts>
+#include <cstdint>
 
 
 namespace Strawberry::Core::Math
 {
-	template <std::integral T>
+	template <std::integral T = int32_t>
 	class Rational
 	{
 	public:
@@ -29,4 +30,8 @@ namespace Strawberry::Core::Math
 		T mNumerator;
 		T mDenominator;
 	};
+
+
+	template <std::integral T>
+	Rational(T, T) -> Rational<T>;
 }
