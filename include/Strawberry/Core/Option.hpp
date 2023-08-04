@@ -527,7 +527,7 @@ namespace Strawberry::Core
 
 
 
-		T& operator*()
+		T operator*()
 		{
 			Assert(HasValue());
 			return mPayload;
@@ -535,7 +535,7 @@ namespace Strawberry::Core
 
 
 
-		const T& operator*() const
+		const T operator*() const
 		{
 			Assert(HasValue());
 			return mPayload;
@@ -543,7 +543,7 @@ namespace Strawberry::Core
 
 
 
-		T* operator->()
+		T operator->()
 		{
 			Assert(HasValue());
 			return mPayload;
@@ -551,7 +551,7 @@ namespace Strawberry::Core
 
 
 
-		const T* operator->() const
+		const T operator->() const
 		{
 			Assert(HasValue());
 			return mPayload;
