@@ -6,7 +6,9 @@ set(CMAKE_CXX_STANDARD 23)
 
 find_package(OpenSSL REQUIRED)
 find_library(FMT_LIBRARY NAMES libfmt.a)
-find_path(FMT_INCLUDE_DIR NAMES fmt/format.hpp)
+find_path(FMT_INCLUDE_DIR REQUIRED
+		NAMES fmt/format.h
+		HINTS /usr/local/include)
 find_path(JSON_INCLUDE_DIR NAMES nlohmann/json.hpp)
 
 
