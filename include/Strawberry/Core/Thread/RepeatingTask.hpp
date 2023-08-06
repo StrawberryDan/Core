@@ -69,7 +69,7 @@ namespace Strawberry::Core
 
 
 		/// Accepts a function taking no arguments.
-		explicit RepeatingTask(std::function<void()> function, std::function<void(RepeatingTask *)> startup)
+		explicit RepeatingTask(std::function<void(RepeatingTask *)> startup, std::function<void()> function)
 				: mShouldRun(true)
 				  , mStartUp([startup, this] { startup(this); })
 				  , mFunction(std::move(function))
@@ -87,7 +87,7 @@ namespace Strawberry::Core
 
 
 		/// Will pass 'this' as the first argument always.
-		explicit RepeatingTask(const std::function<void(RepeatingTask *)>& function, std::function<void()> startup)
+		explicit RepeatingTask(std::function<void()> startup, const std::function<void(RepeatingTask *)>& function)
 				: mShouldRun(true)
 				, mStartUp(std::move(startup))
 				, mFunction([function, this] { function(this); })
@@ -105,7 +105,7 @@ namespace Strawberry::Core
 
 
 		/// Will pass 'this' as the first argument always.
-		explicit RepeatingTask(const std::function<void(RepeatingTask *)>& function, std::function<void(RepeatingTask *)> startup)
+		explicit RepeatingTask(std::function<void(RepeatingTask *)> startup, const std::function<void(RepeatingTask *)>& function)
 				: mShouldRun(true)
 				, mStartUp([startup, this] { startup(this); })
 				, mFunction([function, this] { function(this); })
