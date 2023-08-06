@@ -15,7 +15,8 @@ namespace Strawberry::Core::Math
 	class Rational
 	{
 	public:
-		Rational(T value) : mNumerator(value), mDenominator(1) {}
+		template <std::integral V>
+		Rational(V value) : mNumerator(static_cast<T>(value)), mDenominator(1) {}
 		Rational(T numerator, T denominator) : mNumerator(numerator), mDenominator(denominator) { Normalize(); }
 
 
@@ -35,10 +36,16 @@ namespace Strawberry::Core::Math
 			{ return {Numerator() * rhs.Denominator() + rhs.Numerator() * Denominator(), Denominator() * rhs.Denominator() }; }
 		Rational operator-(const Rational& rhs) const
 			{ return {Numerator() * rhs.Denominator() - rhs.Numerator() * Denominator(), Denominator() * rhs.Denominator() }; }
-		Rational operator*(const Rational& rhs) const
-			{ return {Numerator() * rhs.Numerator(), Denominator() * rhs.Denominator()}; }
+//		Rational operator*(const Rational& rhs) const
+//			{ return {Numerator() * rhs.Numerator(), Denominator() * rhs.Denominator()}; }
 		Rational operator/(const Rational& rhs) const
 			{ return {Numerator() * rhs.Denominator(), Denominator() * rhs.Numerator()}; }
+
+
+		friend Rational operator*(const Rational& lhs, const Rational& rhs)
+		{
+			{ return {lhs.Numerator() * rhs.Numerator(), lhs.Denominator() * rhs.Denominator()}; }
+		}
 
 
 	protected:
