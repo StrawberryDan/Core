@@ -3,7 +3,7 @@
 
 
 #include <regex>
-#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Util/Assert.hpp"
 #include <iostream>
 #include "fmt/core.h"
 

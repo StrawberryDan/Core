@@ -3,7 +3,7 @@
 
 
 #include "Strawberry/Core/Net/Error.hpp"
-#include "Strawberry/Core/Option.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
 #include "TCPClient.hpp"
 #include <memory>
 #include <string>

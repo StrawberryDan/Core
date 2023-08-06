@@ -3,7 +3,6 @@
 
 
 #include <variant>
-#include "Concepts.hpp"
 #include "Assert.hpp"
 
 
@@ -80,16 +79,16 @@ namespace Strawberry::Core
 
 
 
-	    template<typename U, Callable<U, D&&> F>
-	    Result<U, E> Map(F f)
+	    template<std::invocable<D&&> F>
+	    Result<std::invoke_result_t<F, D&&>, E> Map(F f)
 	    {
 	        if (*this)
 	        {
-	            return Result<U, E>::Ok(f(std::move(Unwrap())));
+	            return Result<std::invoke_result_t<F, D&&>, E>::Ok(f(std::move(Unwrap())));
 	        }
 	        else
 	        {
-	            return Result<U, E>::Err(std::move(Err()));
+	            return Result<std::invoke_result_t<F, D&&>, E>::Err(std::move(Err()));
 	        }
 	    }
 

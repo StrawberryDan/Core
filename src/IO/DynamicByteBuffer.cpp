@@ -70,3 +70,25 @@ std::string Strawberry::Core::IO::DynamicByteBuffer::AsString() const
 	memcpy(string.data(), Data(), Size());
 	return string;
 }
+
+
+Strawberry::Core::Result<Strawberry::Core::IO::DynamicByteBuffer, Strawberry::Core::IO::Error>
+Strawberry::Core::IO::DynamicByteBuffer::Read(size_t len)
+{
+	if (Size() - mReadCursor < len)
+	{
+		return Error::EndOfFile;
+	}
+
+	return DynamicByteBuffer(Data() + mReadCursor, len);
+}
+
+
+Strawberry::Core::Result<size_t, Strawberry::Core::IO::Error>
+Strawberry::Core::IO::DynamicByteBuffer::Write(const Strawberry::Core::IO::DynamicByteBuffer& bytes)
+{
+	for (auto byte : bytes)
+	{
+		Push(byte);
+	}
+}

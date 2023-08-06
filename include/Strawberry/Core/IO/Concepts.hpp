@@ -8,7 +8,7 @@
 
 #include "DynamicByteBuffer.hpp"
 #include "Error.hpp"
-#include "Strawberry/Core/Result.hpp"
+#include "Strawberry/Core/Util/Result.hpp"
 
 
 

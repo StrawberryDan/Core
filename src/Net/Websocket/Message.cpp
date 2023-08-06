@@ -2,8 +2,8 @@
 
 
 
-#include "Strawberry/Core/Endian.hpp"
-#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Util/Endian.hpp"
+#include "Strawberry/Core/Util/Assert.hpp"
 
 
 

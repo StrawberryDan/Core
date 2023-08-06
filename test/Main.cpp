@@ -8,7 +8,7 @@
 
 
 
-#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Util/Assert.hpp"
 #include "Strawberry/Core/Math/Math.hpp"
 #include "Strawberry/Core/Math/Periodic.hpp"
 #include "Strawberry/Core/Net/Endpoint.hpp"

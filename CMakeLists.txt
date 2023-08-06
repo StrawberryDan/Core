@@ -14,24 +14,23 @@ find_path(JSON_INCLUDE_DIR NAMES nlohmann/json.hpp)
 
 
 add_library(StrawberryCore STATIC
-		include/Strawberry/Core/Assert.hpp
-		include/Strawberry/Core/Clock.hpp
+		include/Strawberry/Core/Util/Assert.hpp
+		include/Strawberry/Core/Util/Clock.hpp
 		include/Strawberry/Core/Collection/CircularBuffer.hpp
-		include/Strawberry/Core/Concepts.hpp
-		include/Strawberry/Core/DynamicEvaluation.hpp
-		include/Strawberry/Core/Endian.hpp
+		include/Strawberry/Core/Util/DynamicEvaluation.hpp
+		include/Strawberry/Core/Util/Endian.hpp
 		include/Strawberry/Core/IO/Base64.hpp
 		include/Strawberry/Core/IO/ByteBuffer.hpp
 		include/Strawberry/Core/IO/CircularAdapter.hpp
 		include/Strawberry/Core/IO/Concepts.hpp
 		include/Strawberry/Core/IO/DynamicByteBuffer.hpp
 		include/Strawberry/Core/IO/Error.hpp
-		include/Strawberry/Core/Markers.hpp
+		include/Strawberry/Core/Util/Markers.hpp
 		include/Strawberry/Core/Math/Math.hpp
 		include/Strawberry/Core/Math/Math.inl
 		include/Strawberry/Core/Math/Periodic.hpp
 		include/Strawberry/Core/Math/Rational.hpp
-		include/Strawberry/Core/Mutex.hpp
+		include/Strawberry/Core/Sync/Mutex.hpp
 		include/Strawberry/Core/Net/Address.hpp
 		include/Strawberry/Core/Net/Endpoint.hpp
 		include/Strawberry/Core/Net/Error.hpp
@@ -50,10 +49,10 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Net/Websocket/Client.hpp
 		include/Strawberry/Core/Net/Websocket/Client.inl
 		include/Strawberry/Core/Net/Websocket/Message.hpp
-		include/Strawberry/Core/Option.hpp
-		include/Strawberry/Core/Result.hpp
-		include/Strawberry/Core/ScopedTimer.hpp
-		include/Strawberry/Core/Utilities.hpp
+		include/Strawberry/Core/Util/Option.hpp
+		include/Strawberry/Core/Util/Result.hpp
+		include/Strawberry/Core/Util/ScopedTimer.hpp
+		include/Strawberry/Core/Util/Utilities.hpp
 		src/Clock.cpp
 		src/IO/Base64.cpp
 		src/IO/DynamicByteBuffer.cpp
@@ -74,7 +73,7 @@ add_library(StrawberryCore STATIC
 		src/Net/Websocket/Client.cpp
 		src/Net/Websocket/Message.cpp
 		src/ScopedTimer.cpp
-		include/Strawberry/Core/LoopingThread.hpp
+		include/Strawberry/Core/Thread/LoopingThread.hpp
 )
 
 target_include_directories(StrawberryCore PUBLIC include ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR} ${JSON_INCLUDE_DIR})

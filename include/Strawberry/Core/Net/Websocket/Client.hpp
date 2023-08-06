@@ -10,9 +10,9 @@
 
 
 
-#include "Strawberry/Core/Option.hpp"
-#include "Strawberry/Core/Result.hpp"
-#include "Strawberry/Core/Mutex.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Result.hpp"
+#include "Strawberry/Core/Sync/Mutex.hpp"
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
 #include "Message.hpp"

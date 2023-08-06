@@ -2,10 +2,10 @@
 
 
 
-#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Util/Assert.hpp"
 #include "Strawberry/Core/Net/Socket/SocketAPI.hpp"
-#include "Strawberry/Core/Utilities.hpp"
-#include "Strawberry/Core/Logging.hpp"
+#include "Strawberry/Core/Util/Utilities.hpp"
+#include "Strawberry/Core/Util/Logging.hpp"
 #include <memory>
 #include <openssl/tls1.h>
 

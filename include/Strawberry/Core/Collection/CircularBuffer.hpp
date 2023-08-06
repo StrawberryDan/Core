@@ -3,8 +3,8 @@
 
 
 #include "Strawberry/Core/Math/Periodic.hpp"
-#include "Strawberry/Core/Option.hpp"
-#include "Strawberry/Core/Option.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
 
 #include <memory>
 

@@ -9,8 +9,8 @@
 
 #include "Strawberry/Core/Net/HTTP/Client.hpp"
 #include "Strawberry/Core/IO/Base64.hpp"
-#include "Strawberry/Core/Endian.hpp"
-#include "Strawberry/Core/Markers.hpp"
+#include "Strawberry/Core/Util/Endian.hpp"
+#include "Strawberry/Core/Util/Markers.hpp"
 #include "Strawberry/Core/IO/Concepts.hpp"
 
 
@@ -275,7 +275,7 @@ namespace Strawberry::Core::Net::Websocket
 
 		bool final;
 		Opcode opcode;
-		if (auto byte = socket->Read(1).template Map<uint8_t>([](auto x) -> uint8_t { return x.template Into<uint8_t>(); }))
+		if (auto byte = socket->Read(1).template Map([](auto x) -> uint8_t { return x.template Into<uint8_t>(); }))
 		{
 			final = *byte & 0b10000000;
 			auto opcodeIn = GetOpcodeFromByte(*byte & 0b00001111);
@@ -300,7 +300,7 @@ namespace Strawberry::Core::Net::Websocket
 
 		bool masked = false;
 		size_t size = 0;
-		if (auto byte = socket->Read(1).template Map<uint8_t>([](auto x) { return x.template Into<uint8_t>(); }))
+		if (auto byte = socket->Read(1).template Map([](auto x) { return x.template Into<uint8_t>(); }))
 		{
 			masked = *byte & 0b10000000;
 			Assert(!masked);

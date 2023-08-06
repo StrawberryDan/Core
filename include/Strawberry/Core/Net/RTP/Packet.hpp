@@ -2,7 +2,7 @@
 
 
 /// Strawberry Core
-#include "Strawberry/Core/Endian.hpp"
+#include "Strawberry/Core/Util/Endian.hpp"
 #include "Strawberry/Core/IO/Concepts.hpp"
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 #include "Strawberry/Core/Net/Error.hpp"
@@ -33,7 +33,7 @@ namespace Strawberry::Core::Net::RTP
 		};
 #pragma pack()
 
-		template<typename DataSource> requires IO::Read<DataSource> && SizedContainer<DataSource>
+		template<typename DataSource> requires IO::Read<DataSource>
 		static Result<Packet, Error> Read(DataSource& data)
 		{
 			auto headerData = data.Read(sizeof(Header));

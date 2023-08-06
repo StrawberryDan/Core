@@ -2,8 +2,9 @@
 
 
 
-#include "Strawberry/Core/Assert.hpp"
-#include "Strawberry/Core/Result.hpp"
+#include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Util/Result.hpp"
+#include "Strawberry/Core/IO/Error.hpp"
 #include <array>
 #include <compare>
 #include <concepts>
@@ -54,6 +55,10 @@ namespace Strawberry::Core::IO
 		inline void Push(const IO::ByteBuffer<S>& bytes) { Push(bytes.Data(), bytes.Size()); }
 
 
+		Result<DynamicByteBuffer, Error> Read(size_t len);
+		Result<size_t, Error> Write(const DynamicByteBuffer& bytes);
+
+
 
 		// Accessors
 		size_t Size() const;
@@ -65,8 +70,10 @@ namespace Strawberry::Core::IO
 		const uint8_t& operator[](size_t i) const { return mData[i]; }
 
 		// Iterators
-		uint8_t* begin() { return Data(); }
-		uint8_t* end()   { return Data() + Size(); }
+		uint8_t*       begin()       { return Data(); }
+		uint8_t*       end()         { return Data() + Size(); }
+		const uint8_t* begin() const { return Data(); }
+		const uint8_t* end()   const { return Data() + Size(); }
 
 
 
@@ -103,6 +110,7 @@ namespace Strawberry::Core::IO
 
 	private:
 		std::vector<uint8_t> mData;
+		size_t               mReadCursor = 0;
 	};
 }
 

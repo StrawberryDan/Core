@@ -2,10 +2,10 @@
 
 
 
-#include "Strawberry/Core/Assert.hpp"
-#include "Strawberry/Core/Markers.hpp"
+#include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Util/Markers.hpp"
 #include "Strawberry/Core/Net/Socket/SocketAPI.hpp"
-#include "Strawberry/Core/Utilities.hpp"
+#include "Strawberry/Core/Util/Utilities.hpp"
 
 
 #if _WIN32

@@ -1,9 +1,9 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-#include "Strawberry/Core/ScopedTimer.hpp"
+#include "Strawberry/Core/Util/ScopedTimer.hpp"
 // Strawberry Core
-#include "Strawberry/Core/Logging.hpp"
+#include "Strawberry/Core/Util/Logging.hpp"
 
 
 
