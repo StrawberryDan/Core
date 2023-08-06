@@ -53,11 +53,11 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Util/Result.hpp
 		include/Strawberry/Core/Util/ScopedTimer.hpp
 		include/Strawberry/Core/Util/Utilities.hpp
-		src/Clock.cpp
+		src/Util/Clock.cpp
 		src/IO/Base64.cpp
 		src/IO/DynamicByteBuffer.cpp
-		src/Logging.cpp
-		src/Markers.cpp
+		src/Util/Logging.cpp
+		src/Util/Markers.cpp
 		src/Net/Address.cpp
 		src/Net/Endpoint.cpp
 		src/Net/HTTP/Client.cpp
@@ -72,7 +72,7 @@ add_library(StrawberryCore STATIC
 		src/Net/Socket/UDPClient.cpp
 		src/Net/Websocket/Client.cpp
 		src/Net/Websocket/Message.cpp
-		src/ScopedTimer.cpp
+		src/Util/ScopedTimer.cpp
 		include/Strawberry/Core/Thread/LoopingThread.hpp
 )
 
