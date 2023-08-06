@@ -53,7 +53,6 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Option.hpp
 		include/Strawberry/Core/Result.hpp
 		include/Strawberry/Core/ScopedTimer.hpp
-		include/Strawberry/Core/Uninitialised.hpp
 		include/Strawberry/Core/Utilities.hpp
 		src/Clock.cpp
 		src/IO/Base64.cpp
