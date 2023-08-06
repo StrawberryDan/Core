@@ -12,6 +12,17 @@
 
 namespace Strawberry::Core
 {
+	template <typename T>
+	class Option;
+
+
+	template <typename T>
+	struct IsOption : std::false_type {};
+
+	template <typename T>
+	struct IsOption<Option<T>> : std::true_type {};
+
+
 	class NullOpt_t
 	{
 	public:
@@ -265,6 +276,22 @@ namespace Strawberry::Core
 			{
 				return value;
 			}
+		}
+
+
+		template<std::invocable<const T&> F> requires Core::IsOption<std::invoke_result_t<F, T&>>::value
+		Option<std::invoke_result_t<F, T&>> AndThen(F functor) const &
+		{
+			if (HasValue())
+			{
+				auto result = functor(Value());
+				if (result)
+				{
+					return result.Unwrap();
+				}
+			}
+
+			return NullOpt;
 		}
 
 
@@ -675,6 +702,38 @@ namespace Strawberry::Core
 			{
 				return value;
 			}
+		}
+
+
+		template<std::invocable<T> F> requires Core::IsOption<std::invoke_result_t<F, T>>::value
+		std::invoke_result_t<F, T> AndThen(F functor) &
+		{
+			if (HasValue())
+			{
+				auto result = functor(Value());
+				if (result)
+				{
+					return result.Unwrap();
+				}
+			}
+
+			return NullOpt;
+		}
+
+
+		template<std::invocable<const T> F> requires Core::IsOption<std::invoke_result_t<F, const T>>::value
+		std::invoke_result_t<F, const T> AndThen(F functor) const &
+		{
+			if (HasValue())
+			{
+				auto result = functor(Value());
+				if (result)
+				{
+					return result.Unwrap();
+				}
+			}
+
+			return NullOpt;
 		}
 
 
