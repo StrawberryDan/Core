@@ -9,19 +9,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core
 {
-	Metronome::Metronome(double frequency, double eagerness)
+	Metronome::Metronome(double frequency, double preemption)
 		: Frequency(frequency)
-		, mEagerness(1.0 / eagerness)
-	{
-		Core::Assert(!std::isinf(mEagerness));
-		Core::Assert(!std::isnan(mEagerness));
-	}
+		, mPreemption(preemption)
+	{}
 
 
 	Metronome::operator bool()
 	{
 		double time = *mClock;
-		auto result = time >= (Frequency + mSecondsAhead) * mEagerness;
+		auto result = time >= (Frequency + mSecondsAhead) - mPreemption;
 		return result;
 	}
 
@@ -33,10 +30,9 @@ namespace Strawberry::Core
 	}
 
 
-	void Metronome::SetEagerness(double eagerness)
+	void Metronome::SetPreemption(double preemption)
 	{
-		mEagerness = 1.0 / eagerness;
-		Core::Assert(mEagerness > 0.0);
+		mPreemption = preemption;
 	}
 
 

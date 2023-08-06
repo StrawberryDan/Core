@@ -23,14 +23,14 @@ namespace Strawberry::Core
 		void Tick();
 
 
-		void SetEagerness(double eagerness);
+		void SetPreemption(double preemption);
 		void SetAllowedSecondsAhead(double seconds);
 
 
 	private:
 		double Frequency;
 		Clock  mClock;
-		double mSecondsAhead     = 0;
-		double mEagerness        = 1.0;
+		double mSecondsAhead     = 0.0;
+		double mPreemption       = 0.0;
 	};
 }
