@@ -62,7 +62,7 @@ namespace Strawberry::Core
 
 				while (mShouldRun)
 				{
-					  mFunction();
+					mFunction();
 				}
 			});
 		}
