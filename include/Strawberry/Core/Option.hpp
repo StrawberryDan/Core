@@ -217,20 +217,24 @@ namespace Strawberry::Core
 
 
 
-		T& Value()
-		{
-			Assert(HasValue());
-			return mPayload;
-		}
-
-
-
 		const T& Value() const
 		{
 			Assert(HasValue());
 			return mPayload;
 		}
 
+
+		const T& ValueOr(const T& value) const
+		{
+			if (HasValue())
+			{
+				return Value();
+			}
+			else
+			{
+				return value;
+			}
+		}
 
 
 		T& operator*()
@@ -510,19 +514,23 @@ namespace Strawberry::Core
 		{ return HasValue(); }
 
 
-
-		T& Value()
+		T Value() const
 		{
 			Assert(HasValue());
 			return mPayload;
 		}
 
 
-
-		const T& Value() const
+		T ValueOr(T value) const
 		{
-			Assert(HasValue());
-			return mPayload;
+			if (HasValue())
+			{
+				return Value();
+			}
+			else
+			{
+				return value;
+			}
 		}
 
 
