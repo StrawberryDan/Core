@@ -73,7 +73,7 @@ add_library(StrawberryCore STATIC
 		src/Net/Websocket/Client.cpp
 		src/Net/Websocket/Message.cpp
 		src/Util/ScopedTimer.cpp
-		include/Strawberry/Core/Thread/LoopingThread.hpp
+		include/Strawberry/Core/Thread/RepeatingTask.hpp
 		src/Util/Metronome.cpp
 		include/Strawberry/Core/Util/Metronome.hpp
 )

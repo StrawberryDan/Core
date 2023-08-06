@@ -11,11 +11,11 @@
 
 namespace Strawberry::Core
 {
-	class LoopingThread
+	class RepeatingTask
 	{
 	public:
 		/// Accepts a function taking no arguments.
-		explicit LoopingThread(std::function<void()> function)
+		explicit RepeatingTask(std::function<void()> function)
 				: mShouldRun(true)
 				  , mStartUp()
 				  , mFunction(std::move(function))
@@ -33,7 +33,7 @@ namespace Strawberry::Core
 
 
 		/// Accepts a function taking no arguments.
-		explicit LoopingThread(std::function<void()> function, std::function<void()> startup)
+		explicit RepeatingTask(std::function<void()> function, std::function<void()> startup)
 			: mShouldRun(true)
 			, mStartUp(std::move(startup))
 			, mFunction(std::move(function))
@@ -51,7 +51,7 @@ namespace Strawberry::Core
 
 
 		/// Will pass 'this' as the first argument always.
-		explicit LoopingThread(const std::function<void(LoopingThread*)>& function)
+		explicit RepeatingTask(const std::function<void(RepeatingTask *)>& function)
 				: mShouldRun(true)
 				, mStartUp()
 				, mFunction([function, this] { function(this); })
@@ -69,7 +69,7 @@ namespace Strawberry::Core
 
 
 		/// Accepts a function taking no arguments.
-		explicit LoopingThread(std::function<void()> function, std::function<void(LoopingThread*)> startup)
+		explicit RepeatingTask(std::function<void()> function, std::function<void(RepeatingTask *)> startup)
 				: mShouldRun(true)
 				  , mStartUp([startup, this] { startup(this); })
 				  , mFunction(std::move(function))
@@ -87,7 +87,7 @@ namespace Strawberry::Core
 
 
 		/// Will pass 'this' as the first argument always.
-		explicit LoopingThread(const std::function<void(LoopingThread*)>& function, std::function<void()> startup)
+		explicit RepeatingTask(const std::function<void(RepeatingTask *)>& function, std::function<void()> startup)
 				: mShouldRun(true)
 				, mStartUp(std::move(startup))
 				, mFunction([function, this] { function(this); })
@@ -105,7 +105,7 @@ namespace Strawberry::Core
 
 
 		/// Will pass 'this' as the first argument always.
-		explicit LoopingThread(const std::function<void(LoopingThread*)>& function, std::function<void(LoopingThread*)> startup)
+		explicit RepeatingTask(const std::function<void(RepeatingTask *)>& function, std::function<void(RepeatingTask *)> startup)
 				: mShouldRun(true)
 				, mStartUp([startup, this] { startup(this); })
 				, mFunction([function, this] { function(this); })
@@ -122,7 +122,7 @@ namespace Strawberry::Core
 		}
 
 
-		~LoopingThread()
+		~RepeatingTask()
 		{
 			mShouldRun = false;
 			mThread.join();
@@ -141,10 +141,10 @@ namespace Strawberry::Core
 		}
 
 
-		LoopingThread(const LoopingThread& rhs)            = delete;
-		LoopingThread& operator=(const LoopingThread& rhs) = delete;
-		LoopingThread(LoopingThread&& rhs)                 = delete;
-		LoopingThread& operator=(LoopingThread&& rhs)      = delete;
+		RepeatingTask(const RepeatingTask& rhs)            = delete;
+		RepeatingTask& operator=(const RepeatingTask& rhs) = delete;
+		RepeatingTask(RepeatingTask&& rhs)                 = delete;
+		RepeatingTask& operator=(RepeatingTask&& rhs)      = delete;
 
 
 	private:
