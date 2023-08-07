@@ -105,6 +105,7 @@ namespace Strawberry::Core::Net::HTTP
 			if (contentLength > 0)
 			{
 				auto data = mSocket.Read(contentLength).Unwrap();
+				Core::Assert(data.Size() == contentLength);
 				payload.Push(data.Data(), data.Size());
 			}
 		}
@@ -120,16 +121,22 @@ namespace Strawberry::Core::Net::HTTP
 	{
 		std::string line;
 		std::smatch matchResults;
-		static const auto chunkSizeLine = std::regex(R"(([\dabcdefABCDEF]+)\r\n)");
+		static const auto chunkSizeLine = std::regex(R"(([0123456789abcdefABCDEF]+)\r\n)");
+		size_t sumOfChunkLengths = 0;
 
 		IO::DynamicByteBuffer payload;
 		while (true)
 		{
 			line = this->ReadLine();
-			if (line == "\r\n" || !std::regex_match(line, matchResults, chunkSizeLine))
+			if (line == "\r\n")
 			{
 				break;
 			}
+			else if (!std::regex_match(line, matchResults, chunkSizeLine))
+			{
+				Core::Unreachable();
+			}
+
 
 			auto bytesToRead = std::stoul(matchResults[1], nullptr, 16);
 			if (bytesToRead > 0)
@@ -137,16 +144,20 @@ namespace Strawberry::Core::Net::HTTP
 				IO::DynamicByteBuffer chunk;
 				chunk.Reserve(bytesToRead);
 
-				do
-				{
-					chunk.Push(this->mSocket.Read(bytesToRead - chunk.Size()).Unwrap());
-				}
-				while (chunk.Size() < bytesToRead);
-
+				chunk.Push(this->mSocket.Read(bytesToRead).Unwrap());
+				sumOfChunkLengths += chunk.Size();
+				Core::Assert(chunk.Size() == bytesToRead);
 				payload.Push(chunk);
 			}
+
+			auto CRLF = this->ReadLine();
+			Core::Assert(CRLF == "\r\n");
+
+			if (bytesToRead == 0) break;
 		}
 
+
+		Core::Assert(sumOfChunkLengths == payload.Size());
 		return payload;
 	}
 
