@@ -54,7 +54,7 @@ namespace Strawberry::Core
 	{
 	public:
 		template<typename ... Ts>
-		Mutex(Ts ... ts)
+		explicit Mutex(Ts ... ts)
 				: mMutex(), mPayload(std::forward<Ts>(ts)...)
 		{}
 
