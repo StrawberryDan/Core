@@ -188,4 +188,8 @@ namespace Strawberry::Core
 	private:
 		std::shared_ptr<Mutex<T>> mPayload;
 	};
+
+
+	template <typename T>
+	Mutex(T) -> Mutex<std::decay_t<T>>;
 }
