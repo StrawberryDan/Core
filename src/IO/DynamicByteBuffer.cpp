@@ -91,4 +91,6 @@ Strawberry::Core::IO::DynamicByteBuffer::Write(const Strawberry::Core::IO::Dynam
 	{
 		Push(byte);
 	}
+
+	return bytes.Size();
 }
