@@ -76,6 +76,8 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Thread/RepeatingTask.hpp
 		src/Util/Metronome.cpp
 		include/Strawberry/Core/Util/Metronome.hpp
+		include/Strawberry/Core/IO/ChannelBroadcaster.hpp
+		include/Strawberry/Core/IO/ChannelReceiver.hpp
 )
 
 target_include_directories(StrawberryCore PUBLIC include ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
