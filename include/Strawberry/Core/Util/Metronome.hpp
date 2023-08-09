@@ -21,10 +21,11 @@ namespace Strawberry::Core
 
 		explicit operator bool();
 		void Tick();
+		void Restart();
 
 
 		void SetPreemption(double preemption);
-		void SetAllowedSecondsAhead(double seconds);
+		void SetFrequency(double seconds);
 
 
 	private:

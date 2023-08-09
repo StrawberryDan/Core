@@ -30,13 +30,20 @@ namespace Strawberry::Core
 	}
 
 
+	void Metronome::Restart()
+	{
+		mSecondsAhead = 0.0;
+		mClock.Restart();
+	}
+
+
 	void Metronome::SetPreemption(double preemption)
 	{
 		mPreemption = preemption;
 	}
 
 
-	void Metronome::SetAllowedSecondsAhead(double seconds)
+	void Metronome::SetFrequency(double seconds)
 	{
 		Frequency = seconds;
 	}
