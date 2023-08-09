@@ -25,7 +25,7 @@ namespace Strawberry::Core
 
 
 		void SetPreemption(double preemption);
-		void SetFrequency(double seconds);
+		void SetFrequency(double frequency);
 
 
 	private:

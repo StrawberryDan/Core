@@ -43,8 +43,8 @@ namespace Strawberry::Core
 	}
 
 
-	void Metronome::SetFrequency(double seconds)
+	void Metronome::SetFrequency(double frequency)
 	{
-		Frequency = seconds;
+		Frequency = frequency;
 	}
 }
