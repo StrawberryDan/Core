@@ -1,7 +1,9 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+// Core
 #include "Strawberry/Core/Util/Metronome.hpp"
+#include "Strawberry/Core/Util/Logging.hpp"
 
 
 //======================================================================================================================
@@ -27,6 +29,9 @@ namespace Strawberry::Core
 	{
 		mSecondsAhead += Frequency - *mClock;
 		mClock.Restart();
+
+		if (mSecondsAhead > Frequency)
+			Core::Logging::Warning("{}:{} Metronome has fallen behind!", __FILE__, __LINE__);
 	}
 
 
