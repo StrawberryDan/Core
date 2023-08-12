@@ -1,10 +1,15 @@
 #pragma once
 
 
-#include <mutex>
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
+// Core
 #include "Strawberry/Core/Util/Assert.hpp"
-#include <memory>
 #include "Strawberry/Core/Util/Option.hpp"
+// Standard Library
+#include <mutex>
+#include <memory>
 
 
 namespace Strawberry::Core
