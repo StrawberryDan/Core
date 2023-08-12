@@ -30,8 +30,10 @@ namespace Strawberry::Core
 		mSecondsAhead += mFrequency - *mClock;
 		mClock.Restart();
 
-		if (mSecondsAhead > mFrequency)
+		if (mSecondsAhead <= 0.0)
+		{
 			Core::Logging::Warning("{}:{} Metronome has fallen behind!", __FILE__, __LINE__);
+		}
 	}
 
 
