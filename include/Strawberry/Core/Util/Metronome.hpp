@@ -29,7 +29,7 @@ namespace Strawberry::Core
 
 
 	private:
-		double Frequency;
+		double mFrequency;
 		Clock  mClock;
 		double mSecondsAhead     = 0.0;
 		double mPreemption       = 0.0;

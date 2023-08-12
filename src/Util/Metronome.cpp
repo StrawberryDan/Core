@@ -12,25 +12,25 @@
 namespace Strawberry::Core
 {
 	Metronome::Metronome(double frequency, double preemption)
-		: Frequency(frequency)
-		, mPreemption(preemption)
+		: mFrequency(frequency)
+		  , mPreemption(preemption)
 	{}
 
 
 	Metronome::operator bool()
 	{
 		double time = *mClock;
-		auto result = time >= (Frequency + mSecondsAhead) - mPreemption;
+		auto result = time >= (mFrequency + mSecondsAhead) - mPreemption;
 		return result;
 	}
 
 
 	void Metronome::Tick()
 	{
-		mSecondsAhead += Frequency - *mClock;
+		mSecondsAhead += mFrequency - *mClock;
 		mClock.Restart();
 
-		if (mSecondsAhead > Frequency)
+		if (mSecondsAhead > mFrequency)
 			Core::Logging::Warning("{}:{} Metronome has fallen behind!", __FILE__, __LINE__);
 	}
 
@@ -50,6 +50,6 @@ namespace Strawberry::Core
 
 	void Metronome::SetFrequency(double frequency)
 	{
-		Frequency = frequency;
+		mFrequency = frequency;
 	}
 }
