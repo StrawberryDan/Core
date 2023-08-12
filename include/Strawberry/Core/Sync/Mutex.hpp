@@ -45,7 +45,7 @@ namespace Strawberry::Core
 
 
 	private:
-		MutexGuard(std::recursive_mutex& mutex, T* ptr) : mLock(mutex), mPayload(ptr)
+		MutexGuard(LockType lock, T* ptr) : mLock(std::move(lock)), mPayload(ptr)
 		{}
 
 
@@ -89,20 +89,20 @@ namespace Strawberry::Core
 		}
 
 
-		MutexGuard<T> Lock()
-		{ return {mMutex, &mPayload}; }
+		MutexGuard<T> Lock() &
+		{ return {std::unique_lock(mMutex), &mPayload}; }
 
 
-		MutexGuard<const T> Lock() const
-		{ return {mMutex, &mPayload}; }
+		MutexGuard<const T> Lock() const&
+		{ return {std::unique_lock(mMutex), &mPayload}; }
 
 
-		Option<MutexGuard<T>> TryLock()&
+		Option<MutexGuard<T>> TryLock() &
 		{
-			std::unique_lock<std::mutex> lk(mMutex, std::defer_lock);
+			std::unique_lock<std::recursive_mutex> lk(mMutex, std::defer_lock);
 			if (lk.try_lock())
 			{
-				return {lk, mPayload};
+				return MutexGuard<T>(std::move(lk), &mPayload);
 			}
 			else
 			{
@@ -113,10 +113,10 @@ namespace Strawberry::Core
 
 		Option<MutexGuard<const T>> TryLock() const&
 		{
-			std::unique_lock<std::mutex> lk(mMutex, std::defer_lock);
+			std::unique_lock<std::recursive_mutex> lk(mMutex, std::defer_lock);
 			if (lk.try_lock())
 			{
-				return {lk, &mPayload};
+				return MutexGuard<T>(std::move(lk), &mPayload);
 			}
 			else
 			{
