@@ -19,8 +19,7 @@ namespace Strawberry::Core::Net::RTP
 	{
 	public:
 #pragma pack(1)
-		struct Header
-		{
+		struct Header {
 			uint8_t  csrcCount      : 4  = 0;
 			uint8_t  extension      : 1  = 0;
 			uint8_t  padding        : 1  = 0;
@@ -141,4 +140,4 @@ namespace Strawberry::Core::Net::RTP
 
 	static_assert(sizeof(Packet::Header) == 12);
 	static_assert(std::is_standard_layout_v<Packet::Header>);
-}// namespace Strawberry::Core::Net::RTP
+} // namespace Strawberry::Core::Net::RTP

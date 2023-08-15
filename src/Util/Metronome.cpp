@@ -47,4 +47,4 @@ namespace Strawberry::Core
 	{
 		mFrequency = frequency;
 	}
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

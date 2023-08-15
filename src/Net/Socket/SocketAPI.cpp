@@ -29,4 +29,4 @@ namespace Strawberry::Core::Net::Socket
 		Assert(err == 0);
 #endif
 	}
-}// namespace Strawberry::Core::Net::Socket
+} // namespace Strawberry::Core::Net::Socket

@@ -143,4 +143,4 @@ namespace Strawberry::Core::Collection
 		Math::DynamicPeriodic<size_t> mTail;
 		size_t                        mSize;
 	};
-}// namespace Strawberry::Core::Collection
+} // namespace Strawberry::Core::Collection

@@ -48,4 +48,4 @@ namespace Strawberry::Core::Net::Websocket
 		client.mSocket = Core::Mutex(std::move(handshaker).TakeSocket());
 		return std::move(client);
 	}
-}// namespace Strawberry::Core::Net::Websocket
+} // namespace Strawberry::Core::Net::Websocket

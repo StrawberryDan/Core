@@ -27,4 +27,4 @@ namespace Strawberry::Core
 		std::string mName;
 		Clock       mClock;
 	};
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

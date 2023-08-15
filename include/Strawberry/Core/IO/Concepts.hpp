@@ -27,4 +27,4 @@ namespace Strawberry::Core::IO
 				t.Write(bytes)
 			} -> std::same_as<Result<size_t, Error>>;
 		};
-}// namespace Strawberry::Core::IO
+} // namespace Strawberry::Core::IO

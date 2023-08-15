@@ -38,4 +38,4 @@ namespace Strawberry::Core::Math
 	{
 		return multiple * CeilDiv(value, multiple);
 	}
-}// namespace Strawberry::Core::Math
+} // namespace Strawberry::Core::Math

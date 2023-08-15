@@ -69,8 +69,7 @@ namespace Strawberry::Core::Net
 		try
 		{
 			port = std::stoi(portstr);
-		}
-		catch (const std::exception& e)
+		} catch (const std::exception& e)
 		{
 			return Error::ParsingEndpoint;
 		}
@@ -91,8 +90,7 @@ namespace Strawberry::Core::Net
 		try
 		{
 			port = std::stoi(portstr);
-		}
-		catch (const std::exception& e)
+		} catch (const std::exception& e)
 		{
 			return Error::ParsingEndpoint;
 		}
@@ -110,4 +108,5 @@ namespace Strawberry::Core::Net
 	Endpoint::Endpoint(const std::string& hostname, uint16_t port)
 		: mHostName(hostname)
 		, mPort(port)
-	{}// namespace Strawberry::Core::Net
+	{}
+} // namespace Strawberry::Core::Net

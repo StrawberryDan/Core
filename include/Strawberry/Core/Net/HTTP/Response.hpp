@@ -42,4 +42,4 @@ namespace Strawberry::Core::Net::HTTP
 		Header                mHeader;
 		IO::DynamicByteBuffer mPayload;
 	};
-}// namespace Strawberry::Core::Net::HTTP
+} // namespace Strawberry::Core::Net::HTTP

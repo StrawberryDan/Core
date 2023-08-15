@@ -20,7 +20,7 @@
 #include <unistd.h>
 
 
-#endif// _WIN32
+#endif // _WIN32
 
 
 namespace Strawberry::Core::Net::Socket
@@ -177,4 +177,4 @@ namespace Strawberry::Core::Net::Socket
 			Unreachable();
 		}
 	}
-}// namespace Strawberry::Core::Net::Socket
+} // namespace Strawberry::Core::Net::Socket

@@ -361,4 +361,4 @@ namespace Strawberry::Core::Math
 
 	template <typename T>
 	DynamicPeriodic(T, T) -> DynamicPeriodic<T>;
-}// namespace Strawberry::Core::Math
+} // namespace Strawberry::Core::Math

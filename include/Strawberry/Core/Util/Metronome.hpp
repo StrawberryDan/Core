@@ -34,4 +34,4 @@ namespace Strawberry::Core
 		double mSecondsAhead = 0.0;
 		double mPreemption   = 0.0;
 	};
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

@@ -76,4 +76,4 @@ namespace Strawberry::Core::Net::Sockets
 	{
 		return Write(reinterpret_cast<const uint8_t*>(data.data()), data.size() * sizeof(T));
 	}
-}// namespace Strawberry::Core::Net::Sockets
+} // namespace Strawberry::Core::Net::Sockets

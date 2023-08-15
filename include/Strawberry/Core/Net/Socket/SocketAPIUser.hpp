@@ -20,4 +20,4 @@ namespace Strawberry::Core::Net::Socket
 	private:
 		std::shared_ptr<SocketAPI> mSocketAPI;
 	};
-}// namespace Strawberry::Core::Net::Socket
+} // namespace Strawberry::Core::Net::Socket

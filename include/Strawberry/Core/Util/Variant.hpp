@@ -69,4 +69,4 @@ namespace Strawberry::Core
 	private:
 		std::variant<Types...> mData;
 	};
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

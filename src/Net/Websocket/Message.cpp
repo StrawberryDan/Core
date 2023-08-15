@@ -49,8 +49,7 @@ namespace Strawberry::Core::Net::Websocket
 				try
 				{
 					json = nlohmann::json::parse(mPayload.begin(), mPayload.end());
-				}
-				catch (std::exception& e)
+				} catch (std::exception& e)
 				{
 					return std::string("Parse Error");
 				}
@@ -76,4 +75,4 @@ namespace Strawberry::Core::Net::Websocket
 	{
 		mPayload.insert(mPayload.end(), other.mPayload.begin(), other.mPayload.end());
 	}
-}// namespace Strawberry::Core::Net::Websocket
+} // namespace Strawberry::Core::Net::Websocket

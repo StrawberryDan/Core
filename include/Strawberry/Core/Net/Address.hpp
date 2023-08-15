@@ -91,4 +91,4 @@ namespace Strawberry::Core::Net
 	private:
 		std::variant<IPv4Address, IPv6Address> mPayload;
 	};
-}// namespace Strawberry::Core::Net
+} // namespace Strawberry::Core::Net

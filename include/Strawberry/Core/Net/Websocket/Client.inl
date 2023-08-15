@@ -357,4 +357,4 @@ namespace Strawberry::Core::Net::Websocket
 			mSocket.Reset();
 		}
 	}
-}// namespace Strawberry::Core::Net::Websocket
+} // namespace Strawberry::Core::Net::Websocket

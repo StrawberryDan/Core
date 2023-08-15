@@ -35,4 +35,4 @@ namespace Strawberry::Core::Net::Socket
 		TCPClient mTCP;
 		SSL*      mSSL;
 	};
-}// namespace Strawberry::Core::Net::Socket
+} // namespace Strawberry::Core::Net::Socket

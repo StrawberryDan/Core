@@ -23,6 +23,6 @@ namespace Strawberry::Core
 		{
 			return;
 		}
-#endif// !NDEBUG
+#endif // !NDEBUG
 	}
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

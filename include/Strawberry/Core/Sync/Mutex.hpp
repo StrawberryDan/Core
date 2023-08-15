@@ -203,4 +203,4 @@ namespace Strawberry::Core
 
 	template <typename T>
 	Mutex(T) -> Mutex<std::decay_t<T>>;
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

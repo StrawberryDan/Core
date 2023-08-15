@@ -39,4 +39,4 @@ namespace Strawberry::Core
 		Duration        mBuffer;
 		Option<Instant> mStartTime;
 	};
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

@@ -164,4 +164,4 @@ namespace Strawberry::Core::Net::HTTP
 		}
 		return line;
 	}
-}// namespace Strawberry::Core::Net::HTTP
+} // namespace Strawberry::Core::Net::HTTP

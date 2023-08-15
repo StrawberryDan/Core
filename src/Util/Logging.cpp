@@ -59,4 +59,4 @@ namespace Strawberry::Core
 			*sOutputFile << message << std::endl;
 		}
 	}
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

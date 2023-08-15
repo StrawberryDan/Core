@@ -51,4 +51,4 @@ namespace Strawberry::Core
 		mBuffer    = {};
 		mStartTime = std::chrono::system_clock::now();
 	}
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

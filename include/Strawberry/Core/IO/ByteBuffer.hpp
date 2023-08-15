@@ -116,4 +116,4 @@ namespace Strawberry::Core::IO
 	{
 		return DynamicByteBuffer(Data(), S);
 	}
-}// namespace Strawberry::Core::IO
+} // namespace Strawberry::Core::IO

@@ -44,4 +44,4 @@ namespace Strawberry::Core::Net::HTTP
 	private:
 		Entries mEntries;
 	};
-}// namespace Strawberry::Core::Net::HTTP
+} // namespace Strawberry::Core::Net::HTTP

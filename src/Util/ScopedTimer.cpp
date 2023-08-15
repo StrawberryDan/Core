@@ -20,4 +20,4 @@ namespace Strawberry::Core
 	{
 		Logging::Trace("{} ---- {}", mName, *mClock);
 	}
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

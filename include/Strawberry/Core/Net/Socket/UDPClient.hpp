@@ -54,4 +54,4 @@ namespace Strawberry::Core::Net::Socket
 		static constexpr size_t     BUFFER_SIZE = 25536;
 		IO::ByteBuffer<BUFFER_SIZE> mBuffer;
 	};
-}// namespace Strawberry::Core::Net::Socket
+} // namespace Strawberry::Core::Net::Socket

@@ -19,8 +19,7 @@ namespace Strawberry::Core
 			, mStartUp()
 			, mFunction(std::move(function))
 		{
-			mThread = std::thread([this]()
-								  {
+			mThread = std::thread([this]() {
 									  if (mStartUp) mStartUp();
 
 									  while (mShouldRun)
@@ -36,8 +35,7 @@ namespace Strawberry::Core
 			, mStartUp(std::move(startup))
 			, mFunction(std::move(function))
 		{
-			mThread = std::thread([this]()
-								  {
+			mThread = std::thread([this]() {
 									  if (mStartUp) mStartUp();
 
 									  while (mShouldRun)
@@ -53,8 +51,7 @@ namespace Strawberry::Core
 			, mStartUp()
 			, mFunction([function, this] { function(this); })
 		{
-			mThread = std::thread([this]()
-								  {
+			mThread = std::thread([this]() {
 									  if (mStartUp) mStartUp();
 
 									  while (mShouldRun)
@@ -70,8 +67,7 @@ namespace Strawberry::Core
 			, mStartUp([startup, this] { startup(this); })
 			, mFunction(std::move(function))
 		{
-			mThread = std::thread([this]()
-								  {
+			mThread = std::thread([this]() {
 									  if (mStartUp) mStartUp();
 
 									  while (mShouldRun)
@@ -87,8 +83,7 @@ namespace Strawberry::Core
 			, mStartUp(std::move(startup))
 			, mFunction([function, this] { function(this); })
 		{
-			mThread = std::thread([this]()
-								  {
+			mThread = std::thread([this]() {
 									  if (mStartUp) mStartUp();
 
 									  while (mShouldRun)
@@ -104,8 +99,7 @@ namespace Strawberry::Core
 			, mStartUp([startup, this] { startup(this); })
 			, mFunction([function, this] { function(this); })
 		{
-			mThread = std::thread([this]()
-								  {
+			mThread = std::thread([this]() {
 									  if (mStartUp) mStartUp();
 
 									  while (mShouldRun)
@@ -146,4 +140,4 @@ namespace Strawberry::Core
 		const std::function<void()> mStartUp;
 		const std::function<void()> mFunction;
 	};
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

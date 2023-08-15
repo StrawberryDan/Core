@@ -78,4 +78,4 @@ namespace Strawberry::Core
 			return ReverseBytes(v);
 		}
 	}
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

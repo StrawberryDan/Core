@@ -34,4 +34,4 @@ namespace Strawberry::Core
 		std::abort();
 #endif
 	}
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

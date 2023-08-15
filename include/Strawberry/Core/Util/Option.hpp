@@ -18,13 +18,11 @@ namespace Strawberry::Core
 
 	template <typename T>
 	struct IsOption
-		: std::false_type {
-	};
+		: std::false_type {};
 
 	template <typename T>
 	struct IsOption<Option<T>>
-		: std::true_type {
-	};
+		: std::true_type {};
 
 
 	class NullOpt_t
@@ -943,4 +941,4 @@ namespace Strawberry::Core
 	{
 		return b != a;
 	}
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

@@ -49,4 +49,4 @@ namespace Strawberry::Core::Net::HTTP
 		auto lc = ToLowercase(key);
 		return mEntries.contains(lc);
 	}
-}// namespace Strawberry::Core::Net::HTTP
+} // namespace Strawberry::Core::Net::HTTP

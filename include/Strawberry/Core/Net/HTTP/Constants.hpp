@@ -62,4 +62,4 @@ namespace Strawberry::Core::Net::HTTP
 	private:
 		_Enum mValue;
 	};
-}// namespace Strawberry::Core::Net::HTTP
+} // namespace Strawberry::Core::Net::HTTP

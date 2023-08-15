@@ -108,4 +108,4 @@ namespace Strawberry::Core::Math
 
 	template <std::integral T>
 	Rational(T, T) -> Rational<T>;
-}// namespace Strawberry::Core::Math
+} // namespace Strawberry::Core::Math

@@ -94,7 +94,7 @@ namespace Strawberry::Core::Net::Websocket
 		static Result<WSSClient, Error>
 		Connect(const std::string& host, const std::string& resource, uint16_t port = 443);
 	};
-}// namespace Strawberry::Core::Net::Websocket
+} // namespace Strawberry::Core::Net::Websocket
 
 
 #include "Client.inl"

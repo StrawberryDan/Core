@@ -41,4 +41,4 @@ namespace Strawberry::Core::Net
 		Option<IPAddress>   mAddress;
 		uint16_t            mPort;
 	};
-}// namespace Strawberry::Core::Net
+} // namespace Strawberry::Core::Net

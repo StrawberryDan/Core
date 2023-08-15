@@ -50,4 +50,4 @@ namespace Strawberry::Core::Net::Socket
 		SOCKET mSocket;
 #endif
 	};
-}// namespace Strawberry::Core::Net::Socket
+} // namespace Strawberry::Core::Net::Socket

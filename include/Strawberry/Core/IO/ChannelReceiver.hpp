@@ -62,4 +62,4 @@ namespace Strawberry::Core::IO
 	private:
 		Core::Mutex<std::deque<T>> mMessageBuffer;
 	};
-}// namespace Strawberry::Core::IO
+} // namespace Strawberry::Core::IO

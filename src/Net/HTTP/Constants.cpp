@@ -89,4 +89,4 @@ namespace Strawberry::Core::Net::HTTP
 				std::abort();
 		}
 	}
-}// namespace Strawberry::Core::Net::HTTP
+} // namespace Strawberry::Core::Net::HTTP

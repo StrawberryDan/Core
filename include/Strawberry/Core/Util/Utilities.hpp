@@ -61,4 +61,4 @@ namespace Strawberry::Core
 		}
 		return lowercase;
 	}
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

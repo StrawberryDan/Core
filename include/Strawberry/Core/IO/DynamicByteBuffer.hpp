@@ -117,7 +117,7 @@ namespace Strawberry::Core::IO
 		std::vector<uint8_t> mData;
 		size_t               mReadCursor = 0;
 	};
-}// namespace Strawberry::Core::IO
+} // namespace Strawberry::Core::IO
 
 
 template <typename T>

@@ -52,7 +52,7 @@ namespace Strawberry::Core::Net::HTTP
 	public:
 		explicit HTTPSClient(const std::string& hostname, uint16_t port = 443);
 	};
-}// namespace Strawberry::Core::Net::HTTP
+} // namespace Strawberry::Core::Net::HTTP
 
 
 #include "Client.inl"

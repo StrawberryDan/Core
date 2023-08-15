@@ -159,4 +159,4 @@ namespace Strawberry::Core
 		bool    mIsOk;
 		Payload mPayload;
 	};
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

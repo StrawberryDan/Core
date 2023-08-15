@@ -56,4 +56,4 @@ namespace Strawberry::Core::Net::Websocket
 		Ping,
 		Pong,
 	};
-}// namespace Strawberry::Core::Net::Websocket
+} // namespace Strawberry::Core::Net::Websocket

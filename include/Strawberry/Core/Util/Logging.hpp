@@ -85,4 +85,4 @@ namespace Strawberry::Core
 	private:
 		static void LogRaw(Level level, const std::string& message);
 	};
-}// namespace Strawberry::Core
+} // namespace Strawberry::Core

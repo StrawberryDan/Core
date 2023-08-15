@@ -159,7 +159,7 @@ namespace Test
 		Assert(dynamicDouble * 4 == 0);
 		Assert(dynamicDouble / 2 == 2.5);
 	}
-}// namespace Test
+} // namespace Test
 
 
 int main()

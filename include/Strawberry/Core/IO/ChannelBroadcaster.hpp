@@ -41,4 +41,4 @@ namespace Strawberry::Core::IO
 	private:
 		std::vector<std::weak_ptr<ChannelReceiver<T>>> mReceivers;
 	};
-}// namespace Strawberry::Core::IO
+} // namespace Strawberry::Core::IO

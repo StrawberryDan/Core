@@ -143,4 +143,4 @@ namespace Strawberry::Core::Net
 			Unreachable();
 		}
 	}
-}// namespace Strawberry::Core::Net
+} // namespace Strawberry::Core::Net
