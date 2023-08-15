@@ -47,7 +47,7 @@ void Strawberry::Core::IO::DynamicByteBuffer::Resize(size_t len)
 }
 
 
-template<>
+template <>
 std::vector<uint8_t> Strawberry::Core::IO::DynamicByteBuffer::AsVector<uint8_t>()
 {
 	return mData;
@@ -78,7 +78,7 @@ Strawberry::Core::IO::DynamicByteBuffer::Read(size_t len)
 Strawberry::Core::Result<size_t, Strawberry::Core::IO::Error>
 Strawberry::Core::IO::DynamicByteBuffer::Write(const Strawberry::Core::IO::DynamicByteBuffer& bytes)
 {
-	for (auto byte: bytes)
+	for (auto byte : bytes)
 	{
 		Push(byte);
 	}

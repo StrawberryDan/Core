@@ -11,17 +11,24 @@
 
 namespace Strawberry::Core::Math
 {
-	template<std::integral T = int32_t>
+	template <std::integral T = int32_t>
 	class Rational
 	{
 	public:
-		template<std::integral V>
+		template <std::integral V>
 		Rational(V value)
-			: mNumerator(static_cast<T>(value)), mDenominator(1) {}
+			: mNumerator(static_cast<T>(value))
+			, mDenominator(1)
+		{
+		}
 
 
 		Rational(T numerator, T denominator)
-			: mNumerator(numerator), mDenominator(denominator) { Normalize(); }
+			: mNumerator(numerator)
+			, mDenominator(denominator)
+		{
+			Normalize();
+		}
 
 
 		void SetNumerator(T value)
@@ -55,20 +62,18 @@ namespace Strawberry::Core::Math
 
 		Rational operator+(const Rational& rhs) const
 		{
-			return {Numerator() * rhs.Denominator() + rhs.Numerator() * Denominator(),
-					Denominator() * rhs.Denominator()};
+			return {Numerator() * rhs.Denominator() + rhs.Numerator() * Denominator(), Denominator() * rhs.Denominator()};
 		}
 
 
 		Rational operator-(const Rational& rhs) const
 		{
-			return {Numerator() * rhs.Denominator() - rhs.Numerator() * Denominator(),
-					Denominator() * rhs.Denominator()};
+			return {Numerator() * rhs.Denominator() - rhs.Numerator() * Denominator(), Denominator() * rhs.Denominator()};
 		}
 
 
-//		Rational operator*(const Rational& rhs) const
-//			{ return {Numerator() * rhs.Numerator(), Denominator() * rhs.Denominator()}; }
+		//		Rational operator*(const Rational& rhs) const
+		//			{ return {Numerator() * rhs.Numerator(), Denominator() * rhs.Denominator()}; }
 		Rational operator/(const Rational& rhs) const
 		{
 			return {Numerator() * rhs.Denominator(), Denominator() * rhs.Numerator()};
@@ -77,7 +82,9 @@ namespace Strawberry::Core::Math
 
 		friend Rational operator*(const Rational& lhs, const Rational& rhs)
 		{
-			{ return {lhs.Numerator() * rhs.Numerator(), lhs.Denominator() * rhs.Denominator()}; }
+			{
+				return {lhs.Numerator() * rhs.Numerator(), lhs.Denominator() * rhs.Denominator()};
+			}
 		}
 
 
@@ -88,7 +95,7 @@ namespace Strawberry::Core::Math
 				 gcd != 1;
 				 gcd = GreatestCommonDivisor(mNumerator, mDenominator))
 			{
-				mNumerator /= gcd;
+				mNumerator   /= gcd;
 				mDenominator /= gcd;
 			}
 		}
@@ -100,6 +107,6 @@ namespace Strawberry::Core::Math
 	};
 
 
-	template<std::integral T>
+	template <std::integral T>
 	Rational(T, T) -> Rational<T>;
-}
+}// namespace Strawberry::Core::Math

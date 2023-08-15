@@ -97,7 +97,9 @@ namespace Strawberry::Core::Net::Socket
 
 
 	TLSClient::TLSClient()
-		: mSSL(nullptr) {}
+		: mSSL(nullptr)
+	{
+	}
 
 
 	TLSClient::TLSClient(TLSClient&& other) noexcept
@@ -144,13 +146,12 @@ namespace Strawberry::Core::Net::Socket
 
 	Result<IO::DynamicByteBuffer, IO::Error> TLSClient::Read(size_t length)
 	{
-		auto buffer = IO::DynamicByteBuffer::Zeroes(length);
+		auto   buffer    = IO::DynamicByteBuffer::Zeroes(length);
 		size_t bytesRead = 0;
 
 		while (bytesRead < length)
 		{
-			auto thisRead = SSL_read(mSSL, reinterpret_cast<void*>(buffer.Data() + bytesRead),
-									 static_cast<int>(length - bytesRead));
+			auto thisRead = SSL_read(mSSL, reinterpret_cast<void*>(buffer.Data() + bytesRead), static_cast<int>(length - bytesRead));
 			if (thisRead > 0)
 			{
 				bytesRead += thisRead;
@@ -195,4 +196,4 @@ namespace Strawberry::Core::Net::Socket
 			}
 		}
 	}
-}
+}// namespace Strawberry::Core::Net::Socket

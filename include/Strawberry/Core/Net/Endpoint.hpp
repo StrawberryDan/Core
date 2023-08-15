@@ -1,12 +1,12 @@
 #pragma once
 
 
-#include <variant>
 #include "Address.hpp"
+#include <variant>
 
 
-#include "Strawberry/Core/Util/Result.hpp"
 #include "Error.hpp"
+#include "Strawberry/Core/Util/Result.hpp"
 
 
 namespace Strawberry::Core::Net
@@ -38,7 +38,7 @@ namespace Strawberry::Core::Net
 
 	private:
 		Option<std::string> mHostName;
-		Option<IPAddress> mAddress;
-		uint16_t mPort;
+		Option<IPAddress>   mAddress;
+		uint16_t            mPort;
 	};
-}
+}// namespace Strawberry::Core::Net

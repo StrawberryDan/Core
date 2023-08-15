@@ -12,13 +12,15 @@ namespace Strawberry::Core
 {
 	Metronome::Metronome(double frequency, double preemption)
 		: mFrequency(frequency)
-		  , mPreemption(preemption) {}
+		, mPreemption(preemption)
+	{
+	}
 
 
 	Metronome::operator bool()
 	{
-		double time = *mClock;
-		auto result = time >= (mFrequency + mSecondsAhead) - mPreemption;
+		double time   = *mClock;
+		auto   result = time >= (mFrequency + mSecondsAhead) - mPreemption;
 		return result;
 	}
 
@@ -46,4 +48,4 @@ namespace Strawberry::Core
 	{
 		mFrequency = frequency;
 	}
-}
+}// namespace Strawberry::Core

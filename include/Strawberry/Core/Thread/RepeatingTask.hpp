@@ -4,8 +4,8 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include <atomic>
-#include <thread>
 #include <functional>
+#include <thread>
 
 
 namespace Strawberry::Core
@@ -16,8 +16,8 @@ namespace Strawberry::Core
 		/// Accepts a function taking no arguments.
 		explicit RepeatingTask(std::function<void()> function)
 			: mShouldRun(true)
-			  , mStartUp()
-			  , mFunction(std::move(function))
+			, mStartUp()
+			, mFunction(std::move(function))
 		{
 			mThread = std::thread([this]()
 								  {
@@ -26,16 +26,15 @@ namespace Strawberry::Core
 									  while (mShouldRun)
 									  {
 										  mFunction();
-									  }
-								  });
+									  } });
 		}
 
 
 		/// Accepts a function taking no arguments.
 		explicit RepeatingTask(std::function<void()> function, std::function<void()> startup)
 			: mShouldRun(true)
-			  , mStartUp(std::move(startup))
-			  , mFunction(std::move(function))
+			, mStartUp(std::move(startup))
+			, mFunction(std::move(function))
 		{
 			mThread = std::thread([this]()
 								  {
@@ -44,16 +43,15 @@ namespace Strawberry::Core
 									  while (mShouldRun)
 									  {
 										  mFunction();
-									  }
-								  });
+									  } });
 		}
 
 
 		/// Will pass 'this' as the first argument always.
 		explicit RepeatingTask(const std::function<void(RepeatingTask*)>& function)
 			: mShouldRun(true)
-			  , mStartUp()
-			  , mFunction([function, this] { function(this); })
+			, mStartUp()
+			, mFunction([function, this] { function(this); })
 		{
 			mThread = std::thread([this]()
 								  {
@@ -62,16 +60,15 @@ namespace Strawberry::Core
 									  while (mShouldRun)
 									  {
 										  mFunction();
-									  }
-								  });
+									  } });
 		}
 
 
 		/// Accepts a function taking no arguments.
 		explicit RepeatingTask(const std::function<void(RepeatingTask*)>& startup, std::function<void()> function)
 			: mShouldRun(true)
-			  , mStartUp([startup, this] { startup(this); })
-			  , mFunction(std::move(function))
+			, mStartUp([startup, this] { startup(this); })
+			, mFunction(std::move(function))
 		{
 			mThread = std::thread([this]()
 								  {
@@ -80,16 +77,15 @@ namespace Strawberry::Core
 									  while (mShouldRun)
 									  {
 										  mFunction();
-									  }
-								  });
+									  } });
 		}
 
 
 		/// Will pass 'this' as the first argument always.
 		explicit RepeatingTask(std::function<void()> startup, const std::function<void(RepeatingTask*)>& function)
 			: mShouldRun(true)
-			  , mStartUp(std::move(startup))
-			  , mFunction([function, this] { function(this); })
+			, mStartUp(std::move(startup))
+			, mFunction([function, this] { function(this); })
 		{
 			mThread = std::thread([this]()
 								  {
@@ -98,17 +94,15 @@ namespace Strawberry::Core
 									  while (mShouldRun)
 									  {
 										  mFunction();
-									  }
-								  });
+									  } });
 		}
 
 
 		/// Will pass 'this' as the first argument always.
-		explicit RepeatingTask(const std::function<void(RepeatingTask*)>& startup,
-							   const std::function<void(RepeatingTask*)>& function)
+		explicit RepeatingTask(const std::function<void(RepeatingTask*)>& startup, const std::function<void(RepeatingTask*)>& function)
 			: mShouldRun(true)
-			  , mStartUp([startup, this] { startup(this); })
-			  , mFunction([function, this] { function(this); })
+			, mStartUp([startup, this] { startup(this); })
+			, mFunction([function, this] { function(this); })
 		{
 			mThread = std::thread([this]()
 								  {
@@ -117,8 +111,7 @@ namespace Strawberry::Core
 									  while (mShouldRun)
 									  {
 										  mFunction();
-									  }
-								  });
+									  } });
 		}
 
 
@@ -141,16 +134,16 @@ namespace Strawberry::Core
 		}
 
 
-		RepeatingTask(const RepeatingTask& rhs) = delete;
+		RepeatingTask(const RepeatingTask& rhs)            = delete;
 		RepeatingTask& operator=(const RepeatingTask& rhs) = delete;
-		RepeatingTask(RepeatingTask&& rhs) = delete;
-		RepeatingTask& operator=(RepeatingTask&& rhs) = delete;
+		RepeatingTask(RepeatingTask&& rhs)                 = delete;
+		RepeatingTask& operator=(RepeatingTask&& rhs)      = delete;
 
 
 	private:
-		std::atomic<bool> mShouldRun;
-		std::thread mThread;
+		std::atomic<bool>           mShouldRun;
+		std::thread                 mThread;
 		const std::function<void()> mStartUp;
 		const std::function<void()> mFunction;
 	};
-}
+}// namespace Strawberry::Core

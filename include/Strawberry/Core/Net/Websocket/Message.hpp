@@ -1,11 +1,11 @@
 #pragma once
 
 
-#include <vector>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <variant>
-#include <optional>
+#include <vector>
 
 
 #include "Strawberry/Core/Util/Result.hpp"
@@ -33,16 +33,16 @@ namespace Strawberry::Core::Net::Websocket
 		[[nodiscard]] inline std::vector<uint8_t> AsBytes() const { return mPayload; }
 
 
-		[[nodiscard]] std::string AsString() const;
+		[[nodiscard]] std::string                         AsString() const;
 		[[nodiscard]] Result<nlohmann::json, std::string> AsJSON() const;
-		[[nodiscard]] uint16_t GetCloseStatusCode() const;
+		[[nodiscard]] uint16_t                            GetCloseStatusCode() const;
 
 
 		void Append(const Message& other);
 
 
 	private:
-		Opcode mOpcode;
+		Opcode  mOpcode;
 		Payload mPayload;
 	};
 
@@ -56,4 +56,4 @@ namespace Strawberry::Core::Net::Websocket
 		Ping,
 		Pong,
 	};
-}
+}// namespace Strawberry::Core::Net::Websocket

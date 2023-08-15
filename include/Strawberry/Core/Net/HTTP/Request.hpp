@@ -37,10 +37,10 @@ namespace Strawberry::Core::Net::HTTP
 
 
 	private:
-		Verb mVerb;
-		std::string mURI;
-		Version mVersion;
-		Header mHeader;
+		Verb                  mVerb;
+		std::string           mURI;
+		Version               mVersion;
+		Header                mHeader;
 		IO::DynamicByteBuffer mPayload;
 	};
-}
+}// namespace Strawberry::Core::Net::HTTP

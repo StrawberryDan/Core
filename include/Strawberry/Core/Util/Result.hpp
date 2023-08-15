@@ -1,65 +1,79 @@
 #pragma once
 
 
-#include <variant>
 #include "Assert.hpp"
+#include <variant>
 
 
 namespace Strawberry::Core
 {
-	template<typename D, typename E>
-	requires ( !std::same_as<D, E> )
+	template <typename D, typename E>
+	requires (!std::same_as<D, E>)
 	class [[nodiscard]] Result
 	{
 	public:
 		Result(const D& value)
-		requires ( std::copy_constructible<D> )
+			requires (std::copy_constructible<D>)
 			: mIsOk(true)
-			  , mPayload(value) {}
+			, mPayload(value)
+		{
+		}
 
 
 		Result(D&& value)
-		requires ( std::move_constructible<D> )
+			requires (std::move_constructible<D>)
 			: mIsOk(true)
-			  , mPayload(std::move(value)) {}
+			, mPayload(std::move(value))
+		{
+		}
 
 
 		Result(const E& value)
-		requires ( std::copy_constructible<E> )
+			requires (std::copy_constructible<E>)
 			: mIsOk(false)
-			  , mPayload(value) {}
+			, mPayload(value)
+		{
+		}
 
 
 		Result(E&& value)
-		requires ( std::move_constructible<E> )
+			requires (std::move_constructible<E>)
 			: mIsOk(false)
-			  , mPayload(std::move(value)) {}
+			, mPayload(std::move(value))
+		{
+		}
 
 
 		static Result Ok(const D& value)
-		requires ( std::copy_constructible<D> ) { return Result(true, value); }
+			requires (std::copy_constructible<D>) { return Result(true, value); }
 
 
 		static Result Ok(D&& value)
-		requires ( std::move_constructible<D> ) { return Result(true, std::forward<D>(value)); }
+			requires (std::move_constructible<D>) { return Result(true, std::forward<D>(value)); }
 
 
-		template<typename ...Args>
-		static Result Ok(Args ...args)
-		requires ( std::constructible_from<D, Args...> ) { return Result(true, D(std::forward<Args>(args)...)); }
+		template <typename... Args>
+		static Result Ok(Args... args)
+			requires (std::constructible_from<D, Args...>)
+		{
+			return Result(true, D(std::forward<Args>(args)...));
+		}
 
 
 		static Result Err(const E& value)
-		requires ( std::copy_constructible<E> ) { return Result(false, value); }
+			requires (std::copy_constructible<E>) { return Result(false, value); }
 
 
 		static Result Err(E&& value)
-		requires ( std::move_constructible<E> ) { return Result(false, std::forward<E>(value)); }
+			requires (std::move_constructible<E>) { return Result(false, std::forward<E>(value)); }
 
 
-		template<typename ...Args>
-		static Result Err(Args ...args)
-		requires ( std::constructible_from<E, Args...> ) { return Result(false, E(std::forward<Args>(args)...)); }
+		template <typename... Args>
+		static Result Err(Args... args)
+			requires (std::constructible_from<E, Args...>)
+		{
+			return Result(false, E(std::forward<Args>(args)...));
+		}
 
 
 		[[nodiscard]] inline bool IsOk() const { return mIsOk; }
@@ -116,7 +130,7 @@ namespace Strawberry::Core
 		explicit inline operator bool() { return IsOk(); }
 
 
-		template<std::invocable<D&&> F>
+		template <std::invocable<D&&> F>
 		Result<std::invoke_result_t<F, D&&>, E> Map(F f)
 		{
 			if (*this)
@@ -135,14 +149,20 @@ namespace Strawberry::Core
 
 
 		Result(bool isOk, const Payload& payload)
-			: mIsOk(isOk), mPayload(payload) {}
+			: mIsOk(isOk)
+			, mPayload(payload)
+		{
+		}
 
 
 		Result(bool isOk, Payload&& payload)
-			: mIsOk(isOk), mPayload(std::forward<Payload>(payload)) {}
+			: mIsOk(isOk)
+			, mPayload(std::forward<Payload>(payload))
+		{
+		}
 
 
-		bool mIsOk;
+		bool    mIsOk;
 		Payload mPayload;
 	};
-}
+}// namespace Strawberry::Core

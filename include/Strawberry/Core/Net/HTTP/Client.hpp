@@ -1,34 +1,34 @@
 #pragma once
 
 
-#include "Strawberry/Core/Util/Utilities.hpp"
-#include "Response.hpp"
 #include "Request.hpp"
+#include "Response.hpp"
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
+#include "Strawberry/Core/Util/Utilities.hpp"
 
 
 namespace Strawberry::Core::Net::HTTP
 {
-	template<typename S>
+	template <typename S>
 	class ClientBase
 	{
 	public:
 		/// Connects to the given endpoint over HTTP
 		ClientBase(const std::string& hostname, uint16_t port);
 		/// Sends an HTTP Request
-		void SendRequest(const Request& request);
+		void     SendRequest(const Request& request);
 		/// Waits for an HTTP Response
 		Response Receive();
 
 
 		/// Removes and returns the socket of an rvalue HTTP client.
-		inline S TakeSocket()&& { return std::move(mSocket); }
+		inline S TakeSocket() && { return std::move(mSocket); }
 
 
 	private:
 		/// Reads a line of input until a newline character from the socket.
-		std::string ReadLine();
+		std::string           ReadLine();
 		/// Reads a chunked HTTP payload from the socket.
 		IO::DynamicByteBuffer ReadChunkedPayload();
 
@@ -52,7 +52,7 @@ namespace Strawberry::Core::Net::HTTP
 	public:
 		explicit HTTPSClient(const std::string& hostname, uint16_t port = 443);
 	};
-}
+}// namespace Strawberry::Core::Net::HTTP
 
 
 #include "Client.inl"

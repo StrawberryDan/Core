@@ -12,13 +12,13 @@
 #elif __APPLE__ || __linux__
 
 
-#include <sys/socket.h>
 #include <netdb.h>
-#include <unistd.h>
 #include <poll.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 
-#endif // _WIN32
+#endif// _WIN32
 
 
 namespace Strawberry::Core::Net::Socket
@@ -29,12 +29,12 @@ namespace Strawberry::Core::Net::Socket
 
 		addrinfo hints{.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_STREAM, .ai_protocol = IPPROTO_TCP};
 		if (endpoint.GetAddress()->IsIPv4()) hints.ai_family = AF_INET;
-		else if (endpoint.GetAddress()->IsIPv6()) hints.ai_family = AF_INET6;
-		else Unreachable();
+		else if (endpoint.GetAddress()->IsIPv6())
+			hints.ai_family = AF_INET6;
+		else
+			Unreachable();
 		addrinfo* peerAddress = nullptr;
-		auto addrResult = getaddrinfo(endpoint.GetAddress()->AsString().c_str(),
-									  std::to_string(endpoint.GetPort()).c_str(),
-									  &hints, &peerAddress);
+		auto      addrResult  = getaddrinfo(endpoint.GetAddress()->AsString().c_str(), std::to_string(endpoint.GetPort()).c_str(), &hints, &peerAddress);
 		if (addrResult != 0)
 		{
 			freeaddrinfo(peerAddress);
@@ -62,11 +62,15 @@ namespace Strawberry::Core::Net::Socket
 
 
 	TCPClient::TCPClient()
-		: mSocket(-1) {}
+		: mSocket(-1)
+	{
+	}
 
 
 	TCPClient::TCPClient(TCPClient&& other) noexcept
-		: mSocket(std::exchange(other.mSocket, -1)) {}
+		: mSocket(std::exchange(other.mSocket, -1))
+	{
+	}
 
 
 	TCPClient& TCPClient::operator=(TCPClient&& other) noexcept
@@ -102,7 +106,7 @@ namespace Strawberry::Core::Net::Socket
 		pollfd fds[] =
 			{
 				{mSocket, POLLIN, 0}
-			};
+        };
 
 		int pollResult = poll(fds, 1, 0);
 		Assert(pollResult >= 0);
@@ -115,7 +119,7 @@ namespace Strawberry::Core::Net::Socket
 
 	Result<IO::DynamicByteBuffer, IO::Error> TCPClient::Read(size_t length)
 	{
-		auto buffer = IO::DynamicByteBuffer::Zeroes(length);
+		auto   buffer    = IO::DynamicByteBuffer::Zeroes(length);
 		size_t bytesRead = 0;
 
 		while (bytesRead < length)
@@ -142,8 +146,7 @@ namespace Strawberry::Core::Net::Socket
 
 		while (bytesSent < bytes.Size())
 		{
-			auto thisSend = send(mSocket, reinterpret_cast<const char*>(bytes.Data()) + bytesSent,
-								 bytes.Size() - bytesSent, 0);
+			auto thisSend = send(mSocket, reinterpret_cast<const char*>(bytes.Data()) + bytesSent, bytes.Size() - bytesSent, 0);
 			if (thisSend > 0)
 			{
 				bytesSent += thisSend;
@@ -157,4 +160,4 @@ namespace Strawberry::Core::Net::Socket
 		Assert(bytesSent == bytes.Size());
 		return bytesSent;
 	}
-}
+}// namespace Strawberry::Core::Net::Socket

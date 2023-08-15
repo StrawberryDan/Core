@@ -7,8 +7,8 @@
 // Core
 #include "ChannelReceiver.hpp"
 // Standard Library
-#include <vector>
 #include <memory>
+#include <vector>
 
 
 //======================================================================================================================
@@ -16,14 +16,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template<typename T>
+	template <typename T>
 	class ChannelBroadcaster
 	{
 	public:
 		void Broadcast(T value)
 		{
 			std::erase_if(mReceivers, [](const std::weak_ptr<ChannelReceiver<T>>& x) { return x.expired(); });
-			for (auto& receiver: mReceivers)
+			for (auto& receiver : mReceivers)
 			{
 				receiver.lock()->Receive(value);
 			}
@@ -41,4 +41,4 @@ namespace Strawberry::Core::IO
 	private:
 		std::vector<std::weak_ptr<ChannelReceiver<T>>> mReceivers;
 	};
-}
+}// namespace Strawberry::Core::IO

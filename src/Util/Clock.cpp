@@ -5,7 +5,7 @@ namespace Strawberry::Core
 {
 	Clock::Clock(bool start)
 		: mBuffer{}
-		  , mStartTime()
+		, mStartTime()
 	{
 		if (start) Start();
 	}
@@ -24,8 +24,8 @@ namespace Strawberry::Core
 	{
 		if (mStartTime)
 		{
-			auto now = std::chrono::system_clock::now();
-			mBuffer += (now - *mStartTime);
+			auto now  = std::chrono::system_clock::now();
+			mBuffer  += (now - *mStartTime);
 		}
 		return mBuffer.count();
 	}
@@ -35,7 +35,7 @@ namespace Strawberry::Core
 	{
 		if (mStartTime)
 		{
-			auto now = std::chrono::system_clock::now();
+			auto now        = std::chrono::system_clock::now();
 			auto currentRun = std::chrono::duration_cast<Duration>(now - *mStartTime);
 			return (currentRun + mBuffer).count();
 		}
@@ -48,7 +48,7 @@ namespace Strawberry::Core
 
 	void Clock::Restart()
 	{
-		mBuffer = {};
+		mBuffer    = {};
 		mStartTime = std::chrono::system_clock::now();
 	}
-}
+}// namespace Strawberry::Core

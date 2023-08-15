@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include <string>
 #include "Strawberry/Core/Util/Option.hpp"
+#include <string>
 
 
 namespace Strawberry::Core::Net::HTTP
@@ -18,16 +18,20 @@ namespace Strawberry::Core::Net::HTTP
 			PATCH,
 			DEL,
 		};
+
 	public:
 		inline Verb(_Enum value)
-			: mValue(value) {}
+			: mValue(value)
+		{
+		}
 
 
 		operator _Enum() const { return mValue; }
 
 
-		static Option<Verb> Parse(const std::string& string);
+		static Option<Verb>       Parse(const std::string& string);
 		[[nodiscard]] std::string ToString() const;
+
 	private:
 		_Enum mValue;
 	};
@@ -43,17 +47,21 @@ namespace Strawberry::Core::Net::HTTP
 			VERSION_2,
 			VERSION_3
 		};
+
 	public:
 		inline Version(_Enum value)
-			: mValue(value) {}
+			: mValue(value)
+		{
+		}
 
 
 		inline operator _Enum() const { return mValue; }
 
 
-		static Option<Version> Parse(const std::string& string);
+		static Option<Version>    Parse(const std::string& string);
 		[[nodiscard]] std::string ToString() const;
+
 	private:
 		_Enum mValue;
 	};
-}
+}// namespace Strawberry::Core::Net::HTTP

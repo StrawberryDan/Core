@@ -3,14 +3,12 @@ project(StrawberryCore)
 set(CMAKE_CXX_STANDARD 23)
 
 
-
 find_package(OpenSSL REQUIRED)
 find_library(FMT_LIBRARY NAMES libfmt.a)
 find_path(FMT_INCLUDE_DIR REQUIRED
 		NAMES fmt/format.h
 		HINTS /usr/local/include)
 find_path(JSON_INCLUDE_DIR NAMES nlohmann/json.hpp)
-
 
 
 add_library(StrawberryCore STATIC
@@ -84,8 +82,7 @@ target_link_libraries(StrawberryCore PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	target_link_libraries(StrawberryCore PRIVATE ws2_32)
-endif()
-
+endif ()
 
 
 add_executable(StrawberryCoreTest

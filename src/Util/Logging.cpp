@@ -8,8 +8,8 @@
 
 namespace Strawberry::Core
 {
-	static Option<Logging::Level> sLogLevel = {};
-	static Option<std::ofstream> sOutputFile = {};
+	static Option<Logging::Level> sLogLevel   = {};
+	static Option<std::ofstream>  sOutputFile = {};
 
 
 	std::string Logging::LevelToString(Level logLevel)
@@ -59,4 +59,4 @@ namespace Strawberry::Core
 			*sOutputFile << message << std::endl;
 		}
 	}
-}
+}// namespace Strawberry::Core

@@ -31,11 +31,12 @@ namespace Strawberry::Core
 
 
 		void Restart();
+
 	private:
 		using Duration = std::chrono::duration<double, std::ratio<1>>;
-		using Instant = std::chrono::time_point<std::chrono::system_clock, Duration>;
+		using Instant  = std::chrono::time_point<std::chrono::system_clock, Duration>;
 
-		Duration mBuffer;
+		Duration        mBuffer;
 		Option<Instant> mStartTime;
 	};
-}
+}// namespace Strawberry::Core

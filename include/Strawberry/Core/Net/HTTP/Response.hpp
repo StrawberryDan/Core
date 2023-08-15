@@ -36,10 +36,10 @@ namespace Strawberry::Core::Net::HTTP
 
 
 	private:
-		Version mVersion;
-		unsigned int mStatus;
-		std::string mStatusText;
-		Header mHeader;
+		Version               mVersion;
+		unsigned int          mStatus;
+		std::string           mStatusText;
+		Header                mHeader;
 		IO::DynamicByteBuffer mPayload;
 	};
-}
+}// namespace Strawberry::Core::Net::HTTP

@@ -25,8 +25,8 @@ namespace Strawberry::Core::Net::Socket
 		Logging::Info("Initialising Socket API");
 #if defined(_WIN32)
 		WSAData wsaData;
-		auto err = WSAStartup(MAKEWORD(2, 2), &wsaData);
+		auto    err = WSAStartup(MAKEWORD(2, 2), &wsaData);
 		Assert(err == 0);
 #endif
 	}
-}
+}// namespace Strawberry::Core::Net::Socket

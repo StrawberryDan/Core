@@ -39,9 +39,9 @@ namespace Strawberry::Core::Net::Socket
 		~UDPClient() override;
 
 
-		[[nodiscard]] bool Poll() const;
+		[[nodiscard]] bool                                                     Poll() const;
 		Result<std::tuple<Option<Endpoint>, IO::DynamicByteBuffer>, IO::Error> Read();
-		Result<size_t, IO::Error> Write(const Endpoint& endpoint, const IO::DynamicByteBuffer& bytes) const;
+		Result<size_t, IO::Error>                                              Write(const Endpoint& endpoint, const IO::DynamicByteBuffer& bytes) const;
 
 
 	private:
@@ -51,7 +51,7 @@ namespace Strawberry::Core::Net::Socket
 		SOCKET mSocket;
 #endif
 
-		static constexpr size_t BUFFER_SIZE = 25536;
+		static constexpr size_t     BUFFER_SIZE = 25536;
 		IO::ByteBuffer<BUFFER_SIZE> mBuffer;
 	};
-}
+}// namespace Strawberry::Core::Net::Socket

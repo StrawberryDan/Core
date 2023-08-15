@@ -24,4 +24,4 @@ namespace Strawberry::Core::Net::Socket
 
 
 	SocketAPIUser::~SocketAPIUser() {}
-}
+}// namespace Strawberry::Core::Net::Socket

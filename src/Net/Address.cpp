@@ -24,7 +24,7 @@ namespace Strawberry::Core::Net
 	Option<IPv4Address> IPv4Address::Parse(const std::string& data)
 	{
 		uint8_t buffer[sizeof(in_addr)] = {0};
-		auto result = inet_pton(AF_INET, data.data(), buffer);
+		auto    result                  = inet_pton(AF_INET, data.data(), buffer);
 		if (result == 1)
 		{
 			IO::ByteBuffer<4> bytes(buffer, 4);
@@ -46,7 +46,7 @@ namespace Strawberry::Core::Net
 	std::string IPv4Address::AsString() const
 	{
 		char buffer[INET_ADDRSTRLEN] = {0};
-		auto result = inet_ntop(AF_INET, mData.Data(), buffer, INET_ADDRSTRLEN);
+		auto result                  = inet_ntop(AF_INET, mData.Data(), buffer, INET_ADDRSTRLEN);
 		Assert(result != nullptr);
 		return {buffer};
 	}
@@ -55,7 +55,7 @@ namespace Strawberry::Core::Net
 	Option<IPv6Address> IPv6Address::Parse(const std::string& string)
 	{
 		uint8_t buffer[sizeof(in6_addr)] = {0};
-		auto result = inet_pton(AF_INET6, string.data(), buffer);
+		auto    result                   = inet_pton(AF_INET6, string.data(), buffer);
 		if (result == 1)
 		{
 			IO::ByteBuffer<16> bytes(buffer, 16);
@@ -77,18 +77,22 @@ namespace Strawberry::Core::Net
 	std::string IPv6Address::AsString() const
 	{
 		char buffer[INET6_ADDRSTRLEN] = {0};
-		auto result = inet_ntop(AF_INET6, mData.Data(), buffer, INET6_ADDRSTRLEN);
+		auto result                   = inet_ntop(AF_INET6, mData.Data(), buffer, INET6_ADDRSTRLEN);
 		Assert(result != nullptr);
 		return {buffer};
 	}
 
 
 	IPAddress::IPAddress(IPv4Address address)
-		: mPayload(address) {}
+		: mPayload(address)
+	{
+	}
 
 
 	IPAddress::IPAddress(IPv6Address address)
-		: mPayload(address) {}
+		: mPayload(address)
+	{
+	}
 
 
 	Option<IPv4Address> IPAddress::AsIPv4() const
@@ -141,4 +145,4 @@ namespace Strawberry::Core::Net
 			Unreachable();
 		}
 	}
-}
+}// namespace Strawberry::Core::Net

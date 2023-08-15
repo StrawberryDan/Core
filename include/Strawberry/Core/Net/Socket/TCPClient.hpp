@@ -4,12 +4,12 @@
 #include <string>
 
 
-#include "Strawberry/Core/Net/Error.hpp"
-#include "Strawberry/Core/Util/Result.hpp"
-#include "Strawberry/Core/Net/Endpoint.hpp"
+#include "SocketAPIUser.hpp"
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 #include "Strawberry/Core/IO/Error.hpp"
-#include "SocketAPIUser.hpp"
+#include "Strawberry/Core/Net/Endpoint.hpp"
+#include "Strawberry/Core/Net/Error.hpp"
+#include "Strawberry/Core/Util/Result.hpp"
 
 
 #if defined(_WIN32)
@@ -38,9 +38,9 @@ namespace Strawberry::Core::Net::Socket
 		~TCPClient() final;
 
 
-		[[nodiscard]] bool Poll() const;
+		[[nodiscard]] bool                       Poll() const;
 		Result<IO::DynamicByteBuffer, IO::Error> Read(size_t length);
-		Result<size_t, IO::Error> Write(const IO::DynamicByteBuffer& bytes);
+		Result<size_t, IO::Error>                Write(const IO::DynamicByteBuffer& bytes);
 
 
 	private:
@@ -50,4 +50,4 @@ namespace Strawberry::Core::Net::Socket
 		SOCKET mSocket;
 #endif
 	};
-}
+}// namespace Strawberry::Core::Net::Socket

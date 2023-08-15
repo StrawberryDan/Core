@@ -2,19 +2,19 @@
 
 
 #include <cstdint>
-#include <string>
-#include <optional>
-#include <thread>
 #include <future>
+#include <optional>
+#include <string>
+#include <thread>
 
 
-#include "Strawberry/Core/Util/Option.hpp"
-#include "Strawberry/Core/Util/Result.hpp"
-#include "Strawberry/Core/Sync/Mutex.hpp"
-#include "Strawberry/Core/Net/Socket/TCPClient.hpp"
-#include "Strawberry/Core/Net/Socket/TLSClient.hpp"
 #include "Message.hpp"
 #include "Strawberry/Core/IO/Concepts.hpp"
+#include "Strawberry/Core/Net/Socket/TCPClient.hpp"
+#include "Strawberry/Core/Net/Socket/TLSClient.hpp"
+#include "Strawberry/Core/Sync/Mutex.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Result.hpp"
 
 
 namespace Strawberry::Core::Net::Websocket
@@ -28,14 +28,14 @@ namespace Strawberry::Core::Net::Websocket
 	};
 
 
-	template<typename S>
+	template <typename S>
 	requires IO::Read<S> && IO::Write<S>
 	class ClientBase
 	{
 	public:
-		ClientBase(const ClientBase&) = delete;
-		ClientBase& operator=(const ClientBase&) = delete;
-		ClientBase(ClientBase&& rhs) noexcept = default;
+		ClientBase(const ClientBase&)                    = delete;
+		ClientBase& operator=(const ClientBase&)         = delete;
+		ClientBase(ClientBase&& rhs) noexcept            = default;
 		ClientBase& operator=(ClientBase&& rhs) noexcept = default;
 		~ClientBase();
 
@@ -55,15 +55,15 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	protected:
-		[[nodiscard]] Result<Message, Error> ReceiveFrame();
+		[[nodiscard]] Result<Message, Error>  ReceiveFrame();
 		[[nodiscard]] Result<Fragment, Error> ReceiveFragment();
-		[[nodiscard]] Result<size_t, Error> TransmitFrame(const Message& frame);
+		[[nodiscard]] Result<size_t, Error>   TransmitFrame(const Message& frame);
 
 
-		[[nodiscard]] static std::string GenerateNonce();
-		[[nodiscard]] static uint8_t GetOpcodeMask(Message::Opcode opcode);
+		[[nodiscard]] static std::string             GenerateNonce();
+		[[nodiscard]] static uint8_t                 GetOpcodeMask(Message::Opcode opcode);
 		[[nodiscard]] static Option<Message::Opcode> GetOpcodeFromByte(uint8_t byte);
-		[[nodiscard]] static uint32_t GenerateMaskingKey();
+		[[nodiscard]] static uint32_t                GenerateMaskingKey();
 
 		void Disconnect(int code = 1000);
 
@@ -74,7 +74,7 @@ namespace Strawberry::Core::Net::Websocket
 
 	protected:
 		Option<Mutex<S>> mSocket;
-		Option<Error> mError;
+		Option<Error>    mError;
 	};
 
 
@@ -94,7 +94,7 @@ namespace Strawberry::Core::Net::Websocket
 		static Result<WSSClient, Error>
 		Connect(const std::string& host, const std::string& resource, uint16_t port = 443);
 	};
-}
+}// namespace Strawberry::Core::Net::Websocket
 
 
 #include "Client.inl"

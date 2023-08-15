@@ -33,12 +33,12 @@ namespace Strawberry::Core::Net::HTTP
 	{
 		static const std::map<std::string, Verb> mapping =
 			{
-				{"POST",   Verb::POST},
-				{"GET",    Verb::GET},
-				{"PUT",    Verb::PUT},
+				{"POST",   Verb::POST },
+				{"GET",    Verb::GET  },
+				{"PUT",    Verb::PUT  },
 				{"PATCH",  Verb::PATCH},
-				{"DELETE", Verb::DEL}
-			};
+				{"DELETE", Verb::DEL  }
+        };
 
 		std::string upper = ToUppercase(string);
 		if (mapping.contains(upper))
@@ -58,9 +58,9 @@ namespace Strawberry::Core::Net::HTTP
 			{
 				{"1.0", Version::VERSION_1_0},
 				{"1.1", Version::VERSION_1_1},
-				{"2",   Version::VERSION_2},
-				{"3",   Version::VERSION_3},
-			};
+				{"2",   Version::VERSION_2  },
+				{"3",   Version::VERSION_3  },
+        };
 
 		if (mapping.contains(string))
 		{
@@ -89,4 +89,4 @@ namespace Strawberry::Core::Net::HTTP
 				std::abort();
 		}
 	}
-}
+}// namespace Strawberry::Core::Net::HTTP

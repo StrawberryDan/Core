@@ -5,8 +5,8 @@
 #include "Strawberry/Core/Util/Option.hpp"
 #include "TCPClient.hpp"
 #include <memory>
-#include <string>
 #include <openssl/ssl.h>
+#include <string>
 
 
 namespace Strawberry::Core::Net::Socket
@@ -26,13 +26,13 @@ namespace Strawberry::Core::Net::Socket
 		~TLSClient();
 
 
-		[[nodiscard]] bool Poll() const;
+		[[nodiscard]] bool                       Poll() const;
 		Result<IO::DynamicByteBuffer, IO::Error> Read(size_t length);
-		Result<size_t, IO::Error> Write(const IO::DynamicByteBuffer& bytes);
+		Result<size_t, IO::Error>                Write(const IO::DynamicByteBuffer& bytes);
 
 
 	private:
 		TCPClient mTCP;
-		SSL* mSSL;
+		SSL*      mSSL;
 	};
-}
+}// namespace Strawberry::Core::Net::Socket

@@ -3,11 +3,11 @@
 
 namespace Strawberry::Core::Net::Sockets
 {
-	template<typename T>
-	Result <T, Socket::Error> Socket::ReadType() const
-	requires(std::is_fundamental_v<T>)
+	template <typename T>
+	Result<T, Socket::Error> Socket::ReadType() const
+		requires (std::is_fundamental_v<T>)
 	{
-		T data;
+		T    data;
 		auto readResult = Read(reinterpret_cast<uint8_t*>(&data), sizeof(T));
 		if (readResult)
 		{
@@ -20,9 +20,9 @@ namespace Strawberry::Core::Net::Sockets
 	}
 
 
-	template<typename T>
-	Result <size_t, Socket::Error> Socket::ReadArray(T* data, size_t count) const
-	requires(std::is_fundamental_v<T>)
+	template <typename T>
+	Result<size_t, Socket::Error> Socket::ReadArray(T* data, size_t count) const
+		requires (std::is_fundamental_v<T>)
 	{
 		auto readResult = Read(reinterpret_cast<uint8_t*>(data), count * sizeof(T));
 		if (readResult)
@@ -36,9 +36,9 @@ namespace Strawberry::Core::Net::Sockets
 	}
 
 
-	template<typename T>
-	Result <std::vector<T>, Socket::Error> Socket::ReadVector(size_t count) const
-	requires(std::is_fundamental_v<T>)
+	template <typename T>
+	Result<std::vector<T>, Socket::Error> Socket::ReadVector(size_t count) const
+		requires (std::is_fundamental_v<T>)
 	{
 		std::vector<T> data;
 		data.resize(count);
@@ -54,26 +54,26 @@ namespace Strawberry::Core::Net::Sockets
 	}
 
 
-	template<typename T>
-	Result <size_t, Socket::Error> Socket::WriteType(const T& data) const
-	requires(std::is_fundamental_v<T>)
+	template <typename T>
+	Result<size_t, Socket::Error> Socket::WriteType(const T& data) const
+		requires (std::is_fundamental_v<T>)
 	{
 		return Write(reinterpret_cast<const uint8_t*>(&data), sizeof(T));
 	}
 
 
-	template<typename T>
-	Result <size_t, Socket::Error> Socket::WriteArray(const T* data, size_t count) const
-	requires(std::is_fundamental_v<T>)
+	template <typename T>
+	Result<size_t, Socket::Error> Socket::WriteArray(const T* data, size_t count) const
+		requires (std::is_fundamental_v<T>)
 	{
 		return Write(reinterpret_cast<const uint8_t*>(data), count * sizeof(T));
 	}
 
 
-	template<typename T>
-	Result <size_t, Socket::Error> Socket::WriteVector(const std::vector<T>& data) const
-	requires(std::is_fundamental_v<T>)
+	template <typename T>
+	Result<size_t, Socket::Error> Socket::WriteVector(const std::vector<T>& data) const
+		requires (std::is_fundamental_v<T>)
 	{
 		return Write(reinterpret_cast<const uint8_t*>(data.data()), data.size() * sizeof(T));
 	}
-}
+}// namespace Strawberry::Core::Net::Sockets

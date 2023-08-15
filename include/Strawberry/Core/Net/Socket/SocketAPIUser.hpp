@@ -13,9 +13,11 @@ namespace Strawberry::Core::Net::Socket
 	public:
 		SocketAPIUser();
 		virtual ~SocketAPIUser();
+
 	private:
 		static std::weak_ptr<SocketAPI> sGlobalAPI;
+
 	private:
 		std::shared_ptr<SocketAPI> mSocketAPI;
 	};
-}
+}// namespace Strawberry::Core::Net::Socket

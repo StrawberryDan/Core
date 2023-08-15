@@ -15,4 +15,4 @@ namespace Strawberry::Core::Net::Socket
 	private:
 		SocketAPI();
 	};
-}
+}// namespace Strawberry::Core::Net::Socket

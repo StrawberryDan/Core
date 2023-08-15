@@ -1,31 +1,31 @@
 #pragma once
 
 
-#include <regex>
 #include "Strawberry/Core/Util/Assert.hpp"
-#include <iostream>
 #include "fmt/core.h"
+#include <iostream>
+#include <regex>
 
 
 namespace Strawberry::Core::Net::HTTP
 {
-	template<typename S>
+	template <typename S>
 	ClientBase<S>::ClientBase(const std::string& hostname, uint16_t port)
 		: mSocket(S::Connect(Endpoint::Resolve(hostname, port).Unwrap()).Unwrap())
 	{
 	}
 
 
-	template<typename S>
+	template <typename S>
 	void ClientBase<S>::SendRequest(const Request& request)
 	{
 		std::string headerLine = fmt::format(
 			"{} {} HTTP/{}\r\n",
 			request.GetVerb().ToString(), request.GetURI(), request.GetVersion().ToString());
 		mSocket.Write({headerLine.data(), headerLine.length()}).Unwrap();
-		for (const auto& [key, values]: *request.GetHeader())
+		for (const auto& [key, values] : *request.GetHeader())
 		{
-			for (const auto& value: values)
+			for (const auto& value : values)
 			{
 				std::string formatted = fmt::format("{}: {}\r\n", key, value);
 				mSocket.Write({formatted.data(), formatted.length()}).Unwrap();
@@ -42,27 +42,26 @@ namespace Strawberry::Core::Net::HTTP
 	}
 
 
-	template<typename S>
+	template <typename S>
 	Response ClientBase<S>::Receive()
 	{
 		static const auto statusLinePattern = std::regex(R"(HTTP\/([^\s]+)\s+(\d{3})\s+([^\r]*)\r\n)");
 		static const auto headerLinePattern = std::regex(R"(([^:]+)\s*:\s*([^\r]+)\r\n)");
 
 		std::string currentLine;
-		bool matched;
+		bool        matched;
 		std::smatch matchResults;
 
 		do
 		{
 			currentLine = ReadLine();
-			matched = std::regex_match(currentLine, matchResults, statusLinePattern);
-		}
-		while (!matched);
+			matched     = std::regex_match(currentLine, matchResults, statusLinePattern);
+		} while (!matched);
 
 
-		std::string version = matchResults[1],
-			status = matchResults[2],
-			statusText = matchResults[3];
+		std::string version    = matchResults[1],
+					status     = matchResults[2],
+					statusText = matchResults[3];
 
 		Response response(*Version::Parse(version), std::stoi(status), statusText);
 
@@ -110,13 +109,13 @@ namespace Strawberry::Core::Net::HTTP
 	}
 
 
-	template<typename S>
+	template <typename S>
 	IO::DynamicByteBuffer ClientBase<S>::ReadChunkedPayload()
 	{
-		std::string line;
-		std::smatch matchResults;
-		static const auto chunkSizeLine = std::regex(R"(([0123456789abcdefABCDEF]+)\r\n)");
-		size_t sumOfChunkLengths = 0;
+		std::string       line;
+		std::smatch       matchResults;
+		static const auto chunkSizeLine     = std::regex(R"(([0123456789abcdefABCDEF]+)\r\n)");
+		size_t            sumOfChunkLengths = 0;
 
 		IO::DynamicByteBuffer payload;
 		while (true)
@@ -156,7 +155,7 @@ namespace Strawberry::Core::Net::HTTP
 	}
 
 
-	template<typename S>
+	template <typename S>
 	std::string ClientBase<S>::ReadLine()
 	{
 		std::string line;
@@ -166,4 +165,4 @@ namespace Strawberry::Core::Net::HTTP
 		}
 		return line;
 	}
-}
+}// namespace Strawberry::Core::Net::HTTP

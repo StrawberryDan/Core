@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include <concepts>
 #include "Strawberry/Core/Util/Logging.hpp"
+#include <concepts>
 
 
 namespace Strawberry::Core::Math
@@ -10,7 +10,7 @@ namespace Strawberry::Core::Math
 	//======================================================================================================================
 	//  Forward Declarations
 	//----------------------------------------------------------------------------------------------------------------------
-	template<typename T>
+	template <typename T>
 	class DynamicPeriodic;
 
 
@@ -19,17 +19,21 @@ namespace Strawberry::Core::Math
 	//----------------------------------------------------------------------------------------------------------------------
 	//  Static Periodic Integer
 	//----------------------------------------------------------------------------------------------------------------------
-	template<typename T, T N>
+	template <typename T, T N>
 	requires std::unsigned_integral<T>
 	class Periodic
 	{
 	public:
 		Periodic()
-			: mValue{} {}
+			: mValue{}
+		{
+		}
 
 
 		Periodic(T value)
-			: mValue(value % N) {}
+			: mValue(value % N)
+		{
+		}
 
 
 		auto operator<=>(const Periodic& rhs) const = default;
@@ -54,16 +58,16 @@ namespace Strawberry::Core::Math
 
 		Periodic operator++(int)
 		{
-			Periodic val = *this;
-			*this += 1;
+			Periodic val  = *this;
+			*this        += 1;
 			return val;
 		}
 
 
 		Periodic operator--(int)
 		{
-			Periodic val = *this;
-			*this -= 1;
+			Periodic val  = *this;
+			*this        -= 1;
 			return val;
 		}
 
@@ -117,11 +121,11 @@ namespace Strawberry::Core::Math
 	//----------------------------------------------------------------------------------------------------------------------
 	//  Base Case : Do not use
 	//----------------------------------------------------------------------------------------------------------------------
-	template<typename T>
+	template <typename T>
 	class DynamicPeriodic
 	{
 	public:
-		DynamicPeriodic() = delete;
+		DynamicPeriodic()  = delete;
 		~DynamicPeriodic() = delete;
 	};
 
@@ -129,19 +133,23 @@ namespace Strawberry::Core::Math
 	//======================================================================================================================
 	//  Unsigned Integer Periodic Number
 	//----------------------------------------------------------------------------------------------------------------------
-	template<typename T>
+	template <typename T>
 	requires std::unsigned_integral<T>
 	class DynamicPeriodic<T>
 	{
 	public:
 		DynamicPeriodic(T value)
 			: mMax(std::numeric_limits<T>::max())
-			  , mValue(value % mMax) {}
+			, mValue(value % mMax)
+		{
+		}
 
 
 		explicit DynamicPeriodic(T max, T value)
 			: mMax(max)
-			  , mValue(value) {}
+			, mValue(value)
+		{
+		}
 
 
 		T GetMax() const { return mMax; }
@@ -149,7 +157,7 @@ namespace Strawberry::Core::Math
 
 		void SetMax(T max)
 		{
-			mMax = max;
+			mMax   = max;
 			mValue = mValue % mMax;
 		}
 
@@ -267,19 +275,23 @@ namespace Strawberry::Core::Math
 	//======================================================================================================================
 	//  Floating Point Periodic Number
 	//----------------------------------------------------------------------------------------------------------------------
-	template<typename T>
+	template <typename T>
 	requires std::floating_point<T>
 	class DynamicPeriodic<T>
 	{
 	public:
 		DynamicPeriodic(T value)
 			: mMax(std::numeric_limits<T>::max())
-			  , mValue(value >= 0 ? std::fmod(value, mMax) : mMax - std::fmod(-value, mMax)) {}
+			, mValue(value >= 0 ? std::fmod(value, mMax) : mMax - std::fmod(-value, mMax))
+		{
+		}
 
 
 		explicit DynamicPeriodic(T max, T value = 0)
 			: mMax(max)
-			  , mValue(value >= 0 ? std::fmod(value, mMax) : mMax - std::fmod(-value, mMax)) {}
+			, mValue(value >= 0 ? std::fmod(value, mMax) : mMax - std::fmod(-value, mMax))
+		{
+		}
 
 
 		T GetMax() const { return mMax; }
@@ -287,7 +299,7 @@ namespace Strawberry::Core::Math
 
 		void SetMax(T max)
 		{
-			mMax = max;
+			mMax   = max;
 			mValue = std::fmod(mValue, mMax);
 		}
 
@@ -308,8 +320,7 @@ namespace Strawberry::Core::Math
 		DynamicPeriodic operator-(DynamicPeriodic rhs) const
 		{
 			rhs.SetMax(mMax);
-			return rhs.mValue >= mValue ? std::fmod(mMax - (rhs.mValue - mValue), mMax) : std::fmod(mValue - rhs.mValue,
-																									mMax);
+			return rhs.mValue >= mValue ? std::fmod(mMax - (rhs.mValue - mValue), mMax) : std::fmod(mValue - rhs.mValue, mMax);
 		}
 
 
@@ -354,6 +365,6 @@ namespace Strawberry::Core::Math
 	};
 
 
-	template<typename T>
+	template <typename T>
 	DynamicPeriodic(T, T) -> DynamicPeriodic<T>;
-}
+}// namespace Strawberry::Core::Math

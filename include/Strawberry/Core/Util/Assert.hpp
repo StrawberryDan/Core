@@ -1,10 +1,10 @@
 #pragma once
 
 
+#include <csignal>
 #include <cstddef>
 #include <iostream>
 #include <utility>
-#include <csignal>
 
 
 #include "Markers.hpp"
@@ -23,6 +23,6 @@ namespace Strawberry::Core
 		{
 			return;
 		}
-#endif // !NDEBUG
+#endif// !NDEBUG
 	}
-}
+}// namespace Strawberry::Core

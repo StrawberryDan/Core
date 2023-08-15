@@ -6,7 +6,7 @@ namespace Strawberry::Core::Net::Websocket
 	Result<WSClient, Error> WSClient::Connect(const std::string& host, const std::string& resource, uint16_t port)
 	{
 		HTTP::HTTPClient handshaker(host, port);
-		HTTP::Request upgradeRequest(HTTP::Verb::GET, resource);
+		HTTP::Request    upgradeRequest(HTTP::Verb::GET, resource);
 		upgradeRequest.GetHeader().Add("Host", host);
 		upgradeRequest.GetHeader().Add("Upgrade", "websocket");
 		upgradeRequest.GetHeader().Add("Connection", "Upgrade");
@@ -30,7 +30,7 @@ namespace Strawberry::Core::Net::Websocket
 	Result<WSSClient, Error> WSSClient::Connect(const std::string& host, const std::string& resource, uint16_t port)
 	{
 		HTTP::HTTPSClient handshaker(host, port);
-		HTTP::Request upgradeRequest(HTTP::Verb::GET, resource);
+		HTTP::Request     upgradeRequest(HTTP::Verb::GET, resource);
 		upgradeRequest.GetHeader().Add("Host", host);
 		upgradeRequest.GetHeader().Add("Upgrade", "websocket");
 		upgradeRequest.GetHeader().Add("Connection", "Upgrade");
@@ -48,4 +48,4 @@ namespace Strawberry::Core::Net::Websocket
 		client.mSocket = Core::Mutex(std::move(handshaker).TakeSocket());
 		return std::move(client);
 	}
-}
+}// namespace Strawberry::Core::Net::Websocket

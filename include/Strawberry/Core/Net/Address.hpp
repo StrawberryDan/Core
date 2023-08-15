@@ -1,14 +1,14 @@
 #pragma once
 
 
-#include <vector>
-#include <string>
 #include <cstdint>
+#include <string>
+#include <vector>
 
 
-#include "Strawberry/Core/Util/Option.hpp"
 #include "Strawberry/Core/IO/ByteBuffer.hpp"
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
+#include "Strawberry/Core/Util/Option.hpp"
 
 
 namespace Strawberry::Core::Net
@@ -23,16 +23,20 @@ namespace Strawberry::Core::Net
 	public:
 		// Constructors
 		IPv4Address(const IO::ByteBuffer<4> bytes)
-			: mData(bytes) {}
+			: mData(bytes)
+		{
+		}
 
 
 		IPv4Address(const IO::DynamicByteBuffer& bytes)
-			: mData(bytes.AsStatic<4>()) {}
+			: mData(bytes.AsStatic<4>())
+		{
+		}
 
 
 		// Casting
 		[[nodiscard]] IO::ByteBuffer<4> AsBytes() const;
-		[[nodiscard]] std::string AsString() const;
+		[[nodiscard]] std::string       AsString() const;
 
 	private:
 		IO::ByteBuffer<4> mData;
@@ -47,16 +51,20 @@ namespace Strawberry::Core::Net
 
 	public:
 		IPv6Address(const IO::ByteBuffer<16>& bytes)
-			: mData(bytes) {}
+			: mData(bytes)
+		{
+		}
 
 
 		IPv6Address(const IO::DynamicByteBuffer& bytes)
-			: mData(bytes.AsStatic<16>()) {}
+			: mData(bytes.AsStatic<16>())
+		{
+		}
 
 
 		// Casting
 		[[nodiscard]] const IO::ByteBuffer<16>& AsBytes() const;
-		[[nodiscard]] std::string AsString() const;
+		[[nodiscard]] std::string               AsString() const;
 
 	private:
 		IO::ByteBuffer<16> mData;
@@ -78,13 +86,13 @@ namespace Strawberry::Core::Net
 
 
 		// Casting
-		[[nodiscard]] Option<IPv4Address> AsIPv4() const;
-		[[nodiscard]] Option<IPv6Address> AsIPv6() const;
+		[[nodiscard]] Option<IPv4Address>   AsIPv4() const;
+		[[nodiscard]] Option<IPv6Address>   AsIPv6() const;
 		[[nodiscard]] IO::DynamicByteBuffer AsBytes() const;
-		[[nodiscard]] std::string AsString() const;
+		[[nodiscard]] std::string           AsString() const;
 
 
 	private:
 		std::variant<IPv4Address, IPv6Address> mPayload;
 	};
-}
+}// namespace Strawberry::Core::Net

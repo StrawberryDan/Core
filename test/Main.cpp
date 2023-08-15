@@ -3,17 +3,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Standard Library
 #include <cstring>
-#include <vector>
 #include <random>
+#include <vector>
 // Core
-#include "Strawberry/Core/Util/Assert.hpp"
 #include "Strawberry/Core/IO/Base64.hpp"
 #include "Strawberry/Core/Math/Math.hpp"
 #include "Strawberry/Core/Math/Periodic.hpp"
 #include "Strawberry/Core/Net/Endpoint.hpp"
+#include "Strawberry/Core/Net/HTTP/Client.hpp"
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
-#include "Strawberry/Core/Net/HTTP/Client.hpp"
+#include "Strawberry/Core/Util/Assert.hpp"
 
 
 using namespace Strawberry::Core;
@@ -26,8 +26,8 @@ namespace Test
 
 	void CheckBytes(const IO::DynamicByteBuffer& bytes)
 	{
-		auto encoded = IO::Base64::Encode(bytes);
-		auto decoded = IO::Base64::Decode(encoded);
+		auto               encoded      = IO::Base64::Encode(bytes);
+		auto               decoded      = IO::Base64::Decode(encoded);
 		unsigned long long expectedSize = RoundUpToNearestMultiple(CeilDiv(8 * bytes.Size(), 6), 3);
 		Assert(encoded.size() == expectedSize);
 		Assert(decoded.Size() == bytes.Size());
@@ -37,26 +37,26 @@ namespace Test
 
 	void Base64()
 	{
-		const char* sample = "Many hands make light work.";
+		const char*           sample = "Many hands make light work.";
 		IO::DynamicByteBuffer sampleBytes(reinterpret_cast<const uint8_t*>(sample), strlen(sample));
 		CheckBytes(sampleBytes);
 
-		sample = "light wo";
+		sample      = "light wo";
 		sampleBytes = IO::DynamicByteBuffer(reinterpret_cast<const uint8_t*>(sample), strlen(sample));
 		CheckBytes(sampleBytes);
 
-		sample = "light w";
+		sample      = "light w";
 		sampleBytes = IO::DynamicByteBuffer(reinterpret_cast<const uint8_t*>(sample), strlen(sample));
 		CheckBytes(sampleBytes);
 
-		std::random_device randomDevice;
-		std::mt19937 randgen(randomDevice());
+		std::random_device                          randomDevice;
+		std::mt19937                                randgen(randomDevice());
 		std::uniform_int_distribution<unsigned int> lengthDistribution(0, 1024);
-		std::uniform_int_distribution<uint8_t> byteDistribution;
+		std::uniform_int_distribution<uint8_t>      byteDistribution;
 
 		for (int iterations = 0; iterations < 1024; iterations++)
 		{
-			unsigned int len = lengthDistribution(randgen);
+			unsigned int          len = lengthDistribution(randgen);
 			IO::DynamicByteBuffer randomBytes;
 			for (int i = 0; i < len; ++i)
 			{
@@ -79,7 +79,7 @@ namespace Test
 	void DNS()
 	{
 		auto justnoise = Strawberry::Core::Net::Endpoint::Resolve("justnoise.net", 80);
-		auto google = Strawberry::Core::Net::Endpoint::Resolve("google.com", 80);
+		auto google    = Strawberry::Core::Net::Endpoint::Resolve("google.com", 80);
 		Assert(google || justnoise);
 	}
 
@@ -107,14 +107,14 @@ namespace Test
 	void HTTP()
 	{
 		{
-			auto http = Strawberry::Core::Net::HTTP::HTTPSClient("google.com");
+			auto                                 http = Strawberry::Core::Net::HTTP::HTTPSClient("google.com");
 			Strawberry::Core::Net::HTTP::Request request(Strawberry::Core::Net::HTTP::Verb::GET, "/");
 			http.SendRequest(request);
 			auto response = http.Receive();
 		}
 
 		{
-			auto http = Strawberry::Core::Net::HTTP::HTTPSClient("api.agify.io");
+			auto                                 http = Strawberry::Core::Net::HTTP::HTTPSClient("api.agify.io");
 			Strawberry::Core::Net::HTTP::Request request(Strawberry::Core::Net::HTTP::Verb::GET, "/?name=dan");
 			http.SendRequest(request);
 			auto response = http.Receive();
@@ -159,7 +159,7 @@ namespace Test
 		Assert(dynamicDouble * 4 == 0);
 		Assert(dynamicDouble / 2 == 2.5);
 	}
-}
+}// namespace Test
 
 
 int main()

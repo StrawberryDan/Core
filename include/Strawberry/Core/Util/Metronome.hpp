@@ -30,8 +30,8 @@ namespace Strawberry::Core
 
 	private:
 		double mFrequency;
-		Clock mClock;
+		Clock  mClock;
 		double mSecondsAhead = 0.0;
-		double mPreemption = 0.0;
+		double mPreemption   = 0.0;
 	};
-}
+}// namespace Strawberry::Core

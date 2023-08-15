@@ -3,14 +3,13 @@
 
 #include "Strawberry/Core/Math/Periodic.hpp"
 #include "Strawberry/Core/Util/Option.hpp"
-#include "Strawberry/Core/Util/Option.hpp"
 
 #include <memory>
 
 
 namespace Strawberry::Core::Collection
 {
-	template<typename T>
+	template <typename T>
 	class CircularBuffer
 	{
 	public:
@@ -18,7 +17,9 @@ namespace Strawberry::Core::Collection
 			: mData(capacity)
 			, mHead(Capacity(), 0)
 			, mTail(Capacity(), 0)
-			  , mSize(0) {}
+			, mSize(0)
+		{
+		}
 
 
 		void Push(T value)
@@ -55,26 +56,31 @@ namespace Strawberry::Core::Collection
 		[[nodiscard]] bool AtCapacity() const { return Capacity() == Size(); }
 
 
-		void Clear() { while (!Empty()) Pop(); }
+		void Clear()
+		{
+			while (!Empty()) Pop();
+		}
 
 
 	private:
-		std::vector<Option<T>> mData;
+		std::vector<Option<T>>        mData;
 		Math::DynamicPeriodic<size_t> mHead;
 		Math::DynamicPeriodic<size_t> mTail;
-		size_t mSize;
+		size_t                        mSize;
 	};
 
 
-	template<typename T>
+	template <typename T>
 	class DynamicCircularBuffer
 	{
 	public:
 		DynamicCircularBuffer()
 			: mData(16)
-			  , mHead(Capacity(), 0)
-			  , mTail(Capacity(), 0)
-			  , mSize(0) {}
+			, mHead(Capacity(), 0)
+			, mTail(Capacity(), 0)
+			, mSize(0)
+		{
+		}
 
 
 		void Push(T value)
@@ -92,8 +98,8 @@ namespace Strawberry::Core::Collection
 		Option<T> Pop()
 		{
 			if (Size() == 0) return {};
-			auto value = std::move(*mData[*mHead++]);
-			mSize -= 1;
+			auto value  = std::move(*mData[*mHead++]);
+			mSize      -= 1;
 			return value;
 		}
 
@@ -110,7 +116,10 @@ namespace Strawberry::Core::Collection
 		[[nodiscard]] bool AtCapacity() const { return Capacity() == Size(); }
 
 
-		void Clear() { while (!Empty()) Pop(); }
+		void Clear()
+		{
+			while (!Empty()) Pop();
+		}
 
 
 	private:
@@ -126,14 +135,14 @@ namespace Strawberry::Core::Collection
 			mSize = 0;
 
 			mData = std::vector<Option<T>>(newSize, Option<T>());
-			for (auto& value: newData) Push(std::move(value));
+			for (auto& value : newData) Push(std::move(value));
 		}
 
 
 	private:
-		std::vector<Option<T>> mData;
+		std::vector<Option<T>>        mData;
 		Math::DynamicPeriodic<size_t> mHead;
 		Math::DynamicPeriodic<size_t> mTail;
-		size_t mSize;
+		size_t                        mSize;
 	};
-}
+}// namespace Strawberry::Core::Collection

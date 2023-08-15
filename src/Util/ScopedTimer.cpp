@@ -12,11 +12,13 @@ namespace Strawberry::Core
 {
 	ScopedTimer::ScopedTimer(std::string name)
 		: mName(std::move(name))
-		  , mClock() {}
+		, mClock()
+	{
+	}
 
 
 	ScopedTimer::~ScopedTimer()
 	{
 		Logging::Trace("{} ---- {}", mName, *mClock);
 	}
-}
+}// namespace Strawberry::Core

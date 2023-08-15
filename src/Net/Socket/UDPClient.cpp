@@ -1,9 +1,9 @@
 #include "Strawberry/Core/Net/Socket/UDPClient.hpp"
 
 
+#include "Strawberry/Core/Net/Socket/SocketAPI.hpp"
 #include "Strawberry/Core/Util/Assert.hpp"
 #include "Strawberry/Core/Util/Markers.hpp"
-#include "Strawberry/Core/Net/Socket/SocketAPI.hpp"
 #include "Strawberry/Core/Util/Utilities.hpp"
 
 
@@ -13,14 +13,14 @@
 #elif __APPLE__ || __linux__
 
 
-#include <sys/socket.h>
-#include <netdb.h>
 #include <fcntl.h>
-#include <unistd.h>
+#include <netdb.h>
 #include <poll.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 
-#endif // _WIN32
+#endif// _WIN32
 
 
 namespace Strawberry::Core::Net::Socket
@@ -33,9 +33,8 @@ namespace Strawberry::Core::Net::Socket
 			return Error::SocketCreation;
 		}
 
-		int ipv6Only = 0;
-		auto optSetResult = setsockopt(handle, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char*>(&ipv6Only),
-									   sizeof(ipv6Only));
+		int  ipv6Only     = 0;
+		auto optSetResult = setsockopt(handle, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char*>(&ipv6Only), sizeof(ipv6Only));
 		Assert(optSetResult == 0);
 
 		UDPClient client;
@@ -73,11 +72,15 @@ namespace Strawberry::Core::Net::Socket
 
 
 	UDPClient::UDPClient()
-		: mSocket(-1) {}
+		: mSocket(-1)
+	{
+	}
 
 
 	UDPClient::UDPClient(UDPClient&& other) noexcept
-		: mSocket(std::exchange(other.mSocket, -1)) {}
+		: mSocket(std::exchange(other.mSocket, -1))
+	{
+	}
 
 
 	UDPClient& UDPClient::operator=(UDPClient&& other) noexcept
@@ -113,7 +116,7 @@ namespace Strawberry::Core::Net::Socket
 		pollfd fds[] =
 			{
 				{mSocket, POLLIN, 0}
-			};
+        };
 
 		int pollResult = poll(fds, 1, 0);
 		Assert(pollResult >= 0);
@@ -127,9 +130,8 @@ namespace Strawberry::Core::Net::Socket
 	Result<std::tuple<Option<Endpoint>, IO::DynamicByteBuffer>, IO::Error> UDPClient::Read()
 	{
 		sockaddr_storage peer{};
-		socklen_t peerLen = 0;
-		auto bytesRead = recvfrom(mSocket, reinterpret_cast<char*>(mBuffer.Data()), mBuffer.Size(), 0,
-								  reinterpret_cast<sockaddr*>(&peer), &peerLen);
+		socklen_t        peerLen   = 0;
+		auto             bytesRead = recvfrom(mSocket, reinterpret_cast<char*>(mBuffer.Data()), mBuffer.Size(), 0, reinterpret_cast<sockaddr*>(&peer), &peerLen);
 
 		if (bytesRead >= 0)
 		{
@@ -160,17 +162,13 @@ namespace Strawberry::Core::Net::Socket
 
 	Result<size_t, IO::Error> UDPClient::Write(const Endpoint& endpoint, const IO::DynamicByteBuffer& bytes) const
 	{
-		addrinfo hints{.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_DGRAM, .ai_protocol = IPPROTO_UDP};
-		addrinfo* peer = nullptr;
-		auto result = getaddrinfo(endpoint.GetAddress()->AsString().c_str(),
-								  std::to_string(endpoint.GetPort()).c_str(),
-								  &hints,
-								  &peer);
+		addrinfo  hints{.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_DGRAM, .ai_protocol = IPPROTO_UDP};
+		addrinfo* peer   = nullptr;
+		auto      result = getaddrinfo(endpoint.GetAddress()->AsString().c_str(), std::to_string(endpoint.GetPort()).c_str(), &hints, &peer);
 		Core::Assert(result == 0);
 
 
-		auto bytesSent = sendto(mSocket, reinterpret_cast<const char*>(bytes.Data()), bytes.Size(), 0, peer->ai_addr,
-								peer->ai_addrlen);
+		auto bytesSent = sendto(mSocket, reinterpret_cast<const char*>(bytes.Data()), bytes.Size(), 0, peer->ai_addr, peer->ai_addrlen);
 		freeaddrinfo(peer);
 		if (bytesSent >= 0)
 		{
@@ -180,6 +178,5 @@ namespace Strawberry::Core::Net::Socket
 		{
 			Unreachable();
 		}
-
 	}
-}
+}// namespace Strawberry::Core::Net::Socket

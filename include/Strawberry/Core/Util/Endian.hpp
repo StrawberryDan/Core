@@ -7,8 +7,8 @@
 
 namespace Strawberry::Core
 {
-	template<typename T>
-	requires(std::is_fundamental_v<T>)
+	template <typename T>
+	requires (std::is_fundamental_v<T>)
 	T ReverseBytes(T in)
 	{
 		T out = 0;
@@ -20,9 +20,9 @@ namespace Strawberry::Core
 	}
 
 
-	template<typename T>
+	template <typename T>
 	T ToBigEndian(T v)
-	requires(std::is_integral_v<T>)
+		requires (std::is_integral_v<T>)
 	{
 		if constexpr (std::endian::native == std::endian::big)
 		{
@@ -35,9 +35,9 @@ namespace Strawberry::Core
 	}
 
 
-	template<typename T>
+	template <typename T>
 	T ToLittleEndian(T v)
-	requires(std::is_integral_v<T>)
+		requires (std::is_integral_v<T>)
 	{
 		if constexpr (std::endian::native == std::endian::little)
 		{
@@ -50,9 +50,9 @@ namespace Strawberry::Core
 	}
 
 
-	template<typename T>
+	template <typename T>
 	T FromBigEndian(T v)
-	requires(std::is_integral_v<T>)
+		requires (std::is_integral_v<T>)
 	{
 		if constexpr (std::endian::native == std::endian::big)
 		{
@@ -65,9 +65,9 @@ namespace Strawberry::Core
 	}
 
 
-	template<typename T>
+	template <typename T>
 	T FromLittleEndian(T v)
-	requires(std::is_integral_v<T>)
+		requires (std::is_integral_v<T>)
 	{
 		if constexpr (std::endian::native == std::endian::little)
 		{
@@ -78,4 +78,4 @@ namespace Strawberry::Core
 			return ReverseBytes(v);
 		}
 	}
-}
+}// namespace Strawberry::Core

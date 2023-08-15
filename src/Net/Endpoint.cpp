@@ -17,28 +17,28 @@ namespace Strawberry::Core::Net
 {
 	Result<Endpoint, Error> Endpoint::Resolve(const std::string& hostname, uint16_t port)
 	{
-		addrinfo hints{.ai_flags = AI_ALL | AI_ADDRCONFIG};
-		addrinfo* peer = nullptr;
-		auto dnsResult = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &peer);
+		addrinfo  hints{.ai_flags = AI_ALL | AI_ADDRCONFIG};
+		addrinfo* peer      = nullptr;
+		auto      dnsResult = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &peer);
 		if (dnsResult != 0)
 		{
 			return Error::DNSResolution;
 		}
 
 		Option<Endpoint> result;
-		addrinfo* cursor = peer;
+		addrinfo*        cursor = peer;
 		while (cursor != nullptr)
 		{
 			if (cursor->ai_family == AF_INET)
 			{
-				auto ipData = reinterpret_cast<sockaddr_in*>(cursor->ai_addr);
+				auto        ipData = reinterpret_cast<sockaddr_in*>(cursor->ai_addr);
 				IPv4Address addr(IO::ByteBuffer<4>(ipData->sin_addr.s_addr));
 				result = Endpoint(addr, port);
 			}
 			else if (cursor->ai_family == AF_INET6)
 			{
-				auto ipData = reinterpret_cast<sockaddr_in6*>(cursor->ai_addr);
-				IPv6Address addr(IO::ByteBuffer<16>(& ipData->sin6_addr));
+				auto        ipData = reinterpret_cast<sockaddr_in6*>(cursor->ai_addr);
+				IPv6Address addr(IO::ByteBuffer<16>(&ipData->sin6_addr));
 				result = Endpoint(addr, port);
 			}
 
@@ -63,7 +63,7 @@ namespace Strawberry::Core::Net
 		if (colonPos == std::string::npos) return Error::ParsingEndpoint;
 
 		std::string hostname = endpoint.substr(0, colonPos);
-		std::string portstr = endpoint.substr(colonPos + 1, endpoint.size());
+		std::string portstr  = endpoint.substr(colonPos + 1, endpoint.size());
 
 		uint16_t port;
 		try
@@ -85,7 +85,7 @@ namespace Strawberry::Core::Net
 		if (colonPos == std::string::npos) return Error::ParsingEndpoint;
 
 		std::string hostname = endpoint.substr(0, colonPos);
-		std::string portstr = endpoint.substr(colonPos + 1, endpoint.size());
+		std::string portstr  = endpoint.substr(colonPos + 1, endpoint.size());
 
 		uint16_t port;
 		try
@@ -103,10 +103,14 @@ namespace Strawberry::Core::Net
 
 	Endpoint::Endpoint(IPAddress address, uint16_t port)
 		: mAddress(address)
-		  , mPort(port) {}
+		, mPort(port)
+	{
+	}
 
 
 	Endpoint::Endpoint(const std::string& hostname, uint16_t port)
 		: mHostName(hostname)
-		  , mPort(port) {}
-}
+		, mPort(port)
+	{
+	}
+}// namespace Strawberry::Core::Net

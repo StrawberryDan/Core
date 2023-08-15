@@ -14,21 +14,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template<typename T>
+	template <typename T>
 	class ChannelBroadcaster;
 
 
-	template<typename T>
+	template <typename T>
 	class ChannelReceiver
 	{
 		friend class ChannelBroadcaster<T>;
 
 
 	public:
-		ChannelReceiver(const ChannelReceiver& rhs) = default;
+		ChannelReceiver(const ChannelReceiver& rhs)            = default;
 		ChannelReceiver& operator=(const ChannelReceiver& rhs) = default;
-		ChannelReceiver(ChannelReceiver&& rhs) = default;
-		ChannelReceiver& operator=(ChannelReceiver&& rhs) = default;
+		ChannelReceiver(ChannelReceiver&& rhs)                 = default;
+		ChannelReceiver& operator=(ChannelReceiver&& rhs)      = default;
 
 
 		~ChannelReceiver()
@@ -40,7 +40,7 @@ namespace Strawberry::Core::IO
 		Core::Option<T> Read()
 		{
 			auto messageBuffer = mMessageBuffer.Lock();
-			auto result = messageBuffer->empty() ? Core::NullOpt : Core::Option(messageBuffer->front());
+			auto result        = messageBuffer->empty() ? Core::NullOpt : Core::Option(messageBuffer->front());
 			if (result)
 			{
 				messageBuffer->pop_front();
@@ -61,7 +61,5 @@ namespace Strawberry::Core::IO
 
 	private:
 		Core::Mutex<std::deque<T>> mMessageBuffer;
-
-
 	};
-}
+}// namespace Strawberry::Core::IO
