@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 namespace Strawberry::Core::Net
 {
 	enum class Error

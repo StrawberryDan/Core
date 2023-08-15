@@ -1,20 +1,22 @@
 #pragma once
 
 
-
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
+// Core
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 #include "Strawberry/Core/IO/Error.hpp"
 #include "Strawberry/Core/Net/Endpoint.hpp"
+#include "Strawberry/Core/Net/Socket/SocketAPIUser.hpp"
 #include "Strawberry/Core/Util/Result.hpp"
+// Standard Library
 #include <tuple>
-#include "SocketAPIUser.hpp"
-
 
 
 #if defined(_WIN32)
 #include <winsock2.h>
 #endif
-
 
 
 namespace Strawberry::Core::Net::Socket
@@ -28,26 +30,23 @@ namespace Strawberry::Core::Net::Socket
 		static Result<UDPClient, Error> CreateIPv6();
 
 
-
 	public:
 		UDPClient();
 		UDPClient(const UDPClient& other) = delete;
-		UDPClient(UDPClient&& other);
+		UDPClient(UDPClient&& other) noexcept;
 		UDPClient& operator=(const UDPClient& other) = delete;
-		UDPClient& operator=(UDPClient&& other);
-		~UDPClient();
+		UDPClient& operator=(UDPClient&& other) noexcept;
+		~UDPClient() override;
 
 
-
-		bool															Poll() const;
-		Result<std::tuple<Option<Endpoint>, IO::DynamicByteBuffer>, IO::Error>	Read();
-		Result<size_t, IO::Error>										Write(const Endpoint& endpoint, const IO::DynamicByteBuffer& bytes);
-
+		[[nodiscard]] bool Poll() const;
+		Result<std::tuple<Option<Endpoint>, IO::DynamicByteBuffer>, IO::Error> Read();
+		Result<size_t, IO::Error> Write(const Endpoint& endpoint, const IO::DynamicByteBuffer& bytes) const;
 
 
 	private:
 #if defined(__APPLE__) || defined(__linux__)
-		int    mSocket;
+		int mSocket;
 #elif defined(_WIN32)
 		SOCKET mSocket;
 #endif

@@ -1,15 +1,12 @@
 #pragma once
 
 
-
 #include <variant>
 #include "Address.hpp"
 
 
-
 #include "Strawberry/Core/Util/Result.hpp"
 #include "Error.hpp"
-
 
 
 namespace Strawberry::Core::Net
@@ -22,8 +19,7 @@ namespace Strawberry::Core::Net
 		/// Parses strings of the form <hostname>:<port> and resolves IP
 		static Result<Endpoint, Error> Resolve(const std::string& endpoint);
 		/// Parses strings of the form <hostname>:<port> without resolving IP
-		static Result<Endpoint, Error>   Parse(const std::string& endpoint);
-
+		static Result<Endpoint, Error> Parse(const std::string& endpoint);
 
 
 	public:
@@ -31,15 +27,18 @@ namespace Strawberry::Core::Net
 		Endpoint(IPAddress address, uint16_t port);
 
 
+		[[nodiscard]] inline const Option<std::string>& GetHostname() const { return mHostName; };
 
-		inline const Option<std::string>& GetHostname() const { return mHostName; };
-		inline const Option<IPAddress>    GetAddress()  const { return mAddress;  }
-		inline        uint16_t            GetPort()     const { return mPort;     }
+
+		[[nodiscard]] inline Option<IPAddress> GetAddress() const { return mAddress; }
+
+
+		[[nodiscard]] inline uint16_t GetPort() const { return mPort; }
 
 
 	private:
 		Option<std::string> mHostName;
-		Option<IPAddress>   mAddress;
-		uint16_t            mPort;
+		Option<IPAddress> mAddress;
+		uint16_t mPort;
 	};
 }

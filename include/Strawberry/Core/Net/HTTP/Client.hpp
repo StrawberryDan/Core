@@ -1,13 +1,11 @@
 #pragma once
 
 
-
 #include "Strawberry/Core/Util/Utilities.hpp"
 #include "Response.hpp"
 #include "Request.hpp"
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
-
 
 
 namespace Strawberry::Core::Net::HTTP
@@ -25,8 +23,7 @@ namespace Strawberry::Core::Net::HTTP
 
 
 		/// Removes and returns the socket of an rvalue HTTP client.
-		inline S TakeSocket() && { return std::move(mSocket); }
-
+		inline S TakeSocket()&& { return std::move(mSocket); }
 
 
 	private:
@@ -36,30 +33,26 @@ namespace Strawberry::Core::Net::HTTP
 		IO::DynamicByteBuffer ReadChunkedPayload();
 
 
-
 	private:
 		S mSocket;
 	};
-
 
 
 	class HTTPClient
 		: public ClientBase<Socket::TCPClient>
 	{
 	public:
-		HTTPClient(const std::string& hostname, uint16_t port = 80);
+		explicit HTTPClient(const std::string& hostname, uint16_t port = 80);
 	};
-
 
 
 	class HTTPSClient
 		: public ClientBase<Socket::TLSClient>
 	{
 	public:
-		HTTPSClient(const std::string& hostname, uint16_t port = 443);
+		explicit HTTPSClient(const std::string& hostname, uint16_t port = 443);
 	};
 }
-
 
 
 #include "Client.inl"

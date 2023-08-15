@@ -1,18 +1,18 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+#include <utility>
+
 #include "Strawberry/Core/Util/ScopedTimer.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Util/Logging.hpp"
 
 
-
 namespace Strawberry::Core
 {
-	ScopedTimer::ScopedTimer(const std::string& name)
-		: mName(name)
-		, mClock()
-	{}
+	ScopedTimer::ScopedTimer(std::string name)
+		: mName(std::move(name))
+		  , mClock() {}
 
 
 	ScopedTimer::~ScopedTimer()

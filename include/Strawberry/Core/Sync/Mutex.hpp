@@ -22,7 +22,9 @@ namespace Strawberry::Core
 	class MutexGuard
 	{
 		template<typename>
-		friend class Mutex;
+		friend
+		class Mutex;
+
 
 	public:
 		using LockType = std::unique_lock<std::recursive_mutex>;
@@ -36,21 +38,19 @@ namespace Strawberry::Core
 		MutexGuard& operator=(MutexGuard&& other) noexcept = default;
 
 
-		inline T& operator*() const
-		{ return *mPayload; }
+		inline T& operator*() const { return *mPayload; }
 
 
-		inline T* operator->() const
-		{ return mPayload; }
+		inline T* operator->() const { return mPayload; }
 
 
 	private:
-		MutexGuard(LockType lock, T* ptr) : mLock(std::move(lock)), mPayload(ptr)
-		{}
+		MutexGuard(LockType lock, T* ptr)
+			: mLock(std::move(lock)), mPayload(ptr) {}
 
 
 		LockType mLock;
-		T*       mPayload;
+		T* mPayload;
 	};
 
 
@@ -60,16 +60,15 @@ namespace Strawberry::Core
 	public:
 		template<typename ... Ts>
 		explicit Mutex(Ts ... ts)
-				: mMutex(), mPayload(std::forward<Ts>(ts)...)
-		{}
+			: mMutex(), mPayload(std::forward<Ts>(ts)...) {}
 
 
-		Mutex(Mutex&& rhs) requires(std::is_move_constructible_v<T>)
-				: mMutex(), mPayload(std::move(rhs).Take())
-		{}
+		Mutex(Mutex&& rhs) noexcept
+		requires(std::is_move_constructible_v<T>)
+			: mMutex(), mPayload(std::move(rhs).Take()) {}
 
 
-		Mutex& operator=(Mutex&& other)
+		Mutex& operator=(Mutex&& other) noexcept
 		requires(std::is_move_assignable_v<T>)
 		{
 			if (this != &other)
@@ -89,15 +88,13 @@ namespace Strawberry::Core
 		}
 
 
-		MutexGuard<T> Lock() &
-		{ return {std::unique_lock(mMutex), &mPayload}; }
+		MutexGuard<T> Lock()& { return {std::unique_lock(mMutex), &mPayload}; }
 
 
-		MutexGuard<const T> Lock() const&
-		{ return {std::unique_lock(mMutex), &mPayload}; }
+		MutexGuard<const T> Lock() const& { return {std::unique_lock(mMutex), &mPayload}; }
 
 
-		Option<MutexGuard<T>> TryLock() &
+		Option<MutexGuard<T>> TryLock()&
 		{
 			std::unique_lock<std::recursive_mutex> lk(mMutex, std::defer_lock);
 			if (lk.try_lock())
@@ -152,18 +149,24 @@ namespace Strawberry::Core
 	class SharedMutex
 	{
 	public:
-		SharedMutex(std::nullptr_t) : mPayload(nullptr)
-		{}
+		explicit SharedMutex(std::nullptr_t)
+			: mPayload(nullptr) {}
 
 
 		template<typename ... Ts>
 		requires ( std::constructible_from<T, Ts...> )
-		explicit SharedMutex(Ts ... ts) : mPayload(std::make_shared<Mutex<T>>(std::forward<Ts>(ts)...))
-		{}
+		explicit SharedMutex(Ts ... ts)
+			: mPayload(std::make_shared<Mutex<T>>(std::forward<Ts>(ts)...)) {}
 
 
-		operator bool() const
-		{ return mPayload.operator bool(); }
+		SharedMutex& operator=(std::nullptr_t)
+		{
+			mPayload = nullptr;
+			return *this;
+		}
+
+
+		operator bool() const { return mPayload.operator bool(); }
 
 
 		template<typename... Ts>
@@ -174,20 +177,16 @@ namespace Strawberry::Core
 		}
 
 
-		MutexGuard<T> Lock()
-		{ return mPayload->Lock(); }
+		MutexGuard<T> Lock() { return mPayload->Lock(); }
 
 
-		MutexGuard<const T> Lock() const
-		{ return static_cast<const Mutex<T>*>(mPayload.get())->Lock(); }
+		MutexGuard<const T> Lock() const { return static_cast<const Mutex<T>*>(mPayload.get())->Lock(); }
 
 
-		Option<MutexGuard<T>> TryLock()
-		{ return mPayload->TryLock(); }
+		Option<MutexGuard<T>> TryLock() { return mPayload->TryLock(); }
 
 
-		Option<MutexGuard<const T>> TryLock() const
-		{ return mPayload->TryLock(); }
+		Option<MutexGuard<const T>> TryLock() const { return mPayload->TryLock(); }
 
 
 	private:
@@ -195,6 +194,6 @@ namespace Strawberry::Core
 	};
 
 
-	template <typename T>
+	template<typename T>
 	Mutex(T) -> Mutex<std::decay_t<T>>;
 }

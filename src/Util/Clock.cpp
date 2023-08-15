@@ -1,16 +1,14 @@
 #include "Strawberry/Core/Util/Clock.hpp"
 
 
-
 namespace Strawberry::Core
 {
 	Clock::Clock(bool start)
 		: mBuffer{}
-		, mStartTime()
+		  , mStartTime()
 	{
 		if (start) Start();
 	}
-
 
 
 	void Clock::Start()
@@ -22,7 +20,6 @@ namespace Strawberry::Core
 	}
 
 
-
 	double Clock::Stop()
 	{
 		if (mStartTime)
@@ -32,7 +29,6 @@ namespace Strawberry::Core
 		}
 		return mBuffer.count();
 	}
-
 
 
 	double Clock::Read() const
@@ -50,10 +46,9 @@ namespace Strawberry::Core
 	}
 
 
-
 	void Clock::Restart()
 	{
-		mBuffer    = {};
+		mBuffer = {};
 		mStartTime = std::chrono::system_clock::now();
 	}
 }

@@ -1,13 +1,11 @@
 #pragma once
 
 
-
 #include <cstdint>
 #include <string>
 #include <optional>
 #include <thread>
 #include <future>
-
 
 
 #include "Strawberry/Core/Util/Option.hpp"
@@ -19,12 +17,10 @@
 #include "Strawberry/Core/IO/Concepts.hpp"
 
 
-
 namespace Strawberry::Core::Net::Websocket
 {
 	enum class Error
 	{
-		Unknown,
 		NoMessage,
 		Closed,
 		Refused,
@@ -32,17 +28,16 @@ namespace Strawberry::Core::Net::Websocket
 	};
 
 
-
-	template<typename S> requires IO::Read<S> && IO::Write<S>
+	template<typename S>
+	requires IO::Read<S> && IO::Write<S>
 	class ClientBase
 	{
 	public:
-		ClientBase(const ClientBase&)				= delete;
-		ClientBase& operator=(const ClientBase&)	= delete;
-		ClientBase(ClientBase&& rhs) 				= default;
-		ClientBase& operator=(ClientBase&& rhs)		= default;
+		ClientBase(const ClientBase&) = delete;
+		ClientBase& operator=(const ClientBase&) = delete;
+		ClientBase(ClientBase&& rhs) noexcept = default;
+		ClientBase& operator=(ClientBase&& rhs) noexcept = default;
 		~ClientBase();
-
 
 
 		Result<int, Error> SendMessage(const Message& message);
@@ -52,21 +47,11 @@ namespace Strawberry::Core::Net::Websocket
 		Result<Message, Error> WaitMessage();
 
 
-
-		[[nodiscard]] inline bool IsValid() const
-		{ return mSocket.HasValue(); }
-
-
-
-		inline S TakeSocket()
-		{ return std::move(mSocket); }
-
+		[[nodiscard]] inline bool IsValid() const { return mSocket.HasValue(); }
 
 
 	protected:
-		using MessageBuffer = Mutex<std::vector<Message>>;
 		using Fragment = std::pair<bool, Message>;
-
 
 
 	protected:
@@ -83,36 +68,33 @@ namespace Strawberry::Core::Net::Websocket
 		void Disconnect(int code = 1000);
 
 
-
 	protected:
 		ClientBase() = default;
 
 
-
 	protected:
-		Option<Mutex<S>>			mSocket;
-		Option<Error>				mError;
+		Option<Mutex<S>> mSocket;
+		Option<Error> mError;
 	};
-
 
 
 	class WSClient
 		: public ClientBase<Socket::TCPClient>
 	{
 	public:
-		static Result<WSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 80);
+		static Result<WSClient, Error>
+		Connect(const std::string& host, const std::string& resource, uint16_t port = 80);
 	};
-
 
 
 	class WSSClient
 		: public ClientBase<Socket::TLSClient>
 	{
 	public:
-		static Result<WSSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 443);
+		static Result<WSSClient, Error>
+		Connect(const std::string& host, const std::string& resource, uint16_t port = 443);
 	};
 }
-
 
 
 #include "Client.inl"

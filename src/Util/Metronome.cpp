@@ -3,7 +3,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Core
 #include "Strawberry/Core/Util/Metronome.hpp"
-#include "Strawberry/Core/Util/Logging.hpp"
 
 
 //======================================================================================================================
@@ -13,8 +12,7 @@ namespace Strawberry::Core
 {
 	Metronome::Metronome(double frequency, double preemption)
 		: mFrequency(frequency)
-		  , mPreemption(preemption)
-	{}
+		  , mPreemption(preemption) {}
 
 
 	Metronome::operator bool()

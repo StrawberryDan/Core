@@ -12,15 +12,21 @@
 
 namespace Strawberry::Core
 {
-	template <typename T>
+	template<typename T>
 	class Option;
 
 
-	template <typename T>
-	struct IsOption : std::false_type {};
+	template<typename T>
+	struct IsOption
+		: std::false_type
+	{
+	};
 
-	template <typename T>
-	struct IsOption<Option<T>> : std::true_type {};
+	template<typename T>
+	struct IsOption<Option<T>>
+		: std::true_type
+	{
+	};
 
 
 	class NullOpt_t
@@ -74,6 +80,7 @@ namespace Strawberry::Core
 
 
 		Option(Option&& rhs)
+		noexcept
 		requires(std::is_move_constructible_v<T>)
 			: mHasValue(rhs.mHasValue)
 		{
@@ -148,6 +155,7 @@ namespace Strawberry::Core
 
 
 		Option& operator=(Option&& rhs)
+		noexcept
 		requires(std::is_move_assignable_v<T>)
 		{
 			if (this != &rhs)
@@ -204,7 +212,7 @@ namespace Strawberry::Core
 		}
 
 
-		inline bool HasValue() const { return mHasValue; }
+		[[nodiscard]] inline bool HasValue() const { return mHasValue; }
 
 
 		explicit inline operator bool() const { return mHasValue; }
@@ -279,8 +287,9 @@ namespace Strawberry::Core
 		}
 
 
-		template<std::invocable<const T&> F> requires Core::IsOption<std::invoke_result_t<F, T&>>::value
-		Option<std::invoke_result_t<F, T&>> AndThen(F functor) const &
+		template<std::invocable<const T&> F>
+		requires Core::IsOption<std::invoke_result_t<F, T&>>::value
+		Option<std::invoke_result_t<F, T&>> AndThen(F functor) const&
 		{
 			if (HasValue())
 			{
@@ -584,6 +593,7 @@ namespace Strawberry::Core
 
 
 		Option(Option&& rhs)
+		noexcept
 			: mPayload(std::exchange(rhs.mPayload, nullptr)) {}
 
 
@@ -614,6 +624,7 @@ namespace Strawberry::Core
 
 
 		Option& operator=(Option&& rhs)
+		noexcept
 		requires(std::is_move_assignable_v<T>)
 		{
 			if (this != &rhs)
@@ -631,7 +642,7 @@ namespace Strawberry::Core
 		}
 
 
-		inline bool HasValue() const { return mPayload != nullptr; }
+		[[nodiscard]] inline bool HasValue() const { return mPayload != nullptr; }
 
 
 		explicit inline operator bool() const { return HasValue(); }
@@ -664,7 +675,7 @@ namespace Strawberry::Core
 		}
 
 
-		const T operator*() const
+		T operator*() const
 		{
 			Assert(HasValue());
 			return mPayload;
@@ -678,7 +689,7 @@ namespace Strawberry::Core
 		}
 
 
-		const T operator->() const
+		T operator->() const
 		{
 			Assert(HasValue());
 			return mPayload;
@@ -705,8 +716,9 @@ namespace Strawberry::Core
 		}
 
 
-		template<std::invocable<T> F> requires Core::IsOption<std::invoke_result_t<F, T>>::value
-		std::invoke_result_t<F, T> AndThen(F functor) &
+		template<std::invocable<T> F>
+		requires Core::IsOption<std::invoke_result_t<F, T>>::value
+		std::invoke_result_t<F, T> AndThen(F functor)&
 		{
 			if (HasValue())
 			{
@@ -721,8 +733,9 @@ namespace Strawberry::Core
 		}
 
 
-		template<std::invocable<const T> F> requires Core::IsOption<std::invoke_result_t<F, const T>>::value
-		std::invoke_result_t<F, const T> AndThen(F functor) const &
+		template<std::invocable<const T> F>
+		requires Core::IsOption<std::invoke_result_t<F, const T>>::value
+		std::invoke_result_t<F, const T> AndThen(F functor) const&
 		{
 			if (HasValue())
 			{

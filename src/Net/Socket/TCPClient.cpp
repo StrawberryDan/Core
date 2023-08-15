@@ -1,23 +1,24 @@
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 
 
-
 #include "Strawberry/Core/Util/Assert.hpp"
 #include "Strawberry/Core/Util/Markers.hpp"
 #include "Strawberry/Core/Util/Utilities.hpp"
-
 
 
 #if _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #elif __APPLE__ || __linux__
+
+
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <poll.h>
-#endif // _WIN32
 
+
+#endif // _WIN32
 
 
 namespace Strawberry::Core::Net::Socket
@@ -26,10 +27,10 @@ namespace Strawberry::Core::Net::Socket
 	{
 		TCPClient client;
 
-		addrinfo hints {.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_STREAM,.ai_protocol = IPPROTO_TCP};
-		if      (endpoint.GetAddress()->IsIPv4()) hints.ai_family = AF_INET;
+		addrinfo hints{.ai_flags = AI_ADDRCONFIG, .ai_socktype = SOCK_STREAM, .ai_protocol = IPPROTO_TCP};
+		if (endpoint.GetAddress()->IsIPv4()) hints.ai_family = AF_INET;
 		else if (endpoint.GetAddress()->IsIPv6()) hints.ai_family = AF_INET6;
-		else                                      Unreachable();
+		else Unreachable();
 		addrinfo* peerAddress = nullptr;
 		auto addrResult = getaddrinfo(endpoint.GetAddress()->AsString().c_str(),
 									  std::to_string(endpoint.GetPort()).c_str(),
@@ -60,30 +61,24 @@ namespace Strawberry::Core::Net::Socket
 	}
 
 
-
 	TCPClient::TCPClient()
-		: mSocket(-1)
-	{}
+		: mSocket(-1) {}
 
 
-
-	TCPClient::TCPClient(TCPClient&& other)
-        : mSocket(std::exchange(other.mSocket, -1))
-    {}
+	TCPClient::TCPClient(TCPClient&& other) noexcept
+		: mSocket(std::exchange(other.mSocket, -1)) {}
 
 
-
-	TCPClient& TCPClient::operator=(TCPClient&& other)
+	TCPClient& TCPClient::operator=(TCPClient&& other) noexcept
 	{
 		if (this != &other)
 		{
-            std::destroy_at(this);
-            std::construct_at(this, std::move(other));
+			std::destroy_at(this);
+			std::construct_at(this, std::move(other));
 		}
 
 		return *this;
 	}
-
 
 
 	TCPClient::~TCPClient()
@@ -101,14 +96,13 @@ namespace Strawberry::Core::Net::Socket
 	}
 
 
-
 	bool TCPClient::Poll() const
 	{
 #if defined(__APPLE__) || defined(__linux__)
 		pollfd fds[] =
-		{
+			{
 				{mSocket, POLLIN, 0}
-		};
+			};
 
 		int pollResult = poll(fds, 1, 0);
 		Assert(pollResult >= 0);
@@ -117,7 +111,6 @@ namespace Strawberry::Core::Net::Socket
 		Unreachable();
 #endif
 	}
-
 
 
 	Result<IO::DynamicByteBuffer, IO::Error> TCPClient::Read(size_t length)
@@ -143,14 +136,14 @@ namespace Strawberry::Core::Net::Socket
 	}
 
 
-
 	Result<size_t, IO::Error> TCPClient::Write(const IO::DynamicByteBuffer& bytes)
 	{
 		size_t bytesSent = 0;
 
 		while (bytesSent < bytes.Size())
 		{
-			auto thisSend = send(mSocket, reinterpret_cast<const char*>(bytes.Data()) + bytesSent, bytes.Size() - bytesSent, 0);
+			auto thisSend = send(mSocket, reinterpret_cast<const char*>(bytes.Data()) + bytesSent,
+								 bytes.Size() - bytesSent, 0);
 			if (thisSend > 0)
 			{
 				bytesSent += thisSend;

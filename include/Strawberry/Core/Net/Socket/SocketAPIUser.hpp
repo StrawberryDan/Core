@@ -1,11 +1,9 @@
 #pragma once
 
 
-
 #include <memory>
 
 #include "SocketAPI.hpp"
-
 
 
 namespace Strawberry::Core::Net::Socket

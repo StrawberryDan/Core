@@ -1,32 +1,27 @@
-#include "Strawberry/Core/IO/Base64.hpp"
-
-
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
+// Standard Library
 #include <cstring>
 #include <vector>
-#include <map>
 #include <random>
-
-
-
+// Core
 #include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/IO/Base64.hpp"
 #include "Strawberry/Core/Math/Math.hpp"
 #include "Strawberry/Core/Math/Periodic.hpp"
 #include "Strawberry/Core/Net/Endpoint.hpp"
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
-#include "Strawberry/Core/Collection/CircularBuffer.hpp"
 #include "Strawberry/Core/Net/HTTP/Client.hpp"
-
 
 
 using namespace Strawberry::Core;
 
 
-
 namespace Test
 {
 	using namespace Math;
-
 
 
 	void CheckBytes(const IO::DynamicByteBuffer& bytes)
@@ -38,7 +33,6 @@ namespace Test
 		Assert(decoded.Size() == bytes.Size());
 		Assert(decoded == bytes);
 	}
-
 
 
 	void Base64()
@@ -75,13 +69,11 @@ namespace Test
 	}
 
 
-
 	void ParseIP()
 	{
 		auto ip = Net::IPv4Address::Parse("255.255.255.255").Unwrap();
 		Assert(ip.AsString() == "255.255.255.255");
 	}
-
 
 
 	void DNS()
@@ -92,13 +84,11 @@ namespace Test
 	}
 
 
-
 	void TCP()
 	{
 		auto google = Strawberry::Core::Net::Endpoint::Resolve("google.com", 80).Unwrap();
 		auto client = Strawberry::Core::Net::Socket::TCPClient::Connect(google).Unwrap();
 	}
-
 
 
 	void TLS()
@@ -112,7 +102,6 @@ namespace Test
 			auto client = Strawberry::Core::Net::Socket::TLSClient::Connect(google).Unwrap();
 		}
 	}
-
 
 
 	void HTTP()
@@ -133,7 +122,6 @@ namespace Test
 	}
 
 
-
 	void PeriodicNumbers()
 	{
 		using namespace Strawberry::Core::Math;
@@ -141,48 +129,46 @@ namespace Test
 		Periodic<unsigned int, 10> unsignedInt = 5;
 		Assert(unsignedInt + 10 == 5);
 		Assert(unsignedInt + 14 == 9);
-		Assert(unsignedInt -  6 == 9);
+		Assert(unsignedInt - 6 == 9);
 		Assert(unsignedInt - 10 == 5);
 		Assert(unsignedInt - 15 == 0);
-		Assert(unsignedInt *  2 == 0);
-		Assert(unsignedInt *  3 == 5);
-		Assert(unsignedInt *  4 == 0);
-		Assert(unsignedInt /  2 == 2);
+		Assert(unsignedInt * 2 == 0);
+		Assert(unsignedInt * 3 == 5);
+		Assert(unsignedInt * 4 == 0);
+		Assert(unsignedInt / 2 == 2);
 
 		DynamicPeriodic<unsigned int> dynamicUnsignedInt(10, 5);
 		Assert(dynamicUnsignedInt + 10 == 5);
 		Assert(dynamicUnsignedInt + 14 == 9);
-		Assert(dynamicUnsignedInt -  6 == 9);
+		Assert(dynamicUnsignedInt - 6 == 9);
 		Assert(dynamicUnsignedInt - 10 == 5);
 		Assert(dynamicUnsignedInt - 15 == 0);
-		Assert(dynamicUnsignedInt *  2 == 0);
-		Assert(dynamicUnsignedInt *  3 == 5);
-		Assert(dynamicUnsignedInt *  4 == 0);
-		Assert(dynamicUnsignedInt /  2 == 2);
+		Assert(dynamicUnsignedInt * 2 == 0);
+		Assert(dynamicUnsignedInt * 3 == 5);
+		Assert(dynamicUnsignedInt * 4 == 0);
+		Assert(dynamicUnsignedInt / 2 == 2);
 
 		DynamicPeriodic<double> dynamicDouble(10, 5);
 		Assert(dynamicDouble + 10 == 5);
 		Assert(dynamicDouble + 14 == 9);
-		Assert(dynamicDouble -  6 == 9);
+		Assert(dynamicDouble - 6 == 9);
 		Assert(dynamicDouble - 10 == 5);
 		Assert(dynamicDouble - 15 == 0);
-		Assert(dynamicDouble *  2 == 0);
-		Assert(dynamicDouble *  3 == 5);
-		Assert(dynamicDouble *  4 == 0);
-		Assert(dynamicDouble /  2 == 2.5);
+		Assert(dynamicDouble * 2 == 0);
+		Assert(dynamicDouble * 3 == 5);
+		Assert(dynamicDouble * 4 == 0);
+		Assert(dynamicDouble / 2 == 2.5);
 	}
 }
 
 
-
 int main()
 {
-//	Test::Base64();
-//	// Test::Iterators();
-//	Test::ParseIP();
-//	Test::DNS();
-//	Test::TCP();
-//	Test::TLS();
-//	Test::HTTP();
+	Test::Base64();
+	Test::ParseIP();
+	Test::DNS();
+	Test::TCP();
+	Test::TLS();
+	Test::HTTP();
 	Test::PeriodicNumbers();
 }

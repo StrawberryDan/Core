@@ -15,7 +15,7 @@ namespace Strawberry::Core
 	class ScopedTimer
 	{
 	public:
-		ScopedTimer(const std::string& name);
+		explicit ScopedTimer(std::string name);
 		ScopedTimer(const ScopedTimer& rhs) = delete;
 		ScopedTimer& operator=(const ScopedTimer& rhs) = delete;
 		ScopedTimer(ScopedTimer&& rhs) = delete;

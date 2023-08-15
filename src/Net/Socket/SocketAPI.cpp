@@ -1,15 +1,12 @@
 #include "Strawberry/Core/Net/Socket/SocketAPI.hpp"
 
 
-
 #include "Strawberry/Core/Util/Logging.hpp"
-
 
 
 #if defined(_WIN32)
 #include <winsock2.h>
 #endif
-
 
 
 namespace Strawberry::Core::Net::Socket
@@ -21,7 +18,6 @@ namespace Strawberry::Core::Net::Socket
 		WSACleanup();
 #endif
 	}
-
 
 
 	SocketAPI::SocketAPI()

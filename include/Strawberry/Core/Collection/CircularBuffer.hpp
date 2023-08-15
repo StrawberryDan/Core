@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 #include "Strawberry/Core/Math/Periodic.hpp"
 #include "Strawberry/Core/Util/Option.hpp"
 #include "Strawberry/Core/Util/Option.hpp"
@@ -9,19 +8,17 @@
 #include <memory>
 
 
-
 namespace Strawberry::Core::Collection
 {
-	template <typename T>
+	template<typename T>
 	class CircularBuffer
 	{
 	public:
-		CircularBuffer(size_t capacity)
+		explicit CircularBuffer(size_t capacity)
 			: mData(capacity)
 			, mHead(Capacity(), 0)
 			, mTail(Capacity(), 0)
-			, mSize(0)
-		{}
+			  , mSize(0) {}
 
 
 		void Push(T value)
@@ -46,32 +43,38 @@ namespace Strawberry::Core::Collection
 		}
 
 
-		size_t Size()       const { return mSize; }
-		bool   Empty()      const { return Size() == 0; }
-		size_t Capacity()   const { return mData.size(); }
-		bool   AtCapacity() const { return Capacity() == Size(); }
-		void   Clear()            { while (!Empty()) Pop(); }
+		[[nodiscard]] size_t Size() const { return mSize; }
+
+
+		[[nodiscard]] bool Empty() const { return Size() == 0; }
+
+
+		[[nodiscard]] size_t Capacity() const { return mData.size(); }
+
+
+		[[nodiscard]] bool AtCapacity() const { return Capacity() == Size(); }
+
+
+		void Clear() { while (!Empty()) Pop(); }
 
 
 	private:
-		std::vector<Option<T>>        mData;
+		std::vector<Option<T>> mData;
 		Math::DynamicPeriodic<size_t> mHead;
 		Math::DynamicPeriodic<size_t> mTail;
-		size_t                        mSize;
+		size_t mSize;
 	};
 
 
-
-	template <typename T>
+	template<typename T>
 	class DynamicCircularBuffer
 	{
 	public:
 		DynamicCircularBuffer()
-				: mData(16)
-				, mHead(Capacity(), 0)
-				, mTail(Capacity(), 0)
-				, mSize(0)
-		{}
+			: mData(16)
+			  , mHead(Capacity(), 0)
+			  , mTail(Capacity(), 0)
+			  , mSize(0) {}
 
 
 		void Push(T value)
@@ -95,11 +98,19 @@ namespace Strawberry::Core::Collection
 		}
 
 
-		size_t Size()       const { return mSize; }
-		bool   Empty()      const { return Size() == 0; }
-		size_t Capacity()   const { return mData.size(); }
-		bool   AtCapacity() const { return Capacity() == Size(); }
-		void   Clear()            { while (!Empty()) Pop(); }
+		[[nodiscard]] size_t Size() const { return mSize; }
+
+
+		[[nodiscard]] bool Empty() const { return Size() == 0; }
+
+
+		[[nodiscard]] size_t Capacity() const { return mData.size(); }
+
+
+		[[nodiscard]] bool AtCapacity() const { return Capacity() == Size(); }
+
+
+		void Clear() { while (!Empty()) Pop(); }
 
 
 	private:
@@ -110,8 +121,8 @@ namespace Strawberry::Core::Collection
 
 			while (!Empty()) newData.emplace_back(std::move(Pop().Unwrap()));
 
-			mHead = Math::DynamicPeriodic(newSize, (size_t)0);
-			mTail = Math::DynamicPeriodic(newSize, (size_t)0);
+			mHead = Math::DynamicPeriodic(newSize, (size_t) 0);
+			mTail = Math::DynamicPeriodic(newSize, (size_t) 0);
 			mSize = 0;
 
 			mData = std::vector<Option<T>>(newSize, Option<T>());
@@ -120,9 +131,9 @@ namespace Strawberry::Core::Collection
 
 
 	private:
-		std::vector<Option<T>>        mData;
+		std::vector<Option<T>> mData;
 		Math::DynamicPeriodic<size_t> mHead;
 		Math::DynamicPeriodic<size_t> mTail;
-		size_t                        mSize;
+		size_t mSize;
 	};
 }

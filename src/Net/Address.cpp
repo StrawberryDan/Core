@@ -1,21 +1,22 @@
 #include "Strawberry/Core/Net/Address.hpp"
 
 
-
 #include "Strawberry/Core/Util/Assert.hpp"
 #include "Strawberry/Core/Util/Markers.hpp"
 #include <numeric>
 
 
-
 #if defined(__APPLE__) || defined(__linux__)
+
+
 #include <arpa/inet.h>
 #include <netdb.h>
+
+
 #elif defined(_WIN32)
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #endif
-
 
 
 namespace Strawberry::Core::Net
@@ -36,12 +37,10 @@ namespace Strawberry::Core::Net
 	}
 
 
-
 	IO::ByteBuffer<4> IPv4Address::AsBytes() const
 	{
 		return mData;
 	}
-
 
 
 	std::string IPv4Address::AsString() const
@@ -51,7 +50,6 @@ namespace Strawberry::Core::Net
 		Assert(result != nullptr);
 		return {buffer};
 	}
-
 
 
 	Option<IPv6Address> IPv6Address::Parse(const std::string& string)
@@ -70,12 +68,10 @@ namespace Strawberry::Core::Net
 	}
 
 
-
 	const IO::ByteBuffer<16>& IPv6Address::AsBytes() const
 	{
 		return mData;
 	}
-
 
 
 	std::string IPv6Address::AsString() const
@@ -87,17 +83,12 @@ namespace Strawberry::Core::Net
 	}
 
 
-
 	IPAddress::IPAddress(IPv4Address address)
-		: mPayload(address)
-	{}
-
+		: mPayload(address) {}
 
 
 	IPAddress::IPAddress(IPv6Address address)
-		: mPayload(address)
-	{}
-
+		: mPayload(address) {}
 
 
 	Option<IPv4Address> IPAddress::AsIPv4() const
@@ -109,7 +100,6 @@ namespace Strawberry::Core::Net
 	}
 
 
-
 	Option<IPv6Address> IPAddress::AsIPv6() const
 	{
 		if (IsIPv6())
@@ -119,13 +109,13 @@ namespace Strawberry::Core::Net
 	}
 
 
-
-	const IO::DynamicByteBuffer IPAddress::AsBytes() const
+	IO::DynamicByteBuffer IPAddress::AsBytes() const
 	{
 		if (auto addr = AsIPv4())
 		{
 			return IO::DynamicByteBuffer(addr->AsBytes());
-		} else if (auto addr = AsIPv6())
+		}
+		else if (auto addr = AsIPv6())
 		{
 			return IO::DynamicByteBuffer(addr->AsBytes());
 		}
@@ -136,13 +126,13 @@ namespace Strawberry::Core::Net
 	}
 
 
-
 	std::string IPAddress::AsString() const
 	{
 		if (auto addr = AsIPv4())
 		{
 			return addr->AsString();
-		} else if (auto addr = AsIPv6())
+		}
+		else if (auto addr = AsIPv6())
 		{
 			return addr->AsString();
 		}

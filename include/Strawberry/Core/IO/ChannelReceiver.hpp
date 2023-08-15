@@ -14,21 +14,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template <typename T>
+	template<typename T>
 	class ChannelBroadcaster;
 
 
-	template <typename T>
+	template<typename T>
 	class ChannelReceiver
 	{
 		friend class ChannelBroadcaster<T>;
 
 
 	public:
-		ChannelReceiver(const ChannelReceiver& rhs)            = default;
+		ChannelReceiver(const ChannelReceiver& rhs) = default;
 		ChannelReceiver& operator=(const ChannelReceiver& rhs) = default;
-		ChannelReceiver(ChannelReceiver&& rhs)                 = default;
-		ChannelReceiver& operator=(ChannelReceiver&& rhs)      = default;
+		ChannelReceiver(ChannelReceiver&& rhs) = default;
+		ChannelReceiver& operator=(ChannelReceiver&& rhs) = default;
+
+
 		~ChannelReceiver()
 		{
 			mMessageBuffer.Lock()->clear();

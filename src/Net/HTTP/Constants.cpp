@@ -1,12 +1,10 @@
 #include "Strawberry/Core/Net/HTTP/Constants.hpp"
 
 
-
 #include "Strawberry/Core/Util/Utilities.hpp"
 
 
 #include <map>
-
 
 
 namespace Strawberry::Core::Net::HTTP
@@ -31,17 +29,16 @@ namespace Strawberry::Core::Net::HTTP
 	}
 
 
-
 	Option<Verb> Verb::Parse(const std::string& string)
 	{
 		static const std::map<std::string, Verb> mapping =
-		{
-			{"POST",   Verb::POST},
-			{"GET",    Verb::GET},
-			{"PUT",    Verb::PUT},
-			{"PATCH",  Verb::PATCH},
-			{"DELETE", Verb::DEL}
-		};
+			{
+				{"POST",   Verb::POST},
+				{"GET",    Verb::GET},
+				{"PUT",    Verb::PUT},
+				{"PATCH",  Verb::PATCH},
+				{"DELETE", Verb::DEL}
+			};
 
 		std::string upper = ToUppercase(string);
 		if (mapping.contains(upper))
@@ -55,16 +52,15 @@ namespace Strawberry::Core::Net::HTTP
 	}
 
 
-
 	Option<Version> Version::Parse(const std::string& string)
 	{
 		static const std::map<std::string, Version> mapping =
-		{
-			{"1.0", Version::VERSION_1_0},
-			{"1.1", Version::VERSION_1_1},
-			{"2",   Version::VERSION_2},
-			{"3",   Version::VERSION_3},
-		};
+			{
+				{"1.0", Version::VERSION_1_0},
+				{"1.1", Version::VERSION_1_1},
+				{"2",   Version::VERSION_2},
+				{"3",   Version::VERSION_3},
+			};
 
 		if (mapping.contains(string))
 		{
@@ -75,7 +71,6 @@ namespace Strawberry::Core::Net::HTTP
 			return {};
 		}
 	}
-
 
 
 	std::string Version::ToString() const

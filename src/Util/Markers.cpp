@@ -1,14 +1,9 @@
 #include "Strawberry/Core/Util/Markers.hpp"
 
 
-
-#include <cstdlib>
-#include <csignal>
-
 #if defined(_WIN32)
-	#include <debugapi.h>
+#include <debugapi.h>
 #endif
-
 
 
 namespace Strawberry::Core
@@ -21,11 +16,10 @@ namespace Strawberry::Core
 #elif defined(__UNIX) || defined(__APPLE__)
 		std::raise(SIGTRAP);
 #else
-		#warning "Debug Break not defined on this target!";
+#warning "Debug Break not defined on this target!";
 #endif
 #endif
 	}
-
 
 
 	[[noreturn]] void Unreachable()

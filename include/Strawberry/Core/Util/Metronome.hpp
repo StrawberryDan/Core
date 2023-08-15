@@ -16,7 +16,7 @@ namespace Strawberry::Core
 	{
 	public:
 		Metronome() = default;
-		Metronome(double frequency, double eagerness = 1.0);
+		explicit Metronome(double frequency, double eagerness = 1.0);
 
 
 		explicit operator bool();
@@ -30,8 +30,8 @@ namespace Strawberry::Core
 
 	private:
 		double mFrequency;
-		Clock  mClock;
-		double mSecondsAhead     = 0.0;
-		double mPreemption       = 0.0;
+		Clock mClock;
+		double mSecondsAhead = 0.0;
+		double mPreemption = 0.0;
 	};
 }

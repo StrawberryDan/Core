@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 #include <cstddef>
 #include <iostream>
 #include <utility>
@@ -11,10 +10,9 @@
 #include "Markers.hpp"
 
 
-
 namespace Strawberry::Core
 {
-	inline constexpr void Assert(bool value)
+	inline constexpr void Assert([[maybe_unused]] bool value)
 	{
 #if !NDEBUG
 		if (!value)

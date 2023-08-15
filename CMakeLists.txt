@@ -17,11 +17,9 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Util/Assert.hpp
 		include/Strawberry/Core/Util/Clock.hpp
 		include/Strawberry/Core/Collection/CircularBuffer.hpp
-		include/Strawberry/Core/Util/DynamicEvaluation.hpp
 		include/Strawberry/Core/Util/Endian.hpp
 		include/Strawberry/Core/IO/Base64.hpp
 		include/Strawberry/Core/IO/ByteBuffer.hpp
-		include/Strawberry/Core/IO/CircularAdapter.hpp
 		include/Strawberry/Core/IO/Concepts.hpp
 		include/Strawberry/Core/IO/DynamicByteBuffer.hpp
 		include/Strawberry/Core/IO/Error.hpp

@@ -11,35 +11,68 @@
 
 namespace Strawberry::Core::Math
 {
-	template <std::integral T = int32_t>
+	template<std::integral T = int32_t>
 	class Rational
 	{
 	public:
-		template <std::integral V>
-		Rational(V value) : mNumerator(static_cast<T>(value)), mDenominator(1) {}
-		Rational(T numerator, T denominator) : mNumerator(numerator), mDenominator(denominator) { Normalize(); }
+		template<std::integral V>
+		Rational(V value)
+			: mNumerator(static_cast<T>(value)), mDenominator(1) {}
 
 
-		void SetNumerator(T value)   { mNumerator = value; Normalize(); }
-		void SetDenominator(T value) { mDenominator = value; Normalize(); }
+		Rational(T numerator, T denominator)
+			: mNumerator(numerator), mDenominator(denominator) { Normalize(); }
 
-		
-		const T& Numerator() const   { return mNumerator; }
+
+		void SetNumerator(T value)
+		{
+			mNumerator = value;
+			Normalize();
+		}
+
+
+		void SetDenominator(T value)
+		{
+			mDenominator = value;
+			Normalize();
+		}
+
+
+		const T& Numerator() const { return mNumerator; }
+
+
 		const T& Denominator() const { return mDenominator; }
 
 
-		double Evaluate() const { return static_cast<double>(mNumerator) / static_cast<double>(mDenominator); }
+		[[nodiscard]] double Evaluate() const
+		{
+			return static_cast<double>(mNumerator) / static_cast<double>(mDenominator);
+		}
+
+
 		double operator*() const { return Evaluate(); }
 
 
 		Rational operator+(const Rational& rhs) const
-			{ return {Numerator() * rhs.Denominator() + rhs.Numerator() * Denominator(), Denominator() * rhs.Denominator() }; }
+		{
+			return {Numerator() * rhs.Denominator() + rhs.Numerator() * Denominator(),
+					Denominator() * rhs.Denominator()};
+		}
+
+
 		Rational operator-(const Rational& rhs) const
-			{ return {Numerator() * rhs.Denominator() - rhs.Numerator() * Denominator(), Denominator() * rhs.Denominator() }; }
+		{
+			return {Numerator() * rhs.Denominator() - rhs.Numerator() * Denominator(),
+					Denominator() * rhs.Denominator()};
+		}
+
+
 //		Rational operator*(const Rational& rhs) const
 //			{ return {Numerator() * rhs.Numerator(), Denominator() * rhs.Denominator()}; }
 		Rational operator/(const Rational& rhs) const
-			{ return {Numerator() * rhs.Denominator(), Denominator() * rhs.Numerator()}; }
+		{
+			return {Numerator() * rhs.Denominator(), Denominator() * rhs.Numerator()};
+		}
 
 
 		friend Rational operator*(const Rational& lhs, const Rational& rhs)
@@ -67,6 +100,6 @@ namespace Strawberry::Core::Math
 	};
 
 
-	template <std::integral T>
+	template<std::integral T>
 	Rational(T, T) -> Rational<T>;
 }

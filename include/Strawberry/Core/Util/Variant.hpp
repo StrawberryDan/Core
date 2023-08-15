@@ -25,11 +25,11 @@ namespace Strawberry::Core
 			: mData(std::move(data)) {}
 
 
-		bool ContainsValue() const { return !mData.valueless_by_exception(); }
+		[[nodiscard]] bool ContainsValue() const { return !mData.valueless_by_exception(); }
 
 
 		template<typename T>
-		bool IsType() const { return std::holds_alternative<T>(mData); }
+		[[nodiscard]] bool IsType() const { return std::holds_alternative<T>(mData); }
 
 
 		template<typename T>
@@ -48,7 +48,7 @@ namespace Strawberry::Core
 
 
 		template<typename T>
-		Core::Option<T> Value() &&
+		Core::Option<T> Value()&&
 		{
 			Core::Assert(ContainsValue());
 			if (std::holds_alternative<T>(mData))

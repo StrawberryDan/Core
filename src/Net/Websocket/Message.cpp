@@ -1,32 +1,31 @@
-#include "Strawberry/Core/Net/Websocket/Message.hpp"
+#include <utility>
 
+#include "Strawberry/Core/Net/Websocket/Message.hpp"
 
 
 #include "Strawberry/Core/Util/Endian.hpp"
 #include "Strawberry/Core/Util/Assert.hpp"
 
 
-
 namespace Strawberry::Core::Net::Websocket
 {
 	Message::Message(Message::Opcode opcode, Payload payload)
 		: mOpcode(opcode)
-		, mPayload(payload)
+		  , mPayload(std::move(payload))
 	{
 
 	}
-
 
 
 	Message::Message(const std::string& string)
 		: mOpcode(Opcode::Text)
-		, mPayload(string.data(), string.data() + string.size())
+		  , mPayload(string.data(), string.data() + string.size())
 	{
 
 	}
 
 
-	Message::Message(const nlohmann::json &json)
+	Message::Message(const nlohmann::json& json)
 		: Message(static_cast<std::string>(json.dump()))
 	{
 
@@ -35,18 +34,16 @@ namespace Strawberry::Core::Net::Websocket
 
 	Message::Message(std::vector<uint8_t> bytes)
 		: mOpcode(Opcode::Binary)
-		, mPayload(std::move(bytes))
+		  , mPayload(std::move(bytes))
 	{
 
 	}
-
 
 
 	std::string Message::AsString() const
 	{
-		return std::string(mPayload.data(), mPayload.data() + mPayload.size());
+		return {mPayload.data(), mPayload.data() + mPayload.size()};
 	}
-
 
 
 	Result<nlohmann::json, std::string> Message::AsJSON() const
@@ -75,14 +72,12 @@ namespace Strawberry::Core::Net::Websocket
 	}
 
 
-
 	uint16_t Message::GetCloseStatusCode() const
 	{
 		uint16_t s = static_cast<uint16_t>(mPayload[0]) << 0 | static_cast<uint16_t>(mPayload[1]) << 8;
 		s = FromBigEndian(s);
 		return s;
 	}
-
 
 
 	void Message::Append(const Message& other)

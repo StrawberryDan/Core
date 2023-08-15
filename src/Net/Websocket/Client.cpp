@@ -1,7 +1,6 @@
 #include "Strawberry/Core/Net/Websocket/Client.hpp"
 
 
-
 namespace Strawberry::Core::Net::Websocket
 {
 	Result<WSClient, Error> WSClient::Connect(const std::string& host, const std::string& resource, uint16_t port)
@@ -26,7 +25,6 @@ namespace Strawberry::Core::Net::Websocket
 
 		return std::move(client);
 	}
-
 
 
 	Result<WSSClient, Error> WSSClient::Connect(const std::string& host, const std::string& resource, uint16_t port)

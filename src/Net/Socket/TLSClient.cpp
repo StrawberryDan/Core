@@ -1,21 +1,22 @@
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
-
-
-
+// Core
 #include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Net/Socket/SocketAPI.hpp"
-#include "Strawberry/Core/Util/Utilities.hpp"
 #include "Strawberry/Core/Util/Logging.hpp"
+// System
 #include <memory>
 #include <openssl/tls1.h>
 
 
-
 #if defined(__APPLE__) || defined(__linux__)
-#include <sys/socket.h>
-#include <unistd.h>
-#endif
 
+
+#include <unistd.h>
+
+
+#endif
 
 
 class TLSContext
@@ -28,9 +29,8 @@ public:
 			mInstance = std::unique_ptr<TLSContext>(new TLSContext());
 		}
 
-		return mInstance.get()->mSSL_CONTEXT;
+		return mInstance->mSSL_CONTEXT;
 	}
-
 
 
 	~TLSContext()
@@ -39,10 +39,8 @@ public:
 	}
 
 
-
 private:
 	TLSContext()
-		: mSSL_CONTEXT(nullptr)
 	{
 		SSL_library_init();
 		OpenSSL_add_all_algorithms();
@@ -52,15 +50,14 @@ private:
 		Strawberry::Core::Assert(mSSL_CONTEXT != nullptr);
 	}
 
+
 	SSL_CTX* mSSL_CONTEXT;
 
 	static std::unique_ptr<TLSContext> mInstance;
 };
 
 
-
 std::unique_ptr<TLSContext> TLSContext::mInstance = nullptr;
-
 
 
 namespace Strawberry::Core::Net::Socket
@@ -99,22 +96,18 @@ namespace Strawberry::Core::Net::Socket
 	}
 
 
-
 	TLSClient::TLSClient()
-		: mSSL(nullptr)
-	{}
+		: mSSL(nullptr) {}
 
 
-
-	TLSClient::TLSClient(TLSClient&& other)
+	TLSClient::TLSClient(TLSClient&& other) noexcept
 	{
 		mTCP = std::move(other.mTCP);
 		mSSL = std::exchange(other.mSSL, nullptr);
 	}
 
 
-
-	TLSClient& TLSClient::operator=(TLSClient&& other)
+	TLSClient& TLSClient::operator=(TLSClient&& other) noexcept
 	{
 		if (this != &other)
 		{
@@ -124,7 +117,6 @@ namespace Strawberry::Core::Net::Socket
 
 		return *this;
 	}
-
 
 
 	TLSClient::~TLSClient()
@@ -144,12 +136,10 @@ namespace Strawberry::Core::Net::Socket
 	}
 
 
-
 	bool TLSClient::Poll() const
 	{
 		return mTCP.Poll();
 	}
-
 
 
 	Result<IO::DynamicByteBuffer, IO::Error> TLSClient::Read(size_t length)
@@ -159,7 +149,8 @@ namespace Strawberry::Core::Net::Socket
 
 		while (bytesRead < length)
 		{
-			auto thisRead = SSL_read(mSSL, reinterpret_cast<void*>(buffer.Data() + bytesRead), static_cast<int>(length - bytesRead));
+			auto thisRead = SSL_read(mSSL, reinterpret_cast<void*>(buffer.Data() + bytesRead),
+									 static_cast<int>(length - bytesRead));
 			if (thisRead > 0)
 			{
 				bytesRead += thisRead;
@@ -184,7 +175,6 @@ namespace Strawberry::Core::Net::Socket
 		Assert(bytesRead == length);
 		return buffer;
 	}
-
 
 
 	Result<size_t, IO::Error> TLSClient::Write(const IO::DynamicByteBuffer& bytes)

@@ -1,12 +1,10 @@
 #pragma once
 
 
-
 #include <regex>
 #include "Strawberry/Core/Util/Assert.hpp"
 #include <iostream>
 #include "fmt/core.h"
-
 
 
 namespace Strawberry::Core::Net::HTTP
@@ -18,13 +16,12 @@ namespace Strawberry::Core::Net::HTTP
 	}
 
 
-
 	template<typename S>
 	void ClientBase<S>::SendRequest(const Request& request)
 	{
 		std::string headerLine = fmt::format(
-				"{} {} HTTP/{}\r\n",
-				request.GetVerb().ToString(), request.GetURI(), request.GetVersion().ToString());
+			"{} {} HTTP/{}\r\n",
+			request.GetVerb().ToString(), request.GetURI(), request.GetVersion().ToString());
 		mSocket.Write({headerLine.data(), headerLine.length()}).Unwrap();
 		for (const auto& [key, values]: *request.GetHeader())
 		{
@@ -45,7 +42,6 @@ namespace Strawberry::Core::Net::HTTP
 	}
 
 
-
 	template<typename S>
 	Response ClientBase<S>::Receive()
 	{
@@ -64,10 +60,9 @@ namespace Strawberry::Core::Net::HTTP
 		while (!matched);
 
 
-
-		std::string version    = matchResults[1],
-					status     = matchResults[2],
-					statusText = matchResults[3];
+		std::string version = matchResults[1],
+			status = matchResults[2],
+			statusText = matchResults[3];
 
 		Response response(*Version::Parse(version), std::stoi(status), statusText);
 
@@ -115,7 +110,6 @@ namespace Strawberry::Core::Net::HTTP
 	}
 
 
-
 	template<typename S>
 	IO::DynamicByteBuffer ClientBase<S>::ReadChunkedPayload()
 	{
@@ -160,7 +154,6 @@ namespace Strawberry::Core::Net::HTTP
 		Core::Assert(sumOfChunkLengths == payload.Size());
 		return payload;
 	}
-
 
 
 	template<typename S>

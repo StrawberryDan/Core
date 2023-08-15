@@ -8,9 +8,8 @@
 
 namespace Strawberry::Core
 {
-	static Option<Logging::Level>      sLogLevel   = {};
-	static Option<std::ofstream>       sOutputFile = {};
-
+	static Option<Logging::Level> sLogLevel = {};
+	static Option<std::ofstream> sOutputFile = {};
 
 
 	std::string Logging::LevelToString(Level logLevel)
@@ -31,12 +30,10 @@ namespace Strawberry::Core
 	}
 
 
-
 	Logging::Level Logging::GetLevel()
 	{
 		return sLogLevel.UnwrapOr(Level::Trace);
 	}
-
 
 
 	void Logging::SetLevel(Level logLevel)
@@ -45,12 +42,10 @@ namespace Strawberry::Core
 	}
 
 
-
 	void Logging::SetOutputFile(std::string message)
 	{
 		sOutputFile.Emplace(std::move(message));
 	}
-
 
 
 	void Logging::LogRaw(Level level, const std::string& message)

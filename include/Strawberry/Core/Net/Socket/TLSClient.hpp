@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 #include "Strawberry/Core/Net/Error.hpp"
 #include "Strawberry/Core/Util/Option.hpp"
 #include "TCPClient.hpp"
@@ -18,25 +17,22 @@ namespace Strawberry::Core::Net::Socket
 		static Result<TLSClient, Error> Connect(const Endpoint& endpoint);
 
 
-
 	public:
 		TLSClient();
 		TLSClient(const TLSClient& other) = delete;
-		TLSClient(TLSClient&& other);
+		TLSClient(TLSClient&& other) noexcept;
 		TLSClient& operator=(const TLSClient& other) = delete;
-		TLSClient& operator=(TLSClient&& other);
+		TLSClient& operator=(TLSClient&& other) noexcept;
 		~TLSClient();
 
 
-
-		bool										Poll() const;
-		Result<IO::DynamicByteBuffer, IO::Error>	Read(size_t length);
-		Result<size_t, IO::Error>					Write(const IO::DynamicByteBuffer& bytes);
-
+		[[nodiscard]] bool Poll() const;
+		Result<IO::DynamicByteBuffer, IO::Error> Read(size_t length);
+		Result<size_t, IO::Error> Write(const IO::DynamicByteBuffer& bytes);
 
 
 	private:
 		TCPClient mTCP;
-		SSL*      mSSL;
+		SSL* mSSL;
 	};
 }

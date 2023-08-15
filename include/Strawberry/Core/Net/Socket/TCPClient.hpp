@@ -1,9 +1,7 @@
 #pragma once
 
 
-
 #include <string>
-
 
 
 #include "Strawberry/Core/Net/Error.hpp"
@@ -14,11 +12,9 @@
 #include "SocketAPIUser.hpp"
 
 
-
 #if defined(_WIN32)
 #include <winsock2.h>
 #endif
-
 
 
 namespace Strawberry::Core::Net::Socket
@@ -27,30 +23,29 @@ namespace Strawberry::Core::Net::Socket
 		: private SocketAPIUser
 	{
 		friend class TLSClient;
+
+
 	public:
 		static Result<TCPClient, Error> Connect(const Endpoint& endpoint);
-
 
 
 	public:
 		TCPClient();
 		TCPClient(const TCPClient& other) = delete;
-		TCPClient(TCPClient&& other);
+		TCPClient(TCPClient&& other) noexcept;
 		TCPClient& operator=(const TCPClient& other) = delete;
-		TCPClient& operator=(TCPClient&& other);
-		~TCPClient();
+		TCPClient& operator=(TCPClient&& other) noexcept;
+		~TCPClient() final;
 
 
-
-		bool										Poll() const;
-		Result<IO::DynamicByteBuffer, IO::Error>	Read(size_t length);
-		Result<size_t, IO::Error>					Write(const IO::DynamicByteBuffer& bytes);
-
+		[[nodiscard]] bool Poll() const;
+		Result<IO::DynamicByteBuffer, IO::Error> Read(size_t length);
+		Result<size_t, IO::Error> Write(const IO::DynamicByteBuffer& bytes);
 
 
 	private:
 #if defined(__APPLE__) || defined(__linux__)
-		int    mSocket;
+		int mSocket;
 #elif defined(_WIN32)
 		SOCKET mSocket;
 #endif
