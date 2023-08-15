@@ -9,6 +9,4 @@ namespace Strawberry::Core::Net::HTTP
 		: mVerb(verb)
 		, mURI(std::move(uri))
 		, mVersion(version)
-	{
-	}
-}// namespace Strawberry::Core::Net::HTTP
+	{}// namespace Strawberry::Core::Net::HTTP

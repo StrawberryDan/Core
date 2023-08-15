@@ -23,8 +23,7 @@ namespace Strawberry::Core
 		template <std::convertible_to<std::variant<Types...>> T>
 		Variant(T data)
 			: mData(std::move(data))
-		{
-		}
+		{}
 
 
 		[[nodiscard]] bool ContainsValue() const { return !mData.valueless_by_exception(); }

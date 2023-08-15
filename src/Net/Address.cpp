@@ -85,14 +85,12 @@ namespace Strawberry::Core::Net
 
 	IPAddress::IPAddress(IPv4Address address)
 		: mPayload(address)
-	{
-	}
+	{}
 
 
 	IPAddress::IPAddress(IPv6Address address)
 		: mPayload(address)
-	{
-	}
+	{}
 
 
 	Option<IPv4Address> IPAddress::AsIPv4() const

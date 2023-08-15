@@ -104,13 +104,10 @@ namespace Strawberry::Core::Net
 	Endpoint::Endpoint(IPAddress address, uint16_t port)
 		: mAddress(address)
 		, mPort(port)
-	{
-	}
+	{}
 
 
 	Endpoint::Endpoint(const std::string& hostname, uint16_t port)
 		: mHostName(hostname)
 		, mPort(port)
-	{
-	}
-}// namespace Strawberry::Core::Net
+	{}// namespace Strawberry::Core::Net

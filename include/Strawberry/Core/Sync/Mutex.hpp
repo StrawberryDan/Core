@@ -47,8 +47,7 @@ namespace Strawberry::Core
 		MutexGuard(LockType lock, T* ptr)
 			: mLock(std::move(lock))
 			, mPayload(ptr)
-		{
-		}
+		{}
 
 
 		LockType mLock;
@@ -64,16 +63,14 @@ namespace Strawberry::Core
 		explicit Mutex(Ts... ts)
 			: mMutex()
 			, mPayload(std::forward<Ts>(ts)...)
-		{
-		}
+		{}
 
 
 		Mutex(Mutex&& rhs) noexcept
 			requires (std::is_move_constructible_v<T>)
 			: mMutex()
 			, mPayload(std::move(rhs).Take())
-		{
-		}
+		{}
 
 
 		Mutex& operator=(Mutex&& other) noexcept
@@ -159,16 +156,14 @@ namespace Strawberry::Core
 	public:
 		explicit SharedMutex(std::nullptr_t)
 			: mPayload(nullptr)
-		{
-		}
+		{}
 
 
 		template <typename... Ts>
 		requires (std::constructible_from<T, Ts...>)
 		explicit SharedMutex(Ts... ts)
 			: mPayload(std::make_shared<Mutex<T>>(std::forward<Ts>(ts)...))
-		{
-		}
+		{}
 
 
 		SharedMutex& operator=(std::nullptr_t)

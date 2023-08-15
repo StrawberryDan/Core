@@ -22,8 +22,7 @@ namespace Strawberry::Core::Net::HTTP
 	public:
 		inline Verb(_Enum value)
 			: mValue(value)
-		{
-		}
+		{}
 
 
 		operator _Enum() const { return mValue; }
@@ -51,8 +50,7 @@ namespace Strawberry::Core::Net::HTTP
 	public:
 		inline Version(_Enum value)
 			: mValue(value)
-		{
-		}
+		{}
 
 
 		inline operator _Enum() const { return mValue; }

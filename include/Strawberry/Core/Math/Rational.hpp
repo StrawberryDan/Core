@@ -19,8 +19,7 @@ namespace Strawberry::Core::Math
 		Rational(V value)
 			: mNumerator(static_cast<T>(value))
 			, mDenominator(1)
-		{
-		}
+		{}
 
 
 		Rational(T numerator, T denominator)

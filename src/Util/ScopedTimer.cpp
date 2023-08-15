@@ -13,8 +13,7 @@ namespace Strawberry::Core
 	ScopedTimer::ScopedTimer(std::string name)
 		: mName(std::move(name))
 		, mClock()
-	{
-	}
+	{}
 
 
 	ScopedTimer::~ScopedTimer()

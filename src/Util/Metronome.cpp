@@ -13,8 +13,7 @@ namespace Strawberry::Core
 	Metronome::Metronome(double frequency, double preemption)
 		: mFrequency(frequency)
 		, mPreemption(preemption)
-	{
-	}
+	{}
 
 
 	Metronome::operator bool()

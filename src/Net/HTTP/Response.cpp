@@ -9,6 +9,4 @@ namespace Strawberry::Core::Net::HTTP
 		: mVersion(mVersion)
 		, mStatus(mStatus)
 		, mStatusText(std::move(mStatusText))
-	{
-	}
-}// namespace Strawberry::Core::Net::HTTP
+	{}// namespace Strawberry::Core::Net::HTTP

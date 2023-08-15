@@ -73,14 +73,12 @@ namespace Strawberry::Core::Net::Socket
 
 	UDPClient::UDPClient()
 		: mSocket(-1)
-	{
-	}
+	{}
 
 
 	UDPClient::UDPClient(UDPClient&& other) noexcept
 		: mSocket(std::exchange(other.mSocket, -1))
-	{
-	}
+	{}
 
 
 	UDPClient& UDPClient::operator=(UDPClient&& other) noexcept

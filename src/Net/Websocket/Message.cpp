@@ -12,28 +12,24 @@ namespace Strawberry::Core::Net::Websocket
 	Message::Message(Message::Opcode opcode, Payload payload)
 		: mOpcode(opcode)
 		, mPayload(std::move(payload))
-	{
-	}
+	{}
 
 
 	Message::Message(const std::string& string)
 		: mOpcode(Opcode::Text)
 		, mPayload(string.data(), string.data() + string.size())
-	{
-	}
+	{}
 
 
 	Message::Message(const nlohmann::json& json)
 		: Message(static_cast<std::string>(json.dump()))
-	{
-	}
+	{}
 
 
 	Message::Message(std::vector<uint8_t> bytes)
 		: mOpcode(Opcode::Binary)
 		, mPayload(std::move(bytes))
-	{
-	}
+	{}
 
 
 	std::string Message::AsString() const

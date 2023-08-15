@@ -18,8 +18,7 @@ namespace Strawberry::Core::Collection
 			, mHead(Capacity(), 0)
 			, mTail(Capacity(), 0)
 			, mSize(0)
-		{
-		}
+		{}
 
 
 		void Push(T value)
@@ -79,8 +78,7 @@ namespace Strawberry::Core::Collection
 			, mHead(Capacity(), 0)
 			, mTail(Capacity(), 0)
 			, mSize(0)
-		{
-		}
+		{}
 
 
 		void Push(T value)

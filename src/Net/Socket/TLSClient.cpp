@@ -98,8 +98,7 @@ namespace Strawberry::Core::Net::Socket
 
 	TLSClient::TLSClient()
 		: mSSL(nullptr)
-	{
-	}
+	{}
 
 
 	TLSClient::TLSClient(TLSClient&& other) noexcept

@@ -63,14 +63,12 @@ namespace Strawberry::Core::Net::Socket
 
 	TCPClient::TCPClient()
 		: mSocket(-1)
-	{
-	}
+	{}
 
 
 	TCPClient::TCPClient(TCPClient&& other) noexcept
 		: mSocket(std::exchange(other.mSocket, -1))
-	{
-	}
+	{}
 
 
 	TCPClient& TCPClient::operator=(TCPClient&& other) noexcept

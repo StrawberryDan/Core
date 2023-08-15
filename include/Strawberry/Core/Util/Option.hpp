@@ -43,14 +43,12 @@ namespace Strawberry::Core
 	public:
 		Option()
 			: mHasValue(false)
-		{
-		}
+		{}
 
 
 		Option(NullOpt_t)
 			: mHasValue(false)
-		{
-		}
+		{}
 
 
 		Option(const T& value) requires (std::is_copy_constructible_v<T>)
@@ -577,32 +575,27 @@ namespace Strawberry::Core
 	public:
 		Option()
 			: mPayload(nullptr)
-		{
-		}
+		{}
 
 
 		Option(NullOpt_t)
 			: mPayload(nullptr)
-		{
-		}
+		{}
 
 
 		Option(T value)
 			: mPayload(value)
-		{
-		}
+		{}
 
 
 		Option(const Option& rhs)
 			: mPayload(rhs.HasValue() ? *rhs : nullptr)
-		{
-		}
+		{}
 
 
 		Option(Option&& rhs) noexcept
 			: mPayload(std::exchange(rhs.mPayload, nullptr))
-		{
-		}
+		{}
 
 
 		Option& operator=(NullOpt_t)

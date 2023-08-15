@@ -16,32 +16,28 @@ namespace Strawberry::Core
 			requires (std::copy_constructible<D>)
 			: mIsOk(true)
 			, mPayload(value)
-		{
-		}
+		{}
 
 
 		Result(D&& value)
 			requires (std::move_constructible<D>)
 			: mIsOk(true)
 			, mPayload(std::move(value))
-		{
-		}
+		{}
 
 
 		Result(const E& value)
 			requires (std::copy_constructible<E>)
 			: mIsOk(false)
 			, mPayload(value)
-		{
-		}
+		{}
 
 
 		Result(E&& value)
 			requires (std::move_constructible<E>)
 			: mIsOk(false)
 			, mPayload(std::move(value))
-		{
-		}
+		{}
 
 
 		static Result Ok(const D& value)
@@ -151,15 +147,13 @@ namespace Strawberry::Core
 		Result(bool isOk, const Payload& payload)
 			: mIsOk(isOk)
 			, mPayload(payload)
-		{
-		}
+		{}
 
 
 		Result(bool isOk, Payload&& payload)
 			: mIsOk(isOk)
 			, mPayload(std::forward<Payload>(payload))
-		{
-		}
+		{}
 
 
 		bool    mIsOk;
