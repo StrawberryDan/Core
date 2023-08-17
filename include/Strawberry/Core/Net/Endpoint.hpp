@@ -27,7 +27,7 @@ namespace Strawberry::Core::Net
 		Endpoint(IPAddress address, uint16_t port);
 
 
-		[[nodiscard]] inline const Option<std::string>& GetHostname() const { return mHostName; };
+		[[nodiscard]] inline const Option<std::string>& GetHostname() const { return mHostName; }
 
 
 		[[nodiscard]] inline Option<IPAddress> GetAddress() const { return mAddress; }

@@ -101,9 +101,8 @@ namespace Strawberry::Core::Net::Socket
 	bool TCPClient::Poll() const
 	{
 #if defined(__APPLE__) || defined(__linux__)
-		pollfd fds[] =
-			{
-				{mSocket, POLLIN, 0}
+		pollfd fds[] = {
+			{mSocket, POLLIN, 0}
         };
 
 		int pollResult = poll(fds, 1, 0);
@@ -123,14 +122,8 @@ namespace Strawberry::Core::Net::Socket
 		while (bytesRead < length)
 		{
 			auto thisRead = recv(mSocket, reinterpret_cast<char*>(buffer.Data()) + bytesRead, length - bytesRead, 0);
-			if (thisRead > 0)
-			{
-				bytesRead += thisRead;
-			}
-			else
-			{
-				Unreachable();
-			}
+			if (thisRead > 0) { bytesRead += thisRead; }
+			else { Unreachable(); }
 		}
 
 		Assert(bytesRead == length);
@@ -145,14 +138,8 @@ namespace Strawberry::Core::Net::Socket
 		while (bytesSent < bytes.Size())
 		{
 			auto thisSend = send(mSocket, reinterpret_cast<const char*>(bytes.Data()) + bytesSent, bytes.Size() - bytesSent, 0);
-			if (thisSend > 0)
-			{
-				bytesSent += thisSend;
-			}
-			else
-			{
-				Unreachable();
-			}
+			if (thisSend > 0) { bytesSent += thisSend; }
+			else { Unreachable(); }
 		}
 
 		Assert(bytesSent == bytes.Size());

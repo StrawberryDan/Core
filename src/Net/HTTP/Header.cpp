@@ -10,14 +10,8 @@ namespace Strawberry::Core::Net::HTTP
 	void Header::Add(const Header::Key& key, const Header::Value& value)
 	{
 		auto lc = ToLowercase(key);
-		if (mEntries.contains(lc))
-		{
-			mEntries.at(lc).push_back(value);
-		}
-		else
-		{
-			mEntries.insert({lc, {value}});
-		}
+		if (mEntries.contains(lc)) { mEntries.at(lc).push_back(value); }
+		else { mEntries.insert({lc, {value}}); }
 	}
 
 

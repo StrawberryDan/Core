@@ -28,10 +28,7 @@ namespace Strawberry::Core::Net::Socket
 	Result<UDPClient, Error> UDPClient::Create()
 	{
 		auto handle = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-		if (handle == -1)
-		{
-			return Error::SocketCreation;
-		}
+		if (handle == -1) { return Error::SocketCreation; }
 
 		int  ipv6Only     = 0;
 		auto optSetResult = setsockopt(handle, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char*>(&ipv6Only), sizeof(ipv6Only));
@@ -46,10 +43,7 @@ namespace Strawberry::Core::Net::Socket
 	Result<UDPClient, Error> UDPClient::CreateIPv4()
 	{
 		auto handle = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-		if (handle == -1)
-		{
-			return Error::SocketCreation;
-		}
+		if (handle == -1) { return Error::SocketCreation; }
 
 		UDPClient client;
 		client.mSocket = handle;
@@ -60,10 +54,7 @@ namespace Strawberry::Core::Net::Socket
 	Result<UDPClient, Error> UDPClient::CreateIPv6()
 	{
 		auto handle = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-		if (handle == -1)
-		{
-			return Error::SocketCreation;
-		}
+		if (handle == -1) { return Error::SocketCreation; }
 
 		UDPClient client;
 		client.mSocket = handle;
@@ -111,9 +102,8 @@ namespace Strawberry::Core::Net::Socket
 	bool UDPClient::Poll() const
 	{
 #if defined(__APPLE__) || defined(__linux__)
-		pollfd fds[] =
-			{
-				{mSocket, POLLIN, 0}
+		pollfd fds[] = {
+			{mSocket, POLLIN, 0}
         };
 
 		int pollResult = poll(fds, 1, 0);
@@ -128,8 +118,8 @@ namespace Strawberry::Core::Net::Socket
 	Result<std::tuple<Option<Endpoint>, IO::DynamicByteBuffer>, IO::Error> UDPClient::Read()
 	{
 		sockaddr_storage peer{};
-		socklen_t        peerLen   = 0;
-		auto             bytesRead = recvfrom(mSocket, reinterpret_cast<char*>(mBuffer.Data()), mBuffer.Size(), 0, reinterpret_cast<sockaddr*>(&peer), &peerLen);
+		socklen_t        peerLen = 0;
+		auto bytesRead           = recvfrom(mSocket, reinterpret_cast<char*>(mBuffer.Data()), mBuffer.Size(), 0, reinterpret_cast<sockaddr*>(&peer), &peerLen);
 
 		if (bytesRead >= 0)
 		{
@@ -137,24 +127,17 @@ namespace Strawberry::Core::Net::Socket
 			if (peer.ss_family == AF_INET)
 			{
 				auto* sockaddr = reinterpret_cast<sockaddr_in*>(&peer);
-				endpoint.Emplace(
-					IPv4Address(IO::ByteBuffer<4>(sockaddr->sin_addr)),
-					sockaddr->sin_port);
+				endpoint.Emplace(IPv4Address(IO::ByteBuffer<4>(sockaddr->sin_addr)), sockaddr->sin_port);
 			}
 			else if (peer.ss_family == AF_INET6)
 			{
 				auto* sockaddr = reinterpret_cast<sockaddr_in6*>(&peer);
-				endpoint.Emplace(
-					IPv6Address(IO::ByteBuffer<16>(sockaddr->sin6_addr)),
-					sockaddr->sin6_port);
+				endpoint.Emplace(IPv6Address(IO::ByteBuffer<16>(sockaddr->sin6_addr)), sockaddr->sin6_port);
 			}
 
 			return std::make_tuple(endpoint, IO::DynamicByteBuffer(mBuffer.Data(), bytesRead));
 		}
-		else
-		{
-			Unreachable();
-		}
+		else { Unreachable(); }
 	}
 
 
@@ -168,13 +151,7 @@ namespace Strawberry::Core::Net::Socket
 
 		auto bytesSent = sendto(mSocket, reinterpret_cast<const char*>(bytes.Data()), bytes.Size(), 0, peer->ai_addr, peer->ai_addrlen);
 		freeaddrinfo(peer);
-		if (bytesSent >= 0)
-		{
-			return bytesSent;
-		}
-		else
-		{
-			Unreachable();
-		}
+		if (bytesSent >= 0) { return bytesSent; }
+		else { Unreachable(); }
 	}
 } // namespace Strawberry::Core::Net::Socket

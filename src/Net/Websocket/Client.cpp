@@ -14,10 +14,7 @@ namespace Strawberry::Core::Net::Websocket
 		upgradeRequest.GetHeader().Add("Sec-WebSocket-Version", "13");
 		handshaker.SendRequest(upgradeRequest);
 		auto response = handshaker.Receive();
-		if (response.GetStatus() != 101)
-		{
-			return Error::Refused;
-		}
+		if (response.GetStatus() != 101) { return Error::Refused; }
 
 
 		WSClient client;
@@ -38,10 +35,7 @@ namespace Strawberry::Core::Net::Websocket
 		upgradeRequest.GetHeader().Add("Sec-WebSocket-Version", "13");
 		handshaker.SendRequest(upgradeRequest);
 		auto response = handshaker.Receive();
-		if (response.GetStatus() != 101)
-		{
-			return Error::Refused;
-		}
+		if (response.GetStatus() != 101) { return Error::Refused; }
 
 
 		WSSClient client;

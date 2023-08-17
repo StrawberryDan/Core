@@ -30,22 +30,13 @@ namespace Strawberry::Core
 	}
 
 
-	Logging::Level Logging::GetLevel()
-	{
-		return sLogLevel.UnwrapOr(Level::Trace);
-	}
+	Logging::Level Logging::GetLevel() { return sLogLevel.UnwrapOr(Level::Trace); }
 
 
-	void Logging::SetLevel(Level logLevel)
-	{
-		sLogLevel = logLevel;
-	}
+	void Logging::SetLevel(Level logLevel) { sLogLevel = logLevel; }
 
 
-	void Logging::SetOutputFile(std::string message)
-	{
-		sOutputFile.Emplace(std::move(message));
-	}
+	void Logging::SetOutputFile(std::string message) { sOutputFile.Emplace(std::move(message)); }
 
 
 	void Logging::LogRaw(Level level, const std::string& message)
@@ -54,9 +45,6 @@ namespace Strawberry::Core
 		if (level == Level::Error) outputStream = &std::cerr;
 
 		*outputStream << message << std::endl;
-		if (sOutputFile)
-		{
-			*sOutputFile << message << std::endl;
-		}
+		if (sOutputFile) { *sOutputFile << message << std::endl; }
 	}
 } // namespace Strawberry::Core

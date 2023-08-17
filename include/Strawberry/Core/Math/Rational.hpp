@@ -11,8 +11,7 @@
 
 namespace Strawberry::Core::Math
 {
-	template <std::integral T = int32_t>
-	class Rational
+	template <std::integral T = int32_t> class Rational
 	{
 	public:
 		template <std::integral V>
@@ -50,10 +49,7 @@ namespace Strawberry::Core::Math
 		const T& Denominator() const { return mDenominator; }
 
 
-		[[nodiscard]] double Evaluate() const
-		{
-			return static_cast<double>(mNumerator) / static_cast<double>(mDenominator);
-		}
+		[[nodiscard]] double Evaluate() const { return static_cast<double>(mNumerator) / static_cast<double>(mDenominator); }
 
 
 		double operator*() const { return Evaluate(); }
@@ -73,10 +69,7 @@ namespace Strawberry::Core::Math
 
 		//		Rational operator*(const Rational& rhs) const
 		//			{ return {Numerator() * rhs.Numerator(), Denominator() * rhs.Denominator()}; }
-		Rational operator/(const Rational& rhs) const
-		{
-			return {Numerator() * rhs.Denominator(), Denominator() * rhs.Numerator()};
-		}
+		Rational operator/(const Rational& rhs) const { return {Numerator() * rhs.Denominator(), Denominator() * rhs.Numerator()}; }
 
 
 		friend Rational operator*(const Rational& lhs, const Rational& rhs)
@@ -90,9 +83,7 @@ namespace Strawberry::Core::Math
 	protected:
 		void Normalize()
 		{
-			for (auto gcd = GreatestCommonDivisor(mNumerator, mDenominator);
-				 gcd != 1;
-				 gcd = GreatestCommonDivisor(mNumerator, mDenominator))
+			for (auto gcd = GreatestCommonDivisor(mNumerator, mDenominator); gcd != 1; gcd = GreatestCommonDivisor(mNumerator, mDenominator))
 			{
 				mNumerator   /= gcd;
 				mDenominator /= gcd;
@@ -106,6 +97,5 @@ namespace Strawberry::Core::Math
 	};
 
 
-	template <std::integral T>
-	Rational(T, T) -> Rational<T>;
+	template <std::integral T> Rational(T, T) -> Rational<T>;
 } // namespace Strawberry::Core::Math

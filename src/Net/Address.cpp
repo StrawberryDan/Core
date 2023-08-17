@@ -30,17 +30,11 @@ namespace Strawberry::Core::Net
 			IO::ByteBuffer<4> bytes(buffer, 4);
 			return IPv4Address(bytes);
 		}
-		else
-		{
-			return {};
-		}
+		else { return {}; }
 	}
 
 
-	IO::ByteBuffer<4> IPv4Address::AsBytes() const
-	{
-		return mData;
-	}
+	IO::ByteBuffer<4> IPv4Address::AsBytes() const { return mData; }
 
 
 	std::string IPv4Address::AsString() const
@@ -61,17 +55,11 @@ namespace Strawberry::Core::Net
 			IO::ByteBuffer<16> bytes(buffer, 16);
 			return IPv6Address(bytes);
 		}
-		else
-		{
-			return {};
-		}
+		else { return {}; }
 	}
 
 
-	const IO::ByteBuffer<16>& IPv6Address::AsBytes() const
-	{
-		return mData;
-	}
+	const IO::ByteBuffer<16>& IPv6Address::AsBytes() const { return mData; }
 
 
 	std::string IPv6Address::AsString() const
@@ -95,8 +83,7 @@ namespace Strawberry::Core::Net
 
 	Option<IPv4Address> IPAddress::AsIPv4() const
 	{
-		if (IsIPv4())
-			return std::get<IPv4Address>(mPayload);
+		if (IsIPv4()) return std::get<IPv4Address>(mPayload);
 		else
 			return {};
 	}
@@ -104,8 +91,7 @@ namespace Strawberry::Core::Net
 
 	Option<IPv6Address> IPAddress::AsIPv6() const
 	{
-		if (IsIPv6())
-			return std::get<IPv6Address>(mPayload);
+		if (IsIPv6()) return std::get<IPv6Address>(mPayload);
 		else
 			return {};
 	}
@@ -113,34 +99,16 @@ namespace Strawberry::Core::Net
 
 	IO::DynamicByteBuffer IPAddress::AsBytes() const
 	{
-		if (auto addr = AsIPv4())
-		{
-			return IO::DynamicByteBuffer(addr->AsBytes());
-		}
-		else if (auto addr = AsIPv6())
-		{
-			return IO::DynamicByteBuffer(addr->AsBytes());
-		}
-		else
-		{
-			Unreachable();
-		}
+		if (auto addr = AsIPv4()) { return IO::DynamicByteBuffer(addr->AsBytes()); }
+		else if (auto addr = AsIPv6()) { return IO::DynamicByteBuffer(addr->AsBytes()); }
+		else { Unreachable(); }
 	}
 
 
 	std::string IPAddress::AsString() const
 	{
-		if (auto addr = AsIPv4())
-		{
-			return addr->AsString();
-		}
-		else if (auto addr = AsIPv6())
-		{
-			return addr->AsString();
-		}
-		else
-		{
-			Unreachable();
-		}
+		if (auto addr = AsIPv4()) { return addr->AsString(); }
+		else if (auto addr = AsIPv6()) { return addr->AsString(); }
+		else { Unreachable(); }
 	}
 } // namespace Strawberry::Core::Net

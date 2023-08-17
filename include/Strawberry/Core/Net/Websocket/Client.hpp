@@ -28,8 +28,7 @@ namespace Strawberry::Core::Net::Websocket
 	};
 
 
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <typename S> requires IO::Read<S> && IO::Write<S>
 	class ClientBase
 	{
 	public:
@@ -78,21 +77,17 @@ namespace Strawberry::Core::Net::Websocket
 	};
 
 
-	class WSClient
-		: public ClientBase<Socket::TCPClient>
+	class WSClient : public ClientBase<Socket::TCPClient>
 	{
 	public:
-		static Result<WSClient, Error>
-		Connect(const std::string& host, const std::string& resource, uint16_t port = 80);
+		static Result<WSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 80);
 	};
 
 
-	class WSSClient
-		: public ClientBase<Socket::TLSClient>
+	class WSSClient : public ClientBase<Socket::TLSClient>
 	{
 	public:
-		static Result<WSSClient, Error>
-		Connect(const std::string& host, const std::string& resource, uint16_t port = 443);
+		static Result<WSSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 443);
 	};
 } // namespace Strawberry::Core::Net::Websocket
 

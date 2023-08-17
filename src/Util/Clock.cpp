@@ -13,10 +13,7 @@ namespace Strawberry::Core
 
 	void Clock::Start()
 	{
-		if (!mStartTime)
-		{
-			mStartTime = std::chrono::system_clock::now();
-		}
+		if (!mStartTime) { mStartTime = std::chrono::system_clock::now(); }
 	}
 
 
@@ -39,10 +36,7 @@ namespace Strawberry::Core
 			auto currentRun = std::chrono::duration_cast<Duration>(now - *mStartTime);
 			return (currentRun + mBuffer).count();
 		}
-		else
-		{
-			return mBuffer.count();
-		}
+		else { return mBuffer.count(); }
 	}
 
 

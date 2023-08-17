@@ -16,17 +16,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template <typename T>
-	class ChannelBroadcaster
+	template <typename T> class ChannelBroadcaster
 	{
 	public:
 		void Broadcast(T value)
 		{
 			std::erase_if(mReceivers, [](const std::weak_ptr<ChannelReceiver<T>>& x) { return x.expired(); });
-			for (auto& receiver : mReceivers)
-			{
-				receiver.lock()->Receive(value);
-			}
+			for (auto& receiver : mReceivers) { receiver.lock()->Receive(value); }
 		}
 
 

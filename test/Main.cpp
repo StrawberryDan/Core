@@ -58,10 +58,7 @@ namespace Test
 		{
 			unsigned int          len = lengthDistribution(randgen);
 			IO::DynamicByteBuffer randomBytes;
-			for (int i = 0; i < len; ++i)
-			{
-				randomBytes.Push(byteDistribution(randgen));
-			}
+			for (int i = 0; i < len; ++i) { randomBytes.Push(byteDistribution(randgen)); }
 
 			Assert(randomBytes.Size() == len);
 			CheckBytes(randomBytes);

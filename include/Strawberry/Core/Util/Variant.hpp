@@ -16,8 +16,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core
 {
-	template <typename... Types>
-	class Variant
+	template <typename... Types> class Variant
 	{
 	public:
 		template <std::convertible_to<std::variant<Types...>> T>
@@ -29,40 +28,22 @@ namespace Strawberry::Core
 		[[nodiscard]] bool ContainsValue() const { return !mData.valueless_by_exception(); }
 
 
-		template <typename T>
-		[[nodiscard]] bool IsType() const
+		template <typename T> [[nodiscard]] bool IsType() const { return std::holds_alternative<T>(mData); }
+
+
+		template <typename T> Core::Option<T> Value() const&
 		{
-			return std::holds_alternative<T>(mData);
+			Core::Assert(ContainsValue());
+			if (std::holds_alternative<T>(mData)) { return std::get<T>(mData); }
+			else { return Core::NullOpt; }
 		}
 
 
-		template <typename T>
-		Core::Option<T> Value() const&
+		template <typename T> Core::Option<T> Value() &&
 		{
 			Core::Assert(ContainsValue());
-			if (std::holds_alternative<T>(mData))
-			{
-				return std::get<T>(mData);
-			}
-			else
-			{
-				return Core::NullOpt;
-			}
-		}
-
-
-		template <typename T>
-		Core::Option<T> Value() &&
-		{
-			Core::Assert(ContainsValue());
-			if (std::holds_alternative<T>(mData))
-			{
-				return std::get<T>(std::move(mData));
-			}
-			else
-			{
-				return Core::NullOpt;
-			}
+			if (std::holds_alternative<T>(mData)) { return std::get<T>(std::move(mData)); }
+			else { return Core::NullOpt; }
 		}
 
 

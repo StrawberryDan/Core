@@ -33,8 +33,7 @@ namespace Strawberry::Core::Net::RTP
 #pragma pack()
 
 
-		template <typename DataSource>
-		requires IO::Read<DataSource>
+		template <typename DataSource> requires IO::Read<DataSource>
 		static Result<Packet, Error> Read(DataSource& data)
 		{
 			auto headerData = data.Read(sizeof(Header));
@@ -81,10 +80,7 @@ namespace Strawberry::Core::Net::RTP
 		}
 
 
-		[[nodiscard]] const Header& GetHeader() const
-		{
-			return mHeader;
-		}
+		[[nodiscard]] const Header& GetHeader() const { return mHeader; }
 
 
 		void AddContributingSource(uint32_t source)
@@ -95,22 +91,13 @@ namespace Strawberry::Core::Net::RTP
 		}
 
 
-		[[nodiscard]] const std::vector<uint32_t>& GetContributingSources() const
-		{
-			return mContributingSources;
-		}
+		[[nodiscard]] const std::vector<uint32_t>& GetContributingSources() const { return mContributingSources; }
 
 
-		[[nodiscard]] IO::DynamicByteBuffer GetPayload() const
-		{
-			return mPayload;
-		}
+		[[nodiscard]] IO::DynamicByteBuffer GetPayload() const { return mPayload; }
 
 
-		void SetPayload(IO::DynamicByteBuffer payload)
-		{
-			mPayload = std::move(payload);
-		}
+		void SetPayload(IO::DynamicByteBuffer payload) { mPayload = std::move(payload); }
 
 
 		[[nodiscard]] IO::DynamicByteBuffer AsBytes() const

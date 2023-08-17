@@ -21,8 +21,7 @@
 
 namespace Strawberry::Core::Net::Socket
 {
-	class UDPClient
-		: private SocketAPIUser
+	class UDPClient : private SocketAPIUser
 	{
 	public:
 		static Result<UDPClient, Error> Create();

@@ -14,12 +14,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template <typename T>
-	class ChannelBroadcaster;
+	template <typename T> class ChannelBroadcaster;
 
 
-	template <typename T>
-	class ChannelReceiver
+	template <typename T> class ChannelReceiver
 	{
 		friend class ChannelBroadcaster<T>;
 
@@ -31,20 +29,14 @@ namespace Strawberry::Core::IO
 		ChannelReceiver& operator=(ChannelReceiver&& rhs)      = default;
 
 
-		~ChannelReceiver()
-		{
-			mMessageBuffer.Lock()->clear();
-		}
+		~ChannelReceiver() { mMessageBuffer.Lock()->clear(); }
 
 
 		Core::Option<T> Read()
 		{
 			auto messageBuffer = mMessageBuffer.Lock();
 			auto result        = messageBuffer->empty() ? Core::NullOpt : Core::Option(messageBuffer->front());
-			if (result)
-			{
-				messageBuffer->pop_front();
-			}
+			if (result) { messageBuffer->pop_front(); }
 			return result;
 		}
 
@@ -53,10 +45,7 @@ namespace Strawberry::Core::IO
 		ChannelReceiver() = default;
 
 
-		void Receive(T value)
-		{
-			mMessageBuffer.Lock()->push_back(std::move(value));
-		}
+		void Receive(T value) { mMessageBuffer.Lock()->push_back(std::move(value)); }
 
 
 	private:

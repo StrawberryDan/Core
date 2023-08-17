@@ -31,20 +31,11 @@ namespace Strawberry::Core
 	}
 
 
-	void Metronome::Restart()
-	{
-		mClock.Restart();
-	}
+	void Metronome::Restart() { mClock.Restart(); }
 
 
-	void Metronome::SetPreemption(double preemption)
-	{
-		mPreemption = preemption;
-	}
+	void Metronome::SetPreemption(double preemption) { mPreemption = preemption; }
 
 
-	void Metronome::SetFrequency(double frequency)
-	{
-		mFrequency = frequency;
-	}
+	void Metronome::SetFrequency(double frequency) { mFrequency = frequency; }
 } // namespace Strawberry::Core

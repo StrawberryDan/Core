@@ -16,10 +16,7 @@ namespace Strawberry::Core::Net::Socket
 			mSocketAPI = std::shared_ptr<SocketAPI>(new SocketAPI());
 			sGlobalAPI = mSocketAPI;
 		}
-		else
-		{
-			mSocketAPI = sGlobalAPI.lock();
-		}
+		else { mSocketAPI = sGlobalAPI.lock(); }
 	}
 
 

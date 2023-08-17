@@ -12,17 +12,12 @@
 
 namespace Strawberry::Core
 {
-	template <typename T>
-	class Option;
+	template <typename T> class Option;
 
 
-	template <typename T>
-	struct IsOption
-		: std::false_type {};
+	template <typename T> struct IsOption : std::false_type {};
 
-	template <typename T>
-	struct IsOption<Option<T>>
-		: std::true_type {};
+	template <typename T> struct IsOption<Option<T>> : std::true_type {};
 
 
 	class NullOpt_t
@@ -35,8 +30,7 @@ namespace Strawberry::Core
 	static const NullOpt_t NullOpt = NullOpt_t{0};
 
 
-	template <typename T>
-	class Option
+	template <typename T> class Option
 	{
 	public:
 		Option()
@@ -71,15 +65,11 @@ namespace Strawberry::Core
 		Option(const Option& rhs) requires (std::is_copy_constructible_v<T>)
 			: mHasValue(rhs.mHasValue)
 		{
-			if (rhs)
-			{
-				std::construct_at(&mPayload, *rhs);
-			}
+			if (rhs) { std::construct_at(&mPayload, *rhs); }
 		}
 
 
-		Option(Option&& rhs) noexcept
-			requires (std::is_move_constructible_v<T>)
+		Option(Option&& rhs) noexcept requires (std::is_move_constructible_v<T>)
 			: mHasValue(rhs.mHasValue)
 		{
 			if (rhs)
@@ -90,18 +80,12 @@ namespace Strawberry::Core
 		}
 
 
-		Option& operator=(NullOpt_t)
-		{
-			Reset();
-		}
+		Option& operator=(NullOpt_t) { Reset(); }
 
 
 		Option& operator=(const T& rhs) requires (std::is_copy_assignable_v<T>)
 		{
-			if (mHasValue)
-			{
-				std::destroy_at(&mPayload);
-			}
+			if (mHasValue) { std::destroy_at(&mPayload); }
 
 			mHasValue = true;
 			std::construct_at(&mPayload, rhs);
@@ -114,19 +98,10 @@ namespace Strawberry::Core
 		{
 			if (this != &rhs)
 			{
-				if (!rhs.mHasValue && mHasValue)
-				{
-					std::destroy_at(&mPayload);
-				}
+				if (!rhs.mHasValue && mHasValue) { std::destroy_at(&mPayload); }
 
-				if (rhs.mHasValue && mHasValue)
-				{
-					mPayload = *rhs;
-				}
-				else if (rhs.mHasValue && !mHasValue)
-				{
-					std::construct_at(&mPayload, *rhs);
-				}
+				if (rhs.mHasValue && mHasValue) { mPayload = *rhs; }
+				else if (rhs.mHasValue && !mHasValue) { std::construct_at(&mPayload, *rhs); }
 
 				mHasValue = rhs.mHasValue;
 			}
@@ -135,13 +110,9 @@ namespace Strawberry::Core
 		}
 
 
-		Option& operator=(T&& rhs)
-			requires (std::is_move_assignable_v<T>)
+		Option& operator=(T&& rhs) requires (std::is_move_assignable_v<T>)
 		{
-			if (mHasValue)
-			{
-				std::destroy_at(&mPayload);
-			}
+			if (mHasValue) { std::destroy_at(&mPayload); }
 
 			mHasValue = true;
 			std::construct_at(&mPayload, std::move(rhs));
@@ -150,24 +121,14 @@ namespace Strawberry::Core
 		}
 
 
-		Option& operator=(Option&& rhs) noexcept
-			requires (std::is_move_assignable_v<T>)
+		Option& operator=(Option&& rhs) noexcept requires (std::is_move_assignable_v<T>)
 		{
 			if (this != &rhs)
 			{
-				if (!rhs.mHasValue && mHasValue)
-				{
-					Reset();
-				}
+				if (!rhs.mHasValue && mHasValue) { Reset(); }
 
-				if (rhs.mHasValue && mHasValue)
-				{
-					mPayload = std::move(rhs.Unwrap());
-				}
-				else if (rhs.mHasValue && !mHasValue)
-				{
-					Emplace(std::move(rhs.Unwrap()));
-				}
+				if (rhs.mHasValue && mHasValue) { mPayload = std::move(rhs.Unwrap()); }
+				else if (rhs.mHasValue && !mHasValue) { Emplace(std::move(rhs.Unwrap())); }
 			}
 
 			return *this;
@@ -184,13 +145,9 @@ namespace Strawberry::Core
 		}
 
 
-		template <typename... Args>
-		void Emplace(Args... args)
+		template <typename... Args> void Emplace(Args... args)
 		{
-			if (mHasValue)
-			{
-				std::destroy_at(&mPayload);
-			}
+			if (mHasValue) { std::destroy_at(&mPayload); }
 
 			mHasValue = true;
 			std::construct_at(&mPayload, std::forward<Args>(args)...);
@@ -222,14 +179,8 @@ namespace Strawberry::Core
 
 		const T& ValueOr(const T& value) const
 		{
-			if (HasValue())
-			{
-				return Value();
-			}
-			else
-			{
-				return value;
-			}
+			if (HasValue()) { return Value(); }
+			else { return value; }
 		}
 
 
@@ -271,289 +222,145 @@ namespace Strawberry::Core
 
 		T UnwrapOr(T&& value)
 		{
-			if (HasValue())
-			{
-				return Unwrap();
-			}
-			else
-			{
-				return value;
-			}
+			if (HasValue()) { return Unwrap(); }
+			else { return value; }
 		}
 
 
-		template <std::invocable<const T&> F>
-		requires Core::IsOption<std::invoke_result_t<F, T&>>::value
+		template <std::invocable<const T&> F> requires Core::IsOption<std::invoke_result_t<F, T&>>::value
 		Option<std::invoke_result_t<F, T&>> AndThen(F functor) const&
 		{
 			if (HasValue())
 			{
 				auto result = functor(Value());
-				if (result)
-				{
-					return result.Unwrap();
-				}
+				if (result) { return result.Unwrap(); }
 			}
 
 			return NullOpt;
 		}
 
 
-		template <std::invocable<const T&> F>
-		Option<std::invoke_result_t<F, const T&>> Map(F functor) const&
+		template <std::invocable<const T&> F> Option<std::invoke_result_t<F, const T&>> Map(F functor) const&
 		{
-			if (HasValue())
-			{
-				return Option<std::invoke_result_t<F, const T&>>(functor(Value()));
-			}
-			else
-			{
-				return {};
-			}
+			if (HasValue()) { return Option<std::invoke_result_t<F, const T&>>(functor(Value())); }
+			else { return {}; }
 		}
 
 
-		template <std::invocable<T&&> F>
-		Option<std::invoke_result_t<F, T&&>> Map(F functor) &&
+		template <std::invocable<T&&> F> Option<std::invoke_result_t<F, T&&>> Map(F functor) &&
 		{
-			if (HasValue())
-			{
-				return Option<std::invoke_result_t<F, T&&>>(functor(std::move(Unwrap())));
-			}
-			else
-			{
-				return {};
-			}
+			if (HasValue()) { return Option<std::invoke_result_t<F, T&&>>(functor(std::move(Unwrap()))); }
+			else { return {}; }
 		}
 
 
 		Option<T*> AsPtr()
 		{
-			if (HasValue())
-			{
-				return &mPayload;
-			}
-			else
-			{
-				return {};
-			}
+			if (HasValue()) { return &mPayload; }
+			else { return {}; }
 		}
 
 
 		Option<const T*> AsPtr() const
 		{
-			if (HasValue())
-			{
-				return &mPayload;
-			}
-			else
-			{
-				return {};
-			}
+			if (HasValue()) { return &mPayload; }
+			else { return {}; }
 		}
 
 
-		template <std::equality_comparable_with<T> R>
-		bool operator==(const Option<R>& rhs)
+		template <std::equality_comparable_with<T> R> bool operator==(const Option<R>& rhs)
 		{
-			if (!HasValue() && !rhs.HasValue())
-			{
-				return true;
-			}
-			else if (HasValue() && rhs.HasValue())
-			{
-				return (**this) == (*rhs);
-			}
+			if (!HasValue() && !rhs.HasValue()) { return true; }
+			else if (HasValue() && rhs.HasValue()) { return (**this) == (*rhs); }
 
 			return false;
 		}
 
 
-		template <std::equality_comparable_with<T> R>
-		inline bool operator!=(const Option<R>& rhs) const
+		template <std::equality_comparable_with<T> R> inline bool operator!=(const Option<R>& rhs) const
 		{
-			if (!HasValue() && !rhs.HasValue())
-			{
-				return false;
-			}
-			else if (HasValue() && rhs.HasValue())
-			{
-				return (**this) != (*rhs);
-			}
+			if (!HasValue() && !rhs.HasValue()) { return false; }
+			else if (HasValue() && rhs.HasValue()) { return (**this) != (*rhs); }
 
 			return true;
 		}
 
 
-		template <std::totally_ordered_with<T> R>
-		inline bool operator>(const Option<R> rhs) const
+		template <std::totally_ordered_with<T> R> inline bool operator>(const Option<R> rhs) const
 		{
-			if (HasValue() && rhs.HasValue())
-			{
-				return Value() > rhs.Value();
-			}
-			else if (!HasValue() && rhs.HasValue())
-			{
-				return false;
-			}
-			else if (HasValue() && !rhs.HasValue())
-			{
-				return true;
-			}
-			else if (!HasValue() && !rhs.HasValue())
-			{
-				return false;
-			}
+			if (HasValue() && rhs.HasValue()) { return Value() > rhs.Value(); }
+			else if (!HasValue() && rhs.HasValue()) { return false; }
+			else if (HasValue() && !rhs.HasValue()) { return true; }
+			else if (!HasValue() && !rhs.HasValue()) { return false; }
 		}
 
 
-		template <std::totally_ordered_with<T> R>
-		inline bool operator>=(const Option<R> rhs) const
+		template <std::totally_ordered_with<T> R> inline bool operator>=(const Option<R> rhs) const
 		{
-			if (HasValue() && rhs.HasValue())
-			{
-				return Value() >= rhs.Value();
-			}
-			else if (!HasValue() && rhs.HasValue())
-			{
-				return false;
-			}
-			else if (HasValue() && !rhs.HasValue())
-			{
-				return true;
-			}
-			else if (!HasValue() && !rhs.HasValue())
-			{
-				return true;
-			}
+			if (HasValue() && rhs.HasValue()) { return Value() >= rhs.Value(); }
+			else if (!HasValue() && rhs.HasValue()) { return false; }
+			else if (HasValue() && !rhs.HasValue()) { return true; }
+			else if (!HasValue() && !rhs.HasValue()) { return true; }
 		}
 
 
-		template <std::totally_ordered_with<T> R>
-		inline bool operator<(const Option<R> rhs) const
+		template <std::totally_ordered_with<T> R> inline bool operator<(const Option<R> rhs) const
 		{
-			if (HasValue() && rhs.HasValue())
-			{
-				return Value() < rhs.Value();
-			}
-			else if (!HasValue() && rhs.HasValue())
-			{
-				return true;
-			}
-			else if (HasValue() && !rhs.HasValue())
-			{
-				return false;
-			}
-			else if (!HasValue() && !rhs.HasValue())
-			{
-				return false;
-			}
+			if (HasValue() && rhs.HasValue()) { return Value() < rhs.Value(); }
+			else if (!HasValue() && rhs.HasValue()) { return true; }
+			else if (HasValue() && !rhs.HasValue()) { return false; }
+			else if (!HasValue() && !rhs.HasValue()) { return false; }
 		}
 
 
-		template <std::totally_ordered_with<T> R>
-		inline bool operator<=(const Option<R> rhs) const
+		template <std::totally_ordered_with<T> R> inline bool operator<=(const Option<R> rhs) const
 		{
-			if (HasValue() && rhs.HasValue())
-			{
-				return Value() <= rhs.Value();
-			}
-			else if (!HasValue() && rhs.HasValue())
-			{
-				return true;
-			}
-			else if (HasValue() && !rhs.HasValue())
-			{
-				return false;
-			}
-			else if (!HasValue() && !rhs.HasValue())
-			{
-				return true;
-			}
+			if (HasValue() && rhs.HasValue()) { return Value() <= rhs.Value(); }
+			else if (!HasValue() && rhs.HasValue()) { return true; }
+			else if (HasValue() && !rhs.HasValue()) { return false; }
+			else if (!HasValue() && !rhs.HasValue()) { return true; }
 		}
 
 
-		template <std::equality_comparable_with<T> R>
-		inline bool operator==(const R& rhs)
+		template <std::equality_comparable_with<T> R> inline bool operator==(const R& rhs)
 		{
-			if (!HasValue())
-			{
-				return false;
-			}
-			else
-			{
-				return (**this) == rhs;
-			}
+			if (!HasValue()) { return false; }
+			else { return (**this) == rhs; }
 		}
 
 
-		template <std::equality_comparable_with<T> R>
-		inline bool operator!=(const R& rhs)
+		template <std::equality_comparable_with<T> R> inline bool operator!=(const R& rhs)
 		{
-			if (!HasValue())
-			{
-				return true;
-			}
-			else
-			{
-				return (**this) != rhs;
-			}
+			if (!HasValue()) { return true; }
+			else { return (**this) != rhs; }
 		}
 
 
-		template <std::totally_ordered_with<T> R>
-		inline bool operator>(const R& rhs) const
+		template <std::totally_ordered_with<T> R> inline bool operator>(const R& rhs) const
 		{
-			if (HasValue())
-			{
-				return Value() > rhs;
-			}
-			else
-			{
-				return false;
-			}
+			if (HasValue()) { return Value() > rhs; }
+			else { return false; }
 		}
 
 
-		template <std::totally_ordered_with<T> R>
-		inline bool operator>=(const R& rhs) const
+		template <std::totally_ordered_with<T> R> inline bool operator>=(const R& rhs) const
 		{
-			if (HasValue())
-			{
-				return Value() >= rhs;
-			}
-			else
-			{
-				return false;
-			}
+			if (HasValue()) { return Value() >= rhs; }
+			else { return false; }
 		}
 
 
-		template <std::totally_ordered_with<T> R>
-		inline bool operator<(const R& rhs) const
+		template <std::totally_ordered_with<T> R> inline bool operator<(const R& rhs) const
 		{
-			if (HasValue())
-			{
-				return Value() < rhs;
-			}
-			else
-			{
-				return true;
-			}
+			if (HasValue()) { return Value() < rhs; }
+			else { return true; }
 		}
 
 
-		template <std::totally_ordered_with<T> R>
-		inline bool operator<=(const R& rhs) const
+		template <std::totally_ordered_with<T> R> inline bool operator<=(const R& rhs) const
 		{
-			if (HasValue())
-			{
-				return Value() <= rhs;
-			}
-			else
-			{
-				return true;
-			}
+			if (HasValue()) { return Value() <= rhs; }
+			else { return true; }
 		}
 
 
@@ -566,8 +373,7 @@ namespace Strawberry::Core
 	};
 
 
-	template <typename T>
-	requires (std::is_pointer_v<T>)
+	template <typename T> requires (std::is_pointer_v<T>)
 	class Option<T>
 	{
 	public:
@@ -596,10 +402,7 @@ namespace Strawberry::Core
 		{}
 
 
-		Option& operator=(NullOpt_t)
-		{
-			Reset();
-		}
+		Option& operator=(NullOpt_t) { Reset(); }
 
 
 		Option& operator=(T rhs)
@@ -610,34 +413,23 @@ namespace Strawberry::Core
 		}
 
 
-		Option& operator=(const Option& rhs)
-			requires (std::is_copy_assignable_v<T>)
+		Option& operator=(const Option& rhs) requires (std::is_copy_assignable_v<T>)
 		{
-			if (this != &rhs)
-			{
-				mPayload = rhs.mPayload;
-			}
+			if (this != &rhs) { mPayload = rhs.mPayload; }
 
 			return *this;
 		}
 
 
-		Option& operator=(Option&& rhs) noexcept
-			requires (std::is_move_assignable_v<T>)
+		Option& operator=(Option&& rhs) noexcept requires (std::is_move_assignable_v<T>)
 		{
-			if (this != &rhs)
-			{
-				mPayload = std::exchange(rhs.mPayload, nullptr);
-			}
+			if (this != &rhs) { mPayload = std::exchange(rhs.mPayload, nullptr); }
 
 			return *this;
 		}
 
 
-		void Reset()
-		{
-			mPayload = nullptr;
-		}
+		void Reset() { mPayload = nullptr; }
 
 
 		[[nodiscard]] inline bool HasValue() const { return mPayload != nullptr; }
@@ -655,14 +447,8 @@ namespace Strawberry::Core
 
 		T ValueOr(T value) const
 		{
-			if (HasValue())
-			{
-				return Value();
-			}
-			else
-			{
-				return value;
-			}
+			if (HasValue()) { return Value(); }
+			else { return value; }
 		}
 
 
@@ -703,222 +489,116 @@ namespace Strawberry::Core
 
 		T UnwrapOr(T&& value)
 		{
-			if (HasValue())
-			{
-				return Unwrap();
-			}
-			else
-			{
-				return value;
-			}
+			if (HasValue()) { return Unwrap(); }
+			else { return value; }
 		}
 
 
-		template <std::invocable<T> F>
-		requires Core::IsOption<std::invoke_result_t<F, T>>::value
+		template <std::invocable<T> F> requires Core::IsOption<std::invoke_result_t<F, T>>::value
 		std::invoke_result_t<F, T> AndThen(F functor) &
 		{
 			if (HasValue())
 			{
 				auto result = functor(Value());
-				if (result)
-				{
-					return result.Unwrap();
-				}
+				if (result) { return result.Unwrap(); }
 			}
 
 			return NullOpt;
 		}
 
 
-		template <std::invocable<const T> F>
-		requires Core::IsOption<std::invoke_result_t<F, const T>>::value
+		template <std::invocable<const T> F> requires Core::IsOption<std::invoke_result_t<F, const T>>::value
 		std::invoke_result_t<F, const T> AndThen(F functor) const&
 		{
 			if (HasValue())
 			{
 				auto result = functor(Value());
-				if (result)
-				{
-					return result.Unwrap();
-				}
+				if (result) { return result.Unwrap(); }
 			}
 
 			return NullOpt;
 		}
 
 
-		template <std::invocable<const T> F>
-		Option<std::invoke_result_t<F, const T>> Map(F functor) const&
+		template <std::invocable<const T> F> Option<std::invoke_result_t<F, const T>> Map(F functor) const&
 		{
-			if (HasValue())
-			{
-				return Option<std::invoke_result_t<F, const T&>>(functor(Value()));
-			}
-			else
-			{
-				return {};
-			}
+			if (HasValue()) { return Option<std::invoke_result_t<F, const T&>>(functor(Value())); }
+			else { return {}; }
 		}
 
 
-		template <std::invocable<T> F>
-		Option<std::invoke_result_t<F, T>> Map(F functor) &&
+		template <std::invocable<T> F> Option<std::invoke_result_t<F, T>> Map(F functor) &&
 		{
-			if (HasValue())
-			{
-				return Option<std::invoke_result_t<F, T&&>>(functor(std::move(Unwrap())));
-			}
-			else
-			{
-				return {};
-			}
+			if (HasValue()) { return Option<std::invoke_result_t<F, T&&>>(functor(std::move(Unwrap()))); }
+			else { return {}; }
 		}
 
 
 		Option<T*> AsPtr()
 		{
-			if (HasValue())
-			{
-				return &mPayload;
-			}
-			else
-			{
-				return {};
-			}
+			if (HasValue()) { return &mPayload; }
+			else { return {}; }
 		}
 
 
 		Option<const T*> AsPtr() const
 		{
-			if (HasValue())
-			{
-				return &mPayload;
-			}
-			else
-			{
-				return {};
-			}
+			if (HasValue()) { return &mPayload; }
+			else { return {}; }
 		}
 
 
-		template <std::equality_comparable_with<T> R>
-		bool operator==(const Option<R>& rhs)
+		template <std::equality_comparable_with<T> R> bool operator==(const Option<R>& rhs)
 		{
-			if (!HasValue() && !rhs.HasValue())
-			{
-				return true;
-			}
-			else if (HasValue() && rhs.HasValue())
-			{
-				return (**this) == (*rhs);
-			}
+			if (!HasValue() && !rhs.HasValue()) { return true; }
+			else if (HasValue() && rhs.HasValue()) { return (**this) == (*rhs); }
 
 			return false;
 		}
 
 
-		template <std::equality_comparable_with<T> R>
-		inline bool operator!=(const Option<R>& rhs) const
+		template <std::equality_comparable_with<T> R> inline bool operator!=(const Option<R>& rhs) const
 		{
-			if (!HasValue() && !rhs.HasValue())
-			{
-				return false;
-			}
-			else if (HasValue() && rhs.HasValue())
-			{
-				return (**this) != (*rhs);
-			}
+			if (!HasValue() && !rhs.HasValue()) { return false; }
+			else if (HasValue() && rhs.HasValue()) { return (**this) != (*rhs); }
 
 			return true;
 		}
 
 
-		template <std::totally_ordered_with<T> R>
-		inline bool operator>(const Option<R> rhs) const
+		template <std::totally_ordered_with<T> R> inline bool operator>(const Option<R> rhs) const
 		{
-			if (HasValue() && rhs.HasValue())
-			{
-				return Value() > rhs.Value();
-			}
-			else if (!HasValue() && rhs.HasValue())
-			{
-				return false;
-			}
-			else if (HasValue() && !rhs.HasValue())
-			{
-				return true;
-			}
-			else if (!HasValue() && !rhs.HasValue())
-			{
-				return false;
-			}
+			if (HasValue() && rhs.HasValue()) { return Value() > rhs.Value(); }
+			else if (!HasValue() && rhs.HasValue()) { return false; }
+			else if (HasValue() && !rhs.HasValue()) { return true; }
+			else if (!HasValue() && !rhs.HasValue()) { return false; }
 		}
 
 
-		template <std::totally_ordered_with<T> R>
-		inline bool operator>=(const Option<R> rhs) const
+		template <std::totally_ordered_with<T> R> inline bool operator>=(const Option<R> rhs) const
 		{
-			if (HasValue() && rhs.HasValue())
-			{
-				return Value() >= rhs.Value();
-			}
-			else if (!HasValue() && rhs.HasValue())
-			{
-				return false;
-			}
-			else if (HasValue() && !rhs.HasValue())
-			{
-				return true;
-			}
-			else if (!HasValue() && !rhs.HasValue())
-			{
-				return true;
-			}
+			if (HasValue() && rhs.HasValue()) { return Value() >= rhs.Value(); }
+			else if (!HasValue() && rhs.HasValue()) { return false; }
+			else if (HasValue() && !rhs.HasValue()) { return true; }
+			else if (!HasValue() && !rhs.HasValue()) { return true; }
 		}
 
 
-		template <std::totally_ordered_with<T> R>
-		inline bool operator<(const Option<R> rhs) const
+		template <std::totally_ordered_with<T> R> inline bool operator<(const Option<R> rhs) const
 		{
-			if (HasValue() && rhs.HasValue())
-			{
-				return Value() < rhs.Value();
-			}
-			else if (!HasValue() && rhs.HasValue())
-			{
-				return true;
-			}
-			else if (HasValue() && !rhs.HasValue())
-			{
-				return false;
-			}
-			else if (!HasValue() && !rhs.HasValue())
-			{
-				return false;
-			}
+			if (HasValue() && rhs.HasValue()) { return Value() < rhs.Value(); }
+			else if (!HasValue() && rhs.HasValue()) { return true; }
+			else if (HasValue() && !rhs.HasValue()) { return false; }
+			else if (!HasValue() && !rhs.HasValue()) { return false; }
 		}
 
 
-		template <std::totally_ordered_with<T> R>
-		inline bool operator<=(const Option<R> rhs) const
+		template <std::totally_ordered_with<T> R> inline bool operator<=(const Option<R> rhs) const
 		{
-			if (HasValue() && rhs.HasValue())
-			{
-				return Value() <= rhs.Value();
-			}
-			else if (!HasValue() && rhs.HasValue())
-			{
-				return true;
-			}
-			else if (HasValue() && !rhs.HasValue())
-			{
-				return false;
-			}
-			else if (!HasValue() && !rhs.HasValue())
-			{
-				return true;
-			}
+			if (HasValue() && rhs.HasValue()) { return Value() <= rhs.Value(); }
+			else if (!HasValue() && rhs.HasValue()) { return true; }
+			else if (HasValue() && !rhs.HasValue()) { return false; }
+			else if (!HasValue() && !rhs.HasValue()) { return true; }
 		}
 
 
@@ -927,18 +607,8 @@ namespace Strawberry::Core
 	};
 
 
-	template <typename T>
-	inline bool operator==(const T& a, const Option<T>& b)
-		requires (std::equality_comparable<T>)
-	{
-		return b == a;
-	}
+	template <typename T> inline bool operator==(const T& a, const Option<T>& b) requires (std::equality_comparable<T>) { return b == a; }
 
 
-	template <typename T>
-	inline bool operator!=(const T& a, const Option<T>& b)
-		requires (std::equality_comparable<T>)
-	{
-		return b != a;
-	}
+	template <typename T> inline bool operator!=(const T& a, const Option<T>& b) requires (std::equality_comparable<T>) { return b != a; }
 } // namespace Strawberry::Core

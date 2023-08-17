@@ -19,8 +19,7 @@
 
 namespace Strawberry::Core::Net::Socket
 {
-	class TCPClient
-		: private SocketAPIUser
+	class TCPClient : private SocketAPIUser
 	{
 		friend class TLSClient;
 

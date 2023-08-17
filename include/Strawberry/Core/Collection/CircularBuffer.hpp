@@ -9,8 +9,7 @@
 
 namespace Strawberry::Core::Collection
 {
-	template <typename T>
-	class CircularBuffer
+	template <typename T> class CircularBuffer
 	{
 	public:
 		explicit CircularBuffer(size_t capacity)
@@ -23,10 +22,7 @@ namespace Strawberry::Core::Collection
 
 		void Push(T value)
 		{
-			if (AtCapacity())
-			{
-				mData[*mHead++].Reset();
-			}
+			if (AtCapacity()) { mData[*mHead++].Reset(); }
 
 			mData[*(mTail++)].Emplace(std::move(value));
 			if (!AtCapacity()) mSize += 1;
@@ -69,8 +65,7 @@ namespace Strawberry::Core::Collection
 	};
 
 
-	template <typename T>
-	class DynamicCircularBuffer
+	template <typename T> class DynamicCircularBuffer
 	{
 	public:
 		DynamicCircularBuffer()
@@ -83,10 +78,7 @@ namespace Strawberry::Core::Collection
 
 		void Push(T value)
 		{
-			if (AtCapacity())
-			{
-				Resize(2 * Capacity());
-			}
+			if (AtCapacity()) { Resize(2 * Capacity()); }
 
 			mData[*(mTail++)].Emplace(std::move(value));
 			if (!AtCapacity()) mSize += 1;

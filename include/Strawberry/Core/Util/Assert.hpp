@@ -15,14 +15,8 @@ namespace Strawberry::Core
 	inline constexpr void Assert([[maybe_unused]] bool value)
 	{
 #if !NDEBUG
-		if (!value)
-		{
-			DebugBreak();
-		}
-		else
-		{
-			return;
-		}
+		if (!value) { DebugBreak(); }
+		else { return; }
 #endif // !NDEBUG
 	}
 } // namespace Strawberry::Core

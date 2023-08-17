@@ -20,10 +20,7 @@ namespace Strawberry::Core::Net
 		addrinfo  hints{.ai_flags = AI_ALL | AI_ADDRCONFIG};
 		addrinfo* peer      = nullptr;
 		auto      dnsResult = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &peer);
-		if (dnsResult != 0)
-		{
-			return Error::DNSResolution;
-		}
+		if (dnsResult != 0) { return Error::DNSResolution; }
 
 		Option<Endpoint> result;
 		addrinfo*        cursor = peer;
@@ -50,10 +47,7 @@ namespace Strawberry::Core::Net
 			result->mHostName = hostname;
 			return *result;
 		}
-		else
-		{
-			return Error::DNSResolution;
-		}
+		else { return Error::DNSResolution; }
 	}
 
 

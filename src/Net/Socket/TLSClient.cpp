@@ -24,19 +24,13 @@ class TLSContext
 public:
 	static SSL_CTX* Get()
 	{
-		if (!mInstance)
-		{
-			mInstance = std::unique_ptr<TLSContext>(new TLSContext());
-		}
+		if (!mInstance) { mInstance = std::unique_ptr<TLSContext>(new TLSContext()); }
 
 		return mInstance->mSSL_CONTEXT;
 	}
 
 
-	~TLSContext()
-	{
-		SSL_CTX_free(mSSL_CONTEXT);
-	}
+	~TLSContext() { SSL_CTX_free(mSSL_CONTEXT); }
 
 
 private:
@@ -65,16 +59,10 @@ namespace Strawberry::Core::Net::Socket
 	Result<TLSClient, Error> TLSClient::Connect(const Endpoint& endpoint)
 	{
 		auto tcp = TCPClient::Connect(endpoint);
-		if (!tcp)
-		{
-			return tcp.Err();
-		}
+		if (!tcp) { return tcp.Err(); }
 
 		auto ssl = SSL_new(TLSContext::Get());
-		if (ssl == nullptr)
-		{
-			return Error::SSLAllocation;
-		}
+		if (ssl == nullptr) { return Error::SSLAllocation; }
 
 		if (endpoint.GetHostname())
 		{
@@ -84,10 +72,7 @@ namespace Strawberry::Core::Net::Socket
 
 		SSL_set_fd(ssl, tcp->mSocket);
 		auto connectResult = SSL_connect(ssl);
-		if (connectResult == -1)
-		{
-			return Error::SSLHandshake;
-		}
+		if (connectResult == -1) { return Error::SSLHandshake; }
 
 		TLSClient tls;
 		tls.mTCP = tcp.Unwrap();
@@ -137,10 +122,7 @@ namespace Strawberry::Core::Net::Socket
 	}
 
 
-	bool TLSClient::Poll() const
-	{
-		return mTCP.Poll();
-	}
+	bool TLSClient::Poll() const { return mTCP.Poll(); }
 
 
 	Result<IO::DynamicByteBuffer, IO::Error> TLSClient::Read(size_t length)
@@ -151,10 +133,7 @@ namespace Strawberry::Core::Net::Socket
 		while (bytesRead < length)
 		{
 			auto thisRead = SSL_read(mSSL, reinterpret_cast<void*>(buffer.Data() + bytesRead), static_cast<int>(length - bytesRead));
-			if (thisRead > 0)
-			{
-				bytesRead += thisRead;
-			}
+			if (thisRead > 0) { bytesRead += thisRead; }
 			else
 			{
 				auto error = SSL_get_error(mSSL, bytesRead);

@@ -10,8 +10,7 @@
 
 namespace Strawberry::Core::Net::HTTP
 {
-	template <typename S>
-	class ClientBase
+	template <typename S> class ClientBase
 	{
 	public:
 		/// Connects to the given endpoint over HTTP
@@ -38,16 +37,14 @@ namespace Strawberry::Core::Net::HTTP
 	};
 
 
-	class HTTPClient
-		: public ClientBase<Socket::TCPClient>
+	class HTTPClient : public ClientBase<Socket::TCPClient>
 	{
 	public:
 		explicit HTTPClient(const std::string& hostname, uint16_t port = 80);
 	};
 
 
-	class HTTPSClient
-		: public ClientBase<Socket::TLSClient>
+	class HTTPSClient : public ClientBase<Socket::TLSClient>
 	{
 	public:
 		explicit HTTPSClient(const std::string& hostname, uint16_t port = 443);

@@ -20,12 +20,10 @@ namespace Strawberry::Core
 			, mFunction(std::move(function))
 		{
 			mThread = std::thread([this]() {
-									  if (mStartUp) mStartUp();
+				if (mStartUp) mStartUp();
 
-									  while (mShouldRun)
-									  {
-										  mFunction();
-									  } });
+				while (mShouldRun) { mFunction(); }
+			});
 		}
 
 
@@ -36,12 +34,10 @@ namespace Strawberry::Core
 			, mFunction(std::move(function))
 		{
 			mThread = std::thread([this]() {
-									  if (mStartUp) mStartUp();
+				if (mStartUp) mStartUp();
 
-									  while (mShouldRun)
-									  {
-										  mFunction();
-									  } });
+				while (mShouldRun) { mFunction(); }
+			});
 		}
 
 
@@ -52,12 +48,10 @@ namespace Strawberry::Core
 			, mFunction([function, this] { function(this); })
 		{
 			mThread = std::thread([this]() {
-									  if (mStartUp) mStartUp();
+				if (mStartUp) mStartUp();
 
-									  while (mShouldRun)
-									  {
-										  mFunction();
-									  } });
+				while (mShouldRun) { mFunction(); }
+			});
 		}
 
 
@@ -68,12 +62,10 @@ namespace Strawberry::Core
 			, mFunction(std::move(function))
 		{
 			mThread = std::thread([this]() {
-									  if (mStartUp) mStartUp();
+				if (mStartUp) mStartUp();
 
-									  while (mShouldRun)
-									  {
-										  mFunction();
-									  } });
+				while (mShouldRun) { mFunction(); }
+			});
 		}
 
 
@@ -84,12 +76,10 @@ namespace Strawberry::Core
 			, mFunction([function, this] { function(this); })
 		{
 			mThread = std::thread([this]() {
-									  if (mStartUp) mStartUp();
+				if (mStartUp) mStartUp();
 
-									  while (mShouldRun)
-									  {
-										  mFunction();
-									  } });
+				while (mShouldRun) { mFunction(); }
+			});
 		}
 
 
@@ -100,12 +90,10 @@ namespace Strawberry::Core
 			, mFunction([function, this] { function(this); })
 		{
 			mThread = std::thread([this]() {
-									  if (mStartUp) mStartUp();
+				if (mStartUp) mStartUp();
 
-									  while (mShouldRun)
-									  {
-										  mFunction();
-									  } });
+				while (mShouldRun) { mFunction(); }
+			});
 		}
 
 
@@ -116,16 +104,10 @@ namespace Strawberry::Core
 		}
 
 
-		bool IsRunning() const
-		{
-			return mShouldRun;
-		}
+		bool IsRunning() const { return mShouldRun; }
 
 
-		void Stop()
-		{
-			mShouldRun = false;
-		}
+		void Stop() { mShouldRun = false; }
 
 
 		RepeatingTask(const RepeatingTask& rhs)            = delete;
