@@ -21,4 +21,10 @@ namespace Strawberry::Core
 	{
 		mIsSet = false;
 	}
+
+	Flag& Flag::operator=(bool value)
+	{
+		mIsSet = value;
+		return *this;
+	}
 } // namespace Strawberry::Core

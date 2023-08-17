@@ -19,6 +19,8 @@ namespace Strawberry::Core
 		void Set();
 		void Unset();
 
+		Flag& operator=(bool value);
+
 		operator bool() const { return mIsSet; }
 
 	private:

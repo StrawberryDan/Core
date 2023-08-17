@@ -77,6 +77,7 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Util/Variant.hpp
 		include/Strawberry/Core/Sync/ConditionVariable.cpp
 		include/Strawberry/Core/Sync/ConditionVariable.hpp
+		include/Strawberry/Core/Util/Lazy.hpp
 		include/Strawberry/Core/Util/Flag.cpp
 		include/Strawberry/Core/Util/Flag.hpp
 )
