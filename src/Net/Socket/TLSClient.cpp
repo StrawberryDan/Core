@@ -122,7 +122,10 @@ namespace Strawberry::Core::Net::Socket
 	}
 
 
-	bool TLSClient::Poll() const { return mTCP.Poll(); }
+	bool TLSClient::Poll() const
+	{
+		return mTCP.Poll();
+	}
 
 
 	Result<IO::DynamicByteBuffer, IO::Error> TLSClient::Read(size_t length)

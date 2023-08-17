@@ -17,22 +17,41 @@ Strawberry::Core::IO::DynamicByteBuffer Strawberry::Core::IO::DynamicByteBuffer:
 }
 
 
-size_t Strawberry::Core::IO::DynamicByteBuffer::Size() const { return mData.size(); }
+size_t Strawberry::Core::IO::DynamicByteBuffer::Size() const
+{
+	return mData.size();
+}
 
 
-uint8_t* Strawberry::Core::IO::DynamicByteBuffer::Data() { return mData.data(); }
+uint8_t* Strawberry::Core::IO::DynamicByteBuffer::Data()
+{
+	return mData.data();
+}
 
 
-const uint8_t* Strawberry::Core::IO::DynamicByteBuffer::Data() const { return mData.data(); }
+const uint8_t* Strawberry::Core::IO::DynamicByteBuffer::Data() const
+{
+	return mData.data();
+}
 
 
-void Strawberry::Core::IO::DynamicByteBuffer::Reserve(size_t len) { mData.reserve(len); }
+void Strawberry::Core::IO::DynamicByteBuffer::Reserve(size_t len)
+{
+	mData.reserve(len);
+}
 
 
-void Strawberry::Core::IO::DynamicByteBuffer::Resize(size_t len) { mData.resize(len); }
+void Strawberry::Core::IO::DynamicByteBuffer::Resize(size_t len)
+{
+	mData.resize(len);
+}
 
 
-template <> std::vector<uint8_t> Strawberry::Core::IO::DynamicByteBuffer::AsVector<uint8_t>() { return mData; }
+template <>
+std::vector<uint8_t> Strawberry::Core::IO::DynamicByteBuffer::AsVector<uint8_t>()
+{
+	return mData;
+}
 
 
 std::string Strawberry::Core::IO::DynamicByteBuffer::AsString() const

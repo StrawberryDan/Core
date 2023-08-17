@@ -7,7 +7,8 @@
 
 namespace Strawberry::Core
 {
-	template <typename T> requires (!std::is_pointer_v<T> && std::is_move_assignable_v<T>)
+	template <typename T>
+		requires (!std::is_pointer_v<T> && std::is_move_assignable_v<T>)
 	inline constexpr T Take(T& origin)
 	{
 		T result = std::move(origin);
@@ -16,7 +17,8 @@ namespace Strawberry::Core
 	}
 
 
-	template <typename T> inline constexpr T* Take(T*& origin)
+	template <typename T>
+	inline constexpr T* Take(T*& origin)
 	{
 		T* result = origin;
 		origin    = nullptr;
@@ -25,7 +27,8 @@ namespace Strawberry::Core
 
 
 	template <typename T, typename R>
-	inline constexpr T Replace(T& origin, R replacement) requires (std::is_move_assignable_v<T> && std::is_convertible_v<R, T>)
+	inline constexpr T Replace(T& origin, R replacement)
+		requires (std::is_move_assignable_v<T> && std::is_convertible_v<R, T>)
 	{
 		T result = std::move(origin);
 		origin   = replacement;

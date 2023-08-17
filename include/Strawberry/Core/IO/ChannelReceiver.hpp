@@ -14,10 +14,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template <typename T> class ChannelBroadcaster;
+	template <typename T>
+	class ChannelBroadcaster;
 
 
-	template <typename T> class ChannelReceiver
+	template <typename T>
+	class ChannelReceiver
 	{
 		friend class ChannelBroadcaster<T>;
 

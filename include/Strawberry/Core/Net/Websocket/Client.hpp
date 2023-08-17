@@ -28,7 +28,8 @@ namespace Strawberry::Core::Net::Websocket
 	};
 
 
-	template <typename S> requires IO::Read<S> && IO::Write<S>
+	template <typename S>
+		requires IO::Read<S> && IO::Write<S>
 	class ClientBase
 	{
 	public:

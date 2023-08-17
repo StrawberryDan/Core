@@ -13,7 +13,8 @@
 
 namespace Strawberry::Core::IO
 {
-	template <size_t S> class ByteBuffer;
+	template <size_t S>
+	class ByteBuffer;
 
 
 	class DynamicByteBuffer
@@ -26,22 +27,31 @@ namespace Strawberry::Core::IO
 
 		// Constructors
 		DynamicByteBuffer() = default;
-		template <typename T> DynamicByteBuffer(const T* data, size_t len);
-		template <typename T> explicit DynamicByteBuffer(const T& object);
+		template <typename T>
+		DynamicByteBuffer(const T* data, size_t len);
+		template <typename T>
+		explicit DynamicByteBuffer(const T& object);
 
 
 		// Pushing Data
-		template <typename T> void Push(const T* data, size_t count);
+		template <typename T>
+		void Push(const T* data, size_t count);
 
-		template <typename T> void Push(const T& data);
+		template <typename T>
+		void Push(const T& data);
 
-		template <typename T> void Push(const std::vector<T>& data);
+		template <typename T>
+		void Push(const std::vector<T>& data);
 
 
 		inline void Push(const IO::DynamicByteBuffer& bytes) { Push(bytes.Data(), bytes.Size()); }
 
 
-		template <size_t S> inline void Push(const IO::ByteBuffer<S>& bytes) { Push(bytes.Data(), bytes.Size()); }
+		template <size_t S>
+		inline void Push(const IO::ByteBuffer<S>& bytes)
+		{
+			Push(bytes.Data(), bytes.Size());
+		}
 
 
 		Result<DynamicByteBuffer, Error> Read(size_t len);
@@ -84,16 +94,21 @@ namespace Strawberry::Core::IO
 
 
 		// Casting
-		template <typename T> requires std::copyable<T> || std::movable<T>
+		template <typename T>
+			requires std::copyable<T> || std::movable<T>
 		T Into() const;
 
-		template <typename T> void Into(T& data) const;
+		template <typename T>
+		void Into(T& data) const;
 
-		template <size_t S> ByteBuffer<S> AsStatic() const;
+		template <size_t S>
+		ByteBuffer<S> AsStatic() const;
 
-		template <size_t N> std::array<uint8_t, N> AsArray() const;
+		template <size_t N>
+		std::array<uint8_t, N> AsArray() const;
 
-		template <typename T = uint8_t> std::vector<T> AsVector();
+		template <typename T = uint8_t>
+		std::vector<T> AsVector();
 
 		[[nodiscard]] std::string AsString() const;
 
@@ -117,23 +132,30 @@ Strawberry::Core::IO::DynamicByteBuffer::DynamicByteBuffer(const T& object)
 {}
 
 
-template <typename T> void Strawberry::Core::IO::DynamicByteBuffer::Push(const T* data, size_t count)
+template <typename T>
+void Strawberry::Core::IO::DynamicByteBuffer::Push(const T* data, size_t count)
 {
 	for (int i = 0; i < count; i++) { Push(data[i]); }
 }
 
 
-template <typename T> void Strawberry::Core::IO::DynamicByteBuffer::Push(const T& data)
+template <typename T>
+void Strawberry::Core::IO::DynamicByteBuffer::Push(const T& data)
 {
 	auto bytes = reinterpret_cast<const uint8_t*>(&data);
 	for (int i = 0; i < sizeof(T); i++) { mData.push_back(bytes[i]); }
 }
 
 
-template <typename T> void Strawberry::Core::IO::DynamicByteBuffer::Push(const std::vector<T>& data) { Push(data.data(), data.size()); }
+template <typename T>
+void Strawberry::Core::IO::DynamicByteBuffer::Push(const std::vector<T>& data)
+{
+	Push(data.data(), data.size());
+}
 
 
-template <size_t N> std::array<uint8_t, N> Strawberry::Core::IO::DynamicByteBuffer::AsArray() const
+template <size_t N>
+std::array<uint8_t, N> Strawberry::Core::IO::DynamicByteBuffer::AsArray() const
 {
 	Assert(Size() == N);
 	std::array<uint8_t, N> array;
@@ -142,7 +164,8 @@ template <size_t N> std::array<uint8_t, N> Strawberry::Core::IO::DynamicByteBuff
 }
 
 
-template <typename T> requires std::copyable<T> || std::movable<T>
+template <typename T>
+	requires std::copyable<T> || std::movable<T>
 T Strawberry::Core::IO::DynamicByteBuffer::Into() const
 {
 	Assert(Size() == sizeof(T));
@@ -152,20 +175,23 @@ T Strawberry::Core::IO::DynamicByteBuffer::Into() const
 }
 
 
-template <typename T> void Strawberry::Core::IO::DynamicByteBuffer::Into(T& data) const
+template <typename T>
+void Strawberry::Core::IO::DynamicByteBuffer::Into(T& data) const
 {
 	Assert(Size() == sizeof(T));
 	memcpy(reinterpret_cast<void*>(&data), reinterpret_cast<const void*>(Data()), sizeof(T));
 }
 
 
-template <size_t S> Strawberry::Core::IO::ByteBuffer<S> Strawberry::Core::IO::DynamicByteBuffer::AsStatic() const
+template <size_t S>
+Strawberry::Core::IO::ByteBuffer<S> Strawberry::Core::IO::DynamicByteBuffer::AsStatic() const
 {
 	return ByteBuffer<S>(Data(), std::min(S, Size()));
 }
 
 
-template <typename T> std::vector<T> Strawberry::Core::IO::DynamicByteBuffer::AsVector()
+template <typename T>
+std::vector<T> Strawberry::Core::IO::DynamicByteBuffer::AsVector()
 {
 	Assert(Size() % sizeof(T) == 0);
 	std::vector<T> vector(Data(), Data() + Size());

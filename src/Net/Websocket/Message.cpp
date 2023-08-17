@@ -32,7 +32,10 @@ namespace Strawberry::Core::Net::Websocket
 	{}
 
 
-	std::string Message::AsString() const { return {mPayload.data(), mPayload.data() + mPayload.size()}; }
+	std::string Message::AsString() const
+	{
+		return {mPayload.data(), mPayload.data() + mPayload.size()};
+	}
 
 
 	Result<nlohmann::json, std::string> Message::AsJSON() const
@@ -68,5 +71,8 @@ namespace Strawberry::Core::Net::Websocket
 	}
 
 
-	void Message::Append(const Message& other) { mPayload.insert(mPayload.end(), other.mPayload.begin(), other.mPayload.end()); }
+	void Message::Append(const Message& other)
+	{
+		mPayload.insert(mPayload.end(), other.mPayload.begin(), other.mPayload.end());
+	}
 } // namespace Strawberry::Core::Net::Websocket

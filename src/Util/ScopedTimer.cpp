@@ -16,5 +16,8 @@ namespace Strawberry::Core
 	{}
 
 
-	ScopedTimer::~ScopedTimer() { Logging::Trace("{} ---- {}", mName, *mClock); }
+	ScopedTimer::~ScopedTimer()
+	{
+		Logging::Trace("{} ---- {}", mName, *mClock);
+	}
 } // namespace Strawberry::Core

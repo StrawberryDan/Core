@@ -16,7 +16,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template <typename T> class ChannelBroadcaster
+	template <typename T>
+	class ChannelBroadcaster
 	{
 	public:
 		void Broadcast(T value)

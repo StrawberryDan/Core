@@ -14,12 +14,15 @@
 
 namespace Strawberry::Core
 {
-	template <typename T> class Mutex;
+	template <typename T>
+	class Mutex;
 
 
-	template <typename T> class MutexGuard
+	template <typename T>
+	class MutexGuard
 	{
-		template <typename> friend class Mutex;
+		template <typename>
+		friend class Mutex;
 
 
 	public:
@@ -52,7 +55,8 @@ namespace Strawberry::Core
 	};
 
 
-	template <typename T> class Mutex
+	template <typename T>
+	class Mutex
 	{
 	public:
 		template <typename... Ts>
@@ -62,13 +66,15 @@ namespace Strawberry::Core
 		{}
 
 
-		Mutex(Mutex&& rhs) noexcept requires (std::is_move_constructible_v<T>)
+		Mutex(Mutex&& rhs) noexcept
+			requires (std::is_move_constructible_v<T>)
 			: mMutex()
 			, mPayload(std::move(rhs).Take())
 		{}
 
 
-		Mutex& operator=(Mutex&& other) noexcept requires (std::is_move_assignable_v<T>)
+		Mutex& operator=(Mutex&& other) noexcept
+			requires (std::is_move_assignable_v<T>)
 		{
 			if (this != &other)
 			{
@@ -132,7 +138,8 @@ namespace Strawberry::Core
 	};
 
 
-	template <typename T> class SharedMutex
+	template <typename T>
+	class SharedMutex
 	{
 	public:
 		explicit SharedMutex(std::nullptr_t)
@@ -140,7 +147,8 @@ namespace Strawberry::Core
 		{}
 
 
-		template <typename... Ts> requires (std::constructible_from<T, Ts...>)
+		template <typename... Ts>
+			requires (std::constructible_from<T, Ts...>)
 		explicit SharedMutex(Ts... ts)
 			: mPayload(std::make_shared<Mutex<T>>(std::forward<Ts>(ts)...))
 		{}
@@ -156,7 +164,8 @@ namespace Strawberry::Core
 		operator bool() const { return mPayload.operator bool(); }
 
 
-		template <typename... Ts> requires std::constructible_from<T, Ts...>
+		template <typename... Ts>
+			requires std::constructible_from<T, Ts...>
 		void Emplace(Ts... ts) &
 		{
 			mPayload = std::make_shared<Mutex<T>>(std::forward<Ts>(ts)...);
@@ -180,5 +189,6 @@ namespace Strawberry::Core
 	};
 
 
-	template <typename T> Mutex(T) -> Mutex<std::decay_t<T>>;
+	template <typename T>
+	Mutex(T) -> Mutex<std::decay_t<T>>;
 } // namespace Strawberry::Core

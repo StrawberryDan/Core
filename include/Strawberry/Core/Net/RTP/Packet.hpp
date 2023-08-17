@@ -33,7 +33,8 @@ namespace Strawberry::Core::Net::RTP
 #pragma pack()
 
 
-		template <typename DataSource> requires IO::Read<DataSource>
+		template <typename DataSource>
+			requires IO::Read<DataSource>
 		static Result<Packet, Error> Read(DataSource& data)
 		{
 			auto headerData = data.Read(sizeof(Header));

@@ -11,7 +11,8 @@
 
 namespace Strawberry::Core::Math
 {
-	template <std::integral T = int32_t> class Rational
+	template <std::integral T = int32_t>
+	class Rational
 	{
 	public:
 		template <std::integral V>
@@ -97,5 +98,6 @@ namespace Strawberry::Core::Math
 	};
 
 
-	template <std::integral T> Rational(T, T) -> Rational<T>;
+	template <std::integral T>
+	Rational(T, T) -> Rational<T>;
 } // namespace Strawberry::Core::Math

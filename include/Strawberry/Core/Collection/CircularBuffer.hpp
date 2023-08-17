@@ -9,7 +9,8 @@
 
 namespace Strawberry::Core::Collection
 {
-	template <typename T> class CircularBuffer
+	template <typename T>
+	class CircularBuffer
 	{
 	public:
 		explicit CircularBuffer(size_t capacity)
@@ -65,7 +66,8 @@ namespace Strawberry::Core::Collection
 	};
 
 
-	template <typename T> class DynamicCircularBuffer
+	template <typename T>
+	class DynamicCircularBuffer
 	{
 	public:
 		DynamicCircularBuffer()

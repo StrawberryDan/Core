@@ -10,7 +10,8 @@ namespace Strawberry::Core::Math
 	//======================================================================================================================
 	//  Forward Declarations
 	//----------------------------------------------------------------------------------------------------------------------
-	template <typename T> class DynamicPeriodic;
+	template <typename T>
+	class DynamicPeriodic;
 
 
 	//======================================================================================================================
@@ -18,7 +19,8 @@ namespace Strawberry::Core::Math
 	//----------------------------------------------------------------------------------------------------------------------
 	//  Static Periodic Integer
 	//----------------------------------------------------------------------------------------------------------------------
-	template <typename T, T N> requires std::unsigned_integral<T>
+	template <typename T, T N>
+		requires std::unsigned_integral<T>
 	class Periodic
 	{
 	public:
@@ -114,7 +116,8 @@ namespace Strawberry::Core::Math
 	//----------------------------------------------------------------------------------------------------------------------
 	//  Base Case : Do not use
 	//----------------------------------------------------------------------------------------------------------------------
-	template <typename T> class DynamicPeriodic
+	template <typename T>
+	class DynamicPeriodic
 	{
 	public:
 		DynamicPeriodic()  = delete;
@@ -125,7 +128,8 @@ namespace Strawberry::Core::Math
 	//======================================================================================================================
 	//  Unsigned Integer Periodic Number
 	//----------------------------------------------------------------------------------------------------------------------
-	template <typename T> requires std::unsigned_integral<T>
+	template <typename T>
+		requires std::unsigned_integral<T>
 	class DynamicPeriodic<T>
 	{
 	public:
@@ -263,7 +267,8 @@ namespace Strawberry::Core::Math
 	//======================================================================================================================
 	//  Floating Point Periodic Number
 	//----------------------------------------------------------------------------------------------------------------------
-	template <typename T> requires std::floating_point<T>
+	template <typename T>
+		requires std::floating_point<T>
 	class DynamicPeriodic<T>
 	{
 	public:
@@ -350,5 +355,6 @@ namespace Strawberry::Core::Math
 	};
 
 
-	template <typename T> DynamicPeriodic(T, T) -> DynamicPeriodic<T>;
+	template <typename T>
+	DynamicPeriodic(T, T) -> DynamicPeriodic<T>;
 } // namespace Strawberry::Core::Math

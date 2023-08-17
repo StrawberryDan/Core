@@ -10,7 +10,8 @@
 
 namespace Strawberry::Core::Net::HTTP
 {
-	template <typename S> class ClientBase
+	template <typename S>
+	class ClientBase
 	{
 	public:
 		/// Connects to the given endpoint over HTTP

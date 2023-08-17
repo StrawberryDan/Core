@@ -8,15 +8,18 @@
 
 namespace Strawberry::Core::IO
 {
-	template <size_t S> class ByteBuffer
+	template <size_t S>
+	class ByteBuffer
 	{
 	public:
 		// Constructors
 		ByteBuffer() = default;
 
-		template <typename T> explicit ByteBuffer(const T* data, size_t len = S);
+		template <typename T>
+		explicit ByteBuffer(const T* data, size_t len = S);
 
-		template <typename T> requires (sizeof(T) == S)
+		template <typename T>
+			requires (sizeof(T) == S)
 		explicit ByteBuffer(const T& object);
 
 
@@ -46,10 +49,12 @@ namespace Strawberry::Core::IO
 		bool                 operator<=(const ByteBuffer<S>& rhs) const = default;
 
 
-		template <typename T> requires ((sizeof(T) == S) && (std::copyable<T> || std::movable<T>) )
+		template <typename T>
+			requires ((sizeof(T) == S) && (std::copyable<T> || std::movable<T>) )
 		T Into();
 
-		template <typename T> requires (sizeof(T) == S)
+		template <typename T>
+			requires (sizeof(T) == S)
 		void Into(T& data);
 
 		[[nodiscard]] DynamicByteBuffer ToDynamic() const;
@@ -70,7 +75,8 @@ namespace Strawberry::Core::IO
 
 
 	template <size_t S>
-	template <typename T> requires (sizeof(T) == S)
+	template <typename T>
+		requires (sizeof(T) == S)
 	ByteBuffer<S>::ByteBuffer(const T& object)
 		: mData()
 	{
@@ -78,11 +84,16 @@ namespace Strawberry::Core::IO
 	}
 
 
-	template <size_t S> std::strong_ordering ByteBuffer<S>::operator<=>(const ByteBuffer<S>& rhs) const { return mData <=> rhs; }
+	template <size_t S>
+	std::strong_ordering ByteBuffer<S>::operator<=>(const ByteBuffer<S>& rhs) const
+	{
+		return mData <=> rhs;
+	}
 
 
 	template <size_t S>
-	template <typename T> requires ((sizeof(T) == S) && (std::copyable<T> || std::movable<T>) )
+	template <typename T>
+		requires ((sizeof(T) == S) && (std::copyable<T> || std::movable<T>) )
 	T ByteBuffer<S>::Into()
 	{
 		T value;
@@ -92,12 +103,17 @@ namespace Strawberry::Core::IO
 
 
 	template <size_t S>
-	template <typename T> requires (sizeof(T) == S)
+	template <typename T>
+		requires (sizeof(T) == S)
 	void ByteBuffer<S>::Into(T& data)
 	{
 		memcpy(reinterpret_cast<void*>(&data), reinterpret_cast<const void*>(mData.data()), sizeof(T));
 	}
 
 
-	template <size_t S> DynamicByteBuffer ByteBuffer<S>::ToDynamic() const { return DynamicByteBuffer(Data(), S); }
+	template <size_t S>
+	DynamicByteBuffer ByteBuffer<S>::ToDynamic() const
+	{
+		return DynamicByteBuffer(Data(), S);
+	}
 } // namespace Strawberry::Core::IO

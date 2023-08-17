@@ -34,7 +34,10 @@ namespace Strawberry::Core::Net
 	}
 
 
-	IO::ByteBuffer<4> IPv4Address::AsBytes() const { return mData; }
+	IO::ByteBuffer<4> IPv4Address::AsBytes() const
+	{
+		return mData;
+	}
 
 
 	std::string IPv4Address::AsString() const
@@ -59,7 +62,10 @@ namespace Strawberry::Core::Net
 	}
 
 
-	const IO::ByteBuffer<16>& IPv6Address::AsBytes() const { return mData; }
+	const IO::ByteBuffer<16>& IPv6Address::AsBytes() const
+	{
+		return mData;
+	}
 
 
 	std::string IPv6Address::AsString() const
