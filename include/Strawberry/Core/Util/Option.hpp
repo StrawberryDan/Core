@@ -9,12 +9,10 @@
 #include "Assert.hpp"
 #include "Utilities.hpp"
 
-
 namespace Strawberry::Core
 {
 	template <typename T>
 	class Option;
-
 
 	template <typename T>
 	struct IsOption : std::false_type {};
@@ -22,16 +20,13 @@ namespace Strawberry::Core
 	template <typename T>
 	struct IsOption<Option<T>> : std::true_type {};
 
-
 	class NullOpt_t
 	{
 	public:
 		explicit NullOpt_t(int) {}
 	};
 
-
 	static const NullOpt_t NullOpt = NullOpt_t{0};
-
 
 	template <typename T>
 	class Option
@@ -41,11 +36,9 @@ namespace Strawberry::Core
 			: mHasValue(false)
 		{}
 
-
 		Option(NullOpt_t)
 			: mHasValue(false)
 		{}
-
 
 		Option(const T& value)
 			requires (std::is_copy_constructible_v<T>)
@@ -53,13 +46,11 @@ namespace Strawberry::Core
 			, mPayload(value)
 		{}
 
-
 		Option(T&& value)
 			requires (std::is_move_constructible_v<T>)
 			: mHasValue(true)
 			, mPayload(std::move(value))
 		{}
-
 
 		template <typename... Ts>
 		explicit Option(Ts... ts)
@@ -68,14 +59,12 @@ namespace Strawberry::Core
 			, mPayload(std::forward<Ts>(ts)...)
 		{}
 
-
 		Option(const Option& rhs)
 			requires (std::is_copy_constructible_v<T>)
 			: mHasValue(rhs.mHasValue)
 		{
 			if (rhs) { std::construct_at(&mPayload, *rhs); }
 		}
-
 
 		Option(Option&& rhs) noexcept
 			requires (std::is_move_constructible_v<T>)
@@ -88,9 +77,7 @@ namespace Strawberry::Core
 			}
 		}
 
-
 		Option& operator=(NullOpt_t) { Reset(); }
-
 
 		Option& operator=(const T& rhs)
 			requires (std::is_copy_assignable_v<T>)
@@ -102,7 +89,6 @@ namespace Strawberry::Core
 
 			return *this;
 		}
-
 
 		Option& operator=(const Option& rhs)
 			requires (std::is_copy_assignable_v<T>)
@@ -120,7 +106,6 @@ namespace Strawberry::Core
 			return *this;
 		}
 
-
 		Option& operator=(T&& rhs)
 			requires (std::is_move_assignable_v<T>)
 		{
@@ -131,7 +116,6 @@ namespace Strawberry::Core
 
 			return *this;
 		}
-
 
 		Option& operator=(Option&& rhs) noexcept
 			requires (std::is_move_assignable_v<T>)
@@ -147,7 +131,6 @@ namespace Strawberry::Core
 			return *this;
 		}
 
-
 		~Option()
 		{
 			if (mHasValue)
@@ -156,7 +139,6 @@ namespace Strawberry::Core
 				std::destroy_at(&mPayload);
 			}
 		}
-
 
 		template <typename... Args>
 		void Emplace(Args... args)
@@ -167,7 +149,6 @@ namespace Strawberry::Core
 			std::construct_at(&mPayload, std::forward<Args>(args)...);
 		}
 
-
 		void Reset()
 		{
 			if (mHasValue)
@@ -177,12 +158,15 @@ namespace Strawberry::Core
 			}
 		}
 
-
 		[[nodiscard]] inline bool HasValue() const { return mHasValue; }
-
 
 		explicit inline operator bool() const { return mHasValue; }
 
+		T& Value()
+		{
+			Assert(HasValue());
+			return mPayload;
+		}
 
 		const T& Value() const
 		{
@@ -190,13 +174,11 @@ namespace Strawberry::Core
 			return mPayload;
 		}
 
-
 		const T& ValueOr(const T& value) const
 		{
 			if (HasValue()) { return Value(); }
 			else { return value; }
 		}
-
 
 		T& operator*()
 		{
@@ -204,13 +186,11 @@ namespace Strawberry::Core
 			return mPayload;
 		}
 
-
 		const T& operator*() const
 		{
 			Assert(mHasValue);
 			return mPayload;
 		}
-
 
 		T* operator->()
 		{
@@ -218,13 +198,11 @@ namespace Strawberry::Core
 			return &mPayload;
 		}
 
-
 		const T* operator->() const
 		{
 			Assert(mHasValue);
 			return &mPayload;
 		}
-
 
 		T Unwrap()
 		{
@@ -233,13 +211,11 @@ namespace Strawberry::Core
 			return std::move(mPayload);
 		}
 
-
 		T UnwrapOr(T&& value)
 		{
 			if (HasValue()) { return Unwrap(); }
 			else { return value; }
 		}
-
 
 		template <std::invocable<const T&> F>
 			requires Core::IsOption<std::invoke_result_t<F, T&>>::value
@@ -254,14 +230,12 @@ namespace Strawberry::Core
 			return NullOpt;
 		}
 
-
 		template <std::invocable<const T&> F>
 		Option<std::invoke_result_t<F, const T&>> Map(F functor) const&
 		{
 			if (HasValue()) { return Option<std::invoke_result_t<F, const T&>>(functor(Value())); }
 			else { return {}; }
 		}
-
 
 		template <std::invocable<T&&> F>
 		Option<std::invoke_result_t<F, T&&>> Map(F functor) &&
@@ -270,20 +244,17 @@ namespace Strawberry::Core
 			else { return {}; }
 		}
 
-
 		Option<T*> AsPtr()
 		{
 			if (HasValue()) { return &mPayload; }
 			else { return {}; }
 		}
 
-
 		Option<const T*> AsPtr() const
 		{
 			if (HasValue()) { return &mPayload; }
 			else { return {}; }
 		}
-
 
 		template <std::equality_comparable_with<T> R>
 		bool operator==(const Option<R>& rhs)
@@ -294,7 +265,6 @@ namespace Strawberry::Core
 			return false;
 		}
 
-
 		template <std::equality_comparable_with<T> R>
 		inline bool operator!=(const Option<R>& rhs) const
 		{
@@ -303,7 +273,6 @@ namespace Strawberry::Core
 
 			return true;
 		}
-
 
 		template <std::totally_ordered_with<T> R>
 		inline bool operator>(const Option<R> rhs) const
@@ -314,7 +283,6 @@ namespace Strawberry::Core
 			else if (!HasValue() && !rhs.HasValue()) { return false; }
 		}
 
-
 		template <std::totally_ordered_with<T> R>
 		inline bool operator>=(const Option<R> rhs) const
 		{
@@ -323,7 +291,6 @@ namespace Strawberry::Core
 			else if (HasValue() && !rhs.HasValue()) { return true; }
 			else if (!HasValue() && !rhs.HasValue()) { return true; }
 		}
-
 
 		template <std::totally_ordered_with<T> R>
 		inline bool operator<(const Option<R> rhs) const
@@ -334,7 +301,6 @@ namespace Strawberry::Core
 			else if (!HasValue() && !rhs.HasValue()) { return false; }
 		}
 
-
 		template <std::totally_ordered_with<T> R>
 		inline bool operator<=(const Option<R> rhs) const
 		{
@@ -344,14 +310,12 @@ namespace Strawberry::Core
 			else if (!HasValue() && !rhs.HasValue()) { return true; }
 		}
 
-
 		template <std::equality_comparable_with<T> R>
 		inline bool operator==(const R& rhs)
 		{
 			if (!HasValue()) { return false; }
 			else { return (**this) == rhs; }
 		}
-
 
 		template <std::equality_comparable_with<T> R>
 		inline bool operator!=(const R& rhs)
@@ -360,14 +324,12 @@ namespace Strawberry::Core
 			else { return (**this) != rhs; }
 		}
 
-
 		template <std::totally_ordered_with<T> R>
 		inline bool operator>(const R& rhs) const
 		{
 			if (HasValue()) { return Value() > rhs; }
 			else { return false; }
 		}
-
 
 		template <std::totally_ordered_with<T> R>
 		inline bool operator>=(const R& rhs) const
@@ -376,14 +338,12 @@ namespace Strawberry::Core
 			else { return false; }
 		}
 
-
 		template <std::totally_ordered_with<T> R>
 		inline bool operator<(const R& rhs) const
 		{
 			if (HasValue()) { return Value() < rhs; }
 			else { return true; }
 		}
-
 
 		template <std::totally_ordered_with<T> R>
 		inline bool operator<=(const R& rhs) const
@@ -395,12 +355,12 @@ namespace Strawberry::Core
 
 	private:
 		bool mHasValue;
+
 		union
 		{
 			T mPayload;
 		};
 	};
-
 
 	template <typename T>
 		requires (std::is_pointer_v<T>)
@@ -411,29 +371,23 @@ namespace Strawberry::Core
 			: mPayload(nullptr)
 		{}
 
-
 		Option(NullOpt_t)
 			: mPayload(nullptr)
 		{}
-
 
 		Option(T value)
 			: mPayload(value)
 		{}
 
-
 		Option(const Option& rhs)
 			: mPayload(rhs.HasValue() ? *rhs : nullptr)
 		{}
-
 
 		Option(Option&& rhs) noexcept
 			: mPayload(std::exchange(rhs.mPayload, nullptr))
 		{}
 
-
 		Option& operator=(NullOpt_t) { Reset(); }
-
 
 		Option& operator=(T rhs)
 		{
@@ -441,7 +395,6 @@ namespace Strawberry::Core
 
 			return *this;
 		}
-
 
 		Option& operator=(const Option& rhs)
 			requires (std::is_copy_assignable_v<T>)
@@ -451,7 +404,6 @@ namespace Strawberry::Core
 			return *this;
 		}
 
-
 		Option& operator=(Option&& rhs) noexcept
 			requires (std::is_move_assignable_v<T>)
 		{
@@ -460,15 +412,11 @@ namespace Strawberry::Core
 			return *this;
 		}
 
-
 		void Reset() { mPayload = nullptr; }
-
 
 		[[nodiscard]] inline bool HasValue() const { return mPayload != nullptr; }
 
-
 		explicit inline operator bool() const { return HasValue(); }
-
 
 		T Value() const
 		{
@@ -476,13 +424,11 @@ namespace Strawberry::Core
 			return mPayload;
 		}
 
-
 		T ValueOr(T value) const
 		{
 			if (HasValue()) { return Value(); }
 			else { return value; }
 		}
-
 
 		T operator*()
 		{
@@ -490,13 +436,11 @@ namespace Strawberry::Core
 			return mPayload;
 		}
 
-
 		T operator*() const
 		{
 			Assert(HasValue());
 			return mPayload;
 		}
-
 
 		T operator->()
 		{
@@ -504,13 +448,11 @@ namespace Strawberry::Core
 			return mPayload;
 		}
 
-
 		T operator->() const
 		{
 			Assert(HasValue());
 			return mPayload;
 		}
-
 
 		T Unwrap()
 		{
@@ -518,13 +460,11 @@ namespace Strawberry::Core
 			return std::exchange(mPayload, nullptr);
 		}
 
-
 		T UnwrapOr(T&& value)
 		{
 			if (HasValue()) { return Unwrap(); }
 			else { return value; }
 		}
-
 
 		template <std::invocable<T> F>
 			requires Core::IsOption<std::invoke_result_t<F, T>>::value
@@ -539,7 +479,6 @@ namespace Strawberry::Core
 			return NullOpt;
 		}
 
-
 		template <std::invocable<const T> F>
 			requires Core::IsOption<std::invoke_result_t<F, const T>>::value
 		std::invoke_result_t<F, const T> AndThen(F functor) const&
@@ -553,14 +492,12 @@ namespace Strawberry::Core
 			return NullOpt;
 		}
 
-
 		template <std::invocable<const T> F>
 		Option<std::invoke_result_t<F, const T>> Map(F functor) const&
 		{
 			if (HasValue()) { return Option<std::invoke_result_t<F, const T&>>(functor(Value())); }
 			else { return {}; }
 		}
-
 
 		template <std::invocable<T> F>
 		Option<std::invoke_result_t<F, T>> Map(F functor) &&
@@ -569,20 +506,17 @@ namespace Strawberry::Core
 			else { return {}; }
 		}
 
-
 		Option<T*> AsPtr()
 		{
 			if (HasValue()) { return &mPayload; }
 			else { return {}; }
 		}
 
-
 		Option<const T*> AsPtr() const
 		{
 			if (HasValue()) { return &mPayload; }
 			else { return {}; }
 		}
-
 
 		template <std::equality_comparable_with<T> R>
 		bool operator==(const Option<R>& rhs)
@@ -593,7 +527,6 @@ namespace Strawberry::Core
 			return false;
 		}
 
-
 		template <std::equality_comparable_with<T> R>
 		inline bool operator!=(const Option<R>& rhs) const
 		{
@@ -602,7 +535,6 @@ namespace Strawberry::Core
 
 			return true;
 		}
-
 
 		template <std::totally_ordered_with<T> R>
 		inline bool operator>(const Option<R> rhs) const
@@ -613,7 +545,6 @@ namespace Strawberry::Core
 			else if (!HasValue() && !rhs.HasValue()) { return false; }
 		}
 
-
 		template <std::totally_ordered_with<T> R>
 		inline bool operator>=(const Option<R> rhs) const
 		{
@@ -623,7 +554,6 @@ namespace Strawberry::Core
 			else if (!HasValue() && !rhs.HasValue()) { return true; }
 		}
 
-
 		template <std::totally_ordered_with<T> R>
 		inline bool operator<(const Option<R> rhs) const
 		{
@@ -632,7 +562,6 @@ namespace Strawberry::Core
 			else if (HasValue() && !rhs.HasValue()) { return false; }
 			else if (!HasValue() && !rhs.HasValue()) { return false; }
 		}
-
 
 		template <std::totally_ordered_with<T> R>
 		inline bool operator<=(const Option<R> rhs) const
@@ -648,14 +577,12 @@ namespace Strawberry::Core
 		T mPayload;
 	};
 
-
 	template <typename T>
 	inline bool operator==(const T& a, const Option<T>& b)
 		requires (std::equality_comparable<T>)
 	{
 		return b == a;
 	}
-
 
 	template <typename T>
 	inline bool operator!=(const T& a, const Option<T>& b)
