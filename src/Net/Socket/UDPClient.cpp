@@ -114,8 +114,7 @@ namespace Strawberry::Core::Net::Socket
 #endif
 	}
 
-
-	Result<std::tuple<Option<Endpoint>, IO::DynamicByteBuffer>, IO::Error> UDPClient::Read()
+	Result<std::tuple<Optional<Endpoint>, IO::DynamicByteBuffer>, IO::Error> UDPClient::Read()
 	{
 		sockaddr_storage peer{};
 		socklen_t        peerLen = 0;
@@ -123,7 +122,7 @@ namespace Strawberry::Core::Net::Socket
 
 		if (bytesRead >= 0)
 		{
-			Option<Endpoint> endpoint;
+			Optional<Endpoint> endpoint;
 			if (peer.ss_family == AF_INET)
 			{
 				auto* sockaddr = reinterpret_cast<sockaddr_in*>(&peer);

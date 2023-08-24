@@ -28,8 +28,7 @@ namespace Strawberry::Core::Net::HTTP
 		}
 	}
 
-
-	Option<Verb> Verb::Parse(const std::string& string)
+	Optional<Verb> Verb::Parse(const std::string& string)
 	{
 		static const std::map<std::string, Verb> mapping = {
 			{"POST",   Verb::POST },
@@ -44,8 +43,7 @@ namespace Strawberry::Core::Net::HTTP
 		else { return {}; }
 	}
 
-
-	Option<Version> Version::Parse(const std::string& string)
+	Optional<Version> Version::Parse(const std::string& string)
 	{
 		static const std::map<std::string, Version> mapping = {
 			{"1.0", Version::VERSION_1_0},

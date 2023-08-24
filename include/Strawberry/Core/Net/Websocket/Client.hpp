@@ -13,9 +13,8 @@
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
 #include "Strawberry/Core/Sync/Mutex.hpp"
-#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Optional.hpp"
 #include "Strawberry/Core/Util/Result.hpp"
-
 
 namespace Strawberry::Core::Net::Websocket
 {
@@ -26,7 +25,6 @@ namespace Strawberry::Core::Net::Websocket
 		Refused,
 		ProtocolError,
 	};
-
 
 	template <typename S>
 		requires IO::Read<S> && IO::Write<S>
@@ -46,7 +44,6 @@ namespace Strawberry::Core::Net::Websocket
 
 		Result<Message, Error> WaitMessage();
 
-
 		[[nodiscard]] inline bool IsValid() const { return mSocket.HasValue(); }
 
 
@@ -60,10 +57,10 @@ namespace Strawberry::Core::Net::Websocket
 		[[nodiscard]] Result<size_t, Error>   TransmitFrame(const Message& frame);
 
 
-		[[nodiscard]] static std::string             GenerateNonce();
-		[[nodiscard]] static uint8_t                 GetOpcodeMask(Message::Opcode opcode);
-		[[nodiscard]] static Option<Message::Opcode> GetOpcodeFromByte(uint8_t byte);
-		[[nodiscard]] static uint32_t                GenerateMaskingKey();
+		[[nodiscard]] static std::string               GenerateNonce();
+		[[nodiscard]] static uint8_t                   GetOpcodeMask(Message::Opcode opcode);
+		[[nodiscard]] static Optional<Message::Opcode> GetOpcodeFromByte(uint8_t byte);
+		[[nodiscard]] static uint32_t                  GenerateMaskingKey();
 
 		void Disconnect(int code = 1000);
 
@@ -73,10 +70,9 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	protected:
-		Option<Mutex<S>> mSocket;
-		Option<Error>    mError;
+		Optional<Mutex<S>> mSocket;
+		Optional<Error>    mError;
 	};
-
 
 	class WSClient : public ClientBase<Socket::TCPClient>
 	{
@@ -84,13 +80,11 @@ namespace Strawberry::Core::Net::Websocket
 		static Result<WSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 80);
 	};
 
-
 	class WSSClient : public ClientBase<Socket::TLSClient>
 	{
 	public:
 		static Result<WSSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 443);
 	};
 } // namespace Strawberry::Core::Net::Websocket
-
 
 #include "Client.inl"

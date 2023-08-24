@@ -39,7 +39,7 @@ namespace Strawberry::Core::Net::Socket
 
 
 		[[nodiscard]] bool                                                     Poll() const;
-		Result<std::tuple<Option<Endpoint>, IO::DynamicByteBuffer>, IO::Error> Read();
+		Result<std::tuple<Optional<Endpoint>, IO::DynamicByteBuffer>, IO::Error> Read();
 		Result<size_t, IO::Error>                                              Write(const Endpoint& endpoint, const IO::DynamicByteBuffer& bytes) const;
 
 

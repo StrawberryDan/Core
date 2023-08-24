@@ -8,8 +8,7 @@
 
 #include "Strawberry/Core/IO/ByteBuffer.hpp"
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
-#include "Strawberry/Core/Util/Option.hpp"
-
+#include "Strawberry/Core/Util/Optional.hpp"
 
 namespace Strawberry::Core::Net
 {
@@ -17,7 +16,7 @@ namespace Strawberry::Core::Net
 	{
 	public:
 		// Static constructors
-		static Option<IPv4Address> Parse(const std::string& data);
+		static Optional<IPv4Address> Parse(const std::string& data);
 
 
 	public:
@@ -44,7 +43,7 @@ namespace Strawberry::Core::Net
 	class IPv6Address
 	{
 	public:
-		static Option<IPv6Address> Parse(const std::string& string);
+		static Optional<IPv6Address> Parse(const std::string& string);
 
 
 	public:
@@ -82,8 +81,8 @@ namespace Strawberry::Core::Net
 
 
 		// Casting
-		[[nodiscard]] Option<IPv4Address>   AsIPv4() const;
-		[[nodiscard]] Option<IPv6Address>   AsIPv6() const;
+		[[nodiscard]] Optional<IPv4Address> AsIPv4() const;
+		[[nodiscard]] Optional<IPv6Address> AsIPv6() const;
 		[[nodiscard]] IO::DynamicByteBuffer AsBytes() const;
 		[[nodiscard]] std::string           AsString() const;
 

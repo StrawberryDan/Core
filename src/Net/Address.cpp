@@ -21,7 +21,7 @@
 
 namespace Strawberry::Core::Net
 {
-	Option<IPv4Address> IPv4Address::Parse(const std::string& data)
+	Optional<IPv4Address> IPv4Address::Parse(const std::string& data)
 	{
 		uint8_t buffer[sizeof(in_addr)] = {0};
 		auto    result                  = inet_pton(AF_INET, data.data(), buffer);
@@ -48,8 +48,7 @@ namespace Strawberry::Core::Net
 		return {buffer};
 	}
 
-
-	Option<IPv6Address> IPv6Address::Parse(const std::string& string)
+	Optional<IPv6Address> IPv6Address::Parse(const std::string& string)
 	{
 		uint8_t buffer[sizeof(in6_addr)] = {0};
 		auto    result                   = inet_pton(AF_INET6, string.data(), buffer);
@@ -86,16 +85,14 @@ namespace Strawberry::Core::Net
 		: mPayload(address)
 	{}
 
-
-	Option<IPv4Address> IPAddress::AsIPv4() const
+	Optional<IPv4Address> IPAddress::AsIPv4() const
 	{
 		if (IsIPv4()) return std::get<IPv4Address>(mPayload);
 		else
 			return {};
 	}
 
-
-	Option<IPv6Address> IPAddress::AsIPv6() const
+	Optional<IPv6Address> IPAddress::AsIPv6() const
 	{
 		if (IsIPv6()) return std::get<IPv6Address>(mPayload);
 		else

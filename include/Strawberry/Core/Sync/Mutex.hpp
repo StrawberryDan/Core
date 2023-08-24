@@ -6,7 +6,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Core
 #include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Optional.hpp"
 // Standard Library
 #include <memory>
 #include <mutex>
@@ -98,16 +98,14 @@ namespace Strawberry::Core
 
 		MutexGuard<const T> Lock() const& { return {std::unique_lock(mMutex), &mPayload}; }
 
-
-		Option<MutexGuard<T>> TryLock() &
+		Optional<MutexGuard<T>> TryLock() &
 		{
 			std::unique_lock<std::recursive_mutex> lk(mMutex, std::defer_lock);
 			if (lk.try_lock()) { return MutexGuard<T>(std::move(lk), &mPayload); }
 			else { return {}; }
 		}
 
-
-		Option<MutexGuard<const T>> TryLock() const&
+		Optional<MutexGuard<const T>> TryLock() const&
 		{
 			std::unique_lock<std::recursive_mutex> lk(mMutex, std::defer_lock);
 			if (lk.try_lock()) { return MutexGuard<T>(std::move(lk), &mPayload); }
@@ -177,11 +175,9 @@ namespace Strawberry::Core
 
 		MutexGuard<const T> Lock() const { return static_cast<const Mutex<T>*>(mPayload.get())->Lock(); }
 
+		Optional<MutexGuard<T>> TryLock() { return mPayload->TryLock(); }
 
-		Option<MutexGuard<T>> TryLock() { return mPayload->TryLock(); }
-
-
-		Option<MutexGuard<const T>> TryLock() const { return mPayload->TryLock(); }
+		Optional<MutexGuard<const T>> TryLock() const { return mPayload->TryLock(); }
 
 
 	private:

@@ -45,7 +45,7 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Net/Websocket/Client.hpp
 		include/Strawberry/Core/Net/Websocket/Client.inl
 		include/Strawberry/Core/Net/Websocket/Message.hpp
-		include/Strawberry/Core/Util/Option.hpp
+		include/Strawberry/Core/Util/Optional.hpp
 		include/Strawberry/Core/Util/Result.hpp
 		include/Strawberry/Core/Util/ScopedTimer.hpp
 		include/Strawberry/Core/Util/Utilities.hpp

@@ -5,7 +5,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Core
-#include "Strawberry/Core/Util/Option.hpp"
+#include "Optional.hpp"
 // Standard Library
 #include <concepts>
 #include <variant>
@@ -37,7 +37,7 @@ namespace Strawberry::Core
 
 
 		template <typename T>
-		Core::Option<T> Value() const&
+		Core::Optional<T> Value() const&
 		{
 			Core::Assert(ContainsValue());
 			if (std::holds_alternative<T>(mData)) { return std::get<T>(mData); }
@@ -46,7 +46,7 @@ namespace Strawberry::Core
 
 
 		template <typename T>
-		Core::Option<T> Value() &&
+		Core::Optional<T> Value() &&
 		{
 			Core::Assert(ContainsValue());
 			if (std::holds_alternative<T>(mData)) { return std::get<T>(std::move(mData)); }

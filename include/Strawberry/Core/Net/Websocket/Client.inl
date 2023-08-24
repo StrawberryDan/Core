@@ -116,7 +116,7 @@ namespace Strawberry::Core::Net::Websocket
 
 	template <typename S>
 	requires IO::Read<S> && IO::Write<S>
-	Option<Message::Opcode> ClientBase<S>::GetOpcodeFromByte(uint8_t byte)
+	Optional<Message::Opcode> ClientBase<S>::GetOpcodeFromByte(uint8_t byte)
 	{
 		using Opcode = Message::Opcode;
 

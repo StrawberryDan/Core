@@ -8,7 +8,6 @@
 #include "Error.hpp"
 #include "Strawberry/Core/Util/Result.hpp"
 
-
 namespace Strawberry::Core::Net
 {
 	class Endpoint
@@ -16,9 +15,9 @@ namespace Strawberry::Core::Net
 	public:
 		/// Resolves endpoints from a hostname and a port seperatly.
 		static Result<Endpoint, Error> Resolve(const std::string& hostname, uint16_t port);
-		/// Parses strings of the form <hostname>:<port> and resolves IP
+		/// Parses strings of the form [hostname]:[port] and resolves IP
 		static Result<Endpoint, Error> Resolve(const std::string& endpoint);
-		/// Parses strings of the form <hostname>:<port> without resolving IP
+		/// Parses strings of the form [hostname]:[port] without resolving IP
 		static Result<Endpoint, Error> Parse(const std::string& endpoint);
 
 
@@ -26,19 +25,16 @@ namespace Strawberry::Core::Net
 		Endpoint(const std::string& hostname, uint16_t port);
 		Endpoint(IPAddress address, uint16_t port);
 
+		[[nodiscard]] inline const Optional<std::string>& GetHostname() const { return mHostName; }
 
-		[[nodiscard]] inline const Option<std::string>& GetHostname() const { return mHostName; }
-
-
-		[[nodiscard]] inline Option<IPAddress> GetAddress() const { return mAddress; }
-
+		[[nodiscard]] inline Optional<IPAddress> GetAddress() const { return mAddress; }
 
 		[[nodiscard]] inline uint16_t GetPort() const { return mPort; }
 
 
 	private:
-		Option<std::string> mHostName;
-		Option<IPAddress>   mAddress;
-		uint16_t            mPort;
+		Optional<std::string> mHostName;
+		Optional<IPAddress>   mAddress;
+		uint16_t              mPort;
 	};
 } // namespace Strawberry::Core::Net

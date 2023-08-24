@@ -2,7 +2,7 @@
 
 
 #include "Strawberry/Core/Math/Periodic.hpp"
-#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Optional.hpp"
 
 #include <memory>
 
@@ -29,8 +29,7 @@ namespace Strawberry::Core::Collection
 			if (!AtCapacity()) mSize += 1;
 		}
 
-
-		Option<T> Pop()
+		Optional<T> Pop()
 		{
 			if (Size() == 0) return {};
 			auto value = std::move(*mData[*mHead]);
@@ -59,7 +58,7 @@ namespace Strawberry::Core::Collection
 
 
 	private:
-		std::vector<Option<T>>        mData;
+		std::vector<Optional<T>>      mData;
 		Math::DynamicPeriodic<size_t> mHead;
 		Math::DynamicPeriodic<size_t> mTail;
 		size_t                        mSize;
@@ -86,8 +85,7 @@ namespace Strawberry::Core::Collection
 			if (!AtCapacity()) mSize += 1;
 		}
 
-
-		Option<T> Pop()
+		Optional<T> Pop()
 		{
 			if (Size() == 0) return {};
 			auto value  = std::move(*mData[*mHead++]);
@@ -126,13 +124,13 @@ namespace Strawberry::Core::Collection
 			mTail = Math::DynamicPeriodic(newSize, (size_t) 0);
 			mSize = 0;
 
-			mData = std::vector<Option<T>>(newSize, Option<T>());
+			mData = std::vector<Optional<T>>(newSize, Option<T>());
 			for (auto& value : newData) Push(std::move(value));
 		}
 
 
 	private:
-		std::vector<Option<T>>        mData;
+		std::vector<Optional<T>>      mData;
 		Math::DynamicPeriodic<size_t> mHead;
 		Math::DynamicPeriodic<size_t> mTail;
 		size_t                        mSize;

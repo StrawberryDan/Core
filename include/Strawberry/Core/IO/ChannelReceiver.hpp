@@ -33,11 +33,10 @@ namespace Strawberry::Core::IO
 
 		~ChannelReceiver() { mMessageBuffer.Lock()->clear(); }
 
-
-		Core::Option<T> Read()
+		Core::Optional<T> Read()
 		{
 			auto messageBuffer = mMessageBuffer.Lock();
-			auto result        = messageBuffer->empty() ? Core::NullOpt : Core::Option(messageBuffer->front());
+			auto result        = messageBuffer->empty() ? Core::NullOpt : Core::Optional(messageBuffer->front());
 			if (result) { messageBuffer->pop_front(); }
 			return result;
 		}

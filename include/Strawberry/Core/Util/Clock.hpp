@@ -4,13 +4,11 @@
 #include <chrono>
 
 
-#include "Option.hpp"
-
+#include "Optional.hpp"
 
 namespace Strawberry::Core
 {
 	using Seconds = double;
-
 
 	class Clock
 	{
@@ -23,12 +21,9 @@ namespace Strawberry::Core
 
 		[[nodiscard]] Seconds Read() const;
 
-
 		Seconds operator*() const { return Read(); }
 
-
 		explicit operator Seconds() const { return Read(); }
-
 
 		void Restart();
 
@@ -36,7 +31,7 @@ namespace Strawberry::Core
 		using Duration = std::chrono::duration<double, std::ratio<1>>;
 		using Instant  = std::chrono::time_point<std::chrono::system_clock, Duration>;
 
-		Duration        mBuffer;
-		Option<Instant> mStartTime;
+		Duration          mBuffer;
+		Optional<Instant> mStartTime;
 	};
 } // namespace Strawberry::Core

@@ -1,6 +1,6 @@
 #include "Strawberry/Core/Util/Logging.hpp"
 
-#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Optional.hpp"
 #include <fstream>
 #include <sstream>
 #include <utility>
@@ -8,9 +8,8 @@
 
 namespace Strawberry::Core
 {
-	static Option<Logging::Level> sLogLevel   = {};
-	static Option<std::ofstream>  sOutputFile = {};
-
+	static Optional<Logging::Level> sLogLevel   = {};
+	static Optional<std::ofstream>  sOutputFile = {};
 
 	std::string Logging::LevelToString(Level logLevel)
 	{

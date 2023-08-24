@@ -22,7 +22,7 @@ namespace Strawberry::Core::Net
 		auto      dnsResult = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &peer);
 		if (dnsResult != 0) { return Error::DNSResolution; }
 
-		Option<Endpoint> result;
+		Optional<Endpoint> result;
 		addrinfo*        cursor = peer;
 		while (cursor != nullptr)
 		{

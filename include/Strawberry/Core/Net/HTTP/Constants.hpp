@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "Strawberry/Core/Util/Option.hpp"
+#include "Strawberry/Core/Util/Optional.hpp"
 #include <string>
 
 
@@ -27,8 +27,7 @@ namespace Strawberry::Core::Net::HTTP
 
 		operator _Enum() const { return mValue; }
 
-
-		static Option<Verb>       Parse(const std::string& string);
+		static Optional<Verb>     Parse(const std::string& string);
 		[[nodiscard]] std::string ToString() const;
 
 	private:
@@ -55,8 +54,7 @@ namespace Strawberry::Core::Net::HTTP
 
 		inline operator _Enum() const { return mValue; }
 
-
-		static Option<Version>    Parse(const std::string& string);
+		static Optional<Version>  Parse(const std::string& string);
 		[[nodiscard]] std::string ToString() const;
 
 	private:
