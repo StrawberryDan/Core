@@ -21,7 +21,7 @@ namespace Strawberry::Core
 
 		explicit operator bool();
 		void Tick();
-		void Restart();
+		void TickWithoutProgress();
 
 
 		void SetPreemption(double preemption);

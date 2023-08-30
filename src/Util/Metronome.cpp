@@ -30,8 +30,7 @@ namespace Strawberry::Core
 		mClock.Restart();
 	}
 
-
-	void Metronome::Restart()
+	void Metronome::TickWithoutProgress()
 	{
 		mClock.Restart();
 	}
