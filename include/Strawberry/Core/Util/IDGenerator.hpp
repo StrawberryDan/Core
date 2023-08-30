@@ -23,7 +23,7 @@ namespace Strawberry::Core
 			{
 				auto minimum = std::min_element(mFreeIDs.begin(), mFreeIDs.end());
 				mFreeIDs.erase(minimum);
-				return minimum;
+				return *minimum;
 			}
 		}
 
