@@ -81,6 +81,7 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Util/Flag.cpp
 		include/Strawberry/Core/Util/Flag.hpp
 		include/Strawberry/Core/Util/COW.hpp
+		include/Strawberry/Core/Util/IDGenerator.hpp
 )
 
 target_include_directories(StrawberryCore PUBLIC include ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
