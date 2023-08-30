@@ -1,6 +1,9 @@
 #include "Strawberry/Core/Util/Markers.hpp"
 
 
+#include <csignal>
+
+
 #if defined(_WIN32)
 #include <debugapi.h>
 #endif
