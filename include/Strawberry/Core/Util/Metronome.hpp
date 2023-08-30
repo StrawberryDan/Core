@@ -23,6 +23,9 @@ namespace Strawberry::Core
 		void Tick();
 		void TickWithoutProgress();
 
+		double GetPreemption() const { return mPreemption; }
+
+		double GetFrequency() const { return mFrequency; }
 
 		void SetPreemption(double preemption);
 		void SetFrequency(double frequency);
