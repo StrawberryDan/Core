@@ -1,15 +1,23 @@
 #pragma once
 
 
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
+// Strawberry Core
 #include "Strawberry/Core/Math/Periodic.hpp"
+#include "Strawberry/Core/Util/MaybeUninitialised.hpp"
 #include "Strawberry/Core/Util/Optional.hpp"
-
+// Standard Library
 #include <memory>
 
-
+//======================================================================================================================
+//  Class Definitions
+//----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::Collection
 {
 	template <typename T>
+		requires std::copyable<T> || std::movable<T>
 	class CircularBuffer
 	{
 	public:
@@ -20,12 +28,20 @@ namespace Strawberry::Core::Collection
 			, mSize(0)
 		{}
 
+		~CircularBuffer()
+		{
+			while (!Empty())
+			{
+				Optional<T> value = Pop();
+				value.Reset();
+			}
+		}
 
 		void Push(T value)
 		{
-			if (AtCapacity()) { mData[*mHead++].Reset(); }
+			if (AtCapacity()) { mData[*mHead++].Destruct(); }
 
-			mData[*(mTail++)].Emplace(std::move(value));
+			mData[*(mTail++)].Construct(std::move(value));
 			if (!AtCapacity()) mSize += 1;
 		}
 
@@ -58,7 +74,7 @@ namespace Strawberry::Core::Collection
 
 
 	private:
-		std::vector<Optional<T>>      mData;
+		std::vector<MaybeUninitialised<T>> mData;
 		Math::DynamicPeriodic<size_t> mHead;
 		Math::DynamicPeriodic<size_t> mTail;
 		size_t                        mSize;
@@ -130,7 +146,7 @@ namespace Strawberry::Core::Collection
 
 
 	private:
-		std::vector<Optional<T>>      mData;
+		std::vector<MaybeUninitialised<T>> mData;
 		Math::DynamicPeriodic<size_t> mHead;
 		Math::DynamicPeriodic<size_t> mTail;
 		size_t                        mSize;
