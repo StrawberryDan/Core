@@ -37,6 +37,14 @@ namespace Strawberry::Core
 
 		const T& Get() const { return mPayload; }
 
+		T& operator*() { return mPayload; }
+
+		const T& operator*() const { return mPayload; }
+
+		T* operator->() { return &mPayload; }
+
+		const T* operator->() const { return &mPayload; }
+
 	private:
 		union
 		{
