@@ -17,10 +17,13 @@ namespace Strawberry::Core
 	public:
 		MaybeUninitialised() {}
 
-		MaybeUninitialised(const MaybeUninitialised&)            = delete;
-		MaybeUninitialised(MaybeUninitialised&&)                 = delete;
-		MaybeUninitialised& operator=(const MaybeUninitialised&) = delete;
-		MaybeUninitialised& operator=(MaybeUninitialised&&)      = delete;
+		MaybeUninitialised(const MaybeUninitialised& rhs) { std::memcpy(&mPayload, &rhs.mPayload, sizeof(T)); }
+
+		MaybeUninitialised& operator=(const MaybeUninitialised& rhs) { std::memcpy(&mPayload, &rhs.mPayload, sizeof(T)); }
+
+		MaybeUninitialised(MaybeUninitialised&&)           = delete;
+
+		MaybeUninitialised operator=(MaybeUninitialised&&) = delete;
 
 		~MaybeUninitialised() {}
 
