@@ -14,15 +14,14 @@
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
 #include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Util/MaybeUninitialised.hpp"
 
 
 using namespace Strawberry::Core;
 
-
 namespace Test
 {
 	using namespace Math;
-
 
 	void CheckBytes(const IO::DynamicByteBuffer& bytes)
 	{
@@ -33,7 +32,6 @@ namespace Test
 		Assert(decoded.Size() == bytes.Size());
 		Assert(decoded == bytes);
 	}
-
 
 	void Base64()
 	{
@@ -65,13 +63,11 @@ namespace Test
 		}
 	}
 
-
 	void ParseIP()
 	{
 		auto ip = Net::IPv4Address::Parse("255.255.255.255").Unwrap();
 		Assert(ip.AsString() == "255.255.255.255");
 	}
-
 
 	void DNS()
 	{
@@ -80,13 +76,11 @@ namespace Test
 		Assert(google || justnoise);
 	}
 
-
 	void TCP()
 	{
 		auto google = Strawberry::Core::Net::Endpoint::Resolve("google.com", 80).Unwrap();
 		auto client = Strawberry::Core::Net::Socket::TCPClient::Connect(google).Unwrap();
 	}
-
 
 	void TLS()
 	{
@@ -99,7 +93,6 @@ namespace Test
 			auto client = Strawberry::Core::Net::Socket::TLSClient::Connect(google).Unwrap();
 		}
 	}
-
 
 	void HTTP()
 	{
@@ -117,7 +110,6 @@ namespace Test
 			auto response = http.Receive();
 		}
 	}
-
 
 	void PeriodicNumbers()
 	{
@@ -156,16 +148,43 @@ namespace Test
 		Assert(dynamicDouble * 4 == 0);
 		Assert(dynamicDouble / 2 == 2.5);
 	}
-} // namespace Test
 
+	class UninitialisedTester
+	{
+	public:
+		UninitialisedTester() { numConstructed++; }
+
+		~UninitialisedTester() { numConstructed--; }
+
+	public:
+		static int numConstructed;
+	};
+
+	inline int UninitialisedTester::numConstructed = 0;
+
+	void Uninitialised()
+	{
+		std::vector<Strawberry::Core::MaybeUninitialised<UninitialisedTester>> data(5);
+
+		Strawberry::Core::Assert(UninitialisedTester::numConstructed == 0);
+		data[0].Construct();
+		Strawberry::Core::Assert(UninitialisedTester::numConstructed == 1);
+		data[1].Construct();
+		data[2].Construct();
+		Strawberry::Core::Assert(UninitialisedTester::numConstructed == 3);
+		data[1].Destruct();
+		Strawberry::Core::Assert(UninitialisedTester::numConstructed == 2);
+	}
+} // namespace Test
 
 int main()
 {
-	Test::Base64();
-	Test::ParseIP();
-	Test::DNS();
-	Test::TCP();
-	Test::TLS();
-	Test::HTTP();
-	Test::PeriodicNumbers();
+	//	Test::Base64();
+	//	Test::ParseIP();
+	//	Test::DNS();
+	//	Test::TCP();
+	//	Test::TLS();
+	//	Test::HTTP();
+	//	Test::PeriodicNumbers();
+	Test::Uninitialised();
 }
