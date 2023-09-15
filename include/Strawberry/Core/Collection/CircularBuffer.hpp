@@ -140,7 +140,7 @@ namespace Strawberry::Core::Collection
 			mTail = Math::DynamicPeriodic(newSize, (size_t) 0);
 			mSize = 0;
 
-			mData = std::vector<Optional<T>>(newSize, Option<T>());
+			mData = std::vector<Optional<T>>(newSize, Optional<T>());
 			for (auto& value : newData) Push(std::move(value));
 		}
 
