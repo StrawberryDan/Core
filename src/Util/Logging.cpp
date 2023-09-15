@@ -25,6 +25,8 @@ namespace Strawberry::Core
 				return "WARNING";
 			case Level::Error:
 				return "ERROR";
+			default:
+				Core::Unreachable();
 		}
 	}
 
