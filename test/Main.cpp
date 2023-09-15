@@ -15,6 +15,7 @@
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
 #include "Strawberry/Core/Util/Assert.hpp"
 #include "Strawberry/Core/Util/MaybeUninitialised.hpp"
+#include "Strawberry/Core/Net/Socket/API.hpp"
 
 
 using namespace Strawberry::Core;
@@ -179,12 +180,14 @@ namespace Test
 
 int main()
 {
-	//	Test::Base64();
-	//	Test::ParseIP();
-	//	Test::DNS();
-	//	Test::TCP();
-	//	Test::TLS();
-	//	Test::HTTP();
-	//	Test::PeriodicNumbers();
+	Strawberry::Core::Net::Socket::API::Initialise();
+	Test::Base64();
+	Test::ParseIP();
+	Test::DNS();
+	Test::TCP();
+	Test::TLS();
+	Test::HTTP();
+	Test::PeriodicNumbers();
 	Test::Uninitialised();
+	Strawberry::Core::Net::Socket::API::Terminate();
 }
