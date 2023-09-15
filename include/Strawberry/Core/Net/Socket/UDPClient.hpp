@@ -8,7 +8,6 @@
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 #include "Strawberry/Core/IO/Error.hpp"
 #include "Strawberry/Core/Net/Endpoint.hpp"
-#include "Strawberry/Core/Net/Socket/SocketAPIUser.hpp"
 #include "Strawberry/Core/Util/Result.hpp"
 // Standard Library
 #include <tuple>
@@ -21,7 +20,7 @@
 
 namespace Strawberry::Core::Net::Socket
 {
-	class UDPClient : private SocketAPIUser
+	class UDPClient
 	{
 	public:
 		static Result<UDPClient, Error> Create();
@@ -35,7 +34,7 @@ namespace Strawberry::Core::Net::Socket
 		UDPClient(UDPClient&& other) noexcept;
 		UDPClient& operator=(const UDPClient& other) = delete;
 		UDPClient& operator=(UDPClient&& other) noexcept;
-		~UDPClient() override;
+		~UDPClient();
 
 
 		[[nodiscard]] bool                                                     Poll() const;

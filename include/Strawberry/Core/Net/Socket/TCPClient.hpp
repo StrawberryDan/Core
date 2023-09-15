@@ -4,7 +4,6 @@
 #include <string>
 
 
-#include "SocketAPIUser.hpp"
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 #include "Strawberry/Core/IO/Error.hpp"
 #include "Strawberry/Core/Net/Endpoint.hpp"
@@ -19,7 +18,7 @@
 
 namespace Strawberry::Core::Net::Socket
 {
-	class TCPClient : private SocketAPIUser
+	class TCPClient
 	{
 		friend class TLSClient;
 
@@ -34,7 +33,7 @@ namespace Strawberry::Core::Net::Socket
 		TCPClient(TCPClient&& other) noexcept;
 		TCPClient& operator=(const TCPClient& other) = delete;
 		TCPClient& operator=(TCPClient&& other) noexcept;
-		~TCPClient() final;
+		~TCPClient();
 
 
 		[[nodiscard]] bool                       Poll() const;
