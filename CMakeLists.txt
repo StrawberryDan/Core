@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 3.20)
 project(StrawberryCore)
 set(CMAKE_CXX_STANDARD 23)
+include(FetchContent)
 
 
 find_package(OpenSSL REQUIRED)
 find_library(FMT_LIBRARY NAMES libfmt.a)
-find_path(FMT_INCLUDE_DIR REQUIRED
-		NAMES fmt/format.h
-		HINTS /usr/local/include)
-find_path(JSON_INCLUDE_DIR NAMES nlohmann/json.hpp)
+
+FetchContent_Declare(JSON
+	GIT_REPOSITORY https://github.com/nlohmann/json.git)
+FetchContent_MakeAvailable(JSON)
 
 
 add_library(StrawberryCore STATIC
@@ -82,8 +83,8 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Util/MaybeUninitialised.hpp
 )
 
-target_include_directories(StrawberryCore PUBLIC include ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR} ${JSON_INCLUDE_DIR})
-target_link_libraries(StrawberryCore PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY})
+target_include_directories(StrawberryCore PUBLIC include ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR})
+target_link_libraries(StrawberryCore PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY} nlohmann_json)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	target_link_libraries(StrawberryCore PRIVATE ws2_32)
