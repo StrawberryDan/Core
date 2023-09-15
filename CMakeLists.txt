@@ -84,7 +84,7 @@ add_library(StrawberryCore STATIC
 )
 
 target_include_directories(StrawberryCore PUBLIC include ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR})
-target_link_libraries(StrawberryCore PRIVATE OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY} nlohmann_json)
+target_link_libraries(StrawberryCore PUBLIC OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY} nlohmann_json)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	target_link_libraries(StrawberryCore PRIVATE ws2_32)
