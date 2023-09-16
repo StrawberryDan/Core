@@ -5,10 +5,13 @@ include(FetchContent)
 
 
 find_package(OpenSSL REQUIRED)
-find_library(FMT_LIBRARY NAMES libfmt.a)
+FetchContent_Declare(FMT
+		GIT_REPOSITORY "https://github.com/fmtlib/fmt.git")
+FetchContent_MakeAvailable(FMT)
 
 FetchContent_Declare(JSON
-	GIT_REPOSITORY https://github.com/nlohmann/json.git)
+		GIT_REPOSITORY "https://github.com/nlohmann/json.git"
+		GIT_TAG "v3.11.2")
 FetchContent_MakeAvailable(JSON)
 
 
