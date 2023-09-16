@@ -89,7 +89,8 @@ namespace Strawberry::Core::Net::HTTP
 			}
 			else
 			{
-				fmt::print(stderr, "Unsupported value for Transfer-Encoding: {}\n", transferEncoding);
+				Logging::Error("Unsupported value for Transfer-Encoding: {}", transferEncoding);
+				Unreachable();
 			}
 		}
 		else if (response.GetHeader().Contains("Content-Length"))
