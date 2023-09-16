@@ -89,7 +89,7 @@ add_library(StrawberryCore STATIC
 )
 
 target_include_directories(StrawberryCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(StrawberryCore PUBLIC OpenSSL::SSL OpenSSL::Crypto nlohmann_json::nlohmann_json fmt::fmt)
+target_link_libraries(StrawberryCore PUBLIC OpenSSL::SSL OpenSSL::Crypto nlohmann_json::nlohmann_json fmt::fmt-header-only)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	target_link_libraries(StrawberryCore PUBLIC ws2_32)
