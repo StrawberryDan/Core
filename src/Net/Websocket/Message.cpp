@@ -22,7 +22,7 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	Message::Message(const nlohmann::json& json)
-		: Message(static_cast<std::string>(json.dump()))
+		: Message(static_cast<std::string>(json))
 	{}
 
 
