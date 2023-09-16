@@ -83,11 +83,11 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Util/MaybeUninitialised.hpp
 )
 
-target_include_directories(StrawberryCore PUBLIC include ${OPENSSL_INCLUDE_DIR} ${FMT_INCLUDE_DIR})
-target_link_libraries(StrawberryCore PUBLIC OpenSSL::SSL OpenSSL::Crypto ${FMT_LIBRARY} nlohmann_json)
+target_include_directories(StrawberryCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(StrawberryCore PUBLIC OpenSSL::SSL OpenSSL::Crypto nlohmann_json::nlohmann_json fmt::fmt)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	target_link_libraries(StrawberryCore PRIVATE ws2_32)
+	target_link_libraries(StrawberryCore PUBLIC ws2_32)
 endif ()
 
 
