@@ -5,8 +5,10 @@ include(FetchContent)
 
 
 find_package(OpenSSL REQUIRED)
+
 FetchContent_Declare(FMT
-		GIT_REPOSITORY "https://github.com/fmtlib/fmt.git")
+		GIT_REPOSITORY "https://github.com/fmtlib/fmt.git"
+		GIT_TAG "10.1.1")
 FetchContent_MakeAvailable(FMT)
 
 FetchContent_Declare(JSON
