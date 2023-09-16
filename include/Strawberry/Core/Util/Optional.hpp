@@ -323,14 +323,14 @@ namespace Strawberry::Core
 		}
 
 		template <std::equality_comparable_with<T> R>
-		inline bool operator==(const R& rhs)
+		inline bool operator==(const R& rhs) const
 		{
 			if (!HasValue()) { return false; }
 			else { return (**this) == rhs; }
 		}
 
 		template <std::equality_comparable_with<T> R>
-		inline bool operator!=(const R& rhs)
+		inline bool operator!=(const R& rhs) const
 		{
 			if (!HasValue()) { return true; }
 			else { return (**this) != rhs; }
@@ -592,16 +592,16 @@ namespace Strawberry::Core
 		T mPayload;
 	};
 
-	template <typename T>
-	inline bool operator==(const T& a, const Optional<T>& b)
-		requires (std::equality_comparable<T>)
+	template <typename T, typename R>
+	inline bool operator==(const T& a, const Optional<R>& b)
+		requires (std::equality_comparable_with<T, R>)
 	{
 		return b == a;
 	}
 
-	template <typename T>
-	inline bool operator!=(const T& a, const Optional<T>& b)
-		requires (std::equality_comparable<T>)
+	template <typename T, typename R>
+	inline bool operator!=(const T& a, const Optional<R>& b)
+		requires (std::equality_comparable_with<T, R>)
 	{
 		return b != a;
 	}
