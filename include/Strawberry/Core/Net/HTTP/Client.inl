@@ -2,6 +2,7 @@
 
 
 #include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Util/Logging.hpp"
 #include "fmt/core.h"
 #include <iostream>
 #include <regex>
