@@ -50,7 +50,7 @@ namespace Strawberry::Core::IO
 
 		~ChannelReceiver() { (*mManagedThis->Lock()) = nullptr; }
 
-		virtual void Receive(T value){};
+		virtual void Receive(T value) = 0;
 
 	private:
 		std::shared_ptr<Core::Mutex<ChannelReceiver*>> mManagedThis;
