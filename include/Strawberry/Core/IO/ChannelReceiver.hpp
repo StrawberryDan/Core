@@ -18,8 +18,8 @@ namespace Strawberry::Core::IO
 
 	template <std::copyable T, std::copyable... Ts>
 	class ChannelReceiver
-		: private ChannelReceiver<T>
-		, private ChannelReceiver<Ts...>
+		: protected ChannelReceiver<T>
+		, protected ChannelReceiver<Ts...>
 	{
 		template <std::copyable, std::copyable...>
 		friend class ChannelBroadcaster;

@@ -18,8 +18,8 @@ namespace Strawberry::Core::IO
 {
 	template <std::copyable T, std::copyable... Ts>
 	class ChannelBroadcaster
-		: public ChannelBroadcaster<T>
-		, public ChannelBroadcaster<Ts...>
+		: protected ChannelBroadcaster<T>
+		, protected ChannelBroadcaster<Ts...>
 	{
 	public:
 		using ChannelBroadcaster<T>::Broadcast;
