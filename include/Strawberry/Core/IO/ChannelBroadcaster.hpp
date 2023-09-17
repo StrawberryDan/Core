@@ -18,8 +18,8 @@ namespace Strawberry::Core::IO
 {
 	template <std::copyable T, std::copyable... Ts>
 	class ChannelBroadcaster
-		: private ChannelBroadcaster<T>
-		, private ChannelBroadcaster<Ts...>
+		: public ChannelBroadcaster<T>
+		, public ChannelBroadcaster<Ts...>
 	{
 	public:
 		using ChannelBroadcaster<T>::Broadcast;
@@ -28,15 +28,23 @@ namespace Strawberry::Core::IO
 		template <typename R, typename... Rs>
 		void Register(ChannelReceiver<R, Rs...>* receiver)
 		{
-			ChannelBroadcaster<R>::Register(static_cast<ChannelReceiver<R>*>(receiver));
-			ChannelBroadcaster<Rs...>::Register(static_cast<ChannelReceiver<Rs...>*>(receiver));
+			if constexpr (std::is_same_v<R, T> || (std::is_same_v<R, Ts> || ...))
+			{
+				ChannelBroadcaster<R>::Register(static_cast<ChannelReceiver<R>*>(receiver));
+			}
+
+			if constexpr (sizeof...(Rs) >= 1) { ChannelBroadcaster<Ts...>::Register(static_cast<ChannelReceiver<Rs...>*>(receiver)); }
 		}
 
 		template <typename R, typename... Rs>
 		void Unregister(ChannelReceiver<R, Rs...>* receiver)
 		{
-			ChannelBroadcaster<R>::Unregister(static_cast<ChannelReceiver<R>*>(receiver));
-			ChannelBroadcaster<Rs...>::Unregister(static_cast<ChannelReceiver<Rs...>*>(receiver));
+			if constexpr (std::is_same_v<R, T> || (std::is_same_v<R, Ts> || ...))
+			{
+				ChannelBroadcaster<R>::Unregister(static_cast<ChannelReceiver<R>*>(receiver));
+			}
+
+			if constexpr (sizeof...(Rs) >= 1) { ChannelBroadcaster<Ts...>::Unregister(static_cast<ChannelReceiver<Rs...>*>(receiver)); }
 		}
 	};
 
