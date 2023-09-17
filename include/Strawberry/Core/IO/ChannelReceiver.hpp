@@ -6,50 +6,53 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include "Strawberry/Core/Sync/Mutex.hpp"
 // Standard Library
-#include <deque>
-
+#include <set>
 
 //======================================================================================================================
 //  Class Declaration
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template <typename T>
+	template <std::copyable T, std::copyable... Ts>
 	class ChannelBroadcaster;
 
-
-	template <typename T>
+	template <std::copyable T, std::copyable... Ts>
 	class ChannelReceiver
+		: private ChannelReceiver<T>
+		, private ChannelReceiver<Ts...>
 	{
-		friend class ChannelBroadcaster<T>;
+		template <std::copyable, std::copyable...>
+		friend class ChannelBroadcaster;
+
+	protected:
+		using ChannelReceiver<T>::Receive;
+		using ChannelReceiver<Ts>::Receive...;
+	};
+
+	template <std::copyable T>
+	class ChannelReceiver<T>
+	{
+		template <std::copyable, std::copyable...>
+		friend class ChannelBroadcaster;
 
 
 	public:
-		ChannelReceiver(const ChannelReceiver& rhs)            = default;
-		ChannelReceiver& operator=(const ChannelReceiver& rhs) = default;
-		ChannelReceiver(ChannelReceiver&& rhs)                 = default;
-		ChannelReceiver& operator=(ChannelReceiver&& rhs)      = default;
+		ChannelReceiver()
+			: mManagedThis(std::make_shared<Core::Mutex<ChannelReceiver*>>(this))
+		{}
 
+		ChannelReceiver(const ChannelReceiver& rhs)            = delete;
+		ChannelReceiver& operator=(const ChannelReceiver& rhs) = delete;
 
-		~ChannelReceiver() { mMessageBuffer.Lock()->clear(); }
+		ChannelReceiver(ChannelReceiver&& rhs) { *rhs.mManagedThis = this; }
 
-		Core::Optional<T> Read()
-		{
-			auto messageBuffer = mMessageBuffer.Lock();
-			auto result        = messageBuffer->empty() ? Core::NullOpt : Core::Optional(messageBuffer->front());
-			if (result) { messageBuffer->pop_front(); }
-			return result;
-		}
+		ChannelReceiver& operator=(ChannelReceiver&& rhs) = delete;
 
+		~ChannelReceiver() { (*mManagedThis->Lock()) = nullptr; }
 
-	protected:
-		ChannelReceiver() = default;
-
-
-		void Receive(T value) { mMessageBuffer.Lock()->push_back(std::move(value)); }
-
+		virtual void Receive(T value){};
 
 	private:
-		Core::Mutex<std::deque<T>> mMessageBuffer;
+		std::shared_ptr<Core::Mutex<ChannelReceiver*>> mManagedThis;
 	};
 } // namespace Strawberry::Core::IO

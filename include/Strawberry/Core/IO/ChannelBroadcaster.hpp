@@ -7,35 +7,59 @@
 // Core
 #include "ChannelReceiver.hpp"
 // Standard Library
+#include <map>
 #include <memory>
-#include <vector>
-
+#include <set>
 
 //======================================================================================================================
 //  Class Declaration
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template <typename T>
+	template <std::copyable T, std::copyable... Ts>
 	class ChannelBroadcaster
+		: private ChannelBroadcaster<T>
+		, private ChannelBroadcaster<Ts...>
 	{
 	public:
+		using ChannelBroadcaster<T>::Broadcast;
+		using ChannelBroadcaster<Ts>::Broadcast...;
+
+		template <typename R, typename... Rs>
+		void Register(ChannelReceiver<R, Rs...>* receiver)
+		{
+			ChannelBroadcaster<R>::Register(static_cast<ChannelReceiver<R>*>(receiver));
+			ChannelBroadcaster<Rs...>::Register(static_cast<ChannelReceiver<Rs...>*>(receiver));
+		}
+	};
+
+	template <std::copyable T>
+	class ChannelBroadcaster<T>
+	{
+		template <std::copyable, std::copyable...>
+		friend class ChannelBroadcaster;
+
+	public:
+		ChannelBroadcaster()                                         = default;
+
+		ChannelBroadcaster(const ChannelBroadcaster& rhs)            = delete;
+		ChannelBroadcaster& operator=(const ChannelBroadcaster& rhs) = delete;
+		ChannelBroadcaster(ChannelBroadcaster&& rhs)                 = default;
+		ChannelBroadcaster& operator=(ChannelBroadcaster&& rhs)      = delete;
+
+		void Register(ChannelReceiver<T>* receiver) { mReceivers.emplace(receiver->mManagedThis); }
+
 		void Broadcast(T value)
 		{
-			std::erase_if(mReceivers, [](const std::weak_ptr<ChannelReceiver<T>>& x) { return x.expired(); });
-			for (auto& receiver : mReceivers) { receiver.lock()->Receive(value); }
+			for (auto& receiver : mReceivers)
+			{
+				auto lock = receiver->Lock();
+				if (*lock) { (*lock)->Receive(value); }
+			}
 		}
 
 
-		std::shared_ptr<ChannelReceiver<T>> CreateReceiver()
-		{
-			auto receiver = std::shared_ptr<ChannelReceiver<T>>(new ChannelReceiver<T>());
-			mReceivers.emplace_back(receiver);
-			return receiver;
-		}
-
-
-	private:
-		std::vector<std::weak_ptr<ChannelReceiver<T>>> mReceivers;
+	protected:
+		std::set<std::shared_ptr<Mutex<ChannelReceiver<T>*>>> mReceivers;
 	};
 } // namespace Strawberry::Core::IO
