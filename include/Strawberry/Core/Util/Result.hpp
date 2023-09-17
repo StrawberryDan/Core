@@ -2,6 +2,7 @@
 
 
 #include "Assert.hpp"
+#include "Strawberry/Core/Util/Optional.hpp"
 #include <variant>
 
 
@@ -137,6 +138,11 @@ namespace Strawberry::Core
 
 		explicit inline operator bool() { return IsOk(); }
 
+		Optional<D> IntoOptional()
+		{
+			if (IsOk()) { return this->Unwrap(); }
+			else { return NullOpt; }
+		}
 
 		template <std::invocable<D&&> F>
 		Result<std::invoke_result_t<F, D&&>, E> Map(F f)
