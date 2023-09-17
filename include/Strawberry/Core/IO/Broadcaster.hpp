@@ -14,8 +14,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
+	template <std::copyable... Ts>
+	class Broadcaster : private Broadcaster<Ts>...
+	{
+	public:
+		using Broadcaster<Ts>::Broadcast...;
+	};
+
 	template <std::copyable T>
-	class Broadcaster
+	class Broadcaster<T>
 	{
 	protected:
 		void Broadcast(T value)
