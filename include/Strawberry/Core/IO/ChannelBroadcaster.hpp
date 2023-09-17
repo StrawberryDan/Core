@@ -60,11 +60,17 @@ namespace Strawberry::Core::IO
 
 		void Broadcast(T value)
 		{
+			std::set<std::shared_ptr<Mutex<ChannelReceiver<T>*>>> toRemove;
+
 			for (auto& receiver : mReceivers)
 			{
 				auto lock = receiver->Lock();
-				if (*lock) { (*lock)->Receive(value); }
+				if (*lock) (*lock)->Receive(value);
+				else
+					toRemove.emplace(receiver);
 			}
+
+			for (auto& receiver : toRemove) { mReceivers.erase(receiver); }
 		}
 
 
