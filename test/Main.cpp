@@ -7,15 +7,17 @@
 #include <vector>
 // Core
 #include "Strawberry/Core/IO/Base64.hpp"
+#include "Strawberry/Core/IO/ChannelBroadcaster.hpp"
+#include "Strawberry/Core/IO/ChannelReceiver.hpp"
 #include "Strawberry/Core/Math/Math.hpp"
 #include "Strawberry/Core/Math/Periodic.hpp"
 #include "Strawberry/Core/Net/Endpoint.hpp"
 #include "Strawberry/Core/Net/HTTP/Client.hpp"
+#include "Strawberry/Core/Net/Socket/API.hpp"
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
 #include "Strawberry/Core/Util/Assert.hpp"
 #include "Strawberry/Core/Util/MaybeUninitialised.hpp"
-#include "Strawberry/Core/Net/Socket/API.hpp"
 
 
 using namespace Strawberry::Core;
@@ -176,6 +178,24 @@ namespace Test
 		data[1].Destruct();
 		Strawberry::Core::Assert(UninitialisedTester::numConstructed == 2);
 	}
+
+	void ChannelBroadcasterReceiver()
+	{
+		struct A {};
+
+		struct B {};
+
+		struct C {};
+
+		struct D {};
+
+		Strawberry::Core::IO::ChannelBroadcaster<A, B, C> b1;
+		Strawberry::Core::IO::ChannelReceiver<A, B>       r1;
+		Strawberry::Core::IO::ChannelReceiver<A, B, C, D> r2;
+
+		b1.Register(&r1);
+		b1.Register(&r2);
+	}
 } // namespace Test
 
 int main()
@@ -189,5 +209,6 @@ int main()
 	Test::HTTP();
 	Test::PeriodicNumbers();
 	Test::Uninitialised();
+	Test::ChannelBroadcasterReceiver();
 	Strawberry::Core::Net::Socket::API::Terminate();
 }
