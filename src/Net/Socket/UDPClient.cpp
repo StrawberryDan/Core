@@ -108,6 +108,14 @@ namespace Strawberry::Core::Net::Socket
 		int pollResult = poll(fds, 1, 0);
 		Assert(pollResult >= 0);
 		return static_cast<bool>(fds[0].revents & POLLIN);
+#elif defined(__WIN32)
+		WSAPOLLFD fds[] =
+				{
+						{mSocket, POLLIN, 0}
+				};
+		int pollResult = WSAPoll(fds, 1, 0);
+		Assert(pollResult >= 0);
+		return static_cast<bool>(fds[0].revents & POLLIN);
 #else
 		Unreachable();
 #endif
