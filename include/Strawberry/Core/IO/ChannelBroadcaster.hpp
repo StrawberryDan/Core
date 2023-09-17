@@ -31,6 +31,13 @@ namespace Strawberry::Core::IO
 			ChannelBroadcaster<R>::Register(static_cast<ChannelReceiver<R>*>(receiver));
 			ChannelBroadcaster<Rs...>::Register(static_cast<ChannelReceiver<Rs...>*>(receiver));
 		}
+
+		template <typename R, typename... Rs>
+		void Unregister(ChannelReceiver<R, Rs...>* receiver)
+		{
+			ChannelBroadcaster<R>::Unregister(static_cast<ChannelReceiver<R>*>(receiver));
+			ChannelBroadcaster<Rs...>::Unregister(static_cast<ChannelReceiver<Rs...>*>(receiver));
+		}
 	};
 
 	template <std::copyable T>
@@ -48,6 +55,8 @@ namespace Strawberry::Core::IO
 		ChannelBroadcaster& operator=(ChannelBroadcaster&& rhs)      = delete;
 
 		void Register(ChannelReceiver<T>* receiver) { mReceivers.emplace(receiver->mManagedThis); }
+
+		void Unregister(ChannelReceiver<T>* receiver) { mReceivers.erase(receiver->mManagedThis); }
 
 		void Broadcast(T value)
 		{
