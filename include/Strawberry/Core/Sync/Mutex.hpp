@@ -144,7 +144,9 @@ namespace Strawberry::Core
 			return *this;
 		}
 
-		operator bool() const { return mPayload.operator bool(); }
+		bool HasValue() const { return mPayload.operator bool(); }
+
+		operator bool() const { return HasValue(); }
 
 		template <typename... Ts>
 			requires std::constructible_from<T, Ts...>
@@ -168,4 +170,7 @@ namespace Strawberry::Core
 
 	template <typename T>
 	Mutex(T) -> Mutex<std::decay_t<T>>;
+
+	template <typename T>
+	SharedMutex(T) -> SharedMutex<std::decay_t<T>>;
 } // namespace Strawberry::Core
