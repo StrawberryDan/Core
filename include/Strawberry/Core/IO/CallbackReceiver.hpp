@@ -37,7 +37,7 @@ namespace Strawberry::Core::IO
 			mCallback = std::move(rhs.mCallback);
 		}
 
-		LammbdaReceiver& operator=(CallbackReceiver&& rhs)
+		CallbackReceiver& operator=(CallbackReceiver&& rhs)
 		{
 			if (this != &rhs)
 			{
