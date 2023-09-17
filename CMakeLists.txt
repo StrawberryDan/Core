@@ -86,6 +86,9 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Util/COW.hpp
 		include/Strawberry/Core/Util/IDGenerator.hpp
 		include/Strawberry/Core/Util/MaybeUninitialised.hpp
+		include/Strawberry/Core/IO/Broadcaster.hpp
+		include/Strawberry/Core/IO/Receiver.hpp
+		include/Strawberry/Core/IO/CallbackReceiver.hpp
 )
 
 target_include_directories(StrawberryCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
