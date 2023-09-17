@@ -13,7 +13,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template <std::copyable... Ts>
+	template <std::copyable, std::copyable...>
 	class Broadcaster;
 }
 
@@ -22,17 +22,20 @@ namespace Strawberry::Core::IO
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template <std::copyable... Ts>
-	class Receiver : private Receiver<Ts>...
+	template <std::copyable T, std::copyable... Ts>
+	class Receiver
+		: private Receiver<T>
+		, private Receiver<Ts...>
 	{
-	public:
+	protected:
+		using Receiver<T>::Receive;
 		using Receiver<Ts>::Receive...;
 	};
 
 	template <std::copyable T>
 	class Receiver<T>
 	{
-		template <std::copyable... Ts>
+		template <std::copyable, std::copyable...>
 		friend class Broadcaster;
 
 	public:

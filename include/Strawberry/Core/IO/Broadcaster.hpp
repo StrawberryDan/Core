@@ -14,10 +14,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template <std::copyable... Ts>
-	class Broadcaster : private Broadcaster<Ts>...
+	template <std::copyable T, std::copyable... Ts>
+	class Broadcaster
+		: private Broadcaster<T>
+		, private Broadcaster<Ts...>
 	{
 	public:
+		using Broadcaster<T>::Broadcast;
 		using Broadcaster<Ts>::Broadcast...;
 	};
 
