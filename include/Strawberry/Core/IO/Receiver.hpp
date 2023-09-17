@@ -71,7 +71,7 @@ namespace Strawberry::Core::IO
 		}
 
 	protected:
-		virtual void Receive(T value) = 0;
+		virtual void Receive(T value) {}
 
 
 	private:
