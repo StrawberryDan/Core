@@ -12,21 +12,21 @@
 namespace Strawberry::Core
 {
 	template <std::copyable T>
-	class COW
+	class CopyOnWrite
 	{
 	public:
-		COW()
+		CopyOnWrite()
 			requires std::default_initializable<T>
 			: mPayload(std::make_shared<T>())
 		{}
 
-		COW(T value)
+		CopyOnWrite(T value)
 			requires std::move_constructible<T>
 			: mPayload(std::make_shared<T>(std::move(value)))
 		{}
 
 		template <typename... Args>
-		COW(Args... args)
+		CopyOnWrite(Args... args)
 			requires std::constructible_from<T, Args...>
 			: mPayload(std::make_shared<T>(std::forward<Args>(args)...))
 		{}

@@ -81,7 +81,7 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Sync/ConditionVariable.cpp
 		include/Strawberry/Core/Sync/ConditionVariable.hpp
 		include/Strawberry/Core/Util/Lazy.hpp
-		include/Strawberry/Core/Util/COW.hpp
+		include/Strawberry/Core/Util/CopyOnWrite.hpp
 		include/Strawberry/Core/Util/IDPool.hpp
 		include/Strawberry/Core/Util/MaybeUninitialised.hpp
 		include/Strawberry/Core/IO/Broadcaster.hpp
