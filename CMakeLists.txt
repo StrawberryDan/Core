@@ -84,7 +84,7 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Util/Flag.cpp
 		include/Strawberry/Core/Util/Flag.hpp
 		include/Strawberry/Core/Util/COW.hpp
-		include/Strawberry/Core/Util/IDGenerator.hpp
+		include/Strawberry/Core/Util/IDPool.hpp
 		include/Strawberry/Core/Util/MaybeUninitialised.hpp
 		include/Strawberry/Core/IO/Broadcaster.hpp
 		include/Strawberry/Core/IO/Receiver.hpp

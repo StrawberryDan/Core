@@ -13,7 +13,7 @@
 namespace Strawberry::Core
 {
 	template <std::integral T = size_t>
-	class IDGenerator
+	class IDPool
 	{
 	public:
 		T Generate()
