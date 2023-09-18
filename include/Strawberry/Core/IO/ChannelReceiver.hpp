@@ -4,7 +4,9 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+// Core
 #include "Strawberry/Core/Sync/Mutex.hpp"
+#include "Strawberry/Core/Util/ReflexivePointer.hpp"
 // Standard Library
 #include <set>
 
@@ -30,7 +32,7 @@ namespace Strawberry::Core::IO
 	};
 
 	template <std::copyable T>
-	class ChannelReceiver<T>
+	class ChannelReceiver<T> : public EnableReflexivePointer<ChannelReceiver<T>>
 	{
 		template <std::copyable, std::copyable...>
 		friend class ChannelBroadcaster;
@@ -38,21 +40,13 @@ namespace Strawberry::Core::IO
 
 	public:
 		ChannelReceiver()
-			: mManagedThis(std::make_shared<Core::Mutex<ChannelReceiver*>>(this))
 		{}
 
 		ChannelReceiver(const ChannelReceiver& rhs)            = delete;
 		ChannelReceiver& operator=(const ChannelReceiver& rhs) = delete;
-
 		ChannelReceiver(ChannelReceiver&& rhs) { *rhs.mManagedThis = this; }
-
 		ChannelReceiver& operator=(ChannelReceiver&& rhs) = delete;
 
-		~ChannelReceiver() { (*mManagedThis->Lock()) = nullptr; }
-
 		virtual void Receive(T value) = 0;
-
-	private:
-		std::shared_ptr<Core::Mutex<ChannelReceiver*>> mManagedThis;
 	};
 } // namespace Strawberry::Core::IO
