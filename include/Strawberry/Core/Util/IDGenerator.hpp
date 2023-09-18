@@ -21,9 +21,9 @@ namespace Strawberry::Core
 			if (mFreeIDs.empty()) { return mGreatestID++; }
 			else
 			{
-				auto minimum = std::min_element(mFreeIDs.begin(), mFreeIDs.end());
+				auto minimum = *std::min_element(mFreeIDs.begin(), mFreeIDs.end());
 				mFreeIDs.erase(minimum);
-				return *minimum;
+				return minimum;
 			}
 		}
 
