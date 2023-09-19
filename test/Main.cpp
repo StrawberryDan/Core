@@ -11,6 +11,7 @@
 #include "Strawberry/Core/IO/ChannelReceiver.hpp"
 #include "Strawberry/Core/Math/Math.hpp"
 #include "Strawberry/Core/Math/Periodic.hpp"
+#include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Net/Endpoint.hpp"
 #include "Strawberry/Core/Net/HTTP/Client.hpp"
 #include "Strawberry/Core/Net/Socket/API.hpp"
@@ -189,12 +190,39 @@ namespace Test
 
 		struct D {};
 
+		struct R1 : public Strawberry::Core::IO::ChannelReceiver<A, B> {
+			void Receive(A a) {}
+
+			void Receive(B b) {}
+		};
+
+		struct R2 : public Strawberry::Core::IO::ChannelReceiver<A, B, C, D> {
+			void Receive(A a) {}
+
+			void Receive(B b) {}
+
+			void Receive(C c) {}
+
+			void Receive(D d) {}
+		};
+
 		Strawberry::Core::IO::ChannelBroadcaster<A, B, C> b1;
-		Strawberry::Core::IO::ChannelReceiver<A, B>       r1;
-		Strawberry::Core::IO::ChannelReceiver<A, B, C, D> r2;
+		R1                                                r1;
+		R2                                                r2;
 
 		b1.Register(&r1);
 		b1.Register(&r2);
+	}
+
+	void Vectors() {
+		Vector a(1, 2, 3);
+		Vector b(4, 5, 6);
+
+		auto c = a.Dot(b);
+		auto d = a.Cross(b);
+
+		double e = d.Magnitude();
+		float f = d.Magnitude();
 	}
 } // namespace Test
 
@@ -210,5 +238,6 @@ int main()
 	Test::PeriodicNumbers();
 	Test::Uninitialised();
 	Test::ChannelBroadcasterReceiver();
+	Test::Vectors();
 	Strawberry::Core::Net::Socket::API::Terminate();
 }
