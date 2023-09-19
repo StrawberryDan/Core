@@ -88,6 +88,7 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/IO/Receiver.hpp
 		include/Strawberry/Core/IO/CallbackReceiver.hpp
         include/Strawberry/Core/Util/ReflexivePointer.hpp
+		include/Strawberry/Core/Math/Units.hpp
 )
 
 target_include_directories(StrawberryCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
