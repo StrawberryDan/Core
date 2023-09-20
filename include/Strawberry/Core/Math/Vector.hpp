@@ -86,6 +86,13 @@ namespace Strawberry::Core::Math
 			return result;
 		}
 
+		/// Define vector normalisation
+		Vector Normalised() const noexcept
+			requires (std::floating_point<T>)
+		{
+			return *this / Magnitude();
+		}
+
 		/// Define Dot Product
 		constexpr T Dot(const Vector& b) const noexcept
 		{
@@ -103,6 +110,13 @@ namespace Strawberry::Core::Math
 
 		/// Calculate the angle between this and another vector in radians.
 		Radians AngleBetween(const Vector& b) const noexcept { return std::acos(Dot(b) / std::sqrt(SquareMagnitude() * b.SquareMagnitude())); }
+
+		/// Gets the vector after it is projected onto a plane oriented by the given normal.
+		Vector ProjectOntoPlane(const Vector& normal) const noexcept
+			requires (std::floating_point<T>)
+		{
+			return *this - normal.Normalised() * (this->Dot(normal));
+		}
 
 
 	private:
