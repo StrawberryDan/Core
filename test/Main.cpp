@@ -223,6 +223,11 @@ namespace Test
 
 		double e = d.Magnitude();
 		float f = d.Magnitude();
+
+		auto& [x, y, z] = a;
+		x += 1;
+
+		Strawberry::Core::Assert(a == Vector(2, 2, 3));
 	}
 } // namespace Test
 

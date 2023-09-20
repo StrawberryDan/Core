@@ -45,6 +45,13 @@ namespace Strawberry::Core::Math
 		/// Immutable accessor
 		constexpr const T& operator[](size_t i) const noexcept { return mValue[i]; }
 
+		/// get implementation for structured binding
+		template <size_t I>
+		constexpr T& get() { return mValue[I]; }
+
+		template <size_t I>
+		constexpr const T& get() const { return mValue[I]; }
+
 		/// Define Vector Equality
 		friend constexpr bool operator==(const Vector& a, const Vector& b)
 		{
@@ -148,3 +155,14 @@ namespace Strawberry::Core::Math
 	template <typename T, typename... Args>
 	Vector(T, Args...) -> Vector<T, 1 + sizeof...(Args)>;
 } // namespace Strawberry::Core::Math
+
+namespace std
+{
+	template <size_t I, typename T, size_t D>
+	struct tuple_element<I, Strawberry::Core::Math::Vector<T, D>> {
+		using type = T;
+	};
+
+	template <typename T, size_t D>
+	struct tuple_size<Strawberry::Core::Math::Vector<T, D>> : public std::integral_constant<size_t, D> {};
+} // namespace std
