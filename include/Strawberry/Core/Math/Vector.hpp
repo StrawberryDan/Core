@@ -57,7 +57,7 @@ namespace Strawberry::Core::Math
 		}
 
 		/// Define Vector Inequality
-		friend constexpr bool operator==(const Vector& a, const Vector& b)
+		friend constexpr bool operator!=(const Vector& a, const Vector& b)
 		{
 			for (size_t i = 0; i < D; i++)
 			{
