@@ -134,7 +134,9 @@ namespace Strawberry::Core::Math
 		constexpr Vector Cross(const Vector& b) const noexcept
 			requires (D == 3)
 		{
-			return Vector(mValue[1] * b[2] - mValue[2] * b[1], mValue[2] * b[0] - mValue[0] * b[2], mValue[1] * b[2] - mValue[2] * b[1]);
+			auto [x1, y1, z1] = *this;
+			auto [x2, y2, z2] = *this;
+			return Vector(y1 * z2 - z1 * y2, z1 * x2 - x1 * z2, x1 * y2 - y1 * x2);
 		}
 
 		/// Calculate the angle between this and another vector in radians.
