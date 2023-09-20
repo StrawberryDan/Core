@@ -45,6 +45,28 @@ namespace Strawberry::Core::Math
 		/// Immutable accessor
 		constexpr const T& operator[](size_t i) const noexcept { return mValue[i]; }
 
+		/// Define Vector Equality
+		friend constexpr bool operator==(const Vector& a, const Vector& b)
+		{
+			for (size_t i = 0; i < D; i++)
+			{
+				if (a[i] != b[i]) return false;
+			}
+
+			return true;
+		}
+
+		/// Define Vector Inequality
+		friend constexpr bool operator==(const Vector& a, const Vector& b)
+		{
+			for (size_t i = 0; i < D; i++)
+			{
+				if (a[i] == b[i]) return false;
+			}
+
+			return true;
+		}
+
 		/// Define addition
 		constexpr friend Vector operator+(const Vector& a, const Vector& b) noexcept
 		{
