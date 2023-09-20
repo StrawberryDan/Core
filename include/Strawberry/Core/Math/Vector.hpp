@@ -71,7 +71,7 @@ namespace Strawberry::Core::Math
 		constexpr friend Vector operator+(const Vector& a, const Vector& b) noexcept
 		{
 			Vector result;
-			for (int i = 0; i < D; i++) result[i] = a[i] + b[i];
+			for (size_t i = 0; i < D; i++) result[i] = a[i] + b[i];
 			return result;
 		}
 
@@ -79,7 +79,7 @@ namespace Strawberry::Core::Math
 		constexpr friend Vector operator-(const Vector& a, const Vector& b) noexcept
 		{
 			Vector result;
-			for (int i = 0; i < D; i++) result[i] = a[i] - b[i];
+			for (size_t i = 0; i < D; i++) result[i] = a[i] - b[i];
 			return result;
 		}
 
@@ -87,7 +87,7 @@ namespace Strawberry::Core::Math
 		constexpr friend Vector operator*(const Vector& a, T b) noexcept
 		{
 			Vector result;
-			for (int i = 0; i < D; i++) result[i] = a[i] * b;
+			for (size_t i = 0; i < D; i++) result[i] = a[i] * b;
 			return result;
 		}
 
@@ -104,7 +104,7 @@ namespace Strawberry::Core::Math
 		T SquareMagnitude() const noexcept
 		{
 			T result(0);
-			for (int i = 0; i < D; i++) result += mValue[i] * mValue[i];
+			for (size_t i = 0; i < D; i++) result += mValue[i] * mValue[i];
 			return result;
 		}
 
@@ -119,7 +119,7 @@ namespace Strawberry::Core::Math
 		constexpr T Dot(const Vector& b) const noexcept
 		{
 			T result(0);
-			for (int i = 0; i < D; i++) result += mValue[i] * b[i];
+			for (size_t i = 0; i < D; i++) result += mValue[i] * b[i];
 			return result;
 		}
 
