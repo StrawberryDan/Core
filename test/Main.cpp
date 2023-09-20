@@ -10,6 +10,7 @@
 #include "Strawberry/Core/IO/ChannelBroadcaster.hpp"
 #include "Strawberry/Core/IO/ChannelReceiver.hpp"
 #include "Strawberry/Core/Math/Math.hpp"
+#include "Strawberry/Core/Math/Matrix.hpp"
 #include "Strawberry/Core/Math/Periodic.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Net/Endpoint.hpp"
@@ -214,20 +215,31 @@ namespace Test
 		b1.Register(&r2);
 	}
 
-	void Vectors() {
+	void Vectors()
+	{
 		Vector a(1, 2, 3);
 		Vector b(4, 5, 6);
 
-		auto c = a.Dot(b);
-		auto d = a.Cross(b);
+		auto c           = a.Dot(b);
+		auto d           = a.Cross(b);
 
-		double e = d.Magnitude();
-		float f = d.Magnitude();
+		double e         = d.Magnitude();
+		float  f         = d.Magnitude();
 
-		auto& [x, y, z] = a;
-		x += 1;
+		auto& [x, y, z]  = a;
+		x               += 1;
 
 		Strawberry::Core::Assert(a == Vector(2, 2, 3));
+	}
+
+	void Matrices()
+	{
+		Matrix<int, 2, 2> m(1, 2,
+							3, 4);
+		Assert(m[0, 0] == 1);
+		Assert(m[1, 0] == 3);
+		Assert(m[0, 1] == 2);
+		Assert(m[1, 1] == 4);
 	}
 } // namespace Test
 
@@ -244,5 +256,6 @@ int main()
 	Test::Uninitialised();
 	Test::ChannelBroadcasterReceiver();
 	Test::Vectors();
+	Test::Matrices();
 	Strawberry::Core::Net::Socket::API::Terminate();
 }

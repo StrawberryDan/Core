@@ -91,6 +91,7 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Math/Vector.hpp
 		include/Strawberry/Core/Math/Units.hpp
 		src/Math/Units.cpp
+		include/Strawberry/Core/Math/Matrix.hpp
 )
 
 target_include_directories(StrawberryCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
