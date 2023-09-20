@@ -47,10 +47,16 @@ namespace Strawberry::Core::Math
 
 		/// get implementation for structured binding
 		template <size_t I>
-		constexpr T& get() { return mValue[I]; }
+		constexpr T& get()
+		{
+			return mValue[I];
+		}
 
 		template <size_t I>
-		constexpr const T& get() const { return mValue[I]; }
+		constexpr const T& get() const
+		{
+			return mValue[I];
+		}
 
 		/// Define Vector Equality
 		friend constexpr bool operator==(const Vector& a, const Vector& b)
@@ -154,8 +160,21 @@ namespace Strawberry::Core::Math
 		T mValue[D];
 	};
 
+	//======================================================================================================================
+	//  Deduction Guide
+	//----------------------------------------------------------------------------------------------------------------------
 	template <typename T, typename... Args>
 	Vector(T, Args...) -> Vector<T, 1 + sizeof...(Args)>;
+
+	//======================================================================================================================
+	//  Type Aliases for Common Use
+	//----------------------------------------------------------------------------------------------------------------------
+	using Vec2  = Vector<double, 2>;
+	using Vec3  = Vector<double, 3>;
+	using Vec4  = Vector<double, 4>;
+	using Vec2i = Vector<int, 2>;
+	using Vec3i = Vector<int, 3>;
+	using Vec4i = Vector<int, 4>;
 } // namespace Strawberry::Core::Math
 
 namespace std
