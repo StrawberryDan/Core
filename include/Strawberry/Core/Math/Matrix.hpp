@@ -19,6 +19,18 @@ namespace Strawberry::Core::Math
 	class Matrix
 	{
 	public:
+		/// Produced a matrix of all zeros;
+		constexpr static Matrix Zeroed()
+		{
+			Matrix result;
+			for (size_t i = 0; i < std::min(W, H); i++)
+			{
+				result[i, i] = T(0);
+			}
+			return result;
+		}
+
+
 		/// Identity Matrix Constructor
 		constexpr Matrix()
 			: mValue{T(0)}
