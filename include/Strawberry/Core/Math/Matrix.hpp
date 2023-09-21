@@ -76,6 +76,48 @@ namespace Strawberry::Core::Math
 			return true;
 		}
 
+		constexpr Matrix operator+(const Matrix& b) const
+		{
+			Matrix result;
+			for (size_t row = 0; row < H; row++)
+			{
+				for (size_t col = 0; col < W; col++)
+				{
+					result[row, col] = (*this)[row, col] + b[row, col];
+				}
+			}
+			return result;
+		}
+
+		constexpr Matrix operator-(const Matrix& b) const
+		{
+			Matrix result;
+			for (size_t row = 0; row < H; row++)
+			{
+				for (size_t col = 0; col < W; col++)
+				{
+					result[row, col] = (*this)[row, col] - b[row, col];
+				}
+			}
+			return result;
+		}
+
+		constexpr Matrix operator*(const Matrix<T, W, H>& b) const
+		{
+			Matrix result = Matrix::Zeroed();
+			for (size_t row = 0; row < H; row++)
+			{
+				for (size_t col = 0; col < W; col++)
+				{
+					for (size_t k = 0; k < W; k++)
+					{
+						result[row, col] += (*this)[row, k] * b[k, col];
+					}
+				}
+			}
+			return result;
+		}
+
 	private:
 		T mValue[H][W];
 	};
