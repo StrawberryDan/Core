@@ -38,7 +38,31 @@ namespace Strawberry::Core::Math
 
 		constexpr T& operator[](size_t row, size_t col) const { return mValue[row][col]; }
 
-		const T& operator[](size_t row, size_t col) const { return mValue[row][col]; }
+		constexpr bool operator==(const Matrix& b) const
+		{
+			for (size_t row = 0; row < H; row++)
+			{
+				for (size_t col = 0; col < W; col++)
+				{
+					if (mValue[row][col] != b[row, col]) return false;
+				}
+			}
+
+			return true;
+		}
+
+		constexpr bool operator!=(const Matrix& b) const
+		{
+			for (size_t row = 0; row < H; row++)
+			{
+				for (size_t col = 0; col < W; col++)
+				{
+					if (mValue[row][col] == b[row, col]) return false;
+				}
+			}
+
+			return true;
+		}
 
 	private:
 		T mValue[H][W];
