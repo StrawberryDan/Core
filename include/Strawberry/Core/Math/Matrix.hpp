@@ -34,7 +34,9 @@ namespace Strawberry::Core::Math
 			for (size_t i = 0; i < values.size(); i++) mValue[i / W][i % W] = values[i];
 		}
 
-		T& operator[](size_t row, size_t col) { return mValue[row][col]; }
+		constexpr T& operator[](size_t row, size_t col) { return mValue[row][col]; }
+
+		constexpr T& operator[](size_t row, size_t col) const { return mValue[row][col]; }
 
 		const T& operator[](size_t row, size_t col) const { return mValue[row][col]; }
 
