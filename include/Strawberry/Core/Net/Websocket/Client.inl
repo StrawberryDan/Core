@@ -147,12 +147,11 @@ namespace Strawberry::Core::Net::Websocket
 	Result<size_t, Error>
 	ClientBase<S>::TransmitFrame(const Message& frame)
 	{
-		if (!mSocket)
+		if (mError == Error::Closed)
 		{
 			return Error::Closed;
 		}
 
-		auto                        socket = mSocket->Lock();
 		Core::IO::DynamicByteBuffer bytesToSend;
 
 		uint8_t byte = 0b10000000 | GetOpcodeMask(frame.GetOpcode());
@@ -186,7 +185,7 @@ namespace Strawberry::Core::Net::Websocket
 			bytesToSend.Push<uint8_t>(bytes[i] ^ mask);
 		}
 
-		auto sendResult = socket->Write(bytesToSend);
+		auto sendResult = mSocket.Write(bytesToSend);
 		if (sendResult)
 		{
 			return sendResult.Unwrap();
@@ -231,7 +230,6 @@ namespace Strawberry::Core::Net::Websocket
 
 			if (message.GetOpcode() == Message::Opcode::Close)
 			{
-				mSocket.Reset();
 				mError = Error::Closed;
 			}
 
@@ -250,15 +248,14 @@ namespace Strawberry::Core::Net::Websocket
 	{
 		using Opcode = Message::Opcode;
 
-		auto socket  = mSocket->Lock();
-		if (!socket->Poll())
+		if (!mSocket.Poll())
 		{
 			return Error::NoMessage;
 		}
 
 		bool   final;
 		Opcode opcode;
-		if (auto byte = socket->Read(1).template Map([](auto x) -> uint8_t { return x.template Into<uint8_t>(); }))
+		if (auto byte = mSocket.Read(1).template Map([](auto x) -> uint8_t { return x.template Into<uint8_t>(); }))
 		{
 			final         = *byte & 0b10000000;
 			auto opcodeIn = GetOpcodeFromByte(*byte & 0b00001111);
@@ -284,18 +281,18 @@ namespace Strawberry::Core::Net::Websocket
 
 		bool   masked;
 		size_t size;
-		if (auto byte = socket->Read(1).template Map([](auto x) { return x.template Into<uint8_t>(); }))
+		if (auto byte = mSocket.Read(1).template Map([](auto x) { return x.template Into<uint8_t>(); }))
 		{
 			masked = *byte & 0b10000000;
 			Assert(!masked);
 			uint8_t sizeByte = *byte & 0b01111111;
 			if (sizeByte == 126)
 			{
-				size = FromBigEndian(socket->Read(sizeof(uint16_t)).Unwrap().template Into<uint16_t>());
+				size = FromBigEndian(mSocket.Read(sizeof(uint16_t)).Unwrap().template Into<uint16_t>());
 			}
 			else if (sizeByte == 127)
 			{
-				size = FromBigEndian(socket->Read(sizeof(uint64_t)).Unwrap().template Into<uint64_t>());
+				size = FromBigEndian(mSocket.Read(sizeof(uint64_t)).Unwrap().template Into<uint64_t>());
 			}
 			else
 			{
@@ -311,7 +308,7 @@ namespace Strawberry::Core::Net::Websocket
 		std::vector<uint8_t> payload;
 		if (size > 0)
 		{
-			payload = socket->Read(size).Unwrap().AsVector();
+			payload = mSocket.Read(size).Unwrap().AsVector();
 		}
 
 		Assert(payload.size() == size);
@@ -322,23 +319,23 @@ namespace Strawberry::Core::Net::Websocket
 	template <IO::ReadWrite S>
 	void ClientBase<S>::Disconnect(int code)
 	{
-		if (mSocket)
-		{
-			auto                        endianCode = ToBigEndian<uint16_t>(code);
-			Websocket::Message::Payload payload;
-			payload.push_back(reinterpret_cast<uint8_t*>(&endianCode)[0]);
-			payload.push_back(reinterpret_cast<uint8_t*>(&endianCode)[1]);
-			SendMessage(Message(Message::Opcode::Close, payload)).Unwrap();
-			while (true)
-			{
-				auto msg = ReadMessage();
-				if (!msg && msg.Err() == Websocket::Error::Closed || msg && msg.Unwrap().GetOpcode() == Message::Opcode::Close)
-				{
-					break;
-				}
-			}
+		if (mError == Error::Closed) return;
 
-			mSocket.Reset();
+		auto endianCode = ToBigEndian<uint16_t>(code);
+		Websocket::Message::Payload payload;
+		payload.push_back(reinterpret_cast<uint8_t*>(&endianCode)[0]);
+		payload.push_back(reinterpret_cast<uint8_t*>(&endianCode)[1]);
+		SendMessage(Message(Message::Opcode::Close, payload)).Unwrap();
+		while (true)
+		{
+			auto msg = ReadMessage();
+			if (!msg && msg.Err() == Websocket::Error::Closed ||
+				msg && msg.Unwrap().GetOpcode() == Message::Opcode::Close)
+			{
+				break;
+			}
 		}
+
+		mError = Error::Closed;
 	}
 } // namespace Strawberry::Core::Net::Websocket

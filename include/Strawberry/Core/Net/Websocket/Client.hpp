@@ -16,6 +16,7 @@
 #include "Strawberry/Core/Util/Optional.hpp"
 #include "Strawberry/Core/Util/Result.hpp"
 
+
 namespace Strawberry::Core::Net::Websocket
 {
 	enum class Error
@@ -26,14 +27,37 @@ namespace Strawberry::Core::Net::Websocket
 		ProtocolError,
 	};
 
-	template <IO::ReadWrite S>
+
+	template<IO::ReadWrite S>
 	class ClientBase
 	{
 	public:
-		ClientBase(const ClientBase&)                    = delete;
-		ClientBase& operator=(const ClientBase&)         = delete;
-		ClientBase(ClientBase&& rhs) noexcept            = default;
-		ClientBase& operator=(ClientBase&& rhs) noexcept = default;
+		//======================================================================================================================
+		//  Contruction/Destruction
+		//----------------------------------------------------------------------------------------------------------------------
+		ClientBase(const ClientBase&) = delete;
+		ClientBase& operator=(const ClientBase&) = delete;
+
+
+		ClientBase(ClientBase&& rhs) noexcept
+			: mSocket(std::move(rhs.mSocket))
+			  , mError(std::move(rhs.mError))
+		{
+			rhs.mError = Error::Closed;
+		}
+
+
+		ClientBase& operator=(ClientBase&& rhs) noexcept
+		{
+			if (this != &rhs)
+			{
+				std::destroy_at(this);
+				std::construct_at(this, std::move(rhs));
+			}
+
+			return *this;
+		}
+
 		~ClientBase();
 
 
@@ -69,8 +93,8 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	protected:
-		Optional<Mutex<S>> mSocket;
-		Optional<Error>    mError;
+		S mSocket;
+		Optional<Error> mError;
 	};
 
 	class WSClient : public ClientBase<Socket::TCPClient>
