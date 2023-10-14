@@ -25,4 +25,7 @@ namespace Strawberry::Core::IO
 			t.Write(bytes)
 		} -> std::same_as<Result<size_t, Error>>;
 	};
+
+	template <typename T>
+	concept ReadWrite = Read<T> && Write<T>;
 } // namespace Strawberry::Core::IO
