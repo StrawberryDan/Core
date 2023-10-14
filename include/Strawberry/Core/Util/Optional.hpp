@@ -231,7 +231,7 @@ namespace Strawberry::Core
 
 		template <std::invocable<const T&> F>
 			requires Core::IsOptional<std::invoke_result_t<F, T&>>::value
-		Optional<std::invoke_result_t<F, T&>> AndThen(F functor) const&
+			std::invoke_result_t<F, T&> AndThen(F functor) const&
 		{
 			if (HasValue())
 			{
