@@ -23,7 +23,7 @@ namespace Strawberry::Core::Net::HTTP
 
 
 		/// Removes and returns the socket of an rvalue HTTP client.
-		inline S TakeSocket() && { return std::move(mSocket); }
+		inline S IntoSocket()&& { return std::move(mSocket); }
 
 
 	private:
