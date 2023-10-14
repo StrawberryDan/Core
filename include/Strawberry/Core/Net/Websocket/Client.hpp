@@ -1,20 +1,24 @@
 #pragma once
 
 
+//======================================================================================================================
+//		Includes
+//----------------------------------------------------------------------------------------------------------------------
+// Strawberry Core
+#include "Strawberry/Core/IO/Concepts.hpp"
+#include "Strawberry/Core/Net/Socket/TCPClient.hpp"
+#include "Strawberry/Core/Net/Socket/TLSClient.hpp"
+#include "Strawberry/Core/Net/Websocket/Message.hpp"
+#include "Strawberry/Core/Sync/Mutex.hpp"
+#include "Strawberry/Core/Util/NullType.hpp"
+#include "Strawberry/Core/Util/Optional.hpp"
+#include "Strawberry/Core/Util/Result.hpp"
+// Standard Library
 #include <cstdint>
 #include <future>
 #include <optional>
 #include <string>
 #include <thread>
-
-
-#include "Message.hpp"
-#include "Strawberry/Core/IO/Concepts.hpp"
-#include "Strawberry/Core/Net/Socket/TCPClient.hpp"
-#include "Strawberry/Core/Net/Socket/TLSClient.hpp"
-#include "Strawberry/Core/Sync/Mutex.hpp"
-#include "Strawberry/Core/Util/Optional.hpp"
-#include "Strawberry/Core/Util/Result.hpp"
 
 
 namespace Strawberry::Core::Net::Websocket
@@ -60,14 +64,14 @@ namespace Strawberry::Core::Net::Websocket
 
 		~ClientBase();
 
-
-		Result<int, Error> SendMessage(const Message& message);
+		//======================================================================================================================
+		//  Sending/Receiving Methods
+		//----------------------------------------------------------------------------------------------------------------------
+		Result<NullType, Error> SendMessage(const Message& message);
 
 		Result<Message, Error> ReadMessage();
 
 		Result<Message, Error> WaitMessage();
-
-		[[nodiscard]] inline bool IsValid() const { return mSocket.HasValue(); }
 
 
 	protected:
@@ -75,15 +79,21 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	protected:
-		[[nodiscard]] Result<Message, Error>  ReceiveFrame();
+		//======================================================================================================================
+		//  Implementation IO
+		//----------------------------------------------------------------------------------------------------------------------
+		// Receives a single Websocket Frame. This will consolidate sequences of broken up fragments.
+		[[nodiscard]] Result<Message, Error> ReceiveFrame();
+		// Receives a single Websocket Fragment. This may return only parts of a whole websocket frame.
 		[[nodiscard]] Result<Fragment, Error> ReceiveFragment();
-		[[nodiscard]] Result<size_t, Error>   TransmitFrame(const Message& frame);
+		// Sends
+		[[nodiscard]] Result<size_t, Error> TransmitFrame(const Message& frame);
 
 
-		[[nodiscard]] static std::string               GenerateNonce();
-		[[nodiscard]] static uint8_t                   GetOpcodeMask(Message::Opcode opcode);
+		[[nodiscard]] static std::string GenerateNonce();
+		[[nodiscard]] static uint8_t GetOpcodeMask(Message::Opcode opcode);
 		[[nodiscard]] static Optional<Message::Opcode> GetOpcodeFromByte(uint8_t byte);
-		[[nodiscard]] static uint32_t                  GenerateMaskingKey();
+		[[nodiscard]] static uint32_t GenerateMaskingKey();
 
 		void Disconnect(int code = 1000);
 
@@ -97,16 +107,22 @@ namespace Strawberry::Core::Net::Websocket
 		Optional<Error> mError;
 	};
 
-	class WSClient : public ClientBase<Socket::TCPClient>
+
+	class WSClient
+		: public ClientBase<Socket::TCPClient>
 	{
 	public:
-		static Result<WSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 80);
+		static Result<WSClient, Error>
+		Connect(const Core::Net::Endpoint& endpoint, const std::string& resource);
 	};
 
-	class WSSClient : public ClientBase<Socket::TLSClient>
+
+	class WSSClient
+		: public ClientBase<Socket::TLSClient>
 	{
 	public:
-		static Result<WSSClient, Error> Connect(const std::string& host, const std::string& resource, uint16_t port = 443);
+		static Result<WSSClient, Error>
+		Connect(const Core::Net::Endpoint& endpoint, const std::string& resource);
 	};
 } // namespace Strawberry::Core::Net::Websocket
 

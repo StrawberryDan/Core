@@ -22,7 +22,7 @@ namespace Strawberry::Core::Net::Websocket
 
 
 	template <IO::ReadWrite S>
-	Result<int, Error> ClientBase<S>::SendMessage(const Message& message)
+	Result<NullType, Error> ClientBase<S>::SendMessage(const Message& message)
 	{
 		auto result = TransmitFrame(message);
 		if (!result)
@@ -31,7 +31,7 @@ namespace Strawberry::Core::Net::Websocket
 		}
 		else
 		{
-			return 0;
+			return NullType();
 		}
 	}
 

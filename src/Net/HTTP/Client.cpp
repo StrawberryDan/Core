@@ -3,12 +3,12 @@
 
 namespace Strawberry::Core::Net::HTTP
 {
-	HTTPClient::HTTPClient(const std::string& hostname, uint16_t port)
-		: ClientBase<Socket::TCPClient>(hostname, port)
+	HTTPClient::HTTPClient(const Core::Net::Endpoint& endpoint)
+		: ClientBase<Socket::TCPClient>(endpoint)
 	{}
 
 
-	HTTPSClient::HTTPSClient(const std::string& hostname, uint16_t port)
-		: ClientBase<Socket::TLSClient>(hostname, port)
+	HTTPSClient::HTTPSClient(const Core::Net::Endpoint& endpoint)
+		: ClientBase<Socket::TLSClient>(endpoint)
 	{}
 } // namespace Strawberry::Core::Net::HTTP

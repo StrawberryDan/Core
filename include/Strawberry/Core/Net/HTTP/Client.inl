@@ -11,8 +11,8 @@
 namespace Strawberry::Core::Net::HTTP
 {
 	template <typename S>
-	ClientBase<S>::ClientBase(const std::string& hostname, uint16_t port)
-		: mSocket(S::Connect(Endpoint::Resolve(hostname, port).Unwrap()).Unwrap())
+	ClientBase<S>::ClientBase(const Net::Endpoint& endpoint)
+		: mSocket(S::Connect(endpoint).Unwrap())
 	{}
 
 

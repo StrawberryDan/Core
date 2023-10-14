@@ -14,8 +14,6 @@ namespace Strawberry::Core::Net::HTTP
 	class ClientBase
 	{
 	public:
-		/// Connects to the given endpoint over HTTP
-		ClientBase(const std::string& hostname, uint16_t port);
 		/// Sends an HTTP Request
 		void     SendRequest(const Request& request);
 		/// Waits for an HTTP Response
@@ -24,6 +22,11 @@ namespace Strawberry::Core::Net::HTTP
 
 		/// Removes and returns the socket of an rvalue HTTP client.
 		inline S IntoSocket()&& { return std::move(mSocket); }
+
+
+	protected:
+		/// Connects to the given endpoint over HTTP
+		ClientBase(const Core::Net::Endpoint& endpoint);
 
 
 	private:
@@ -41,14 +44,14 @@ namespace Strawberry::Core::Net::HTTP
 	class HTTPClient : public ClientBase<Socket::TCPClient>
 	{
 	public:
-		explicit HTTPClient(const std::string& hostname, uint16_t port = 80);
+		explicit HTTPClient(const Net::Endpoint& endpoint);
 	};
 
 
 	class HTTPSClient : public ClientBase<Socket::TLSClient>
 	{
 	public:
-		explicit HTTPSClient(const std::string& hostname, uint16_t port = 443);
+		explicit HTTPSClient(const Net::Endpoint& endpoint);
 	};
 } // namespace Strawberry::Core::Net::HTTP
 
