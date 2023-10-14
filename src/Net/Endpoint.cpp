@@ -101,6 +101,7 @@ namespace Strawberry::Core::Net
 
 	Endpoint::Endpoint(const std::string& hostname, uint16_t port)
 		: mHostName(hostname)
+		  , mAddress(Resolve(hostname).IntoOptional().AndThen([](auto x) { return x.GetAddress(); }))
 		, mPort(port)
 	{}
 } // namespace Strawberry::Core::Net
