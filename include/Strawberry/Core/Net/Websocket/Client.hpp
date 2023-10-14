@@ -26,8 +26,7 @@ namespace Strawberry::Core::Net::Websocket
 		ProtocolError,
 	};
 
-	template <typename S>
-		requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	class ClientBase
 	{
 	public:

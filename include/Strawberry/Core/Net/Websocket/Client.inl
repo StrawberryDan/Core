@@ -14,16 +14,14 @@
 
 namespace Strawberry::Core::Net::Websocket
 {
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	ClientBase<S>::~ClientBase()
 	{
 		Disconnect();
 	}
 
 
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	Result<int, Error> ClientBase<S>::SendMessage(const Message& message)
 	{
 		auto result = TransmitFrame(message);
@@ -38,39 +36,32 @@ namespace Strawberry::Core::Net::Websocket
 	}
 
 
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	Result<Message, Error> ClientBase<S>::ReadMessage()
 	{
 		return ReceiveFrame();
 	}
 
 
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	Result<Message, Error> ClientBase<S>::WaitMessage()
 	{
 		while (true)
 		{
-			if (auto msg = ReadMessage())
-			{
-				return Result<Message, Error>::Ok(msg.Unwrap());
-			}
-			else if (msg.Err() == Error::NoMessage)
+			if (auto msg = ReadMessage(); msg.IsErr() && msg.Err() == Error::NoMessage)
 			{
 				std::this_thread::yield();
 				continue;
 			}
 			else
 			{
-				return Result<Message, Error>::Err(msg.Err());
+				return msg;
 			}
 		}
 	}
 
 
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	std::string ClientBase<S>::GenerateNonce()
 	{
 		std::random_device    randomDevice;
@@ -90,8 +81,7 @@ namespace Strawberry::Core::Net::Websocket
 	}
 
 
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	uint8_t ClientBase<S>::GetOpcodeMask(Message::Opcode opcode)
 	{
 		switch (opcode)
@@ -114,8 +104,7 @@ namespace Strawberry::Core::Net::Websocket
 	}
 
 
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	Optional<Message::Opcode> ClientBase<S>::GetOpcodeFromByte(uint8_t byte)
 	{
 		using Opcode = Message::Opcode;
@@ -141,8 +130,7 @@ namespace Strawberry::Core::Net::Websocket
 	}
 
 
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	uint32_t ClientBase<S>::GenerateMaskingKey()
 	{
 		std::random_device rd;
@@ -155,8 +143,7 @@ namespace Strawberry::Core::Net::Websocket
 	}
 
 
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	Result<size_t, Error>
 	ClientBase<S>::TransmitFrame(const Message& frame)
 	{
@@ -213,13 +200,12 @@ namespace Strawberry::Core::Net::Websocket
 	}
 
 
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	Result<Message, Error> ClientBase<S>::ReceiveFrame()
 	{
 		if (mError == Error::Closed)
 		{
-			return Result<Message, Error>::Err(*mError);
+			return *mError;
 		}
 
 		auto fragResult = ReceiveFragment();
@@ -249,17 +235,16 @@ namespace Strawberry::Core::Net::Websocket
 				mError = Error::Closed;
 			}
 
-			return Result<Message, Error>::Ok(std::move(message));
+			return std::move(message);
 		}
 		else
 		{
-			return Result<Message, Error>::Err(fragResult.Err());
+			return fragResult.Err();
 		}
 	}
 
 
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	Result<typename ClientBase<S>::Fragment, Error>
 	ClientBase<S>::ReceiveFragment()
 	{
@@ -330,12 +315,11 @@ namespace Strawberry::Core::Net::Websocket
 		}
 
 		Assert(payload.size() == size);
-		return Result<Fragment, Error>::Ok(final, Message(opcode, payload));
+		return ClientBase<S>::Fragment(final, Message(opcode, payload));
 	}
 
 
-	template <typename S>
-	requires IO::Read<S> && IO::Write<S>
+	template <IO::ReadWrite S>
 	void ClientBase<S>::Disconnect(int code)
 	{
 		if (mSocket)
