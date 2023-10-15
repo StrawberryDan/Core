@@ -1,13 +1,17 @@
 #pragma once
 
 
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
+// Strawberry Core
+#include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Util/Concepts.hpp"
+#include "Strawberry/Core/Util/Utilities.hpp"
+// Standard Library
 #include <concepts>
 #include <cstdint>
 #include <utility>
-
-
-#include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Util/Utilities.hpp"
 
 
 namespace Strawberry::Core
@@ -360,6 +364,20 @@ namespace Strawberry::Core
 		}
 
 
+		auto Deref() requires (Dereferencable<T>)
+		{
+			return HasValue() ? *mPayload : NullOpt;
+		}
+
+
+		auto Deref() const requires (Dereferencable<T>)
+		{
+			return HasValue() ? *mPayload : NullOpt;
+		}
+
+
+
+
 		//======================================================================================================================
 		//  Comparison Operators
 		//----------------------------------------------------------------------------------------------------------------------
@@ -700,6 +718,18 @@ namespace Strawberry::Core
 		Optional<const T*> AsPtr() const
 		{
 			return HasValue() ? &mPayload : NullOpt;
+		}
+
+
+		Optional<std::remove_pointer_t<T>> Deref()
+		{
+			return HasValue() ? *mPayload : NullOpt;
+		}
+
+
+		Optional<const std::remove_pointer_t<T>> Deref() const
+		{
+			return HasValue() ? *mPayload : NullOpt;
 		}
 
 
