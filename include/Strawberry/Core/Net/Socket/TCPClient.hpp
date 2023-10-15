@@ -8,7 +8,7 @@
 #include "Strawberry/Core/IO/Error.hpp"
 #include "Strawberry/Core/Net/Endpoint.hpp"
 #include "Strawberry/Core/Net/Error.hpp"
-#include "Strawberry/Core/Util/Result.hpp"
+#include "Strawberry/Core/Types/Result.hpp"
 
 
 #if defined(_WIN32)

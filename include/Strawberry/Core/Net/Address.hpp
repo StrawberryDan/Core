@@ -8,7 +8,7 @@
 
 #include "Strawberry/Core/IO/ByteBuffer.hpp"
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
-#include "Strawberry/Core/Util/Optional.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
 
 namespace Strawberry::Core::Net
 {

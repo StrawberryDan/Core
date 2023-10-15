@@ -7,7 +7,7 @@
 #include <vector>
 
 
-#include "Strawberry/Core/Util/Result.hpp"
+#include "Strawberry/Core/Types/Result.hpp"
 #include "nlohmann/json.hpp"
 
 

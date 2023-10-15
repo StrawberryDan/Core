@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include "Assert.hpp"
-#include "Strawberry/Core/Util/Optional.hpp"
+#include "Strawberry/Core/Util/Assert.hpp"
+#include "Optional.hpp"
 #include <variant>
 
 

@@ -10,9 +10,9 @@
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
 #include "Strawberry/Core/Net/Websocket/Message.hpp"
 #include "Strawberry/Core/Sync/Mutex.hpp"
-#include "Strawberry/Core/Util/NullType.hpp"
-#include "Strawberry/Core/Util/Optional.hpp"
-#include "Strawberry/Core/Util/Result.hpp"
+#include "Strawberry/Core/Types/NullType.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
+#include "Strawberry/Core/Types/Result.hpp"
 // Standard Library
 #include <cstdint>
 #include <future>

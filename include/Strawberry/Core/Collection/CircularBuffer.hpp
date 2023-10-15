@@ -6,8 +6,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Core
 #include "Strawberry/Core/Math/Periodic.hpp"
-#include "Strawberry/Core/Util/MaybeUninitialised.hpp"
-#include "Strawberry/Core/Util/Optional.hpp"
+#include "Strawberry/Core/Types/MaybeUninitialised.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
 // Standard Library
 #include <memory>
 

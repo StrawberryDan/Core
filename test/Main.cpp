@@ -19,7 +19,7 @@
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
 #include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Util/MaybeUninitialised.hpp"
+#include "Strawberry/Core/Types/MaybeUninitialised.hpp"
 
 
 using namespace Strawberry::Core;

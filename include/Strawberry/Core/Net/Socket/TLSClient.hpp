@@ -2,7 +2,7 @@
 
 
 #include "Strawberry/Core/Net/Error.hpp"
-#include "Strawberry/Core/Util/Optional.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
 #include "TCPClient.hpp"
 #include <memory>
 #include <openssl/ssl.h>

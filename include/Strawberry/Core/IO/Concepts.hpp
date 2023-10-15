@@ -6,7 +6,7 @@
 
 #include "DynamicByteBuffer.hpp"
 #include "Error.hpp"
-#include "Strawberry/Core/Util/Result.hpp"
+#include "Strawberry/Core/Types/Result.hpp"
 
 
 namespace Strawberry::Core::IO

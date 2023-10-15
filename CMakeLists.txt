@@ -49,8 +49,8 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Net/Websocket/Client.hpp
 		include/Strawberry/Core/Net/Websocket/Client.inl
 		include/Strawberry/Core/Net/Websocket/Message.hpp
-		include/Strawberry/Core/Util/Optional.hpp
-		include/Strawberry/Core/Util/Result.hpp
+		include/Strawberry/Core/Types/Optional.hpp
+		include/Strawberry/Core/Types/Result.hpp
 		include/Strawberry/Core/Util/ScopedTimer.hpp
 		include/Strawberry/Core/Util/Utilities.hpp
 		src/Util/Clock.cpp
@@ -77,13 +77,13 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Util/Metronome.hpp
 		include/Strawberry/Core/IO/ChannelBroadcaster.hpp
 		include/Strawberry/Core/IO/ChannelReceiver.hpp
-		include/Strawberry/Core/Util/Variant.hpp
+		include/Strawberry/Core/Types/Variant.hpp
 		include/Strawberry/Core/Sync/ConditionVariable.cpp
 		include/Strawberry/Core/Sync/ConditionVariable.hpp
-		include/Strawberry/Core/Util/Lazy.hpp
-		include/Strawberry/Core/Util/CopyOnWrite.hpp
+		include/Strawberry/Core/Types/Lazy.hpp
+		include/Strawberry/Core/Types/CopyOnWrite.hpp
 		include/Strawberry/Core/Util/IDPool.hpp
-		include/Strawberry/Core/Util/MaybeUninitialised.hpp
+		include/Strawberry/Core/Types/MaybeUninitialised.hpp
 		include/Strawberry/Core/IO/Broadcaster.hpp
 		include/Strawberry/Core/IO/Receiver.hpp
 		include/Strawberry/Core/IO/CallbackReceiver.hpp
@@ -92,7 +92,7 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Math/Units.hpp
 		src/Math/Units.cpp
 		include/Strawberry/Core/Math/Matrix.hpp
-		include/Strawberry/Core/Util/NullType.hpp
+		include/Strawberry/Core/Types/NullType.hpp
 		include/Strawberry/Core/Util/Concepts.hpp
 )
 
