@@ -5,7 +5,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Code
-#include "Clock.hpp"
+#include "Strawberry/Core/Timing/Clock.hpp"
 // C++ Standard
 #include <string>
 

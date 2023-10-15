@@ -5,9 +5,9 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Core
-#include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Util/Concepts.hpp"
-#include "Strawberry/Core/Util/Utilities.hpp"
+#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Concepts.hpp"
+#include "Strawberry/Core/Util/Stubs.hpp"
 // Standard Library
 #include <concepts>
 #include <cstdint>

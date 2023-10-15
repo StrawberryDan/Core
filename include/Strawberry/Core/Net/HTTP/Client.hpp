@@ -5,7 +5,7 @@
 #include "Response.hpp"
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
-#include "Strawberry/Core/Util/Utilities.hpp"
+#include "Strawberry/Core/Util/Stubs.hpp"
 
 
 namespace Strawberry::Core::Net::HTTP

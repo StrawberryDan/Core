@@ -5,7 +5,7 @@
 #include "Strawberry/Core/IO/Concepts.hpp"
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 #include "Strawberry/Core/Net/Error.hpp"
-#include "Strawberry/Core/Util/Endian.hpp"
+#include "Strawberry/Core/IO/Endian.hpp"
 
 /// Standard Library
 #include <cstdint>

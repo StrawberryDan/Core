@@ -1,7 +1,7 @@
 #include "Strawberry/Core/Net/Socket/API.hpp"
 
 
-#include "Strawberry/Core/Util/Logging.hpp"
+#include "Strawberry/Core/IO/Logging.hpp"
 
 
 #if defined(_WIN32)

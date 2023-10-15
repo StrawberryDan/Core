@@ -1,9 +1,9 @@
 #include "Strawberry/Core/Net/Socket/UDPClient.hpp"
 
 
-#include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Util/Markers.hpp"
-#include "Strawberry/Core/Util/Utilities.hpp"
+#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Markers.hpp"
+#include "Strawberry/Core/Util/Stubs.hpp"
 
 
 #if _WIN32

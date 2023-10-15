@@ -1,8 +1,8 @@
 #include "Strawberry/Core/Net/HTTP/Header.hpp"
 
 
-#include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Util/Utilities.hpp"
+#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Util/Stubs.hpp"
 
 
 namespace Strawberry::Core::Net::HTTP

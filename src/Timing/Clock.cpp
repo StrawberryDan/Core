@@ -1,4 +1,4 @@
-#include "Strawberry/Core/Util/Clock.hpp"
+#include "Strawberry/Core/Timing/Clock.hpp"
 
 
 namespace Strawberry::Core

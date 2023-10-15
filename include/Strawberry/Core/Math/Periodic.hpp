@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "Strawberry/Core/Util/Logging.hpp"
+#include "Strawberry/Core/IO/Logging.hpp"
 #include <concepts>
 
 

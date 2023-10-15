@@ -18,16 +18,16 @@ FetchContent_MakeAvailable(JSON)
 
 
 add_library(StrawberryCore STATIC
-		include/Strawberry/Core/Util/Assert.hpp
-		include/Strawberry/Core/Util/Clock.hpp
+		include/Strawberry/Core/Assert.hpp
+		include/Strawberry/Core/Timing/Clock.hpp
 		include/Strawberry/Core/Collection/CircularBuffer.hpp
-		include/Strawberry/Core/Util/Endian.hpp
+		include/Strawberry/Core/IO/Endian.hpp
 		include/Strawberry/Core/IO/Base64.hpp
 		include/Strawberry/Core/IO/ByteBuffer.hpp
 		include/Strawberry/Core/IO/Concepts.hpp
 		include/Strawberry/Core/IO/DynamicByteBuffer.hpp
 		include/Strawberry/Core/IO/Error.hpp
-		include/Strawberry/Core/Util/Markers.hpp
+		include/Strawberry/Core/Markers.hpp
 		include/Strawberry/Core/Math/Math.hpp
 		include/Strawberry/Core/Math/Math.inl
 		include/Strawberry/Core/Math/Periodic.hpp
@@ -51,13 +51,13 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Net/Websocket/Message.hpp
 		include/Strawberry/Core/Types/Optional.hpp
 		include/Strawberry/Core/Types/Result.hpp
-		include/Strawberry/Core/Util/ScopedTimer.hpp
-		include/Strawberry/Core/Util/Utilities.hpp
-		src/Util/Clock.cpp
+		include/Strawberry/Core/Timing/ScopedTimer.hpp
+		include/Strawberry/Core/Util/Stubs.hpp
+		src/Timing/Clock.cpp
 		src/IO/Base64.cpp
 		src/IO/DynamicByteBuffer.cpp
-		src/Util/Logging.cpp
-		src/Util/Markers.cpp
+		src/IO/Logging.cpp
+		src/Markers.cpp
 		src/Net/Address.cpp
 		src/Net/Endpoint.cpp
 		src/Net/HTTP/Client.cpp
@@ -71,10 +71,10 @@ add_library(StrawberryCore STATIC
 		src/Net/Socket/UDPClient.cpp
 		src/Net/Websocket/Client.cpp
 		src/Net/Websocket/Message.cpp
-		src/Util/ScopedTimer.cpp
+		src/Timing/ScopedTimer.cpp
 		include/Strawberry/Core/Thread/RepeatingTask.hpp
-		src/Util/Metronome.cpp
-		include/Strawberry/Core/Util/Metronome.hpp
+		src/Timing/Metronome.cpp
+		include/Strawberry/Core/Timing/Metronome.hpp
 		include/Strawberry/Core/IO/ChannelBroadcaster.hpp
 		include/Strawberry/Core/IO/ChannelReceiver.hpp
 		include/Strawberry/Core/Types/Variant.hpp
@@ -87,13 +87,13 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/IO/Broadcaster.hpp
 		include/Strawberry/Core/IO/Receiver.hpp
 		include/Strawberry/Core/IO/CallbackReceiver.hpp
-        include/Strawberry/Core/Util/ReflexivePointer.hpp
+		include/Strawberry/Core/Types/ReflexivePointer.hpp
 		include/Strawberry/Core/Math/Vector.hpp
 		include/Strawberry/Core/Math/Units.hpp
 		src/Math/Units.cpp
 		include/Strawberry/Core/Math/Matrix.hpp
 		include/Strawberry/Core/Types/NullType.hpp
-		include/Strawberry/Core/Util/Concepts.hpp
+		include/Strawberry/Core/Concepts.hpp
 )
 
 target_include_directories(StrawberryCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

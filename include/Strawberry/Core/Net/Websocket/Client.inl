@@ -8,8 +8,8 @@
 #include "Strawberry/Core/IO/Base64.hpp"
 #include "Strawberry/Core/IO/Concepts.hpp"
 #include "Strawberry/Core/Net/HTTP/Client.hpp"
-#include "Strawberry/Core/Util/Endian.hpp"
-#include "Strawberry/Core/Util/Markers.hpp"
+#include "Strawberry/Core/IO/Endian.hpp"
+#include "Strawberry/Core/Markers.hpp"
 
 
 namespace Strawberry::Core::Net::Websocket

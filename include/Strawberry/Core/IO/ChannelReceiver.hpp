@@ -6,7 +6,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Core
 #include "Strawberry/Core/Sync/Mutex.hpp"
-#include "Strawberry/Core/Util/ReflexivePointer.hpp"
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
 // Standard Library
 #include <set>
 

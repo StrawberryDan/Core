@@ -1,7 +1,7 @@
 #include "Strawberry/Core/Net/HTTP/Constants.hpp"
 
 
-#include "Strawberry/Core/Util/Utilities.hpp"
+#include "Strawberry/Core/Util/Stubs.hpp"
 
 
 #include <map>

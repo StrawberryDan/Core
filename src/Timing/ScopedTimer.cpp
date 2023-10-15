@@ -3,9 +3,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include <utility>
 
-#include "Strawberry/Core/Util/ScopedTimer.hpp"
+#include "Strawberry/Core/Timing/ScopedTimer.hpp"
 // Strawberry Core
-#include "Strawberry/Core/Util/Logging.hpp"
+#include "Strawberry/Core/IO/Logging.hpp"
 
 
 namespace Strawberry::Core

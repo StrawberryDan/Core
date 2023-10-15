@@ -3,8 +3,8 @@
 #include "Strawberry/Core/Net/Websocket/Message.hpp"
 
 
-#include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Util/Endian.hpp"
+#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/IO/Endian.hpp"
 
 
 namespace Strawberry::Core::Net::Websocket

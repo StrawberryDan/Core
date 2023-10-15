@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Assert.hpp"
 #include "Optional.hpp"
 #include <variant>
 

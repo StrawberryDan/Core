@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Util/Logging.hpp"
+#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/IO/Logging.hpp"
 #include "fmt/core.h"
 #include <iostream>
 #include <regex>

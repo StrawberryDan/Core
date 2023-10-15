@@ -2,7 +2,7 @@
 
 
 #include "Strawberry/Core/IO/Error.hpp"
-#include "Strawberry/Core/Util/Assert.hpp"
+#include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Types/Result.hpp"
 #include <array>
 #include <compare>

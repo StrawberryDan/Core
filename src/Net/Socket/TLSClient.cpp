@@ -3,8 +3,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
 // Core
-#include "Strawberry/Core/Util/Assert.hpp"
-#include "Strawberry/Core/Util/Logging.hpp"
+#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/IO/Logging.hpp"
 // System
 #include <memory>
 #include <openssl/tls1.h>
