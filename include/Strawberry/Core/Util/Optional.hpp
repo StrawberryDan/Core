@@ -316,7 +316,7 @@ namespace Strawberry::Core
 		requires IsOptional<std::invoke_result_t<F, const T&>>
 		std::invoke_result_t<F, const T&> AndThen(F functor) const&
 		{
-			return HasValue() ? functor(Value()) : NullOpt;
+			return Map(functor).Flatten();
 		}
 
 
@@ -324,7 +324,7 @@ namespace Strawberry::Core
 		requires IsOptional<std::invoke_result_t<F, T&&>>
 		std::invoke_result_t<F, T&&> AndThen(F functor)&&
 		{
-			return HasValue() ? functor(Unwrap()) : NullOpt;
+			return Map(functor).Flatten();
 		}
 
 
@@ -665,7 +665,7 @@ namespace Strawberry::Core
 		requires (IsOptional<std::invoke_result_t<F, T>>)
 		std::invoke_result_t<F, T> AndThen(F functor)
 		{
-			return HasValue() ? functor(Value()) : NullOpt;
+			return Map(functor).Flatten();
 		}
 
 
@@ -673,7 +673,7 @@ namespace Strawberry::Core
 		requires (IsOptional<std::invoke_result_t<F, const T>>)
 		std::invoke_result_t<F, const T> AndThen(F functor) const
 		{
-			return HasValue() ? functor(Value()) : NullOpt;
+			return Map(functor).Flatten();
 		}
 
 
