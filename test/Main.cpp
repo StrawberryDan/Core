@@ -102,14 +102,14 @@ namespace Test
 	void HTTP()
 	{
 		{
-			auto                                 http = Strawberry::Core::Net::HTTP::HTTPSClient("google.com");
+			auto                                 http = Strawberry::Core::Net::HTTP::HTTPSClient(Net::Endpoint::Resolve("google.com", 443).Unwrap());
 			Strawberry::Core::Net::HTTP::Request request(Strawberry::Core::Net::HTTP::Verb::GET, "/");
 			http.SendRequest(request);
 			auto response = http.Receive();
 		}
 
 		{
-			auto                                 http = Strawberry::Core::Net::HTTP::HTTPSClient("api.agify.io");
+			auto                                 http = Strawberry::Core::Net::HTTP::HTTPSClient(Net::Endpoint::Resolve("api.agify.io", 443).Unwrap());
 			Strawberry::Core::Net::HTTP::Request request(Strawberry::Core::Net::HTTP::Verb::GET, "/?name=dan");
 			http.SendRequest(request);
 			auto response = http.Receive();
