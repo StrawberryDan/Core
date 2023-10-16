@@ -4,13 +4,9 @@
 #include "Strawberry/Core/IO/Logging.hpp"
 
 
+#include "Strawberry/Core/Assert.hpp"
 #if defined(_WIN32)
-
-
 #include <winsock2.h>
-#include "Strawberry/Core/Util/Assert.hpp"
-
-
 #endif
 
 
