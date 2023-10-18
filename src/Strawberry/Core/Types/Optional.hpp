@@ -290,12 +290,13 @@ namespace Strawberry::Core
 		}
 
 
-		T UnwrapOr(T&& value)
+		template<typename P> requires std::same_as<T, std::decay_t<P>>
+		T UnwrapOr(P value)
 		{
 			if (HasValue())
 			{ return Unwrap(); }
 			else
-			{ return value; }
+			{ return std::forward<P>(value); }
 		}
 
 
@@ -653,12 +654,13 @@ namespace Strawberry::Core
 		}
 
 
-		T UnwrapOr(T&& value)
+		template<typename P> requires std::same_as<T, std::decay_t<P>>
+		T UnwrapOr(P value)
 		{
 			if (HasValue())
 			{ return Unwrap(); }
 			else
-			{ return value; }
+			{ return std::forward<P>(value); }
 		}
 
 
