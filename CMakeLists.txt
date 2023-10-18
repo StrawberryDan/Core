@@ -94,6 +94,8 @@ add_library(StrawberryCore STATIC
 		include/Strawberry/Core/Math/Matrix.hpp
 		include/Strawberry/Core/Types/NullType.hpp
 		include/Strawberry/Core/Concepts.hpp
+		include/Strawberry/Core/UTF.hpp
+		src/UTF.cpp
 )
 
 target_include_directories(StrawberryCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

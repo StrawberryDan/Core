@@ -20,6 +20,7 @@
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Types/MaybeUninitialised.hpp"
+#include "Strawberry/Core/UTF.hpp"
 
 
 using namespace Strawberry::Core;
@@ -241,6 +242,15 @@ namespace Test
 		Assert(m[0, 1] == 2);
 		Assert(m[1, 1] == 4);
 	}
+
+
+	void UTF()
+	{
+		const char8_t* a = u8"£";
+		char32_t a32 = ToUTF32(a).Unwrap();
+		std::u32string a32str{a32};
+		Assert(a32str == U"£");
+	}
 } // namespace Test
 
 int main()
@@ -257,5 +267,6 @@ int main()
 	Test::ChannelBroadcasterReceiver();
 	Test::Vectors();
 	Test::Matrices();
+	Test::UTF();
 	Strawberry::Core::Net::Socket::API::Terminate();
 }
