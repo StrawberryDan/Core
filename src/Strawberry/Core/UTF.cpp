@@ -19,8 +19,14 @@ namespace Strawberry::Core
 		int i = 0;
 		while (i < utf8.size())
 		{
-			auto c = ToUTF32(utf8.data() + i);
-			result.push_back(c.UnwrapOr(placeholder));
+			auto c = ToUTF32(utf8.data() + i).UnwrapOr(placeholder);
+			result.push_back(c);
+
+			if (c <= 0x007F) i += 1;
+			else if (c <= 0x07FF) i += 2;
+			else if (c <= 0xFFFF) i += 3;
+			else if (c <= 0x10FFFF) i += 4;
+			else Unreachable();
 		}
 
 		return result;
