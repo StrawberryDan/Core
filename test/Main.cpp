@@ -33,7 +33,7 @@ namespace Test
 	{
 		auto               encoded      = IO::Base64::Encode(bytes);
 		auto               decoded      = IO::Base64::Decode(encoded);
-		unsigned long long expectedSize = RoundUpToNearestMultiple(CeilDiv(8 * bytes.Size(), 6), 3);
+		unsigned long long expectedSize = RoundUpToMultiple(CeilDiv(8 * bytes.Size(), 6), 3);
 		Assert(encoded.size() == expectedSize);
 		Assert(decoded.Size() == bytes.Size());
 		Assert(decoded == bytes);
@@ -251,6 +251,10 @@ namespace Test
 		std::u32string a32str{a32};
 		Assert(a32str == U"£");
 		Assert(ToUTF8(a32).Unwrap() == a);
+
+		std::u32string b = U"兎田ぺこら";
+		std::u8string b8 = ToUTF8(b);
+		Assert(ToUTF32(b8) == b);
 	}
 } // namespace Test
 
