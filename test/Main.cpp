@@ -250,6 +250,7 @@ namespace Test
 		char32_t a32 = ToUTF32(a).Unwrap();
 		std::u32string a32str{a32};
 		Assert(a32str == U"£");
+		Assert(ToUTF8(a32).Unwrap() == a);
 	}
 } // namespace Test
 
