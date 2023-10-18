@@ -21,18 +21,22 @@ namespace Strawberry::Core::Math
 	}
 
 
-	template <typename A, typename B>
+	template <std::integral A, std::integral B>
 	auto CeilDiv(A num, B den)
-		requires (std::is_integral_v<A> && std::is_integral_v<B>)
 	{
 		return (num + den - 1) / den;
 	}
 
 
-	template <typename A, typename B>
-	auto RoundUpToNearestMultiple(A value, B multiple)
-		requires (std::is_integral_v<A> && std::is_integral_v<B>)
+	template <std::integral A, std::integral B>
+	auto RoundUpToMultiple(A value, B multiple)
 	{
 		return multiple * CeilDiv(value, multiple);
+	}
+
+	template <std::integral A, std::integral B>
+	auto RoundDownToMultiple(A value, B multiple)
+	{
+		return multiple * (value / multiple);
 	}
 } // namespace Strawberry::Core::Math

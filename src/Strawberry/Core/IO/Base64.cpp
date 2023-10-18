@@ -88,7 +88,7 @@ std::string Strawberry::Core::IO::Base64::Encode(const Strawberry::Core::IO::Dyn
 
 
 	std::string   encoded;
-	unsigned long encodedSize = RoundUpToNearestMultiple(CeilDiv(8 * bytes.Size(), 6), 3);
+	unsigned long encodedSize = RoundUpToMultiple(CeilDiv(8 * bytes.Size(), 6), 3);
 
 	std::vector<uint8_t> fullSegments(bytes.Data(), bytes.Data() + (3 * (bytes.Size() / 3)));
 	std::vector<uint8_t> stragglers(bytes.Data() + (3 * (bytes.Size() / 3)), bytes.Data() + bytes.Size());
