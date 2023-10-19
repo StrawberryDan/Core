@@ -8,6 +8,11 @@ Strawberry::Core::IO::DynamicByteBuffer::FromFile(const std::filesystem::path& p
 	if (std::filesystem::exists(path))
 	{
 		std::ifstream file(path);
+		if (!file.is_open() || file.bad())
+		{
+			return {};
+		}
+
 		file.seekg(0, std::ifstream::seekdir::end);
 		auto length = file.tellg();
 		file.seekg(0, std::ifstream::seekdir::beg);
