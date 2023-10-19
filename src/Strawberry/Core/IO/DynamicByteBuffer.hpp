@@ -9,6 +9,7 @@
 #include <concepts>
 #include <cstdint>
 #include <vector>
+#include <filesystem>
 
 
 namespace Strawberry::Core::IO
@@ -21,6 +22,7 @@ namespace Strawberry::Core::IO
 	{
 	public:
 		// Static Methods
+		static Core::Optional<DynamicByteBuffer> FromFile(const std::filesystem::path& path);
 		static DynamicByteBuffer Zeroes(size_t len);
 		static DynamicByteBuffer WithCapacity(size_t len);
 

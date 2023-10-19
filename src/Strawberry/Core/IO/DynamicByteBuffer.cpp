@@ -1,4 +1,25 @@
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
+#include <fstream>
+
+
+Strawberry::Core::Optional<Strawberry::Core::IO::DynamicByteBuffer>
+Strawberry::Core::IO::DynamicByteBuffer::FromFile(const std::filesystem::path& path)
+{
+	if (std::filesystem::exists(path))
+	{
+		std::ifstream file(path);
+		file.seekg(0, std::ifstream::seekdir::end);
+		auto length = file.tellg();
+		file.seekg(0, std::ifstream::seekdir::beg);
+		DynamicByteBuffer buffer = DynamicByteBuffer::Zeroes(length);
+		file.read(reinterpret_cast<char*>(buffer.Data()), length);
+		return buffer;
+	}
+	else
+	{
+		return {};
+	}
+}
 
 
 Strawberry::Core::IO::DynamicByteBuffer Strawberry::Core::IO::DynamicByteBuffer::Zeroes(size_t len)
