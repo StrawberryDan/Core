@@ -96,6 +96,7 @@ add_library(StrawberryCore STATIC
 		src/Strawberry/Core/Concepts.hpp
 		src/Strawberry/Core/UTF.hpp
 		src/Strawberry/Core/UTF.cpp
+		src/Strawberry/Core/Types/DynamicValue.hpp
 )
 
 target_include_directories(StrawberryCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
