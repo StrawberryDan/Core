@@ -13,9 +13,9 @@ Strawberry::Core::IO::DynamicByteBuffer::FromFile(const std::filesystem::path& p
 			return {};
 		}
 
-		file.seekg(0, std::ifstream::seekdir::end);
+		file.seekg(0, file.end);
 		auto length = file.tellg();
-		file.seekg(0, std::ifstream::seekdir::beg);
+		file.seekg(0, file.beg);
 		DynamicByteBuffer buffer = DynamicByteBuffer::Zeroes(length);
 		file.read(reinterpret_cast<char*>(buffer.Data()), length);
 		return buffer;

@@ -8,6 +8,7 @@
 // Standard Library
 #include <vector>
 #include <bit>
+#include <algorithm>
 
 
 namespace Strawberry::Core
