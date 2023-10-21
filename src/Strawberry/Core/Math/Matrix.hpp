@@ -14,8 +14,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::Math
 {
-	template <typename T, size_t H, size_t W>
-		requires (std::signed_integral<T> || std::floating_point<T>)
+	template<typename T, size_t H, size_t W>
+	requires (std::signed_integral<T> || std::floating_point<T>)
 	class Matrix
 	{
 	public:
@@ -25,7 +25,7 @@ namespace Strawberry::Core::Math
 			Matrix result;
 			for (size_t i = 0; i < std::min(W, H); i++)
 			{
-				result[i, i] = T(0);
+				result[i][i] = T(0);
 			}
 			return result;
 		}
@@ -33,22 +33,26 @@ namespace Strawberry::Core::Math
 
 		/// Identity Matrix Constructor
 		constexpr Matrix()
-			: mValue{T(0)}
+			: mValue {T(0)}
 		{
 			for (size_t i = 0; i < std::min(H, W); i++) mValue[i][i] = T(1);
 		}
 
-		template <typename... Args>
-			requires (sizeof...(Args) == H * W && (std::same_as<T, Args> && ...))
+
+		template<typename... Args>
+		requires (sizeof...(Args) == H * W && (std::same_as<T, Args> && ...))
 		constexpr Matrix(Args... args)
 		{
-			std::array<T, H * W> values{args...};
+			std::array<T, H * W> values {args...};
 			for (size_t i = 0; i < values.size(); i++) mValue[i / W][i % W] = values[i];
 		}
 
-		constexpr T& operator[](size_t row, size_t col) { return mValue[row][col]; }
 
-		constexpr T& operator[](size_t row, size_t col) const { return mValue[row][col]; }
+		constexpr T* operator[](size_t col) { return mValue[col]; }
+
+
+		constexpr T* operator[](size_t col) const { return mValue[col]; }
+
 
 		constexpr bool operator==(const Matrix& b) const
 		{
@@ -56,12 +60,13 @@ namespace Strawberry::Core::Math
 			{
 				for (size_t col = 0; col < W; col++)
 				{
-					if (mValue[row][col] != b[row, col]) return false;
+					if (mValue[col][row] != b[col][row]) return false;
 				}
 			}
 
 			return true;
 		}
+
 
 		constexpr bool operator!=(const Matrix& b) const
 		{
@@ -69,12 +74,13 @@ namespace Strawberry::Core::Math
 			{
 				for (size_t col = 0; col < W; col++)
 				{
-					if (mValue[row][col] == b[row, col]) return false;
+					if (mValue[col][row] == b[col][row]) return false;
 				}
 			}
 
 			return true;
 		}
+
 
 		constexpr Matrix operator+(const Matrix& b) const
 		{
@@ -83,11 +89,12 @@ namespace Strawberry::Core::Math
 			{
 				for (size_t col = 0; col < W; col++)
 				{
-					result[row, col] = (*this)[row, col] + b[row, col];
+					result[col][row] = (*this)[col][row] + b[col][row];
 				}
 			}
 			return result;
 		}
+
 
 		constexpr Matrix operator-(const Matrix& b) const
 		{
@@ -96,11 +103,12 @@ namespace Strawberry::Core::Math
 			{
 				for (size_t col = 0; col < W; col++)
 				{
-					result[row, col] = (*this)[row, col] - b[row, col];
+					result[col][row] = (*this)[col][row] - b[col][row];
 				}
 			}
 			return result;
 		}
+
 
 		constexpr Matrix operator*(const Matrix<T, W, H>& b) const
 		{
@@ -111,14 +119,29 @@ namespace Strawberry::Core::Math
 				{
 					for (size_t k = 0; k < W; k++)
 					{
-						result[row, col] += (*this)[row, k] * b[k, col];
+						result[col][row] += (*this)[row][k] * b[k][col];
 					}
 				}
 			}
 			return result;
 		}
 
+
 	private:
 		T mValue[H][W];
 	};
+
+
+	//======================================================================================================================
+	//  Type Aliases
+	//----------------------------------------------------------------------------------------------------------------------
+	using Mat2 = Matrix<double, 2, 2>;
+	using Mat3 = Matrix<double, 3, 3>;
+	using Mat4 = Matrix<double, 4, 4>;
+	using Mat2f = Matrix<float, 2, 2>;
+	using Mat3f = Matrix<float, 3, 3>;
+	using Mat4f = Matrix<float, 4, 4>;
+	using Mat2i = Matrix<int, 2, 2>;
+	using Mat3i = Matrix<int, 3, 3>;
+	using Mat4i = Matrix<int, 4, 4>;
 } // namespace Strawberry::Core::Math
