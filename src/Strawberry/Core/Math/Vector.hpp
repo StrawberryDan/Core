@@ -195,6 +195,9 @@ namespace Strawberry::Core::Math
 	using Vec2 = Vector<double, 2>;
 	using Vec3 = Vector<double, 3>;
 	using Vec4 = Vector<double, 4>;
+	using Vec2f = Vector<float, 2>;
+	using Vec3f = Vector<float, 3>;
+	using Vec4f = Vector<float, 4>;
 	using Vec2i = Vector<int, 2>;
 	using Vec3i = Vector<int, 3>;
 	using Vec4i = Vector<int, 4>;
