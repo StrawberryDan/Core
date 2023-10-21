@@ -33,12 +33,12 @@ namespace Strawberry::Core::Math
 
 		/// Construction from another vector. If the other vector is smaller, excess values are zeroes.
 		template<typename T2, size_t D2>
-		requires (D2 <= D)
 		constexpr explicit Vector(const Vector<T2, D2>& other) noexcept
 		{
-			size_t i = 0;
-			for (; i < D2; i++) mValue[i] = T(other[i]);
-			for (; i < D; i++) mValue[i] = T(0);
+			for (int i = 0; i < D; i++)
+			{
+				(*this)[i] = (i < D2) ? other[i] : T(0);
+			}
 		}
 
 
