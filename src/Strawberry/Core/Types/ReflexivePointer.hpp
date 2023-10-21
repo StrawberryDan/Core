@@ -2,6 +2,7 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+#include "Strawberry/Core/Assert.hpp"
 // Standard Library
 #include <atomic>
 #include <concepts>
@@ -25,7 +26,7 @@ namespace Strawberry::Core
 
 	public:
 		explicit ReflexivePointer(const EnableReflexivePointer<T>& base) noexcept
-				: ReflexivePointer(base.GetDynamicReflexivePointer())
+				: ReflexivePointer(base.GetReflexivePointer())
 		{}
 
 
@@ -180,7 +181,7 @@ namespace Strawberry::Core
 		}
 
 
-		ReflexivePointer<T> GetReflexivePointer()
+		ReflexivePointer<T> GetReflexivePointer() const
 		{
 			return ReflexivePointer(mPtr);
 		}
