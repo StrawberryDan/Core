@@ -349,31 +349,25 @@ namespace Strawberry::Core
 
 		Optional<T*> AsPtr()
 		{
-			if (HasValue())
-			{ return &mPayload; }
-			else
-			{ return {}; }
+			return HasValue() ? Optional<const T*>(&mPayload) : NullOpt;
 		}
 
 
 		Optional<const T*> AsPtr() const
 		{
-			if (HasValue())
-			{ return &mPayload; }
-			else
-			{ return {}; }
+			return HasValue() ? Optional<const T*>(&mPayload) : NullOpt;
 		}
 
 
 		auto Deref() requires (Dereferencable<T>)
 		{
-			return HasValue() ? *mPayload : NullOpt;
+			return HasValue() ? Optional<decltype(*std::declval<T>())>(*mPayload) : NullOpt;
 		}
 
 
 		auto Deref() const requires (Dereferencable<T>)
 		{
-			return HasValue() ? *mPayload : NullOpt;
+			return HasValue() ? Optional<decltype(*std::declval<T>())>(*mPayload) : NullOpt;
 		}
 
 
@@ -713,25 +707,25 @@ namespace Strawberry::Core
 
 		Optional<T*> AsPtr()
 		{
-			return HasValue() ? &mPayload : NullOpt;
+			return HasValue() ? Optional<T*>(&mPayload) : NullOpt;
 		}
 
 
 		Optional<const T*> AsPtr() const
 		{
-			return HasValue() ? &mPayload : NullOpt;
+			return HasValue() ? Optional<T*>(&mPayload) : NullOpt;
 		}
 
 
 		Optional<std::remove_pointer_t<T>> Deref()
 		{
-			return HasValue() ? *mPayload : NullOpt;
+			return HasValue() ? Optional<std::remove_pointer_t<T>>(*mPayload) : NullOpt;
 		}
 
 
 		Optional<const std::remove_pointer_t<T>> Deref() const
 		{
-			return HasValue() ? *mPayload : NullOpt;
+			return HasValue() ? Optional<std::remove_pointer_t<T>>(*mPayload) : NullOpt;
 		}
 
 
