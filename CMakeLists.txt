@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(StrawberryCore)
 include(FetchContent)
+include(ExternalProject)
 
 
 find_package(OpenSSL REQUIRED)
@@ -14,6 +15,16 @@ FetchContent_Declare(JSON
 		GIT_REPOSITORY "https://github.com/nlohmann/json.git"
 		GIT_TAG "v3.11.2")
 FetchContent_MakeAvailable(JSON)
+
+FetchContent_Declare(STB
+		GIT_REPOSITORY "https://github.com/nothings/stb.git"
+		CONFIGURE_COMMAND ""
+		BUILD_COMMAND ""
+		INSTALL_COMMAND ""
+)
+FetchContent_MakeAvailable(STB)
+FetchContent_GetProperties(STB
+		SOURCE_DIR STB_SOURCE_DIR)
 
 
 add_library(StrawberryCore STATIC
@@ -98,7 +109,9 @@ add_library(StrawberryCore STATIC
 		src/Strawberry/Core/Types/DynamicValue.hpp
 )
 
-target_include_directories(StrawberryCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(StrawberryCore
+		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
+		PRIVATE ${STB_SOURCE_DIR})
 target_link_libraries(StrawberryCore PUBLIC OpenSSL::SSL OpenSSL::Crypto nlohmann_json::nlohmann_json fmt::fmt-header-only)
 set_target_properties(StrawberryCore PROPERTIES CXX_STANDARD 20)
 
@@ -110,3 +123,4 @@ endif ()
 add_executable(StrawberryCoreTest
 		test/Main.cpp)
 target_link_libraries(StrawberryCoreTest PRIVATE StrawberryCore)
+set_target_properties(StrawberryCoreTest PROPERTIES CXX_STANDARD 20)

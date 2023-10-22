@@ -1,6 +1,9 @@
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 #include <fstream>
 
+#define STB_IMAGE_IMPLEMENTATION 1
+#include "stb_image.h"
+
 
 Strawberry::Core::Optional<Strawberry::Core::IO::DynamicByteBuffer>
 Strawberry::Core::IO::DynamicByteBuffer::FromFile(const std::filesystem::path& path)
@@ -19,6 +22,31 @@ Strawberry::Core::IO::DynamicByteBuffer::FromFile(const std::filesystem::path& p
 		DynamicByteBuffer buffer = DynamicByteBuffer::Zeroes(length);
 		file.read(reinterpret_cast<char*>(buffer.Data()), length);
 		return buffer;
+	}
+	else
+	{
+		return {};
+	}
+}
+
+
+Strawberry::Core::Optional<std::tuple<Strawberry::Core::Math::Vec2i, int, Strawberry::Core::IO::DynamicByteBuffer>>
+Strawberry::Core::IO::DynamicByteBuffer::FromImage(const std::filesystem::path& path)
+{
+	if (std::filesystem::exists(path))
+	{
+		Core::Math::Vec2i size;
+		int channels = 0;
+		int desiredChannels = 4;
+		uint8_t* data = stbi_load(path.c_str(), &size[0], &size[1], &channels, desiredChannels);
+		Core::AssertNEQ(data, nullptr);
+
+		DynamicByteBuffer bytes(data, size[0] * size[1] * desiredChannels);
+
+		stbi_image_free(data);
+
+		Core::AssertEQ(size[0] * size[1] * desiredChannels, bytes.Size());
+		return {size, desiredChannels, bytes};
 	}
 	else
 	{
