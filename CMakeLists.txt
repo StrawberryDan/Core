@@ -100,7 +100,6 @@ add_library(StrawberryCore STATIC
 		src/Strawberry/Core/Types/ReflexivePointer.hpp
 		src/Strawberry/Core/Math/Vector.hpp
 		src/Strawberry/Core/Math/Units.hpp
-		src/Strawberry/Core/Math/Units.cpp
 		src/Strawberry/Core/Math/Matrix.hpp
 		src/Strawberry/Core/Types/NullType.hpp
 		src/Strawberry/Core/Concepts.hpp
