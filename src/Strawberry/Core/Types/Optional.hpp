@@ -97,7 +97,7 @@ namespace Strawberry::Core
 
 
 		template<typename... Ts>
-		explicit Optional(Ts... ts)
+		explicit(sizeof...(Ts) <= 1) Optional(Ts... ts)
 		requires (std::constructible_from<T, Ts...>)
 			: mHasValue(true)
 			  , mPayload(std::forward<Ts>(ts)...) {}
