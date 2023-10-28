@@ -182,7 +182,10 @@ namespace Strawberry::Core
 
 		~EnableReflexivePointer()
 		{
-			*mPtr = nullptr;
+			if (mPtr)
+			{
+				*mPtr = nullptr;
+			}
 		}
 
 
