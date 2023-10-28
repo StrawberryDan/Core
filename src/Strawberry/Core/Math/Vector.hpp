@@ -27,7 +27,7 @@ namespace Strawberry::Core::Math
 		/// Value constructor. Initialises specified values. Unspecified values are zeroes.
 		template<typename... Args>
 		requires (sizeof...(Args) <= D && (std::same_as<T, Args> && ...))
-		constexpr explicit Vector(Args... args) noexcept
+		constexpr explicit(sizeof...(Args) == 1) Vector(Args... args) noexcept
 			: mValue{args...} {}
 
 
