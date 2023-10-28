@@ -349,7 +349,7 @@ namespace Strawberry::Core
 
 		Optional<T*> AsPtr()
 		{
-			return HasValue() ? Optional<const T*>(&mPayload) : NullOpt;
+			return HasValue() ? Optional<T*>(&mPayload) : NullOpt;
 		}
 
 
