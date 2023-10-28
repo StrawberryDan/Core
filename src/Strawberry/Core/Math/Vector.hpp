@@ -42,6 +42,14 @@ namespace Strawberry::Core::Math
 		}
 
 
+		// Copy Conversion to a different sized vector
+		template<size_t D2>
+		constexpr Vector<T, D2> AsSize() const noexcept
+		{
+			return Vector<T, D2>(*this);
+		}
+
+
 		/// Mutable accessor
 		constexpr T& operator[](size_t i) noexcept { return mValue[i]; }
 
