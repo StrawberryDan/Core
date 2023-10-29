@@ -4,6 +4,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Core
 #include "Vector.hpp"
+#include "Strawberry/Core/Assert.hpp"
 // Standard Library
 #include <algorithm>
 #include <array>
@@ -48,10 +49,10 @@ namespace Strawberry::Core::Math
 		}
 
 
-		constexpr T* operator[](size_t col) { return mValue[col]; }
+		constexpr T* operator[](size_t col) { Core::Assert(col < W); return mValue[col]; }
 
 
-		constexpr T* operator[](size_t col) const { return mValue[col]; }
+		constexpr const T* operator[](size_t col) const { Core::Assert(col < W); return mValue[col]; }
 
 
 		constexpr bool operator==(const Matrix& b) const
@@ -119,10 +120,20 @@ namespace Strawberry::Core::Math
 				{
 					for (size_t k = 0; k < W; k++)
 					{
-						result[col][row] += (*this)[row][k] * b[k][col];
+						result[col][row] += (*this)[k][row] * b[col][k];
 					}
 				}
 			}
+			return result;
+		}
+
+
+		Matrix Transposed() const
+		{
+			Matrix result;
+			for (int x = 0; x < W; x++)
+			for (int y = 0; y < H; y++)
+				result[x][y] = mValue[y][x];
 			return result;
 		}
 
