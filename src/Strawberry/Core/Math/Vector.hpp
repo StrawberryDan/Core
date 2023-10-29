@@ -26,9 +26,9 @@ namespace Strawberry::Core::Math
 
 		/// Value constructor. Initialises specified values. Unspecified values are zeroes.
 		template<typename... Args>
-		requires (sizeof...(Args) <= D && (std::same_as<T, Args> && ...))
+		requires (sizeof...(Args) <= D && (std::convertible_to<Args, T> && ...))
 		constexpr explicit(sizeof...(Args) == 1) Vector(Args... args) noexcept
-			: mValue{args...} {}
+			: mValue{static_cast<T>(args)...} {}
 
 
 		/// Construction from another vector. If the other vector is smaller, excess values are zeroes.
@@ -42,11 +42,23 @@ namespace Strawberry::Core::Math
 		}
 
 
-		// Copy Conversion to a different sized vector
+		/// Copy Conversion to a different sized vector
 		template<size_t D2>
 		constexpr Vector<T, D2> AsSize() const noexcept
 		{
 			return Vector<T, D2>(*this);
+		}
+
+
+
+		/// Static casts between vector types
+		template <typename T2>
+		constexpr Vector<T2, D> AsType() const noexcept
+		{
+			Vector<T2, D> result;
+			for (int i = 0; i < D; i++)
+				result[i] = static_cast<T2>((*this)[i]);
+			return result;
 		}
 
 
@@ -133,7 +145,7 @@ namespace Strawberry::Core::Math
 
 
 		/// Define Magnitude
-		double Magnitude() const noexcept { return std::sqrt(SquareMagnitude()); }
+		[[nodiscard]] double Magnitude() const noexcept { return std::sqrt(SquareMagnitude()); }
 
 
 		/// Define Square Magnitude
