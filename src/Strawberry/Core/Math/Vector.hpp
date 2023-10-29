@@ -62,6 +62,17 @@ namespace Strawberry::Core::Math
 		}
 
 
+		template <typename... Args> requires (std::convertible_to<Args, T> && ...)
+		constexpr Vector<T, D + sizeof...(Args)> WithAdditionalValues(Args... args) const
+		{
+			Vector argsAsVector(args...);
+			Vector<T, D + sizeof...(Args)> result(*this);
+			for (int i = 0; i < sizeof...(Args); i++)
+				result[D + i] = argsAsVector[i];
+			return result;
+		};
+
+
 		/// Mutable accessor
 		constexpr T& operator[](size_t i) noexcept { return mValue[i]; }
 
