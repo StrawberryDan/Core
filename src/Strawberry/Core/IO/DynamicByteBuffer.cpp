@@ -38,7 +38,7 @@ Strawberry::Core::IO::DynamicByteBuffer::FromImage(const std::filesystem::path& 
 		Core::Math::Vec2i size;
 		int channels = 0;
 		int desiredChannels = 4;
-		uint8_t* data = stbi_load(path.c_str(), &size[0], &size[1], &channels, desiredChannels);
+		uint8_t* data = stbi_load(path.string().c_str(), &size[0], &size[1], &channels, desiredChannels);
 		Core::AssertNEQ(data, nullptr);
 
 		DynamicByteBuffer bytes(data, size[0] * size[1] * desiredChannels);
