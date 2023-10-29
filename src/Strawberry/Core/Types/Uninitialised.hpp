@@ -31,7 +31,7 @@ namespace Strawberry::Core
 			requires std::constructible_from<T, Args...>
 		void Construct(Args... args)
 		{
-			std::construct_at(&mPayload, std::forward<Args...>(args)...);
+			std::construct_at(&mPayload, std::forward<Args>(args)...);
 		}
 
 		void Destruct() { std::destroy_at(&mPayload); }
