@@ -106,6 +106,7 @@ add_library(StrawberryCore STATIC
 		src/Strawberry/Core/UTF.hpp
 		src/Strawberry/Core/UTF.cpp
 		src/Strawberry/Core/Types/DynamicValue.hpp
+		src/Strawberry/Core/Math/Transformations.hpp
 )
 
 target_include_directories(StrawberryCore
