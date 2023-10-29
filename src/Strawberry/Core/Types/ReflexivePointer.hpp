@@ -56,6 +56,17 @@ namespace Strawberry::Core
 		{}
 
 
+		ReflexivePointer& operator=(ReflexivePointer&& rhs) noexcept
+		{
+			if (this != &rhs)
+			{
+				std::destroy_at(this);
+				std::construct_at(this, std::move(rhs));
+			}
+			return *this;
+		}
+
+
 		bool operator==(const ReflexivePointer& rhs) const noexcept
 		{
 			return mPtr == rhs.mPtr;
