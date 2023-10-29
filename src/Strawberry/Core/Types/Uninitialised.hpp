@@ -12,20 +12,20 @@
 namespace Strawberry::Core
 {
 	template <typename T>
-	class MaybeUninitialised
+	class Uninitialised
 	{
 	public:
-		MaybeUninitialised() {}
+		Uninitialised() {}
 
-		MaybeUninitialised(const MaybeUninitialised& rhs) { std::memcpy(&mPayload, &rhs.mPayload, sizeof(T)); }
+		Uninitialised(const Uninitialised& rhs) { std::memcpy(&mPayload, &rhs.mPayload, sizeof(T)); }
 
-		MaybeUninitialised& operator=(const MaybeUninitialised& rhs) { std::memcpy(&mPayload, &rhs.mPayload, sizeof(T)); }
+		Uninitialised& operator=(const Uninitialised& rhs) { std::memcpy(&mPayload, &rhs.mPayload, sizeof(T)); }
 
-		MaybeUninitialised(MaybeUninitialised&&)           = delete;
+		Uninitialised(Uninitialised&&)           = delete;
 
-		MaybeUninitialised operator=(MaybeUninitialised&&) = delete;
+		Uninitialised operator=(Uninitialised&&) = delete;
 
-		~MaybeUninitialised() {}
+		~Uninitialised() {}
 
 		template <typename... Args>
 			requires std::constructible_from<T, Args...>
@@ -49,6 +49,9 @@ namespace Strawberry::Core
 		const T* operator->() const { return &mPayload; }
 
 	private:
+#if !NDEBUG
+		bool mInitialised = false;
+#endif // !NDEBUG
 		union
 		{
 			T mPayload;

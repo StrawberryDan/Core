@@ -6,7 +6,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Core
 #include "Strawberry/Core/Math/Periodic.hpp"
-#include "Strawberry/Core/Types/MaybeUninitialised.hpp"
+#include "Strawberry/Core/Types/Uninitialised.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 // Standard Library
 #include <memory>
@@ -74,7 +74,7 @@ namespace Strawberry::Core::Collection
 
 
 	private:
-		std::vector<MaybeUninitialised<T>> mData;
+		std::vector<Uninitialised<T>> mData;
 		Math::DynamicPeriodic<size_t> mHead;
 		Math::DynamicPeriodic<size_t> mTail;
 		size_t                        mSize;
@@ -146,7 +146,7 @@ namespace Strawberry::Core::Collection
 
 
 	private:
-		std::vector<MaybeUninitialised<T>> mData;
+		std::vector<Uninitialised<T>> mData;
 		Math::DynamicPeriodic<size_t> mHead;
 		Math::DynamicPeriodic<size_t> mTail;
 		size_t                        mSize;

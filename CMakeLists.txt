@@ -93,7 +93,7 @@ add_library(StrawberryCore STATIC
 		src/Strawberry/Core/Types/Lazy.hpp
 		src/Strawberry/Core/Types/CopyOnWrite.hpp
 		src/Strawberry/Core/Util/IDPool.hpp
-		src/Strawberry/Core/Types/MaybeUninitialised.hpp
+		src/Strawberry/Core/Types/Uninitialised.hpp
 		src/Strawberry/Core/IO/Broadcaster.hpp
 		src/Strawberry/Core/IO/Receiver.hpp
 		src/Strawberry/Core/IO/CallbackReceiver.hpp

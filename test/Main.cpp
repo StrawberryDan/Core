@@ -19,7 +19,7 @@
 #include "Strawberry/Core/Net/Socket/TCPClient.hpp"
 #include "Strawberry/Core/Net/Socket/TLSClient.hpp"
 #include "Strawberry/Core/Assert.hpp"
-#include "Strawberry/Core/Types/MaybeUninitialised.hpp"
+#include "Strawberry/Core/Types/Uninitialised.hpp"
 #include "Strawberry/Core/UTF.hpp"
 
 
@@ -170,7 +170,7 @@ namespace Test
 
 	void Uninitialised()
 	{
-		std::vector<Strawberry::Core::MaybeUninitialised<UninitialisedTester>> data(5);
+		std::vector<Strawberry::Core::Uninitialised<UninitialisedTester>> data(5);
 
 		Strawberry::Core::Assert(UninitialisedTester::numConstructed == 0);
 		data[0].Construct();
