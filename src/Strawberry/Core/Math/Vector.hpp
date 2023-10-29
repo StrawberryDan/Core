@@ -15,7 +15,7 @@
 namespace Strawberry::Core::Math
 {
 	template<typename T, size_t D>
-	requires (std::signed_integral<T> || std::floating_point<T>)
+	requires (std::integral<T> || std::floating_point<T>)
 	class Vector
 	{
 	public:
@@ -190,7 +190,7 @@ namespace Strawberry::Core::Math
 		requires (D == 3)
 		{
 			auto [x1, y1, z1] = *this;
-			auto [x2, y2, z2] = *this;
+			auto [x2, y2, z2] = b;
 			return Vector(y1 * z2 - z1 * y2, z1 * x2 - x1 * z2, x1 * y2 - y1 * x2);
 		}
 
@@ -232,6 +232,9 @@ namespace Strawberry::Core::Math
 	using Vec2i = Vector<int, 2>;
 	using Vec3i = Vector<int, 3>;
 	using Vec4i = Vector<int, 4>;
+	using Vec2u = Vector<unsigned int, 2>;
+	using Vec3u = Vector<unsigned int, 3>;
+	using Vec4u = Vector<unsigned int, 4>;
 } // namespace Strawberry::Core::Math
 
 namespace std
