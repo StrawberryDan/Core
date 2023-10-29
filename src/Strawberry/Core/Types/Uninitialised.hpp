@@ -63,7 +63,6 @@ namespace Strawberry::Core
 		void Destruct()
 		{
 #if !NDEBUG
-			static_assert(false);
 			Core::Assert(mInitialised);
 			mInitialised = false;
 #endif // !NDEBUG
