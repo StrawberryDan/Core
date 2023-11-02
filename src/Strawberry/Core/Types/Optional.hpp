@@ -290,13 +290,10 @@ namespace Strawberry::Core
 		}
 
 
-		template<typename P> requires std::same_as<T, std::decay_t<P>>
-		T UnwrapOr(P value)
+		T UnwrapOr(auto value)
 		{
-			if (HasValue())
-			{ return Unwrap(); }
-			else
-			{ return std::forward<P>(value); }
+			if (HasValue()) return Unwrap();
+			else return static_cast<T>(std::forward<decltype(value)>(value));
 		}
 
 
@@ -648,22 +645,19 @@ namespace Strawberry::Core
 		}
 
 
-		template<typename P> requires std::same_as<T, std::decay_t<P>>
-		T UnwrapOr(P value)
+		T UnwrapOr(auto value)
 		{
 			if (HasValue())
 			{ return Unwrap(); }
 			else
-			{ return std::forward<P>(value); }
+			{ return static_cast<T>(std::forward<decltype(value)>(value)); }
 		}
 
 
 		T UnwrapOr(std::nullptr_t)
 		{
-			if (HasValue())
-			{ return Unwrap(); }
-			else
-			{ return nullptr; }
+			if (HasValue()) return Unwrap();
+			else return nullptr;
 		}
 
 
