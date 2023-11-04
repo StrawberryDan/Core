@@ -26,7 +26,7 @@ namespace Strawberry::Core::Math
 
 		/// Value constructor. Initialises specified values. Unspecified values are zeroes.
 		template<typename... Args>
-		requires (sizeof...(Args) <= D && (std::convertible_to<Args, T> && ...))
+		requires (sizeof...(Args) == D && (std::convertible_to<Args, T> && ...))
 		constexpr explicit(sizeof...(Args) == 1) Vector(Args... args) noexcept
 			: mValue{static_cast<T>(args)...} {}
 
@@ -65,7 +65,7 @@ namespace Strawberry::Core::Math
 		template <typename... Args> requires (std::convertible_to<Args, T> && ...)
 		constexpr Vector<T, D + sizeof...(Args)> WithAdditionalValues(Args... args) const
 		{
-			Vector argsAsVector(args...);
+			Vector<T, sizeof...(Args)> argsAsVector(args...);
 			Vector<T, D + sizeof...(Args)> result(*this);
 			for (int i = 0; i < sizeof...(Args); i++)
 				result[D + i] = argsAsVector[i];
