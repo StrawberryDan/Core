@@ -138,7 +138,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		/// Define multiplication
+		/// Define scalar multiplication
 		constexpr friend Vector operator*(const Vector& a, T b) noexcept
 		{
 			Vector result;
@@ -147,8 +147,17 @@ namespace Strawberry::Core::Math
 		}
 
 
-		/// Define commutative multiplication
+		/// Define commutative scalar multiplication
 		constexpr friend Vector operator*(T a, const Vector& b) noexcept { return b * a; }
+
+
+		/// Define Component-wise multiplication
+		constexpr friend Vector operator*(const Vector& a, const Vector& b)
+		{
+			Vector result;
+			for (int i = 0; i < D; i++) result[i] = a[i] * b[i];
+			return result;
+		}
 
 
 		/// Define division by scalars
