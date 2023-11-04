@@ -108,6 +108,18 @@ namespace Strawberry::Core
 		}
 
 
+		bool operator==(std::nullptr_t) const noexcept
+		{
+			return mPtr == nullptr;
+		}
+
+
+		bool operator!=(std::nullptr_t) const noexcept
+		{
+			return mPtr != nullptr;
+		}
+
+
 		T& operator*() const noexcept
 		{
 			Core::Assert(IsValid());
