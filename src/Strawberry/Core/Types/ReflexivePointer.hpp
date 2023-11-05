@@ -23,6 +23,9 @@ namespace Strawberry::Core
 		template<typename>
 		friend class EnableReflexivePointer;
 
+		template<typename>
+		friend class ReflexivePointer;
+
 
 	public:
 		ReflexivePointer()
@@ -69,6 +72,20 @@ namespace Strawberry::Core
 				std::construct_at(this, std::move(rhs));
 			}
 			return *this;
+		}
+
+
+		template<typename T2> requires std::derived_from<T, T2>
+		T2* Cast() const
+		{
+			return static_cast<T2*>(reinterpret_cast<T*>(mPtr->load()));
+		}
+
+
+		template<std::derived_from<T> T2>
+		T2* Cast() const
+		{
+			return dynamic_cast<T2*>(reinterpret_cast<T*>(mPtr->load()));
 		}
 
 
@@ -123,14 +140,14 @@ namespace Strawberry::Core
 		T& operator*() const noexcept
 		{
 			Core::Assert(IsValid());
-			return **mPtr;
+			return *reinterpret_cast<T*>(mPtr->load());
 		}
 
 
 		T* operator->() const noexcept
 		{
 			Core::Assert(IsValid());
-			return *mPtr;
+			return reinterpret_cast<T*>(mPtr->load());
 		}
 
 
@@ -143,7 +160,7 @@ namespace Strawberry::Core
 
 
 		T* Get() const noexcept
-		{ return IsValid() ? static_cast<T*>(*mPtr) : nullptr; }
+		{ return IsValid() ? reinterpret_cast<T*>(mPtr.get()) : nullptr; }
 
 
 		operator T*() const
@@ -151,7 +168,7 @@ namespace Strawberry::Core
 
 
 	protected:
-		explicit ReflexivePointer(std::shared_ptr<std::atomic<T*>> rawPtr) noexcept
+		explicit ReflexivePointer(std::shared_ptr<std::atomic<void*>> rawPtr) noexcept
 				: mPtr(std::move(rawPtr))
 		{
 			static_assert(std::derived_from<T, EnableReflexivePointer<T>>);
@@ -159,7 +176,7 @@ namespace Strawberry::Core
 
 
 	private:
-		std::shared_ptr<std::atomic<T*>> mPtr;
+		std::shared_ptr<std::atomic<void*>> mPtr;
 	};
 
 
@@ -169,7 +186,7 @@ namespace Strawberry::Core
 	{
 	public:
 		EnableReflexivePointer() noexcept
-				: mPtr(std::make_shared<std::atomic<T*>>(static_cast<T*>(this)))
+				: mPtr(std::make_shared<std::atomic<void*>>(static_cast<void*>(this)))
 		{
 			static_assert(std::derived_from<T, EnableReflexivePointer<T>>);
 		}
@@ -219,11 +236,11 @@ namespace Strawberry::Core
 
 		ReflexivePointer<T> GetReflexivePointer() const
 		{
-			return ReflexivePointer(mPtr);
+			return ReflexivePointer<T>(mPtr);
 		}
 
 
 	private:
-		std::shared_ptr<std::atomic<T*>> mPtr;
+		std::shared_ptr<std::atomic<void*>> mPtr;
 	};
 }
