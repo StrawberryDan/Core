@@ -30,7 +30,7 @@ Strawberry::Core::IO::DynamicByteBuffer::FromFile(const std::filesystem::path& p
 }
 
 
-Strawberry::Core::Optional<std::tuple<Strawberry::Core::Math::Vec2i, int, Strawberry::Core::IO::DynamicByteBuffer>>
+Strawberry::Core::Optional<std::tuple<Strawberry::Core::Math::Vec2u, int, Strawberry::Core::IO::DynamicByteBuffer>>
 Strawberry::Core::IO::DynamicByteBuffer::FromImage(const std::filesystem::path& path)
 {
 	if (std::filesystem::exists(path))
@@ -46,7 +46,7 @@ Strawberry::Core::IO::DynamicByteBuffer::FromImage(const std::filesystem::path& 
 		stbi_image_free(data);
 
 		Core::AssertEQ(size[0] * size[1] * desiredChannels, bytes.Size());
-		return {size, desiredChannels, bytes};
+		return {size.AsType<unsigned int>(), desiredChannels, bytes};
 	}
 	else
 	{
