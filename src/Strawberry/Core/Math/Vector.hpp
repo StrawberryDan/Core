@@ -81,6 +81,16 @@ namespace Strawberry::Core::Math
 		constexpr const T& operator[](size_t i) const noexcept { return mValue[i]; }
 
 
+		/// Apply function to all members
+		template <typename F>
+		constexpr Vector Map(F function) const noexcept
+		{
+			Vector result;
+			for (int i = 0; i < D; i++) result[i] = function((*this)[i]);
+			return result;
+		}
+
+
 		/// get implementation for structured binding
 		template<size_t I>
 		constexpr T& get()
