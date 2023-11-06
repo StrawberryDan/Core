@@ -9,16 +9,19 @@ if (NOT TARGET StrawberryCore)
 	find_package(OpenSSL REQUIRED)
 
 	FetchContent_Declare(FMT
+			EXCLUDE_FROM_ALL
 			GIT_REPOSITORY "https://github.com/fmtlib/fmt.git"
 			GIT_TAG "10.1.1")
 	FetchContent_MakeAvailable(FMT)
 
 	FetchContent_Declare(JSON
+			EXCLUDE_FROM_ALL
 			GIT_REPOSITORY "https://github.com/nlohmann/json.git"
 			GIT_TAG "v3.11.2")
 	FetchContent_MakeAvailable(JSON)
 
 	FetchContent_Declare(STB
+			EXCLUDE_FROM_ALL
 			GIT_REPOSITORY "https://github.com/nothings/stb.git"
 			CONFIGURE_COMMAND ""
 			BUILD_COMMAND ""
