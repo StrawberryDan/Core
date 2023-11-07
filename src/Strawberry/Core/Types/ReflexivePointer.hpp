@@ -225,13 +225,7 @@ namespace Strawberry::Core
 		}
 
 
-		~EnableReflexivePointer()
-		{
-			if (mPtr)
-			{
-				*mPtr = nullptr;
-			}
-		}
+		~EnableReflexivePointer() = default;
 
 
 		ReflexivePointer<T> GetReflexivePointer() const
