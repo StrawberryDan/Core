@@ -6,7 +6,7 @@ if (NOT TARGET StrawberryCore)
 	include(ExternalProject)
 
 
-	find_package(OpenSSL REQUIRED)
+#	find_package(OpenSSL REQUIRED)
 
 	FetchContent_Declare(FMT
 			EXCLUDE_FROM_ALL
@@ -75,17 +75,17 @@ if (NOT TARGET StrawberryCore)
 			src/Strawberry/Core/Markers.cpp
 			src/Strawberry/Core/Net/Address.cpp
 			src/Strawberry/Core/Net/Endpoint.cpp
-			src/Strawberry/Core/Net/HTTP/Client.cpp
-			src/Strawberry/Core/Net/HTTP/Constants.cpp
-			src/Strawberry/Core/Net/HTTP/Header.cpp
-			src/Strawberry/Core/Net/HTTP/Request.cpp
-			src/Strawberry/Core/Net/HTTP/Response.cpp
-			src/Strawberry/Core/Net/Socket/API.cpp
-			src/Strawberry/Core/Net/Socket/TCPClient.cpp
-			src/Strawberry/Core/Net/Socket/TLSClient.cpp
-			src/Strawberry/Core/Net/Socket/UDPClient.cpp
-			src/Strawberry/Core/Net/Websocket/Client.cpp
-			src/Strawberry/Core/Net/Websocket/Message.cpp
+#			src/Strawberry/Core/Net/HTTP/Client.cpp
+#			src/Strawberry/Core/Net/HTTP/Constants.cpp
+#			src/Strawberry/Core/Net/HTTP/Header.cpp
+#			src/Strawberry/Core/Net/HTTP/Request.cpp
+#			src/Strawberry/Core/Net/HTTP/Response.cpp
+#			src/Strawberry/Core/Net/Socket/API.cpp
+#			src/Strawberry/Core/Net/Socket/TCPClient.cpp
+#			src/Strawberry/Core/Net/Socket/TLSClient.cpp
+#			src/Strawberry/Core/Net/Socket/UDPClient.cpp
+#			src/Strawberry/Core/Net/Websocket/Client.cpp
+#			src/Strawberry/Core/Net/Websocket/Message.cpp
 			src/Strawberry/Core/Timing/ScopedTimer.cpp
 			src/Strawberry/Core/Thread/RepeatingTask.hpp
 			src/Strawberry/Core/Timing/Metronome.cpp
@@ -117,7 +117,7 @@ if (NOT TARGET StrawberryCore)
 	target_include_directories(StrawberryCore
 			PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
 			PRIVATE ${STB_SOURCE_DIR})
-	target_link_libraries(StrawberryCore PUBLIC OpenSSL::SSL OpenSSL::Crypto nlohmann_json::nlohmann_json fmt::fmt-header-only)
+	target_link_libraries(StrawberryCore PUBLIC nlohmann_json::nlohmann_json fmt::fmt-header-only)
 	set_target_properties(StrawberryCore PROPERTIES CXX_STANDARD 20)
 
 	if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
