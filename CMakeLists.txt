@@ -6,8 +6,6 @@ if (NOT TARGET StrawberryCore)
 	include(ExternalProject)
 
 
-#	find_package(OpenSSL REQUIRED)
-
 	FetchContent_Declare(FMT
 			EXCLUDE_FROM_ALL
 			GIT_REPOSITORY "https://github.com/fmtlib/fmt.git"
@@ -48,22 +46,6 @@ if (NOT TARGET StrawberryCore)
 			src/Strawberry/Core/Math/Periodic.hpp
 			src/Strawberry/Core/Math/Rational.hpp
 			src/Strawberry/Core/Sync/Mutex.hpp
-			src/Strawberry/Core/Net/Address.hpp
-			src/Strawberry/Core/Net/Endpoint.hpp
-			src/Strawberry/Core/Net/Error.hpp
-			src/Strawberry/Core/Net/HTTP/Client.hpp
-			src/Strawberry/Core/Net/HTTP/Client.inl
-			src/Strawberry/Core/Net/HTTP/Constants.hpp
-			src/Strawberry/Core/Net/HTTP/Header.hpp
-			src/Strawberry/Core/Net/HTTP/Request.hpp
-			src/Strawberry/Core/Net/HTTP/Response.hpp
-			src/Strawberry/Core/Net/Socket/API.hpp
-			src/Strawberry/Core/Net/Socket/TCPClient.hpp
-			src/Strawberry/Core/Net/Socket/TLSClient.hpp
-			src/Strawberry/Core/Net/Socket/UDPClient.hpp
-			src/Strawberry/Core/Net/Websocket/Client.hpp
-			src/Strawberry/Core/Net/Websocket/Client.inl
-			src/Strawberry/Core/Net/Websocket/Message.hpp
 			src/Strawberry/Core/Types/Optional.hpp
 			src/Strawberry/Core/Types/Result.hpp
 			src/Strawberry/Core/Timing/ScopedTimer.hpp
@@ -73,19 +55,6 @@ if (NOT TARGET StrawberryCore)
 			src/Strawberry/Core/IO/DynamicByteBuffer.cpp
 			src/Strawberry/Core/IO/Logging.cpp
 			src/Strawberry/Core/Markers.cpp
-			src/Strawberry/Core/Net/Address.cpp
-			src/Strawberry/Core/Net/Endpoint.cpp
-#			src/Strawberry/Core/Net/HTTP/Client.cpp
-#			src/Strawberry/Core/Net/HTTP/Constants.cpp
-#			src/Strawberry/Core/Net/HTTP/Header.cpp
-#			src/Strawberry/Core/Net/HTTP/Request.cpp
-#			src/Strawberry/Core/Net/HTTP/Response.cpp
-#			src/Strawberry/Core/Net/Socket/API.cpp
-#			src/Strawberry/Core/Net/Socket/TCPClient.cpp
-#			src/Strawberry/Core/Net/Socket/TLSClient.cpp
-#			src/Strawberry/Core/Net/Socket/UDPClient.cpp
-#			src/Strawberry/Core/Net/Websocket/Client.cpp
-#			src/Strawberry/Core/Net/Websocket/Message.cpp
 			src/Strawberry/Core/Timing/ScopedTimer.cpp
 			src/Strawberry/Core/Thread/RepeatingTask.hpp
 			src/Strawberry/Core/Timing/Metronome.cpp
@@ -119,10 +88,6 @@ if (NOT TARGET StrawberryCore)
 			PRIVATE ${STB_SOURCE_DIR})
 	target_link_libraries(StrawberryCore PUBLIC nlohmann_json::nlohmann_json fmt::fmt-header-only)
 	set_target_properties(StrawberryCore PROPERTIES CXX_STANDARD 20)
-
-	if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-		target_link_libraries(StrawberryCore PUBLIC ws2_32)
-	endif ()
 
 
 	add_executable(StrawberryCoreTest
