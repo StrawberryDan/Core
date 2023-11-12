@@ -13,11 +13,6 @@
 #include "Strawberry/Core/Math/Matrix.hpp"
 #include "Strawberry/Core/Math/Periodic.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
-#include "Strawberry/Net/Endpoint.hpp"
-#include "Strawberry/Net/HTTP/Client.hpp"
-#include "Strawberry/Net/Socket/API.hpp"
-#include "Strawberry/Net/Socket/TCPClient.hpp"
-#include "Strawberry/Net/Socket/TLSClient.hpp"
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Types/Uninitialised.hpp"
 #include "Strawberry/Core/UTF.hpp"
@@ -66,54 +61,6 @@ namespace Test
 
 			Assert(randomBytes.Size() == len);
 			CheckBytes(randomBytes);
-		}
-	}
-
-	void ParseIP()
-	{
-		auto ip = Net::IPv4Address::Parse("255.255.255.255").Unwrap();
-		Assert(ip.AsString() == "255.255.255.255");
-	}
-
-	void DNS()
-	{
-		auto justnoise = Strawberry::Net::Endpoint::Resolve("justnoise.net", 80);
-		auto google    = Strawberry::Net::Endpoint::Resolve("google.com", 80);
-		Assert(google || justnoise);
-	}
-
-	void TCP()
-	{
-		auto google = Strawberry::Net::Endpoint::Resolve("google.com", 80).Unwrap();
-		auto client = Strawberry::Net::Socket::TCPClient::Connect(google).Unwrap();
-	}
-
-	void TLS()
-	{
-		{
-			auto google = Strawberry::Net::Endpoint::Resolve("google.com", 443).Unwrap();
-			auto client = Strawberry::Net::Socket::TLSClient::Connect(google).Unwrap();
-		}
-		{
-			auto google = Strawberry::Net::Endpoint::Resolve("google.com", 443).Unwrap();
-			auto client = Strawberry::Net::Socket::TLSClient::Connect(google).Unwrap();
-		}
-	}
-
-	void HTTP()
-	{
-		{
-			auto                                 http = Strawberry::Net::HTTP::HTTPSClient(Net::Endpoint::Resolve("google.com", 443).Unwrap());
-			Strawberry::Net::HTTP::Request request(Strawberry::Net::HTTP::Verb::GET, "/");
-			http.SendRequest(request);
-			auto response = http.Receive();
-		}
-
-		{
-			auto                                 http = Strawberry::Net::HTTP::HTTPSClient(Net::Endpoint::Resolve("api.agify.io", 443).Unwrap());
-			Strawberry::Net::HTTP::Request request(Strawberry::Net::HTTP::Verb::GET, "/?name=dan");
-			http.SendRequest(request);
-			auto response = http.Receive();
 		}
 	}
 
@@ -260,18 +207,11 @@ namespace Test
 
 int main()
 {
-	Strawberry::Net::Socket::API::Initialise();
 	Test::Base64();
-	Test::ParseIP();
-	Test::DNS();
-	Test::TCP();
-	Test::TLS();
-	Test::HTTP();
 	Test::PeriodicNumbers();
 	Test::Uninitialised();
 	Test::ChannelBroadcasterReceiver();
 	Test::Vectors();
 	Test::Matrices();
 	Test::UTF();
-	Strawberry::Net::Socket::API::Terminate();
 }
