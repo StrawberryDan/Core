@@ -16,7 +16,11 @@ namespace Strawberry::Core
 	class Uninitialised
 	{
 	public:
-		Uninitialised() {}
+		Uninitialised()
+#if !NDEBUG
+				: mInitialised(false)
+#endif // !NDEBUG
+		{}
 
 
 		Uninitialised(const Uninitialised& rhs)
