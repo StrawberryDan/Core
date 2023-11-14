@@ -40,9 +40,11 @@ namespace Strawberry::Core
 	}
 
 
-	void Clock::Restart()
+	double Clock::Restart()
 	{
+		auto now = Read();
 		mBuffer    = {};
 		mStartTime = std::chrono::system_clock::now();
+		return now;
 	}
 } // namespace Strawberry::Core

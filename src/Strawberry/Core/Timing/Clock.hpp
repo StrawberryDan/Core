@@ -25,7 +25,7 @@ namespace Strawberry::Core
 
 		explicit operator Seconds() const { return Read(); }
 
-		void Restart();
+		Seconds Restart();
 
 	private:
 		using Duration = std::chrono::duration<double, std::ratio<1>>;
