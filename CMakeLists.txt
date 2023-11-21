@@ -82,7 +82,9 @@ if (NOT TARGET StrawberryCore)
 			src/Strawberry/Core/Types/DynamicValue.hpp
 			src/Strawberry/Core/Math/Transformations.hpp
             src/Strawberry/Core/Types/Delayed.hpp
-    )
+			src/Strawberry/Core/IO/Table.hpp
+			src/Strawberry/Core/IO/Table.cpp
+	)
 
 	target_include_directories(StrawberryCore
 			PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
