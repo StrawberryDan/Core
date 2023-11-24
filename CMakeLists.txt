@@ -84,6 +84,8 @@ if (NOT TARGET StrawberryCore)
             src/Strawberry/Core/Types/Delayed.hpp
 			src/Strawberry/Core/IO/Table.hpp
 			src/Strawberry/Core/IO/Table.cpp
+            src/Strawberry/Core/Types/Date.hpp
+			src/Strawberry/Core/Types/Date.cpp
 	)
 
 	target_include_directories(StrawberryCore
