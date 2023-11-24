@@ -60,7 +60,7 @@ namespace Strawberry::Core
 		Date& operator-=(const DateInterval& interval);
 
 
-		std::strong_ordering operator<=>(const Date& rhs) const = default;
+		std::partial_ordering operator<=>(const Date& rhs) const = default;
 
 
 		[[nodiscard]] bool IsLeapYear() const;
