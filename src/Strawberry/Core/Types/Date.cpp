@@ -86,6 +86,27 @@ namespace Strawberry::Core
 	}
 
 
+	void Date::SetYear(int32_t year)
+	{
+		mYear = year;
+		Core::Assert(IsValidDate());
+	}
+
+
+	void Date::SetMonth(uint8_t month)
+	{
+		mMonth = month;
+		Core::Assert(IsValidDate());
+	}
+
+
+	void Date::SetDay(uint8_t day)
+	{
+		mDay = day;
+		Core::Assert(IsValidDate());
+	}
+
+
 	Date Date::operator+(const DateInterval& interval) const
 	{
 		Date date(*this);

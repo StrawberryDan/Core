@@ -49,6 +49,11 @@ namespace Strawberry::Core
 		[[nodiscard]] int32_t GetDay() const;
 
 
+		void SetYear(int32_t year);
+		void SetMonth(uint8_t month);
+		void SetDay(uint8_t day);
+
+
 		Date operator+(const DateInterval& interval) const;
 		Date operator-(const DateInterval& interval) const;
 		Date& operator+=(const DateInterval& interval);
