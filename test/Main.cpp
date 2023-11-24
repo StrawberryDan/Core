@@ -259,6 +259,59 @@ namespace Test
 			Assert(c == 3);
 		}
 	}
+
+
+	void StaticClampedNumbers()
+	{
+		// Test clamped number addition
+		{
+			StaticClamped<int, 0, 10> a(5);
+			StaticClamped<int, 0, 10> b(5);
+			StaticClamped<int, 0, 10> c = a + b;
+			Assert(c == 10);
+		}
+
+		// Test addition which overflows bounds
+		{
+			StaticClamped<int, 0, 10> a(5);
+			StaticClamped<int, 0, 10> b(6);
+			StaticClamped<int, 0, 10> c = a + b;
+			Assert(c == 10);
+		}
+
+		// Test subtraction
+		{
+			StaticClamped<int, 0, 10> a(5);
+			StaticClamped<int, 0, 10> b(5);
+			StaticClamped<int, 0, 10> c = a - b;
+			Assert(c == 0);
+		}
+
+		// Test overflowing subtraction
+		{
+			StaticClamped<int, 0, 10> a(5);
+			StaticClamped<int, 0, 10> b(6);
+			StaticClamped<int, 0, 10> c = a - b;
+			Assert(c == 0);
+		}
+
+
+		// Test overflowing multiplication
+		{
+			StaticClamped<int, 0, 10> a(5);
+			StaticClamped<int, 0, 10> b(3);
+			StaticClamped<int, 0, 10> c = a * b;
+			Assert(c == 10);
+		}
+
+		// Test underflowing division
+		{
+			StaticClamped<int, 3, 10> a(5);
+			StaticClamped<int, 3, 10> b(3);
+			StaticClamped<int, 3, 10> c = a / b;
+			Assert(c == 3);
+		}
+	}
 } // namespace Test
 
 int main()
@@ -270,4 +323,6 @@ int main()
 	Test::Vectors();
 	Test::Matrices();
 	Test::UTF();
+	Test::ClampedNumbers();
+	Test::StaticClampedNumbers();
 }
