@@ -182,4 +182,172 @@ namespace Strawberry::Core::Math
 		T mMax;
 		T mValue;
 	};
+
+
+	template<typename T, T MIN, T MAX> requires std::integral<T> || std::floating_point<T>
+	class StaticClamped
+	{
+		public:
+		StaticClamped(T value = T{})
+			: mValue(std::clamp<T>(value, MIN, MAX))
+		{}
+
+
+		explicit operator T() const { return mValue; }
+
+
+		auto operator<=>(const StaticClamped&) const = default;
+
+
+		bool operator==(T rhs) const
+		{
+			return mValue == rhs;
+		}
+
+
+		bool operator!=(T rhs) const
+		{
+			return mValue != rhs;
+		}
+
+
+		bool operator<(T rhs) const
+		{
+			return mValue < rhs;
+		}
+
+
+		bool operator>(T rhs) const
+		{
+			return mValue > rhs;
+		}
+
+
+		bool operator<=(T rhs) const
+		{
+			return mValue <= rhs;
+		}
+
+
+		bool operator>=(T rhs) const
+		{
+			return mValue >= rhs;
+		}
+
+
+		StaticClamped operator+(const T& rhs) const
+		{
+			return StaticClamped(mValue + rhs);
+		}
+
+
+		StaticClamped operator-(const T& rhs) const
+		{
+			return StaticClamped(mValue - rhs);
+		}
+
+
+		StaticClamped operator*(const T& rhs) const
+		{
+			return StaticClamped(mValue * rhs);
+		}
+
+
+		StaticClamped operator/(const T& rhs) const
+		{
+			return StaticClamped(mValue / rhs);
+		}
+
+
+		StaticClamped& operator+=(const T& rhs)
+		{
+			mValue += rhs;
+			mValue = std::clamp<T>(mValue, MIN, MAX);
+			return *this;
+		}
+
+
+		StaticClamped& operator-=(const T& rhs)
+		{
+			mValue -= rhs;
+			mValue = std::clamp<T>(mValue, MIN, MAX);
+			return *this;
+		}
+
+
+		StaticClamped& operator*=(const T& rhs)
+		{
+			mValue *= rhs;
+			mValue = std::clamp<T>(mValue, MIN, MAX);
+			return *this;
+		}
+
+
+		StaticClamped& operator/=(const T& rhs)
+		{
+			mValue /= rhs;
+			mValue = std::clamp<T>(mValue, MIN, MAX);
+			return *this;
+		}
+
+
+		StaticClamped operator+(const StaticClamped& rhs) const
+		{
+			return StaticClamped(mValue + rhs.mValue);
+		}
+
+
+		StaticClamped operator-(const StaticClamped& rhs) const
+		{
+			return StaticClamped(mValue - rhs.mValue);
+		}
+
+
+		StaticClamped operator*(const StaticClamped& rhs) const
+		{
+			return StaticClamped(mValue * rhs.mValue);
+		}
+
+
+		StaticClamped operator/(const StaticClamped& rhs) const
+		{
+			return StaticClamped(mValue / rhs.mValue);
+		}
+
+
+		StaticClamped& operator+=(const StaticClamped& rhs)
+		{
+			mValue += rhs;
+			mValue = std::clamp<T>(mValue, MIN, MAX);
+			return *this;
+		}
+
+
+		StaticClamped& operator-=(const StaticClamped& rhs)
+		{
+			mValue -= rhs;
+			mValue = std::clamp<T>(mValue, MIN, MAX);
+			return *this;
+		}
+
+
+		StaticClamped& operator*=(const StaticClamped& rhs)
+		{
+			mValue *= rhs;
+			mValue = std::clamp<T>(mValue, MIN, MAX);
+			return *this;
+		}
+
+
+		StaticClamped& operator/=(const StaticClamped& rhs)
+		{
+			mValue /= rhs;
+			mValue = std::clamp<T>(mValue, MIN, MAX);
+			return *this;
+		}
+
+
+	private:
+		T mValue;
+	};
 }
