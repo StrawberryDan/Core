@@ -16,6 +16,7 @@
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Types/Uninitialised.hpp"
 #include "Strawberry/Core/UTF.hpp"
+#include "Strawberry/Core/Math/Clamped.hpp"
 
 
 using namespace Strawberry::Core;
@@ -127,6 +128,8 @@ namespace Test
 		Strawberry::Core::Assert(UninitialisedTester::numConstructed == 3);
 		data[1].Destruct();
 		Strawberry::Core::Assert(UninitialisedTester::numConstructed == 2);
+		data[0].Destruct();
+		data[2].Destruct();
 	}
 
 	void ChannelBroadcasterReceiver()
@@ -202,6 +205,59 @@ namespace Test
 		std::u32string b = U"兎田ぺこら";
 		std::u8string b8 = ToUTF8(b);
 		Assert(ToUTF32(b8) == b);
+	}
+
+
+	void ClampedNumbers()
+	{
+		// Test clamped number addition
+		{
+			Clamped<int> a(0, 10, 5);
+			Clamped<int> b(0, 10, 5);
+			Clamped<int> c = a + b;
+			Assert(c == 10);
+		}
+
+		// Test addition which overflows bounds
+		{
+			Clamped<int> a(0, 10, 5);
+			Clamped<int> b(0, 10, 6);
+			Clamped<int> c = a + b;
+			Assert(c == 10);
+		}
+
+		// Test subtraction
+		{
+			Clamped<int> a(0, 10, 5);
+			Clamped<int> b(0, 10, 5);
+			Clamped<int> c = a - b;
+			Assert(c == 0);
+		}
+
+		// Test overflowing subtraction
+		{
+			Clamped<int> a(0, 10, 5);
+			Clamped<int> b(0, 10, 6);
+			Clamped<int> c = a - b;
+			Assert(c == 0);
+		}
+
+
+		// Test overflowing multiplication
+		{
+			Clamped<int> a(0, 10, 5);
+			Clamped<int> b(0, 10, 3);
+			Clamped<int> c = a * b;
+			Assert(c == 10);
+		}
+
+		// Test underflowing division
+		{
+			Clamped<int> a(3, 10, 5);
+			Clamped<int> b(3, 10, 3);
+			Clamped<int> c = a / b;
+			Assert(c == 3);
+		}
 	}
 } // namespace Test
 
