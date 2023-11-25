@@ -208,7 +208,7 @@ namespace Strawberry::Core
 		}
 
 
-		~EnableReflexivePointer() = default;
+		virtual ~EnableReflexivePointer() = default;
 
 
 		ReflexivePointer<T> GetReflexivePointer() const
