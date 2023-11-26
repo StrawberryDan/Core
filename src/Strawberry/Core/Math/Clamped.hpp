@@ -23,7 +23,8 @@ namespace Strawberry::Core::Math
 		{}
 
 
-		explicit operator T() const { return mValue; }
+		operator T() const { return mValue; }
+		T operator*() const { return mValue; }
 
 
 		auto operator<=>(const Clamped&) const = default;
@@ -187,13 +188,14 @@ namespace Strawberry::Core::Math
 	template<typename T, T MIN, T MAX> requires std::integral<T> || std::floating_point<T>
 	class StaticClamped
 	{
-		public:
+	public:
 		StaticClamped(T value = T{})
 			: mValue(std::clamp<T>(value, MIN, MAX))
 		{}
 
 
-		explicit operator T() const { return mValue; }
+		operator T() const { return mValue; }
+		T operator*() const { return mValue; }
 
 
 		auto operator<=>(const StaticClamped&) const = default;
