@@ -87,6 +87,7 @@ if (NOT TARGET StrawberryCore)
             src/Strawberry/Core/Types/Date.hpp
 			src/Strawberry/Core/Types/Date.cpp
 			src/Strawberry/Core/Math/Clamped.hpp
+			src/Strawberry/Core/IO/CallbackChannelReceiver.hpp
 	)
 
 	target_include_directories(StrawberryCore
