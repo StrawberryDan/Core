@@ -174,6 +174,15 @@ namespace Strawberry::Core::Math
 		constexpr friend Vector operator/(const Vector& a, T b) noexcept { return a * (T(1) / b); }
 
 
+		/// Define Component-wise division
+		constexpr friend Vector operator/(const Vector& a, const Vector& b)
+		{
+			Vector result;
+			for (int i = 0; i < D; i++) result[i] = a[i] / b[i];
+			return result;
+		}
+
+
 		/// Define Magnitude
 		[[nodiscard]] double Magnitude() const noexcept { return std::sqrt(SquareMagnitude()); }
 
