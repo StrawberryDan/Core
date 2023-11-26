@@ -202,7 +202,7 @@ namespace Strawberry::Core
 		//  State Modification
 		//----------------------------------------------------------------------------------------------------------------------
 		template<typename... Args>
-		void Emplace(Args... args)
+		void Emplace(Args&&... args)
 		{
 			if (mHasValue)
 			{ std::destroy_at(&mPayload); }
