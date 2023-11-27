@@ -183,6 +183,38 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Define addition assignment
+		Vector& operator+=(const Vector& rhs) noexcept
+		{
+			*this = *this + rhs;
+			return *this;
+		}
+
+
+		/// Define subtraction assignment
+		Vector& operator-=(const Vector& rhs) noexcept
+		{
+			*this = *this - rhs;
+			return *this;
+		}
+
+
+		/// Define multiplication assignment
+		Vector& operator*=(const Vector& rhs) noexcept
+		{
+			*this = *this * rhs;
+			return *this;
+		}
+
+
+		/// Define scalar division assignment
+		Vector& operator/=(const Vector& rhs) noexcept
+		{
+			*this = *this / rhs;
+			return *this;
+		}
+
+
 		/// Define Magnitude
 		[[nodiscard]] double Magnitude() const noexcept { return std::sqrt(SquareMagnitude()); }
 
