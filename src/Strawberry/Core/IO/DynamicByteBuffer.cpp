@@ -108,10 +108,7 @@ std::vector<uint8_t> Strawberry::Core::IO::DynamicByteBuffer::AsVector<uint8_t>(
 
 std::string Strawberry::Core::IO::DynamicByteBuffer::AsString() const
 {
-
-	std::string string(Size(), 0);
-	memcpy(string.data(), Data(), Size());
-	return string;
+	return {reinterpret_cast<const char*>(Data()), Size()};
 }
 
 
