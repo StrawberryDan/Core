@@ -15,7 +15,7 @@ if (NOT TARGET StrawberryCore)
 	FetchContent_Declare(JSON
 			EXCLUDE_FROM_ALL
 			GIT_REPOSITORY "https://github.com/nlohmann/json.git"
-			GIT_TAG "v3.11.2")
+			GIT_TAG "v3.11.3")
 	FetchContent_MakeAvailable(JSON)
 
 	FetchContent_Declare(STB
