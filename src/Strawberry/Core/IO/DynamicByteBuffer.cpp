@@ -16,17 +16,15 @@ Strawberry::Core::IO::DynamicByteBuffer::FromFile(const std::filesystem::path& p
 			return {};
 		}
 
-		file.seekg(0, file.end);
+		file.seekg(0, std::ifstream::end);
 		auto length = file.tellg();
-		file.seekg(0, file.beg);
+		file.seekg(0, std::ifstream::beg);
 		DynamicByteBuffer buffer = DynamicByteBuffer::Zeroes(length);
 		file.read(reinterpret_cast<char*>(buffer.Data()), length);
 		return buffer;
 	}
-	else
-	{
-		return {};
-	}
+
+	return {};
 }
 
 
