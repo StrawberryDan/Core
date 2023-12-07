@@ -178,6 +178,36 @@ namespace Strawberry::Core::Math
 		}
 
 
+		Clamped& operator++()
+		{
+			*this += 1;
+			return *this;
+		}
+
+
+		Clamped& operator--()
+		{
+			*this -= 1;
+			return *this;
+		}
+
+
+		Clamped operator++(int)
+		{
+			Clamped copy = *this;
+			*this += 1;
+			return copy;
+		}
+
+
+		Clamped operator--(int)
+		{
+			Clamped copy = *this;
+			*this -= 1;
+			return copy;
+		}
+
+
 	private:
 		T mMin;
 		T mMax;
@@ -346,6 +376,36 @@ namespace Strawberry::Core::Math
 			mValue /= rhs;
 			mValue = std::clamp<T>(mValue, MIN, MAX);
 			return *this;
+		}
+
+
+		StaticClamped& operator++()
+		{
+			*this += 1;
+			return *this;
+		}
+
+
+		StaticClamped& operator--()
+		{
+			*this -= 1;
+			return *this;
+		}
+
+
+		StaticClamped operator++(int)
+		{
+			StaticClamped copy = *this;
+			*this += 1;
+			return copy;
+		}
+
+
+		StaticClamped operator--(int)
+		{
+			StaticClamped copy = *this;
+			*this -= 1;
+			return copy;
 		}
 
 
