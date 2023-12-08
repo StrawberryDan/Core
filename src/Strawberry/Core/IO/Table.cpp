@@ -61,6 +61,7 @@ namespace Strawberry::Core::IO::Table
 					currentData += c;
 				}
 			}
+			if (!currentData.empty()) data.emplace_back(std::move(currentData));
 
 			return data;
 		};
