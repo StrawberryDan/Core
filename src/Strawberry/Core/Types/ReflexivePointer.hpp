@@ -35,6 +35,11 @@ namespace Strawberry::Core
 		{}
 
 
+		explicit ReflexivePointer(EnableReflexivePointer<T>& base) noexcept
+			: ReflexivePointer(base.GetReflexivePointer())
+		{}
+
+
 		explicit ReflexivePointer(const EnableReflexivePointer<T>& base) noexcept
 			: ReflexivePointer(base.GetReflexivePointer())
 		{}
