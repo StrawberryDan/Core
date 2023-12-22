@@ -4,8 +4,8 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include <concepts>
-#include <type_traits>
 #include <utility>
+#include <cmath>
 
 
 namespace Strawberry::Core::Math
@@ -38,5 +38,13 @@ namespace Strawberry::Core::Math
 	auto RoundDownToMultiple(A value, B multiple)
 	{
 		return multiple * (value / multiple);
+	}
+
+
+	template <std::floating_point A>
+	A RoundToDecimalPoints(A value, unsigned int decimalPoints)
+	{
+		A magnitude = std::pow<A>(10, decimalPoints);
+		return std::round(value * magnitude) / magnitude;
 	}
 } // namespace Strawberry::Core::Math
