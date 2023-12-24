@@ -17,6 +17,7 @@
 #include "Strawberry/Core/Types/Uninitialised.hpp"
 #include "Strawberry/Core/UTF.hpp"
 #include "Strawberry/Core/Math/Clamped.hpp"
+#include "Strawberry/Core/Math/AABB.hpp"
 
 
 using namespace Strawberry::Core;
