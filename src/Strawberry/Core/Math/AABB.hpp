@@ -47,7 +47,6 @@ namespace Strawberry::Core::Math
                 const bool a = mPosition[i]        >= other.Position()[i] && mPosition[i]       <= other.Position()[i] + other.Extent()[i];
                 const bool b = other.Position()[i] >= Position()[i]       && other.mPosition[i] <= Position()[i]       + Extent()[i];
                 if (!a && !b) return false;
-
             }
 
             return true;
