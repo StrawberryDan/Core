@@ -17,16 +17,16 @@ namespace Strawberry::Core
 	{
 	public:
 		Uninitialised()
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 				: mInitialised(false)
-#endif // !NDEBUG
+#endif // STRAWBERRY_DEBUG
 		{}
 
 
 		Uninitialised(const Uninitialised& rhs)
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 			: mInitialised(rhs.mInitialised)
-#endif // !NDEBUG
+#endif // STRAWBERRY_DEBUG
 		{
 			std::memcpy(&mPayload, &rhs.mPayload, sizeof(T));
 		}
@@ -34,9 +34,9 @@ namespace Strawberry::Core
 
 		Uninitialised& operator=(const Uninitialised& rhs)
 		{
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 			mInitialised = rhs.mInitialised;
-#endif // !NDEBUG
+#endif // STRAWBERRY_DEBUG
 			std::memcpy(&mPayload, &rhs.mPayload, sizeof(T));
 		}
 
@@ -49,9 +49,9 @@ namespace Strawberry::Core
 
 		~Uninitialised()
 		{
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 			Core::Assert(!mInitialised);
-#endif // !NDEBUG
+#endif // STRAWBERRY_DEBUG
 		}
 
 		template <typename... Args>
@@ -59,18 +59,18 @@ namespace Strawberry::Core
 		void Construct(Args... args)
 		{
 			std::construct_at(&mPayload, std::forward<Args>(args)...);
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 			Core::Assert(!mInitialised);
 			mInitialised = true;
-#endif // !NDEBUG
+#endif // STRAWBERRY_DEBUG
 		}
 
 		void Destruct()
 		{
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 			Core::Assert(mInitialised);
 			mInitialised = false;
-#endif // !NDEBUG
+#endif // STRAWBERRY_DEBUG
 			std::destroy_at(&mPayload);
 		}
 
@@ -89,9 +89,9 @@ namespace Strawberry::Core
 		const T* operator->() const { return &mPayload; }
 
 	private:
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 		bool mInitialised = false;
-#endif // !NDEBUG
+#endif // STRAWBERRY_DEBUG
 		union
 		{
 			T mPayload;

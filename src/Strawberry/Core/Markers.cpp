@@ -13,7 +13,7 @@ namespace Strawberry::Core
 {
 	void DebugBreak()
 	{
-#ifndef NDEBUG
+#ifndef STRAWBERRY_RELEASE
 #if defined(_WIN32)
 		__debugbreak();
 #elif defined(__UNIX) || defined(__APPLE__)

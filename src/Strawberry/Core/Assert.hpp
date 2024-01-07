@@ -14,10 +14,10 @@ namespace Strawberry::Core
 {
 	inline constexpr void Assert([[maybe_unused]] bool value)
 	{
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 		if (!value) { DebugBreak(); }
 		else { return; }
-#endif // !NDEBUG
+#endif // STRAWBERRY_DEBUG
 	}
 
 	template <typename A, typename B>
