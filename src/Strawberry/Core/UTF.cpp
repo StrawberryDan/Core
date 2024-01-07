@@ -9,6 +9,7 @@
 #include <vector>
 #include <bit>
 #include <algorithm>
+#include <cstdint>
 
 
 namespace Strawberry::Core
