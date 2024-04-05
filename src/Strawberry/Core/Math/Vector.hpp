@@ -72,6 +72,7 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Appends additional values to the end of the vector
 		template <typename... Args> requires (std::convertible_to<Args, T> && ...)
 		constexpr Vector<T, D + sizeof...(Args)> WithAdditionalValues(Args... args) const
 		{
