@@ -7,6 +7,7 @@
 // Standard Library
 #include <concepts>
 #include <cmath>
+#include <memory>
 #include <tuple>
 
 //======================================================================================================================
@@ -297,17 +298,32 @@ namespace Strawberry::Core::Math
 	using Vec4u = Vector<unsigned int, 4>;
 } // namespace Strawberry::Core::Math
 
+
+// Standard Library Helper Structs
 namespace std
 {
+	// For Destructuring
 	template<size_t I, typename T, size_t D>
 	struct tuple_element<I, Strawberry::Core::Math::Vector<T, D>>
 	{
 		using type = T;
 	};
 
+	// For Destructuring
 	template<typename T, size_t D>
 	struct tuple_size<Strawberry::Core::Math::Vector<T, D>>
 		: public std::integral_constant<size_t, D>
+	{};
+
+	// For Hashing
+	template<typename T, size_t D>
+	struct hash<Strawberry::Core::Math::Vector<T, D>>
 	{
+		std::size_t operator()(const Strawberry::Core::Math::Vector<T, D>& value) const noexcept
+		{
+			std::size_t hash = 0;
+			for (unsigned int i = 0; i < D; i++) hash = hash xor std::hash<T>()(value[i]);
+			return hash;
+		}
 	};
 } // namespace std
