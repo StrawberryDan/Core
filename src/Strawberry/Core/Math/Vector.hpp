@@ -63,6 +63,15 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Offsets the vector by the given args. Shorthand for adding a constant vector.
+		template<typename... Args> requires (sizeof...(Args) == D && (std::convertible_to<T, Args> && ...))
+		constexpr Vector<T, D> Offset(Args... args) const noexcept
+		{
+			Vector<T, D> offset(static_cast<Args>(args)...);
+			return *this + offset;
+		}
+
+
 		template <typename... Args> requires (std::convertible_to<Args, T> && ...)
 		constexpr Vector<T, D + sizeof...(Args)> WithAdditionalValues(Args... args) const
 		{
