@@ -62,7 +62,7 @@ namespace Strawberry::Core
 
 
 		ReflexivePointer(ReflexivePointer&& rhs) noexcept
-				: mPtr(std::move(rhs.mPtr))
+			: mPtr(std::move(rhs.mPtr))
 		{}
 
 
