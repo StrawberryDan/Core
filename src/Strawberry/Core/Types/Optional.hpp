@@ -691,14 +691,14 @@ namespace Strawberry::Core
 		}
 
 
-		auto Flatten()&
+		auto Flatten() &
 		requires (IsOptional<T>)
 		{
 			return HasValue() ? Value() : NullOpt;
 		}
 
 
-		auto Flatten()&&
+		auto Flatten() &&
 		requires (IsOptional<T>)
 		{
 			return HasValue() ? Unwrap() : NullOpt;
