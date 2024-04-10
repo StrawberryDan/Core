@@ -89,6 +89,22 @@ namespace Strawberry::Core
 		}
 
 
+		template <typename T>
+		Core::Optional<T*> Ptr()
+		{
+			Core::Assert(ContainsValue() && IsType<T>());
+			return std::get_if<T>(&mData);
+		}
+
+
+		template <typename T>
+		Core::Optional<const T*> Ptr() const&
+		{
+			Core::Assert(ContainsValue() && IsType<T>());
+			return static_cast<const T*>(std::get_if<T>(&mData));
+		}
+
+
 	private:
 		std::variant<Types...> mData;
 	};
