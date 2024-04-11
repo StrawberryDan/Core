@@ -41,10 +41,10 @@ namespace Strawberry::Core::Math
 
 
 		template<typename... Args>
-		requires (sizeof...(Args) == H * W && (std::same_as<T, Args> && ...))
+		requires (sizeof...(Args) == H * W && (std::convertible_to<T, Args> && ...))
 		constexpr Matrix(Args... args)
 		{
-			std::array<T, H * W> values {args...};
+			std::array<T, H * W> values {static_cast<T>(args)...};
 			for (size_t i = 0; i < values.size(); i++) mValue[i / W][i % W] = values[i];
 		}
 
