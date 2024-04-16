@@ -69,6 +69,11 @@ Strawberry::Core::IO::DynamicByteBuffer Strawberry::Core::IO::DynamicByteBuffer:
 }
 
 
+Strawberry::Core::IO::DynamicByteBuffer::DynamicByteBuffer(const std::string& string)
+		: DynamicByteBuffer(string.data(), string.size())
+{}
+
+
 size_t Strawberry::Core::IO::DynamicByteBuffer::Size() const
 {
 	return mData.size();
