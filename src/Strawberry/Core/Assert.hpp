@@ -20,6 +20,7 @@ namespace Strawberry::Core
 #endif // STRAWBERRY_DEBUG
 	}
 
+
 	template <typename A, typename B>
 	inline constexpr void AssertEQ([[maybe_unused]] A a, [[maybe_unused]] B b)
 	{
