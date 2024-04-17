@@ -121,64 +121,82 @@ namespace Strawberry::Core
 		}
 
 
-		Optional& operator=(NullOpt_t) { Reset(); }
+		Optional& operator=(NullOpt_t) noexcept { Reset(); }
 
 
-		Optional& operator=(const T& rhs)
-		requires(std::is_copy_assignable_v<T>)
+		Optional& operator=(const T& rhs) noexcept requires(std::is_copy_constructible_v<T> && std::is_copy_assignable_v<T>)
 		{
-			if (mHasValue)
-			{ std::destroy_at(&mPayload); }
-
-			mHasValue = true;
-			std::construct_at(&mPayload, rhs);
+			if (HasValue()) mPayload = std::move(rhs);
+			else Emplace(rhs);
 
 			return *this;
 		}
 
-		Optional& operator=(const Optional& rhs)
-		requires(std::is_copy_assignable_v<T>)
+
+		Optional& operator=(const Optional& rhs) noexcept requires(std::is_copy_constructible_v<T> && std::is_copy_assignable_v<T>)
 		{
 			if (this != &rhs)
 			{
-				if (!rhs.mHasValue && mHasValue)
-				{ std::destroy_at(&mPayload); }
-
-				if (rhs.mHasValue && mHasValue)
-				{ mPayload = *rhs; }
-				else if (rhs.mHasValue && !mHasValue)
-				{ std::construct_at(&mPayload, *rhs); }
-
-				mHasValue = rhs.mHasValue;
+				if (!rhs.HasValue() && HasValue()) Reset();
+				else if (rhs.HasValue() && HasValue()) mPayload = *rhs;
+				else if (rhs.HasValue() && !HasValue()) Emplace(*rhs);
 			}
 
 			return *this;
 		}
 
-		Optional& operator=(T&& rhs)
-		requires(std::is_move_assignable_v<T>)
-		{
-			if (mHasValue)
-			{ std::destroy_at(&mPayload); }
 
-			mHasValue = true;
-			std::construct_at(&mPayload, std::move(rhs));
+		Optional& operator=(const T& rhs) noexcept requires(std::is_copy_constructible_v<T> && !std::is_copy_assignable_v<T>)
+		{
+			Emplace(rhs);
 
 			return *this;
 		}
 
-		Optional& operator=(Optional&& rhs) noexcept
-		requires(std::is_move_assignable_v<T>)
+		Optional& operator=(const Optional& rhs) noexcept requires(std::is_copy_constructible_v<T> && !std::is_copy_assignable_v<T>)
 		{
 			if (this != &rhs)
 			{
-				if (!rhs.mHasValue && mHasValue)
-				{ Reset(); }
+				if (!rhs.HasValue()) Reset();
+				else Emplace(*rhs);
+			}
 
-				if (rhs.mHasValue && mHasValue)
-				{ mPayload = std::move(rhs.Unwrap()); }
-				else if (rhs.mHasValue && !mHasValue)
-				{ Emplace(std::move(rhs.Unwrap())); }
+			return *this;
+		}
+
+		Optional& operator=(T&& rhs) noexcept requires(std::is_move_constructible_v<T> && std::is_move_assignable_v<T>)
+		{
+			if (HasValue()) mPayload = std::move(rhs);
+			else Emplace(std::move(rhs));
+
+			return *this;
+		}
+
+		Optional& operator=(Optional&& rhs) noexcept requires(std::is_move_constructible_v<T> && std::is_move_assignable_v<T>)
+		{
+			if (this != &rhs)
+			{
+				if (!rhs.HasValue() && HasValue()) Reset();
+				else if (rhs.HasValue() && HasValue()) mPayload = std::move(rhs.Unwrap());
+				else if (rhs.HasValue() && !HasValue()) Emplace(std::move(rhs.Unwrap()));
+			}
+
+			return *this;
+		}
+
+		Optional& operator=(T&& rhs) noexcept requires(std::is_move_constructible_v<T> && !std::is_move_assignable_v<T>)
+		{
+			Emplace(std::move(rhs));
+
+			return *this;
+		}
+
+		Optional& operator=(Optional&& rhs) noexcept requires(std::is_move_constructible_v<T> && !std::is_move_assignable_v<T>)
+		{
+			if (this != &rhs)
+			{
+				if (!rhs.HasValue()) Reset();
+				else Emplace(std::move(rhs.Unwrap()));
 			}
 
 			return *this;
@@ -544,7 +562,7 @@ namespace Strawberry::Core
 			: mPayload(value) {}
 
 
-		Optional(const Optional& rhs)
+		Optional(const Optional& rhs) noexcept
 			: mPayload(rhs.HasValue() ? *rhs : nullptr) {}
 
 
@@ -552,10 +570,10 @@ namespace Strawberry::Core
 			: mPayload(std::exchange(rhs.mPayload, nullptr)) {}
 
 
-		Optional& operator=(NullOpt_t) { Reset(); }
+		Optional& operator=(NullOpt_t) noexcept { Reset(); }
 
 
-		Optional& operator=(T rhs)
+		Optional& operator=(T rhs) noexcept
 		{
 			mPayload = rhs;
 
@@ -563,7 +581,7 @@ namespace Strawberry::Core
 		}
 
 
-		Optional& operator=(const Optional& rhs)
+		Optional& operator=(const Optional& rhs) noexcept
 		requires(std::is_copy_assignable_v<T>)
 		{
 			if (this != &rhs)
