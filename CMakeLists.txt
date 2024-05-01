@@ -97,6 +97,7 @@ if (NOT TARGET StrawberryCore)
 			src/Strawberry/Core/Util/Strings.hpp
             src/Strawberry/Core/Types/Date.hpp
             src/Strawberry/Core/Types/Delayed.hpp
+			src/Strawberry/Core/Util/Image.hpp
 	)
 
 	target_include_directories(StrawberryCore
