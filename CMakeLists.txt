@@ -102,7 +102,7 @@ if (NOT TARGET StrawberryCore)
 
 	target_include_directories(StrawberryCore
 			PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
-			PRIVATE ${STB_SOURCE_DIR})
+			PUBLIC ${STB_SOURCE_DIR})
 	target_link_libraries(StrawberryCore PUBLIC nlohmann_json::nlohmann_json fmt::fmt-header-only)
 	set_target_properties(StrawberryCore PROPERTIES CXX_STANDARD 20)
 
