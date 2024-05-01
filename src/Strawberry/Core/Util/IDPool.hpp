@@ -16,7 +16,7 @@ namespace Strawberry::Core
 	class IDPool
 	{
 	public:
-		T Generate()
+		T Allocate()
 		{
 			if (mFreeIDs.empty()) { return mGreatestID++; }
 			else
