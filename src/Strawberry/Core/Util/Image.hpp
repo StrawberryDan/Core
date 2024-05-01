@@ -79,7 +79,7 @@ namespace Strawberry::Core::Util
 	Core::Result<Image<PixelType>, IO::Error> Image<PixelType>::FromFile(const std::filesystem::path& path) noexcept
 	{
 		int x, y, channelsInFile;
-		auto bytes = stbi_load(path.c_str(), &x, &y, &channelsInFile, PixelChannelCount<PixelType>());
+		auto bytes = stbi_load(path.string().c_str(), &x, &y, &channelsInFile, PixelChannelCount<PixelType>());
 
 		if (bytes == 0)
 		{
@@ -106,7 +106,7 @@ namespace Strawberry::Core::Util
 	PixelType Image<PixelType>::Read(uint32_t x, uint32_t y) const noexcept
 	{
 		const size_t stride = sizeof(PixelType) * mWidth;
-		return *reinterpret_cast<PixelType*>(mBytes.Data() + y * stride + x * sizeof(PixelType));
+		return *reinterpret_cast<const PixelType*>(mBytes.Data() + y * stride + x * sizeof(PixelType));
 	}
 
 
