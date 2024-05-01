@@ -32,7 +32,7 @@ namespace Strawberry::Core::Util
 	};
 
 	template <>
-	struct PixelChannelCount<PixelRGBA> : public std::integral_constant<uint32_t, 3>
+	struct PixelChannelCount<PixelRGBA> : public std::integral_constant<uint32_t, 4>
 	{};
 
 
