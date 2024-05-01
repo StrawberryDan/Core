@@ -8,5 +8,6 @@ namespace Strawberry::Core::IO
 		Unknown,
 		Closed,
 		EndOfFile,
+		NotFound,
 	};
 }
