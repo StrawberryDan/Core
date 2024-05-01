@@ -16,6 +16,16 @@ namespace Strawberry::Core::Util
 	struct PixelChannelCount {};
 
 
+	struct PixelGreyscale
+	{
+		uint8_t g;
+	};
+
+	template <>
+	struct PixelChannelCount<PixelGreyscale> : public std::integral_constant<uint32_t, 1>
+	{};
+
+
 	struct PixelRGB
 	{
 		uint8_t r, g, b;
