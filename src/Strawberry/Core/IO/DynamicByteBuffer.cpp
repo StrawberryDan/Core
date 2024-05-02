@@ -1,7 +1,6 @@
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 #include <fstream>
 
-#define STB_IMAGE_IMPLEMENTATION 1
 #include "stb_image.h"
 
 

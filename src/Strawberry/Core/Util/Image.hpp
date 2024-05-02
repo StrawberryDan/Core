@@ -5,6 +5,7 @@
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 // STB
 #include "stb_image.h"
+#include "stb_image_write.h"
 
 
 //======================================================================================================================
@@ -66,6 +67,9 @@ namespace Strawberry::Core::Util
 
 		PixelType* Data() noexcept;
 		const PixelType* Data() const noexcept;
+
+
+		void Save(const std::filesystem::path& path, unsigned int quality = 100) const noexcept;
 
 
 	private:
@@ -143,5 +147,29 @@ namespace Strawberry::Core::Util
 	const PixelType* Image<PixelType>::Data() const noexcept
 	{
 		return reinterpret_cast<PixelType*>(mBytes.Data());
+	}
+
+
+	template<typename PixelType>
+	void Image<PixelType>::Save(const std::filesystem::path& path, unsigned int quality) const noexcept
+	{
+		if (path.extension() == ".png")
+		{
+			int x = mWidth, y = mHeight;
+			auto result = stbi_write_png(path.string().c_str(), x, y, PixelChannelCount<PixelType>(), mBytes.Data(), y * sizeof(PixelType));
+			Core::Assert(result != 0);
+		}
+		else if (path.extension() == ".bmp")
+		{
+			int x = mWidth, y = mHeight;
+			auto result = stbi_write_bmp(path.string().c_str(), x, y, PixelChannelCount<PixelType>(), mBytes.Data());
+			Core::Assert(result != 0);
+		}
+		else if (path.extension() == ".jpg")
+		{
+			int x = mWidth, y = mHeight;
+			auto result = stbi_write_jpg(path.string().c_str(), x, y, PixelChannelCount<PixelType>(), mBytes.Data(), quality);
+			Core::Assert(result != 0);
+		}
 	}
 }
