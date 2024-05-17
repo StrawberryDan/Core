@@ -10,6 +10,7 @@
 #include "Strawberry/Core/Types/Optional.hpp"
 // Standard Library
 #include <memory>
+#include <vector>
 
 //======================================================================================================================
 //  Class Definitions
@@ -65,6 +66,24 @@ namespace Strawberry::Core::Collection
 
 
 		[[nodiscard]] bool AtCapacity() const { return Capacity() == Size(); }
+
+
+		void Resize(size_t newSize)
+		{
+			Core::Assert(newSize > Size());
+
+			std::vector<T> newData;
+			newData.reserve(newSize);
+
+			while (!Empty()) newData.emplace_back(std::move(Pop().Unwrap()));
+
+			mHead = Math::DynamicPeriodic(newSize, (size_t) 0);
+			mTail = Math::DynamicPeriodic(newSize, (size_t) 0);
+			mSize = 0;
+
+			mData = std::vector<Uninitialised<T>>(newSize, Uninitialised<T>());
+			for (auto& value : newData) Push(std::move(value));
+		}
 
 
 		void Clear()
