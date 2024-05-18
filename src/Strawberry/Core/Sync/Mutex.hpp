@@ -54,8 +54,8 @@ namespace Strawberry::Core
 	{
 	public:
 		template <typename... Ts>
-		explicit Mutex(Ts... ts)
-			requires ((sizeof...(Ts) == 0 && std::default_initializable<T>) || sizeof...(Ts) > 0)
+		Mutex(Ts... ts)
+			requires (std::constructible_from<T, Ts...>)
 			: mMutex()
 			, mPayload(std::forward<Ts>(ts)...)
 		{}
