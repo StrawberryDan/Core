@@ -211,28 +211,24 @@ namespace Strawberry::Core::Math
 
 		DynamicPeriodic operator+(DynamicPeriodic rhs) const
 		{
-			rhs.SetMax(mMax);
 			return DynamicPeriodic(mMax, (mValue + rhs.mValue) % mMax);
 		}
 
 
 		DynamicPeriodic operator-(DynamicPeriodic rhs) const
 		{
-			rhs.SetMax(mMax);
 			return rhs.mValue >= mValue ? DynamicPeriodic(mMax, (mMax - (rhs.mValue - mValue)) % mMax) : DynamicPeriodic(mMax, (mValue - rhs.mValue) % mMax);
 		}
 
 
 		DynamicPeriodic operator*(DynamicPeriodic rhs) const
 		{
-			rhs.SetMax(mMax);
 			return DynamicPeriodic(mMax, (mValue * rhs.mValue) % mMax);
 		}
 
 
 		DynamicPeriodic operator/(DynamicPeriodic rhs) const
 		{
-			rhs.SetMax(mMax);
 			return DynamicPeriodic(mMax, (mValue / rhs.mValue) % mMax);
 		}
 
