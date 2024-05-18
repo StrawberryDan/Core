@@ -50,7 +50,6 @@ if (NOT TARGET StrawberryCore)
 			src/Strawberry/Core/IO/CallbackReceiver.hpp
 			src/Strawberry/Core/IO/ChannelBroadcaster.hpp
 			src/Strawberry/Core/IO/ChannelReceiver.hpp
-			src/Strawberry/Core/IO/Concepts.hpp
 			src/Strawberry/Core/IO/DynamicByteBuffer.cpp
 			src/Strawberry/Core/IO/DynamicByteBuffer.hpp
 			src/Strawberry/Core/IO/Endian.hpp
