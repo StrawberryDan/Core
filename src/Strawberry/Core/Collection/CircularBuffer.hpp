@@ -50,6 +50,7 @@ namespace Strawberry::Core::Collection
 		{
 			if (Size() == 0) return {};
 			auto value = std::move(*mData[*mHead]);
+			mData[*mHead].Destruct();
 			mHead++;
 			mSize -= 1;
 			return value;
@@ -123,8 +124,10 @@ namespace Strawberry::Core::Collection
 		Optional<T> Pop()
 		{
 			if (Size() == 0) return {};
-			auto value  = std::move(*mData[*mHead++]);
-			mSize      -= 1;
+			auto value  = std::move(*mData[*mHead]);
+			mData[mHead].Destruct();
+			mHead++;
+			mSize-= 1;
 			return value;
 		}
 
