@@ -175,7 +175,7 @@ template<typename T>
 requires std::copyable<T> || std::movable<T>
 T Strawberry::Core::IO::DynamicByteBuffer::Into() const
 {
-	Assert(Size() == sizeof(T));
+	AssertEQ(Size(), sizeof(T));
 	T value;
 	Into<T>(value);
 	return value;
