@@ -25,29 +25,27 @@ namespace Strawberry::Core::Math
 		Rational(T numerator, T denominator)
 			: mNumerator(numerator)
 			, mDenominator(denominator)
-		{
-			Normalize();
-		}
+		{}
 
 
 		void SetNumerator(T value)
 		{
 			mNumerator = value;
-			Normalize();
 		}
 
 
 		void SetDenominator(T value)
 		{
 			mDenominator = value;
-			Normalize();
 		}
 
 
 		const T& Numerator() const { return mNumerator; }
+		      T& Numerator()       { return mNumerator; }
 
 
 		const T& Denominator() const { return mDenominator; }
+		      T& Denominator()       { return mDenominator; }
 
 
 		[[nodiscard]] double Evaluate() const { return static_cast<double>(mNumerator) / static_cast<double>(mDenominator); }
@@ -58,26 +56,35 @@ namespace Strawberry::Core::Math
 
 		Rational operator+(const Rational& rhs) const
 		{
-			return {Numerator() * rhs.Denominator() + rhs.Numerator() * Denominator(), Denominator() * rhs.Denominator()};
+			Rational result = {Numerator() * rhs.Denominator() + rhs.Numerator() * Denominator(), Denominator() * rhs.Denominator()};
+			result.Normalize();
+			return result;
 		}
 
 
 		Rational operator-(const Rational& rhs) const
 		{
-			return {Numerator() * rhs.Denominator() - rhs.Numerator() * Denominator(), Denominator() * rhs.Denominator()};
+			Rational result = {Numerator() * rhs.Denominator() - rhs.Numerator() * Denominator(), Denominator() * rhs.Denominator()};
+			result.Normalize();
+			return result;
 		}
 
 
 		//		Rational operator*(const Rational& rhs) const
 		//			{ return {Numerator() * rhs.Numerator(), Denominator() * rhs.Denominator()}; }
-		Rational operator/(const Rational& rhs) const { return {Numerator() * rhs.Denominator(), Denominator() * rhs.Numerator()}; }
+		Rational operator/(const Rational& rhs) const
+		{
+			Rational result = {Numerator() * rhs.Denominator(), Denominator() * rhs.Numerator()};
+			result.Normalize();
+			return result;
+		}
 
 
 		friend Rational operator*(const Rational& lhs, const Rational& rhs)
 		{
-			{
-				return {lhs.Numerator() * rhs.Numerator(), lhs.Denominator() * rhs.Denominator()};
-			}
+			Rational result = {lhs.Numerator() * rhs.Numerator(), lhs.Denominator() * rhs.Denominator()};
+			result.Normalize();
+			return result;
 		}
 
 
