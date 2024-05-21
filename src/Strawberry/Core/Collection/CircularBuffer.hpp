@@ -89,7 +89,7 @@ namespace Strawberry::Core::Collection
 
 		void Clear()
 		{
-			while (!Empty()) Pop();
+			while (!Empty()) Pop().Unwrap();
 		}
 
 
