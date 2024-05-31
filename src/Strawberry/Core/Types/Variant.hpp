@@ -72,12 +72,12 @@ namespace Strawberry::Core
 
 
             template<typename T>
-            Core::Optional<T> Value() const &
+            Core::Optional<T> Value() &
             {
                 Core::Assert(ContainsValue());
                 if (std::holds_alternative<T>(mData))
                 {
-                    return std::get<T>(mData);
+                    return std::move(std::get<T>(mData));
                 }
                 else
                 {
@@ -92,7 +92,7 @@ namespace Strawberry::Core
                 Core::Assert(ContainsValue());
                 if (std::holds_alternative<T>(mData))
                 {
-                    return std::get<T>(std::move(mData));
+                    return std::move(std::get<T>(std::move(mData)));
                 }
                 else
                 {
