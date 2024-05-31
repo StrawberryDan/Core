@@ -8,30 +8,40 @@
 
 namespace Strawberry::Core
 {
-	using Seconds = double;
+    using Seconds = double;
 
-	class Clock
-	{
-	public:
-		explicit Clock(bool start = true);
 
-		void Start();
+    class Clock
+    {
+        public:
+            explicit Clock(bool start = true);
 
-		double Stop();
+            void Start();
 
-		[[nodiscard]] Seconds Read() const;
+            double Stop();
 
-		Seconds operator*() const { return Read(); }
+            [[nodiscard]] Seconds Read() const;
 
-		explicit operator Seconds() const { return Read(); }
 
-		Seconds Restart();
+            Seconds operator*() const
+            {
+                return Read();
+            }
 
-	private:
-		using Duration = std::chrono::duration<double, std::ratio<1>>;
-		using Instant  = std::chrono::time_point<std::chrono::system_clock, Duration>;
 
-		Duration          mBuffer;
-		Optional<Instant> mStartTime;
-	};
+            explicit operator Seconds() const
+            {
+                return Read();
+            }
+
+
+            Seconds Restart();
+
+        private:
+            using Duration = std::chrono::duration<double, std::ratio<1> >;
+            using Instant  = std::chrono::time_point<std::chrono::system_clock, Duration>;
+
+            Duration          mBuffer;
+            Optional<Instant> mStartTime;
+    };
 } // namespace Strawberry::Core

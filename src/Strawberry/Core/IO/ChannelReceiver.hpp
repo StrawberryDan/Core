@@ -15,38 +15,44 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template <std::copyable T, std::copyable... Ts>
-	class ChannelBroadcaster;
-
-	template <std::copyable T, std::copyable... Ts>
-	class ChannelReceiver
-		: protected ChannelReceiver<T>
-		, protected ChannelReceiver<Ts...>
-	{
-		template <std::copyable, std::copyable...>
-		friend class ChannelBroadcaster;
-
-	protected:
-		using ChannelReceiver<T>::Receive;
-		using ChannelReceiver<Ts>::Receive...;
-	};
-
-	template <std::copyable T>
-	class ChannelReceiver<T> : public EnableReflexivePointer<ChannelReceiver<T>>
-	{
-		template <std::copyable, std::copyable...>
-		friend class ChannelBroadcaster;
+    template<std::copyable T, std::copyable... Ts>
+    class ChannelBroadcaster;
 
 
-	public:
-		ChannelReceiver()
-		{}
+    template<std::copyable T, std::copyable... Ts>
+    class ChannelReceiver
+            : protected ChannelReceiver<T>, protected ChannelReceiver<Ts...>
+    {
+        template<std::copyable, std::copyable...>
+        friend class ChannelBroadcaster;
 
-		ChannelReceiver(const ChannelReceiver& rhs)            = delete;
-		ChannelReceiver& operator=(const ChannelReceiver& rhs) = delete;
-		ChannelReceiver(ChannelReceiver&& rhs) { *rhs.mManagedThis = this; }
-		ChannelReceiver& operator=(ChannelReceiver&& rhs) = delete;
+        protected:
+            using ChannelReceiver<T>::Receive;
+            using ChannelReceiver<Ts>::Receive...;
+    };
 
-		virtual void Receive(T value) = 0;
-	};
+
+    template<std::copyable T>
+    class ChannelReceiver<T> : public EnableReflexivePointer<ChannelReceiver<T> >
+    {
+        template<std::copyable, std::copyable...>
+        friend class ChannelBroadcaster;
+
+        public:
+            ChannelReceiver() {}
+
+            ChannelReceiver(const ChannelReceiver& rhs)            = delete;
+            ChannelReceiver& operator=(const ChannelReceiver& rhs) = delete;
+
+
+            ChannelReceiver(ChannelReceiver&& rhs)
+            {
+                *rhs.mManagedThis = this;
+            }
+
+
+            ChannelReceiver& operator=(ChannelReceiver&& rhs) = delete;
+
+            virtual void Receive(T value) = 0;
+    };
 } // namespace Strawberry::Core::IO

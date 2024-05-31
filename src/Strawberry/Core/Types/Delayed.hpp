@@ -11,60 +11,83 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core
 {
-	template <typename T>
-	class Delayed
-	{
-		public:
-			Delayed() {}
+    template<typename T>
+    class Delayed
+    {
+        public:
+            Delayed() {}
 
 
-			Delayed(const Delayed& rhs) = delete;
+            Delayed(const Delayed& rhs) = delete;
 
 
-			Delayed& operator=(const Delayed& rhs) = delete;
+            Delayed& operator=(const Delayed& rhs) = delete;
 
 
-			Delayed(Delayed&&)           = delete;
+            Delayed(Delayed&&) = delete;
 
 
-			Delayed operator=(Delayed&&) = delete;
+            Delayed operator=(Delayed&&) = delete;
 
 
-			~Delayed()
-			{
-				std::destroy_at(&mPayload);
-			}
-
-			template <typename... Args>
-			requires std::constructible_from<T, Args...>
-			void Construct(Args... args)
-			{
-				std::construct_at(&mPayload, std::forward<Args>(args)...);
-			}
-
-			void Destruct()
-			{
-				std::destroy_at(&mPayload);
-			}
-
-			T& Get() { return mPayload; }
-
-			const T& Get() const { return mPayload; }
+            ~Delayed()
+            {
+                std::destroy_at(&mPayload);
+            }
 
 
-			T& operator*() { return mPayload; }
+            template<typename... Args> requires std::constructible_from<T, Args...>
+            void Construct(Args... args)
+            {
+                std::construct_at(&mPayload, std::forward<Args>(args)...);
+            }
 
-			const T& operator*() const { return mPayload; }
+
+            void Destruct()
+            {
+                std::destroy_at(&mPayload);
+            }
 
 
-			T* operator->() { return &mPayload; }
+            T& Get()
+            {
+                return mPayload;
+            }
 
-			const T* operator->() const { return &mPayload; }
 
-		private:
-			union
-			{
-				T mPayload;
-			};
-	};
+            const T& Get() const
+            {
+                return mPayload;
+            }
+
+
+            T& operator*()
+            {
+                return mPayload;
+            }
+
+
+            const T& operator*() const
+            {
+                return mPayload;
+            }
+
+
+            T* operator->()
+            {
+                return &mPayload;
+            }
+
+
+            const T* operator->() const
+            {
+                return &mPayload;
+            }
+
+        private:
+            union
+            {
+                T mPayload;
+            };
+    };
 }

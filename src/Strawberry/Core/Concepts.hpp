@@ -10,9 +10,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core
 {
-	template <typename T>
-	concept Dereferencable = requires (T t)
-	{
-		!std::is_void_v<decltype(*t)>;
-	};
+    template<typename T>
+    concept Dereferencable = requires(T t)
+    {
+        !std::is_void_v<decltype(*t)>;
+    };
 }

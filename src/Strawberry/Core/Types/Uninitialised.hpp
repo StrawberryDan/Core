@@ -14,89 +14,112 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core
 {
-	template <typename T>
-	class Uninitialised
-	{
-	public:
-		Uninitialised()
+    template<typename T>
+    class Uninitialised
+    {
+        public:
+            Uninitialised()
 #if STRAWBERRY_DEBUG
-				: mInitialised(false)
+                : mInitialised(false)
 #endif // STRAWBERRY_DEBUG
-		{}
+            {}
 
 
-		Uninitialised(const Uninitialised& rhs)
+            Uninitialised(const Uninitialised& rhs)
 #if STRAWBERRY_DEBUG
-			: mInitialised(rhs.mInitialised)
+                : mInitialised(rhs.mInitialised)
 #endif // STRAWBERRY_DEBUG
-		{
-			std::memcpy(&mPayload, &rhs.mPayload, sizeof(T));
-		}
+            {
+                std::memcpy(&mPayload, &rhs.mPayload, sizeof(T));
+            }
 
 
-		Uninitialised& operator=(const Uninitialised& rhs)
-		{
+            Uninitialised& operator=(const Uninitialised& rhs)
+            {
 #if STRAWBERRY_DEBUG
-			mInitialised = rhs.mInitialised;
+                mInitialised = rhs.mInitialised;
 #endif // STRAWBERRY_DEBUG
-			std::memcpy(&mPayload, &rhs.mPayload, sizeof(T));
-		}
+                std::memcpy(&mPayload, &rhs.mPayload, sizeof(T));
+            }
 
 
-		Uninitialised(Uninitialised&&)           = delete;
+            Uninitialised(Uninitialised&&) = delete;
 
 
-		Uninitialised operator=(Uninitialised&&) = delete;
+            Uninitialised operator=(Uninitialised&&) = delete;
 
 
-		~Uninitialised()
-		{
+            ~Uninitialised()
+            {
 #if STRAWBERRY_DEBUG
-			Core::Assert(!mInitialised);
+                Core::Assert(!mInitialised);
 #endif // STRAWBERRY_DEBUG
-		}
+            }
 
-		template <typename... Args>
-			requires std::constructible_from<T, Args...>
-		void Construct(Args... args)
-		{
-			std::construct_at(&mPayload, std::forward<Args>(args)...);
+
+            template<typename... Args> requires std::constructible_from<T, Args...>
+            void Construct(Args... args)
+            {
+                std::construct_at(&mPayload, std::forward<Args>(args)...);
 #if STRAWBERRY_DEBUG
-			Core::Assert(!mInitialised);
-			mInitialised = true;
+                Core::Assert(!mInitialised);
+                mInitialised = true;
 #endif // STRAWBERRY_DEBUG
-		}
+            }
 
-		void Destruct()
-		{
+
+            void Destruct()
+            {
 #if STRAWBERRY_DEBUG
-			Core::Assert(mInitialised);
-			mInitialised = false;
+                Core::Assert(mInitialised);
+                mInitialised = false;
 #endif // STRAWBERRY_DEBUG
-			std::destroy_at(&mPayload);
-		}
-
-		T& Get() { return mPayload; }
-
-		const T& Get() const { return mPayload; }
+                std::destroy_at(&mPayload);
+            }
 
 
-		T& operator*() { return mPayload; }
+            T& Get()
+            {
+                return mPayload;
+            }
 
-		const T& operator*() const { return mPayload; }
+
+            const T& Get() const
+            {
+                return mPayload;
+            }
 
 
-		T* operator->() { return &mPayload; }
+            T& operator*()
+            {
+                return mPayload;
+            }
 
-		const T* operator->() const { return &mPayload; }
 
-	private:
+            const T& operator*() const
+            {
+                return mPayload;
+            }
+
+
+            T* operator->()
+            {
+                return &mPayload;
+            }
+
+
+            const T* operator->() const
+            {
+                return &mPayload;
+            }
+
+        private:
 #if STRAWBERRY_DEBUG
-		bool mInitialised = false;
+            bool mInitialised = false;
 #endif // STRAWBERRY_DEBUG
-		union
-		{
-			T mPayload;
-		};
-	};
+            union
+            {
+                T mPayload;
+            };
+    };
 } // namespace Strawberry::Core

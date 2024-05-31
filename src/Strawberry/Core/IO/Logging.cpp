@@ -8,53 +8,51 @@
 
 namespace Strawberry::Core
 {
-	static Optional<Logging::Level> sLogLevel   = {};
-	static Optional<std::ofstream>  sOutputFile = {};
-
-	std::string Logging::LevelToString(Level logLevel)
-	{
-		switch (logLevel)
-		{
-			case Level::Trace:
-				return "TRACE";
-			case Level::Debug:
-				return "DEBUG";
-			case Level::Info:
-				return "INFO";
-			case Level::Warning:
-				return "WARNING";
-			case Level::Error:
-				return "ERROR";
-			default:
-				Core::Unreachable();
-		}
-	}
+    static Optional<Logging::Level> sLogLevel   = {};
+    static Optional<std::ofstream>  sOutputFile = {};
 
 
-	Logging::Level Logging::GetLevel()
-	{
-		return sLogLevel.UnwrapOr(Level::Trace);
-	}
+    std::string Logging::LevelToString(Level logLevel)
+    {
+        switch (logLevel)
+        {
+            case Level::Trace: return "TRACE";
+            case Level::Debug: return "DEBUG";
+            case Level::Info: return "INFO";
+            case Level::Warning: return "WARNING";
+            case Level::Error: return "ERROR";
+            default: Core::Unreachable();
+        }
+    }
 
 
-	void Logging::SetLevel(Level logLevel)
-	{
-		sLogLevel = logLevel;
-	}
+    Logging::Level Logging::GetLevel()
+    {
+        return sLogLevel.UnwrapOr(Level::Trace);
+    }
 
 
-	void Logging::SetOutputFile(std::string message)
-	{
-		sOutputFile.Emplace(std::move(message));
-	}
+    void Logging::SetLevel(Level logLevel)
+    {
+        sLogLevel = logLevel;
+    }
 
 
-	void Logging::LogRaw(Level level, const std::string& message)
-	{
-		auto* outputStream = &std::cout;
-		if (level == Level::Error) outputStream = &std::cerr;
+    void Logging::SetOutputFile(std::string message)
+    {
+        sOutputFile.Emplace(std::move(message));
+    }
 
-		*outputStream << message << std::endl;
-		if (sOutputFile) { *sOutputFile << message << std::endl; }
-	}
+
+    void Logging::LogRaw(Level level, const std::string& message)
+    {
+        auto* outputStream = &std::cout;
+        if (level == Level::Error) outputStream = &std::cerr;
+
+        *outputStream << message << std::endl;
+        if (sOutputFile)
+        {
+            *sOutputFile << message << std::endl;
+        }
+    }
 } // namespace Strawberry::Core

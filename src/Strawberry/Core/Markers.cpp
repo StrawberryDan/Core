@@ -11,30 +11,30 @@
 
 namespace Strawberry::Core
 {
-	void DebugBreak()
-	{
+    void DebugBreak()
+    {
 #ifndef STRAWBERRY_RELEASE
 #if defined(_WIN32)
-		__debugbreak();
+        __debugbreak();
 #elif defined(__UNIX) || defined(__APPLE__)
 		std::raise(SIGTRAP);
 #else
 #warning "Debug Break not defined on this target!";
 #endif
 #endif
-	}
+    }
 
 
-	[[noreturn]] void Unreachable()
-	{
-		DebugBreak();
+    [[noreturn]] void Unreachable()
+    {
+        DebugBreak();
 
 #if __cpp_lib_unreachable
 		std::unreachable();
 #elif __clang__
 		__builtin_unreachable();
 #else
-		std::abort();
+        std::abort();
 #endif
-	}
+    }
 } // namespace Strawberry::Core
