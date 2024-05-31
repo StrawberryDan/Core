@@ -97,6 +97,20 @@ namespace Strawberry::Core
 
 
             template<typename T>
+            T& Ref()
+            {
+                return std::get<T>(mData);
+            }
+
+
+            template<typename T>
+            const T& Ref() const
+            {
+                return std::get<T>(mData);
+            }
+
+
+            template<typename T>
             Core::Optional<T*> Ptr()
             {
                 Core::Assert(ContainsValue() && IsType<T>());
