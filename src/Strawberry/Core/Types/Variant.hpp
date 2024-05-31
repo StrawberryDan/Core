@@ -42,6 +42,16 @@ namespace Strawberry::Core
     };
 
 
+    template<typename T, typename... Ts>
+    struct IsInVariant
+            : public std::false_type {};
+
+
+    template<typename T, typename... Ts> requires (std::same_as<T, Ts> || ...)
+    struct IsInVariant<T, Variant<Ts...> >
+            : public std::true_type {};
+
+
     template<typename... Types>
     class Variant
     {
@@ -72,22 +82,7 @@ namespace Strawberry::Core
 
 
             template<typename T>
-            Core::Optional<T> Value() &
-            {
-                Core::Assert(ContainsValue());
-                if (std::holds_alternative<T>(mData))
-                {
-                    return std::move(std::get<T>(mData));
-                }
-                else
-                {
-                    return Core::NullOpt;
-                }
-            }
-
-
-            template<typename T>
-            Core::Optional<T> Value() &&
+            Core::Optional<T> Value()
             {
                 Core::Assert(ContainsValue());
                 if (std::holds_alternative<T>(mData))
