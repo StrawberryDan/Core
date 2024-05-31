@@ -125,6 +125,20 @@ namespace Strawberry::Core
                 return static_cast<const T*>(std::get_if<T>(&mData));
             }
 
+
+            template<typename T> requires (IsInVariant<T, Variant>::value)
+            bool operator==(const Variant& other) const
+            {
+                return IsType<T>() && Ref<T>() == other;
+            }
+
+
+            template<typename T> requires (IsInVariant<T, Variant>::value)
+            bool operator!=(const Variant& other) const
+            {
+                return !IsType<T>() || Ref<T>() != other;
+            }
+
         private:
             std::variant<Types...> mData;
     };
