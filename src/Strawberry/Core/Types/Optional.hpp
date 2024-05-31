@@ -285,35 +285,35 @@ namespace Strawberry::Core
 
             T& operator*()
             {
-                Assert(mHasValue);
+                Assert(HasValue());
                 return mPayload;
             }
 
 
             const T& operator*() const
             {
-                Assert(mHasValue);
+                Assert(HasValue());
                 return mPayload;
             }
 
 
             T* operator->()
             {
-                Assert(mHasValue);
+                Assert(HasValue());
                 return &mPayload;
             }
 
 
             const T* operator->() const
             {
-                Assert(mHasValue);
+                Assert(HasValue());
                 return &mPayload;
             }
 
 
             T Unwrap()
             {
-                Assert(mHasValue);
+                Assert(HasValue());
                 mHasValue = false;
                 return std::move(mPayload);
             }
