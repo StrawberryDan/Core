@@ -247,7 +247,7 @@ namespace Strawberry::Core
             }
 
 
-            explicit inline operator bool() const
+            explicit operator bool() const
             {
                 return mHasValue;
             }
