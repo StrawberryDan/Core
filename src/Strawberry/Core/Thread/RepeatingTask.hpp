@@ -18,7 +18,7 @@ namespace Strawberry::Core
         public:
             /// Accepts a function taking no arguments.
             explicit RepeatingTask(std::function<void()> function)
-                : mShouldRun(true)
+                : mShouldRun(false)
                 , mStartUp()
                 , mFunction(std::move(function))
             {
@@ -28,7 +28,7 @@ namespace Strawberry::Core
 
             /// Accepts a function taking no arguments.
             explicit RepeatingTask(std::function<void()> function, std::function<void()> startup)
-                : mShouldRun(true)
+                : mShouldRun(false)
                 , mStartUp(std::move(startup))
                 , mFunction(std::move(function))
             {
@@ -38,7 +38,7 @@ namespace Strawberry::Core
 
             /// Will pass 'this' as the first argument always.
             explicit RepeatingTask(std::function<void(RepeatingTask*)> function)
-                : mShouldRun(true)
+                : mShouldRun(false)
                 , mStartUp()
                 , mFunction([function, this]
                 {
@@ -51,7 +51,7 @@ namespace Strawberry::Core
 
             /// Accepts a function taking no arguments.
             explicit RepeatingTask(std::function<void(RepeatingTask*)> startup, std::function<void()> function)
-                : mShouldRun(true)
+                : mShouldRun(false)
                 , mStartUp([startup, this]
                 {
                     startup(this);
@@ -64,7 +64,7 @@ namespace Strawberry::Core
 
             /// Will pass 'this' as the first argument always.
             explicit RepeatingTask(std::function<void()> startup, const std::function<void(RepeatingTask*)> function)
-                : mShouldRun(true)
+                : mShouldRun(false)
                 , mStartUp(std::move(startup))
                 , mFunction([function, this]
                 {
@@ -77,7 +77,7 @@ namespace Strawberry::Core
 
             /// Will pass 'this' as the first argument always.
             explicit RepeatingTask(std::function<void(RepeatingTask*)> startup, std::function<void(RepeatingTask*)> function)
-                : mShouldRun(true)
+                : mShouldRun(false)
                 , mStartUp([startup, this]
                 {
                     startup(this);
@@ -93,20 +93,20 @@ namespace Strawberry::Core
 
             ~RepeatingTask()
             {
-                mShouldRun = false;
-                mThread.join();
+                Stop();
             }
 
 
             [[nodiscard]] bool IsRunning() const
             {
-                return mShouldRun || !mThread.joinable();
+                return mThread.joinable();
             }
 
 
             void Start()
             {
-                mThread = std::thread([self = GetReflexivePointer()]()
+                mShouldRun = true;
+                mThread    = std::thread([self = GetReflexivePointer()]()
                 {
                     if (self->mStartUp)
                     {
@@ -161,16 +161,16 @@ namespace Strawberry::Core
                 if (this != &rhs)
                 {
                     std::destroy_at(this);
-                    std::construct_at(this, std::forward<RepeatingTask&&>(rhs));
+                    std::construct_at(this, std::forward<RepeatingTask>(rhs));
                 }
 
                 return *this;
             }
 
         private:
-            std::atomic<bool>                      mShouldRun;
-            std::thread                            mThread;
-            Core::Optional<std::function<void()> > mStartUp;
-            std::function<void()>                  mFunction;
+            std::atomic<bool>                mShouldRun;
+            std::thread                      mThread;
+            Optional<std::function<void()> > mStartUp;
+            std::function<void()>            mFunction;
     };
 } // namespace Strawberry::Core
