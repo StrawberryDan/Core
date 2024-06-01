@@ -38,7 +38,7 @@ namespace Strawberry::Core
 
             static Result Ok(D&& value) requires (std::move_constructible<D>)
             {
-                return Result(std::forward<D&&>(value));
+                return Result(std::forward<D>(value));
             }
 
 
@@ -187,7 +187,7 @@ namespace Strawberry::Core
 
 
             Result(Payload&& payload)
-                : mPayload(std::forward<Payload&&>(payload)) {}
+                : mPayload(std::forward<Payload>(payload)) {}
 
 
             Payload mPayload;

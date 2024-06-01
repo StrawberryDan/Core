@@ -91,7 +91,7 @@ namespace Strawberry::Core
             template<typename... Ts>
             explicit(sizeof...(Ts) <= 1) Optional(Ts&&... ts) requires (std::constructible_from<T, Ts&&...>)
                 : mHasValue(true)
-                , mPayload(std::forward<Ts&&>(ts)...) {}
+                , mPayload(std::forward<Ts>(ts)...) {}
 
 
             Optional(const Optional& rhs) requires(std::is_copy_constructible_v<T>)
@@ -99,7 +99,7 @@ namespace Strawberry::Core
             {
                 if (rhs)
                 {
-                    std::construct_at(&mPayload, *rhs);
+                    std::construct_at(&mPayload, rhs.Value());
                 }
             }
 
@@ -109,8 +109,7 @@ namespace Strawberry::Core
             {
                 if (rhs)
                 {
-                    std::construct_at(&mPayload, std::move(*rhs));
-                    rhs.mHasValue = false;
+                    std::construct_at(&mPayload, std::forward<T>(rhs.Unwrap()));
                 }
             }
 
