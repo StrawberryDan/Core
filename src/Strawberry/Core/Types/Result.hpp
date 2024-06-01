@@ -106,7 +106,7 @@ namespace Strawberry::Core
 
             D Unwrap()
             {
-                return mPayload.template Value<D>().Unwrap();
+                return mPayload.template Take<D>().Unwrap();
             }
 
 
