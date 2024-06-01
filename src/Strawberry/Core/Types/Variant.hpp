@@ -82,12 +82,27 @@ namespace Strawberry::Core
 
 
             template<typename T>
-            Core::Optional<T> Value()
+            Core::Optional<T> Take()
             {
                 Core::Assert(ContainsValue());
                 if (std::holds_alternative<T>(mData))
                 {
                     return std::move(std::get<T>(std::move(mData)));
+                }
+                else
+                {
+                    return Core::NullOpt;
+                }
+            }
+
+
+            template<typename T> requires (std::copyable<T>)
+            Core::Optional<T> Value() const
+            {
+                Core::Assert(ContainsValue());
+                if (std::holds_alternative<T>(mData))
+                {
+                    return std::get<T>(mData);
                 }
                 else
                 {
