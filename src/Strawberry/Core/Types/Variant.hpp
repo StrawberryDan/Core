@@ -44,12 +44,12 @@ namespace Strawberry::Core
 
     template<typename T, typename... Ts>
     struct IsInVariant
-            : public std::false_type {};
+            : std::false_type {};
 
 
     template<typename T, typename... Ts> requires (std::same_as<T, Ts> || ...)
     struct IsInVariant<T, Variant<Ts...> >
-            : public std::true_type {};
+            : std::true_type {};
 
 
     template<typename... Types>
