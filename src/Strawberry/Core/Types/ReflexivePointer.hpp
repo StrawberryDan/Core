@@ -88,11 +88,7 @@ namespace Strawberry::Core
                 : ReflexivePointer() {}
 
 
-            explicit ReflexivePointer(EnableReflexivePointer& base) noexcept
-                : ReflexivePointer(base.GetReflexivePointer()) {}
-
-
-            explicit ReflexivePointer(const EnableReflexivePointer& base) noexcept
+            explicit ReflexivePointer(const std::derived_from<EnableReflexivePointer> auto& base) noexcept
                 : ReflexivePointer(base.GetReflexivePointer()) {}
 
 
@@ -177,7 +173,7 @@ namespace Strawberry::Core
             T& operator*() const noexcept
             {
                 Core::Assert(IsValid());
-                return static_cast<T>(*mPtr);
+                return *static_cast<T*>(mPtr->load());
             }
 
 
