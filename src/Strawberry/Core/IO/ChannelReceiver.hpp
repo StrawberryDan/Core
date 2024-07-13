@@ -33,7 +33,7 @@ namespace Strawberry::Core::IO
 
 
     template<std::copyable T>
-    class ChannelReceiver<T> : public EnableReflexivePointer<ChannelReceiver<T> >
+    class ChannelReceiver<T> : public EnableReflexivePointer
     {
         template<std::copyable, std::copyable...>
         friend class ChannelBroadcaster;

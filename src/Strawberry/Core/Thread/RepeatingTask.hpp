@@ -13,7 +13,7 @@
 namespace Strawberry::Core
 {
     class RepeatingTask
-            : public EnableReflexivePointer<RepeatingTask>
+            : public EnableReflexivePointer
     {
         public:
             /// Accepts a function taking no arguments.
