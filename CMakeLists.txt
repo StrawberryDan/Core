@@ -105,10 +105,15 @@ if (NOT TARGET StrawberryCore)
 			PUBLIC ${STB_SOURCE_DIR})
 	target_link_libraries(StrawberryCore PUBLIC nlohmann_json::nlohmann_json fmt::fmt-header-only)
 	set_target_properties(StrawberryCore PROPERTIES CXX_STANDARD 20)
+    target_include_directories(StrawberryCore
+            PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
+            PUBLIC ${STB_SOURCE_DIR})
+    target_link_libraries(StrawberryCore PUBLIC nlohmann_json::nlohmann_json fmt::fmt-header-only)
+    set_target_properties(StrawberryCore PROPERTIES CXX_STANDARD 23)
 
 
-	add_executable(StrawberryCoreTest
-			test/Main.cpp)
-	target_link_libraries(StrawberryCoreTest PRIVATE StrawberryCore)
-	set_target_properties(StrawberryCoreTest PROPERTIES CXX_STANDARD 20)
-endif()
+    add_executable(StrawberryCoreTest
+            test/Main.cpp)
+    target_link_libraries(StrawberryCoreTest PRIVATE StrawberryCore)
+    set_target_properties(StrawberryCoreTest PROPERTIES CXX_STANDARD 23)
+endif ()
