@@ -78,18 +78,8 @@ namespace Strawberry::Core
                 : mHasValue(false) {}
 
 
-            Optional(const T& value) requires(std::is_copy_constructible_v<T>)
-                : mHasValue(true)
-                , mPayload(value) {}
-
-
-            Optional(T&& value) requires(std::is_move_constructible_v<T>)
-                : mHasValue(true)
-                , mPayload(std::move(value)) {}
-
-
             template<typename... Ts>
-            explicit(sizeof...(Ts) <= 1) Optional(Ts&&... ts) requires (std::constructible_from<T, Ts&&...>)
+            Optional(Ts&&... ts) requires (std::constructible_from<T, Ts...>)
                 : mHasValue(true)
                 , mPayload(std::forward<Ts>(ts)...) {}
 
@@ -120,12 +110,18 @@ namespace Strawberry::Core
             }
 
 
-            Optional& operator=(const T& rhs) noexcept requires(std::is_copy_constructible_v<T> && std::is_copy_assignable_v<T>)
             {
-                if (HasValue()) mPayload = std::move(rhs);
-                else Emplace(rhs);
-
-                return *this;
+            template<typename T2> requires (std::assignable_from<T, T2> && std::constructible_from<T, T2>)
+            Optional& operator=(T2&& t2)
+            {
+                if (HasValue())
+                {
+                    mPayload = std::forward<T2>(t2);
+                }
+                else
+                {
+                    Emplace(std::forward<T2>(t2));
+                }
             }
 
 
@@ -142,14 +138,6 @@ namespace Strawberry::Core
             }
 
 
-            Optional& operator=(const T& rhs) noexcept requires(std::is_copy_constructible_v<T> && !std::is_copy_assignable_v<T>)
-            {
-                Emplace(rhs);
-
-                return *this;
-            }
-
-
             Optional& operator=(const Optional& rhs) noexcept requires(std::is_copy_constructible_v<T> && !std::is_copy_assignable_v<T>)
             {
                 if (this != &rhs)
@@ -157,15 +145,6 @@ namespace Strawberry::Core
                     if (!rhs.HasValue()) Reset();
                     else Emplace(*rhs);
                 }
-
-                return *this;
-            }
-
-
-            Optional& operator=(T&& rhs) noexcept requires(std::is_move_constructible_v<T> && std::is_move_assignable_v<T>)
-            {
-                if (HasValue()) mPayload = std::move(rhs);
-                else Emplace(std::move(rhs));
 
                 return *this;
             }

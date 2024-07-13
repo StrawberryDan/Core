@@ -100,11 +100,6 @@ if (NOT TARGET StrawberryCore)
 			src/Strawberry/Core/Util/STBImplementations.cpp
 	)
 
-	target_include_directories(StrawberryCore
-			PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
-			PUBLIC ${STB_SOURCE_DIR})
-	target_link_libraries(StrawberryCore PUBLIC nlohmann_json::nlohmann_json fmt::fmt-header-only)
-	set_target_properties(StrawberryCore PROPERTIES CXX_STANDARD 20)
     target_include_directories(StrawberryCore
             PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
             PUBLIC ${STB_SOURCE_DIR})
