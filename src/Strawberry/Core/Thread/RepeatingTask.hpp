@@ -168,9 +168,9 @@ namespace Strawberry::Core
             }
 
         private:
-            std::atomic<bool>                mShouldRun;
-            std::thread                      mThread;
-            Optional<std::function<void()> > mStartUp;
-            std::function<void()>            mFunction;
+            std::atomic<bool>               mShouldRun;
+            std::thread                     mThread;
+            Optional<std::function<void()>> mStartUp;
+            std::function<void()>           mFunction;
     };
 } // namespace Strawberry::Core

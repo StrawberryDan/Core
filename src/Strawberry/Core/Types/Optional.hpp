@@ -24,7 +24,7 @@ namespace Strawberry::Core
     //  Type Deduction Guide
     //----------------------------------------------------------------------------------------------------------------------
     template<typename T>
-    Optional(T) -> Optional<std::decay_t<T> >;
+    Optional(T) -> Optional<std::decay_t<T>>;
 
 
     //======================================================================================================================
@@ -36,7 +36,7 @@ namespace Strawberry::Core
 
 
     template<typename T>
-    struct IsOptional_v<Optional<T> >
+    struct IsOptional_v<Optional<T>>
             : std::true_type {};
 
 
@@ -110,7 +110,6 @@ namespace Strawberry::Core
             }
 
 
-            {
             template<typename T2> requires (std::assignable_from<T, T2> && std::constructible_from<T, T2>)
             Optional& operator=(T2&& t2)
             {
@@ -322,27 +321,27 @@ namespace Strawberry::Core
             //  Monadic Operations
             //----------------------------------------------------------------------------------------------------------------------
             template<std::invocable<const T&> F>
-            Optional<std::invoke_result_t<F, const T&> > Map(F functor) const &
+            Optional<std::invoke_result_t<F, const T&>> Map(F functor) const &
             {
-                return HasValue() ? Optional<std::invoke_result_t<F, const T&> >(functor(Value())) : NullOpt;
+                return HasValue() ? Optional<std::invoke_result_t<F, const T&>>(functor(Value())) : NullOpt;
             }
 
 
             template<std::invocable<T&&> F>
-            Optional<std::invoke_result_t<F, T&&> > Map(F functor) &&
+            Optional<std::invoke_result_t<F, T&&>> Map(F functor) &&
             {
-                return HasValue() ? Optional<std::invoke_result_t<F, T&&> >(functor(Unwrap())) : NullOpt;
+                return HasValue() ? Optional<std::invoke_result_t<F, T&&>>(functor(Unwrap())) : NullOpt;
             }
 
 
-            template<std::invocable<const T&> F> requires IsOptional<std::invoke_result_t<F, const T&> >
+            template<std::invocable<const T&> F> requires IsOptional<std::invoke_result_t<F, const T&>>
             std::invoke_result_t<F, const T&> AndThen(F functor) const &
             {
                 return Map(functor).Flatten();
             }
 
 
-            template<std::invocable<T&&> F> requires IsOptional<std::invoke_result_t<F, T&&> >
+            template<std::invocable<T&&> F> requires IsOptional<std::invoke_result_t<F, T&&>>
             std::invoke_result_t<F, T&&> AndThen(F functor) &&
             {
                 return Map(functor).Flatten();
@@ -765,27 +764,27 @@ namespace Strawberry::Core
             //  Monadic Operations
             //----------------------------------------------------------------------------------------------------------------------
             template<std::invocable<T> F>
-            Optional<std::invoke_result_t<F, T> > Map(F functor)
+            Optional<std::invoke_result_t<F, T>> Map(F functor)
             {
-                return HasValue() ? Optional<std::invoke_result_t<F, T> >(functor(Value())) : NullOpt;
+                return HasValue() ? Optional<std::invoke_result_t<F, T>>(functor(Value())) : NullOpt;
             }
 
 
             template<std::invocable<const T> F>
-            Optional<std::invoke_result_t<F, const T> > Map(F functor) const
+            Optional<std::invoke_result_t<F, const T>> Map(F functor) const
             {
-                return HasValue() ? Optional<std::invoke_result_t<F, const T> >(functor(Value())) : NullOpt;
+                return HasValue() ? Optional<std::invoke_result_t<F, const T>>(functor(Value())) : NullOpt;
             }
 
 
-            template<std::invocable<T> F> requires (IsOptional<std::invoke_result_t<F, T> >)
+            template<std::invocable<T> F> requires (IsOptional<std::invoke_result_t<F, T>>)
             std::invoke_result_t<F, T> AndThen(F functor)
             {
                 return Map(functor).Flatten();
             }
 
 
-            template<std::invocable<const T> F> requires (IsOptional<std::invoke_result_t<F, const T> >)
+            template<std::invocable<const T> F> requires (IsOptional<std::invoke_result_t<F, const T>>)
             std::invoke_result_t<F, const T> AndThen(F functor) const
             {
                 return Map(functor).Flatten();
@@ -816,15 +815,15 @@ namespace Strawberry::Core
             }
 
 
-            Optional<std::remove_pointer_t<T> > Deref()
+            Optional<std::remove_pointer_t<T>> Deref()
             {
-                return HasValue() ? Optional<std::remove_pointer_t<T> >(*mPayload) : NullOpt;
+                return HasValue() ? Optional<std::remove_pointer_t<T>>(*mPayload) : NullOpt;
             }
 
 
             Optional<const std::remove_pointer_t<T>> Deref() const
             {
-                return HasValue() ? Optional<std::remove_pointer_t<T> >(*mPayload) : NullOpt;
+                return HasValue() ? Optional<std::remove_pointer_t<T>>(*mPayload) : NullOpt;
             }
 
 
