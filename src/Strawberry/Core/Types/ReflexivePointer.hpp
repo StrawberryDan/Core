@@ -79,6 +79,7 @@ namespace Strawberry::Core
 	{
 		friend class EnableReflexivePointer;
 
+
 	public:
 		ReflexivePointer()
 			: mPtr(nullptr) {}
