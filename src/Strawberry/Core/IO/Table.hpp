@@ -13,9 +13,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO::Table
 {
-    using Data = std::vector<std::vector<std::string> >;
+	using Data = std::vector<std::vector<std::string>>;
 
 
-    Core::Optional<Data> FromFile(const std::filesystem::path& path, char delimiter = '\t');
-    Data                 FromString(const std::string& string, char delimiter = '\t');
+	Core::Optional<Data> FromFile(const std::filesystem::path& path, char delimiter = '\t');
+	Data                 FromString(const std::string& string, char delimiter = '\t');
 }

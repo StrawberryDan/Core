@@ -3,14 +3,14 @@
 
 namespace Strawberry::Core
 {
-    void DebugBreak();
+	void DebugBreak();
 
-    [[noreturn]] void Unreachable();
+	[[noreturn]] void Unreachable();
 
 
-    template<typename T>
-    [[noreturn]] T Unreachable()
-    {
-        Unreachable();
-    }
+	template<typename T>
+	[[noreturn]] T Unreachable()
+	{
+		Unreachable();
+	}
 } // namespace Strawberry::Core
