@@ -13,35 +13,35 @@ namespace Strawberry::Core
 
 	class Clock
 	{
-		public:
-			explicit Clock(bool start = true);
+	public:
+		explicit Clock(bool start = true);
 
-			void Start();
+		void Start();
 
-			double Stop();
+		double Stop();
 
-			[[nodiscard]] Seconds Read() const;
-
-
-			Seconds operator*() const
-			{
-				return Read();
-			}
+		[[nodiscard]] Seconds Read() const;
 
 
-			explicit operator Seconds() const
-			{
-				return Read();
-			}
+		Seconds operator*() const
+		{
+			return Read();
+		}
 
 
-			Seconds Restart();
+		explicit operator Seconds() const
+		{
+			return Read();
+		}
 
-		private:
-			using Duration = std::chrono::duration<double, std::ratio<1>>;
-			using Instant  = std::chrono::time_point<std::chrono::system_clock, Duration>;
 
-			Duration          mBuffer;
-			Optional<Instant> mStartTime;
+		Seconds Restart();
+
+	private:
+		using Duration = std::chrono::duration<double, std::ratio<1>>;
+		using Instant  = std::chrono::time_point<std::chrono::system_clock, Duration>;
+
+		Duration          mBuffer;
+		Optional<Instant> mStartTime;
 	};
 } // namespace Strawberry::Core

@@ -40,41 +40,41 @@ namespace Strawberry::Core
 
 	class Date
 	{
-		public:
-			Date(int32_t year, uint8_t month, uint8_t day);
+	public:
+		Date(int32_t year, uint8_t month, uint8_t day);
 
 
-			[[nodiscard]] int32_t GetYear() const;
-			[[nodiscard]] int32_t GetMonth() const;
-			[[nodiscard]] int32_t GetDay() const;
+		[[nodiscard]] int32_t GetYear() const;
+		[[nodiscard]] int32_t GetMonth() const;
+		[[nodiscard]] int32_t GetDay() const;
 
 
-			void SetYear(int32_t year);
-			void SetMonth(uint8_t month);
-			void SetDay(uint8_t day);
+		void SetYear(int32_t year);
+		void SetMonth(uint8_t month);
+		void SetDay(uint8_t day);
 
 
-			Date  operator+(const DateInterval& interval) const;
-			Date  operator-(const DateInterval& interval) const;
-			Date& operator+=(const DateInterval& interval);
-			Date& operator-=(const DateInterval& interval);
+		Date  operator+(const DateInterval& interval) const;
+		Date  operator-(const DateInterval& interval) const;
+		Date& operator+=(const DateInterval& interval);
+		Date& operator-=(const DateInterval& interval);
 
 
-			std::partial_ordering operator<=>(const Date& rhs) const = default;
+		std::partial_ordering operator<=>(const Date& rhs) const = default;
 
 
-			[[nodiscard]] bool IsLeapYear() const;
+		[[nodiscard]] bool IsLeapYear() const;
 
-		protected:
-			[[nodiscard]] bool IsValidDate() const;
-			void               Normalise();
+	protected:
+		[[nodiscard]] bool IsValidDate() const;
+		void               Normalise();
 
 
-			[[nodiscard]] uint8_t GetMonthLength() const;
+		[[nodiscard]] uint8_t GetMonthLength() const;
 
-		private:
-			int32_t mYear;
-			int32_t mMonth;
-			int32_t mDay;
+	private:
+		int32_t mYear;
+		int32_t mMonth;
+		int32_t mDay;
 	};
 }

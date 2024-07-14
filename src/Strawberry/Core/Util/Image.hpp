@@ -50,31 +50,31 @@ namespace Strawberry::Core::Util
 	template<typename PixelType>
 	class Image
 	{
-		public:
-			static Core::Result<Image, IO::Error> FromFile(const std::filesystem::path& path) noexcept;
+	public:
+		static Core::Result<Image, IO::Error> FromFile(const std::filesystem::path& path) noexcept;
 
 
-			Image(uint32_t width, uint32_t height, IO::DynamicByteBuffer bytes) noexcept;
+		Image(uint32_t width, uint32_t height, IO::DynamicByteBuffer bytes) noexcept;
 
 
-			PixelType Read(uint32_t x, uint32_t y) const noexcept;
-			void      Write(uint32_t x, uint32_t y, PixelType pixel) noexcept;
+		PixelType Read(uint32_t x, uint32_t y) const noexcept;
+		void      Write(uint32_t x, uint32_t y, PixelType pixel) noexcept;
 
 
-			uint32_t Width() const noexcept;
-			uint32_t Height() const noexcept;
+		uint32_t Width() const noexcept;
+		uint32_t Height() const noexcept;
 
 
-			PixelType*       Data() noexcept;
-			const PixelType* Data() const noexcept;
+		PixelType*       Data() noexcept;
+		const PixelType* Data() const noexcept;
 
 
-			void Save(const std::filesystem::path& path, unsigned int quality = 100) const noexcept;
+		void Save(const std::filesystem::path& path, unsigned int quality = 100) const noexcept;
 
-		private:
-			uint32_t              mWidth;
-			uint32_t              mHeight;
-			IO::DynamicByteBuffer mBytes;
+	private:
+		uint32_t              mWidth;
+		uint32_t              mHeight;
+		IO::DynamicByteBuffer mBytes;
 	};
 
 

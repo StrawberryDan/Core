@@ -14,81 +14,81 @@ namespace Strawberry::Core
 	template<typename T>
 	class Lazy
 	{
-		public:
-			T& Get()
+	public:
+		T& Get()
+		{
+			if (!mInitialised)
 			{
-				if (!mInitialised)
-				{
-					T payload = mInitialiser();
-					std::destroy_at(&mInitialiser);
-					std::construct_at(&mPayload, std::move(payload));
-					mInitialised = true;
-				}
-
-				return mPayload;
+				T payload = mInitialiser();
+				std::destroy_at(&mInitialiser);
+				std::construct_at(&mPayload, std::move(payload));
+				mInitialised = true;
 			}
 
+			return mPayload;
+		}
 
-			const T& Get() const
+
+		const T& Get() const
+		{
+			if (!mInitialised)
 			{
-				if (!mInitialised)
-				{
-					T payload = mInitialiser();
-					std::destroy_at(mInitialiser);
-					std::construct_at(mPayload, std::move(payload));
-					mInitialised = true;
-				}
-
-				return mPayload;
+				T payload = mInitialiser();
+				std::destroy_at(mInitialiser);
+				std::construct_at(mPayload, std::move(payload));
+				mInitialised = true;
 			}
 
-		public:
-			Lazy() requires (std::default_initializable<T>)
-				: mInitialiser([]() -> T
-				{
-					return T();
-				}) {}
+			return mPayload;
+		}
 
-
-			template<typename F>
-			explicit Lazy(F f)
-				: mInitialiser(std::move(f)) {}
-
-
-			Lazy(const Lazy& rhs)
-				: mInitialised(std::copyable<T> && rhs.mInitialised)
+	public:
+		Lazy() requires (std::default_initializable<T>)
+			: mInitialiser([]() -> T
 			{
-				if (std::copyable<T> && mInitialised)
-				{
-					std::construct_at(&mPayload, rhs.mPayload);
-				}
-				else
-				{
-					std::construct_at(&mInitialiser, rhs.mInitialiser);
-				}
+				return T();
+			}) {}
+
+
+		template<typename F>
+		explicit Lazy(F f)
+			: mInitialiser(std::move(f)) {}
+
+
+		Lazy(const Lazy& rhs)
+			: mInitialised(std::copyable<T> && rhs.mInitialised)
+		{
+			if (std::copyable<T> && mInitialised)
+			{
+				std::construct_at(&mPayload, rhs.mPayload);
 			}
-
-
-			~Lazy()
+			else
 			{
-				if (!mInitialised)
-				{
-					std::destroy_at(&mInitialiser);
-				}
-				else
-				{
-					std::destroy_at(&mPayload);
-				}
+				std::construct_at(&mInitialiser, rhs.mInitialiser);
 			}
-
-		protected:
-			mutable bool mInitialised = false;
+		}
 
 
-			union
+		~Lazy()
+		{
+			if (!mInitialised)
 			{
-				T                  mPayload;
-				std::function<T()> mInitialiser;
-			};
+				std::destroy_at(&mInitialiser);
+			}
+			else
+			{
+				std::destroy_at(&mPayload);
+			}
+		}
+
+	protected:
+		mutable bool mInitialised = false;
+
+
+		union
+		{
+			T                  mPayload;
+			std::function<T()> mInitialiser;
+		};
 	};
 } // namespace Strawberry::Core

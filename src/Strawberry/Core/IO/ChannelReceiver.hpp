@@ -26,9 +26,9 @@ namespace Strawberry::Core::IO
 		template<std::copyable, std::copyable...>
 		friend class ChannelBroadcaster;
 
-		protected:
-			using ChannelReceiver<T>::Receive;
-			using ChannelReceiver<Ts>::Receive...;
+	protected:
+		using ChannelReceiver<T>::Receive;
+		using ChannelReceiver<Ts>::Receive...;
 	};
 
 
@@ -38,21 +38,21 @@ namespace Strawberry::Core::IO
 		template<std::copyable, std::copyable...>
 		friend class ChannelBroadcaster;
 
-		public:
-			ChannelReceiver() {}
+	public:
+		ChannelReceiver() {}
 
-			ChannelReceiver(const ChannelReceiver& rhs)            = delete;
-			ChannelReceiver& operator=(const ChannelReceiver& rhs) = delete;
-
-
-			ChannelReceiver(ChannelReceiver&& rhs)
-			{
-				*rhs.mManagedThis = this;
-			}
+		ChannelReceiver(const ChannelReceiver& rhs)            = delete;
+		ChannelReceiver& operator=(const ChannelReceiver& rhs) = delete;
 
 
-			ChannelReceiver& operator=(ChannelReceiver&& rhs) = delete;
+		ChannelReceiver(ChannelReceiver&& rhs)
+		{
+			*rhs.mManagedThis = this;
+		}
 
-			virtual void Receive(T value) = 0;
+
+		ChannelReceiver& operator=(ChannelReceiver&& rhs) = delete;
+
+		virtual void Receive(T value) = 0;
 	};
 } // namespace Strawberry::Core::IO

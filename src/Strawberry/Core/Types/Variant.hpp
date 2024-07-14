@@ -55,106 +55,106 @@ namespace Strawberry::Core
 	template<typename... Types>
 	class Variant
 	{
-		public:
-			template<typename... Ts>
-			using AddTypes = typename AddVariantTypes<Variant<Types...>, Ts...>::Type;
+	public:
+		template<typename... Ts>
+		using AddTypes = typename AddVariantTypes<Variant<Types...>, Ts...>::Type;
 
-			template<typename... Ts>
-			using MergeTypes = typename MergeVariantTypes<Variant<Types...>, Variant<Ts...>>::Type;
-
-
-			template<std::convertible_to<std::variant<Types...>> T>
-			Variant(T data)
-				: mData(std::move(data)) {}
+		template<typename... Ts>
+		using MergeTypes = typename MergeVariantTypes<Variant<Types...>, Variant<Ts...>>::Type;
 
 
-			[[nodiscard]] bool ContainsValue() const
+		template<std::convertible_to<std::variant<Types...>> T>
+		Variant(T data)
+			: mData(std::move(data)) {}
+
+
+		[[nodiscard]] bool ContainsValue() const
+		{
+			return !mData.valueless_by_exception();
+		}
+
+
+		template<typename T>
+		[[nodiscard]] bool IsType() const
+		{
+			return std::holds_alternative<T>(mData);
+		}
+
+
+		template<typename T>
+		Core::Optional<T> Take()
+		{
+			Core::Assert(ContainsValue());
+			if (std::holds_alternative<T>(mData))
 			{
-				return !mData.valueless_by_exception();
+				return std::move(std::get<T>(std::move(mData)));
 			}
-
-
-			template<typename T>
-			[[nodiscard]] bool IsType() const
+			else
 			{
-				return std::holds_alternative<T>(mData);
+				return Core::NullOpt;
 			}
+		}
 
 
-			template<typename T>
-			Core::Optional<T> Take()
-			{
-				Core::Assert(ContainsValue());
-				if (std::holds_alternative<T>(mData))
-				{
-					return std::move(std::get<T>(std::move(mData)));
-				}
-				else
-				{
-					return Core::NullOpt;
-				}
-			}
-
-
-			template<typename T> requires (std::copyable<T>)
-			Core::Optional<T> Value() const
-			{
-				Core::Assert(ContainsValue());
-				if (std::holds_alternative<T>(mData))
-				{
-					return std::get<T>(mData);
-				}
-				else
-				{
-					return Core::NullOpt;
-				}
-			}
-
-
-			template<typename T>
-			T& Ref()
+		template<typename T> requires (std::copyable<T>)
+		Core::Optional<T> Value() const
+		{
+			Core::Assert(ContainsValue());
+			if (std::holds_alternative<T>(mData))
 			{
 				return std::get<T>(mData);
 			}
-
-
-			template<typename T>
-			const T& Ref() const
+			else
 			{
-				return std::get<T>(mData);
+				return Core::NullOpt;
 			}
+		}
 
 
-			template<typename T>
-			Core::Optional<T*> Ptr()
-			{
-				Core::Assert(ContainsValue() && IsType<T>());
-				return std::get_if<T>(&mData);
-			}
+		template<typename T>
+		T& Ref()
+		{
+			return std::get<T>(mData);
+		}
 
 
-			template<typename T>
-			Core::Optional<const T*> Ptr() const &
-			{
-				Core::Assert(ContainsValue() && IsType<T>());
-				return static_cast<const T*>(std::get_if<T>(&mData));
-			}
+		template<typename T>
+		const T& Ref() const
+		{
+			return std::get<T>(mData);
+		}
 
 
-			template<typename T> requires (IsInVariant<T, Variant>::value)
-			bool operator==(const Variant& other) const
-			{
-				return IsType<T>() && Ref<T>() == other;
-			}
+		template<typename T>
+		Core::Optional<T*> Ptr()
+		{
+			Core::Assert(ContainsValue() && IsType<T>());
+			return std::get_if<T>(&mData);
+		}
 
 
-			template<typename T> requires (IsInVariant<T, Variant>::value)
-			bool operator!=(const Variant& other) const
-			{
-				return !IsType<T>() || Ref<T>() != other;
-			}
+		template<typename T>
+		Core::Optional<const T*> Ptr() const &
+		{
+			Core::Assert(ContainsValue() && IsType<T>());
+			return static_cast<const T*>(std::get_if<T>(&mData));
+		}
 
-		private:
-			std::variant<Types...> mData;
+
+		template<typename T> requires (IsInVariant<T, Variant>::value)
+		bool operator==(const Variant& other) const
+		{
+			return IsType<T>() && Ref<T>() == other;
+		}
+
+
+		template<typename T> requires (IsInVariant<T, Variant>::value)
+		bool operator!=(const Variant& other) const
+		{
+			return !IsType<T>() || Ref<T>() != other;
+		}
+
+	private:
+		std::variant<Types...> mData;
 	};
 } // namespace Strawberry::Core

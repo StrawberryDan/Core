@@ -18,23 +18,23 @@ namespace Strawberry::Core::IO
 	class Broadcaster
 			: private Broadcaster<T>, private Broadcaster<Ts...>
 	{
-		public:
-			using Broadcaster<T>::Broadcast;
-			using Broadcaster<Ts>::Broadcast...;
+	public:
+		using Broadcaster<T>::Broadcast;
+		using Broadcaster<Ts>::Broadcast...;
 	};
 
 
 	template<std::copyable T>
 	class Broadcaster<T>
 	{
-		protected:
-			void Broadcast(T value)
+	protected:
+		void Broadcast(T value)
+		{
+			auto receivers = Receiver<T>::sReceivers.Lock();
+			for (auto& receiver: *receivers)
 			{
-				auto receivers = Receiver<T>::sReceivers.Lock();
-				for (auto& receiver: *receivers)
-				{
-					receiver->Receive(value);
-				}
+				receiver->Receive(value);
 			}
+		}
 	};
 } // namespace Strawberry::Core::IO

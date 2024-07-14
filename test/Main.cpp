@@ -26,6 +26,7 @@ namespace Test
 {
 	using namespace Math;
 
+
 	void CheckBytes(const IO::DynamicByteBuffer& bytes)
 	{
 		auto               encoded      = IO::Base64::Encode(bytes);
@@ -35,6 +36,7 @@ namespace Test
 		Assert(decoded.Size() == bytes.Size());
 		Assert(decoded == bytes);
 	}
+
 
 	void Base64()
 	{
@@ -59,12 +61,16 @@ namespace Test
 		{
 			unsigned int          len = lengthDistribution(randgen);
 			IO::DynamicByteBuffer randomBytes;
-			for (int i = 0; i < len; ++i) { randomBytes.Push(byteDistribution(randgen)); }
+			for (int i = 0; i < len; ++i)
+			{
+				randomBytes.Push(byteDistribution(randgen));
+			}
 
 			Assert(randomBytes.Size() == len);
 			CheckBytes(randomBytes);
 		}
 	}
+
 
 	void PeriodicNumbers()
 	{
@@ -104,18 +110,28 @@ namespace Test
 		Assert(dynamicDouble / 2 == 2.5);
 	}
 
+
 	class UninitialisedTester
 	{
 	public:
-		UninitialisedTester() { numConstructed++; }
+		UninitialisedTester()
+		{
+			numConstructed++;
+		}
 
-		~UninitialisedTester() { numConstructed--; }
+
+		~UninitialisedTester()
+		{
+			numConstructed--;
+		}
 
 	public:
 		static int numConstructed;
 	};
 
+
 	inline int UninitialisedTester::numConstructed = 0;
+
 
 	void Uninitialised()
 	{
@@ -133,6 +149,7 @@ namespace Test
 		data[2].Destruct();
 	}
 
+
 	void ChannelBroadcasterReceiver()
 	{
 		struct A {};
@@ -143,13 +160,15 @@ namespace Test
 
 		struct D {};
 
-		struct R1 : public Strawberry::Core::IO::ChannelReceiver<A, B> {
+		struct R1 : public Strawberry::Core::IO::ChannelReceiver<A, B>
+		{
 			void Receive(A a) {}
 
 			void Receive(B b) {}
 		};
 
-		struct R2 : public Strawberry::Core::IO::ChannelReceiver<A, B, C, D> {
+		struct R2 : public Strawberry::Core::IO::ChannelReceiver<A, B, C, D>
+		{
 			void Receive(A a) {}
 
 			void Receive(B b) {}
@@ -167,27 +186,31 @@ namespace Test
 		b1.Register(&r2);
 	}
 
+
 	void Vectors()
 	{
 		Vector a(1, 2, 3);
 		Vector b(4, 5, 6);
 
-		auto c           = a.Dot(b);
-		auto d           = a.Cross(b);
+		auto c = a.Dot(b);
+		auto d = a.Cross(b);
 
-		double e         = d.Magnitude();
-		float  f         = d.Magnitude();
+		double e = d.Magnitude();
+		float  f = d.Magnitude();
 
-		auto& [x, y, z]  = a;
-		x               += 1;
+		auto& [x, y, z] = a;
+		x += 1;
 
 		Strawberry::Core::Assert(a == Vector(2, 2, 3));
 	}
 
+
 	void Matrices()
 	{
-		Matrix<int, 2, 2> m(1, 2,
-							3, 4);
+		Matrix<int, 2, 2> m(1,
+		                    2,
+		                    3,
+		                    4);
 		Assert(m[0][0] == 1);
 		Assert(m[1][0] == 3);
 		Assert(m[0][1] == 2);
@@ -197,14 +220,14 @@ namespace Test
 
 	void UTF()
 	{
-		const char8_t* a = u8"£";
-		char32_t a32 = ToUTF32(a).Unwrap();
+		const char8_t* a   = u8"£";
+		char32_t       a32 = ToUTF32(a).Unwrap();
 		std::u32string a32str{a32};
 		Assert(a32str == U"£");
 		Assert(ToUTF8(a32).Unwrap() == a);
 
-		std::u32string b = U"兎田ぺこら";
-		std::u8string b8 = ToUTF8(b);
+		std::u32string b  = U"兎田ぺこら";
+		std::u8string  b8 = ToUTF8(b);
 		Assert(ToUTF32(b8) == b);
 	}
 

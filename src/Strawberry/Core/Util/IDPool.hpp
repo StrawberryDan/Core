@@ -15,29 +15,29 @@ namespace Strawberry::Core
 	template<std::integral T = size_t>
 	class IDPool
 	{
-		public:
-			T Allocate()
+	public:
+		T Allocate()
+		{
+			if (mFreeIDs.empty())
 			{
-				if (mFreeIDs.empty())
-				{
-					return mGreatestID++;
-				}
-				else
-				{
-					auto minimum = *std::min_element(mFreeIDs.begin(), mFreeIDs.end());
-					mFreeIDs.erase(minimum);
-					return minimum;
-				}
+				return mGreatestID++;
 			}
-
-
-			void Free(T id)
+			else
 			{
-				mFreeIDs.emplace(id);
+				auto minimum = *std::min_element(mFreeIDs.begin(), mFreeIDs.end());
+				mFreeIDs.erase(minimum);
+				return minimum;
 			}
+		}
 
-		private:
-			T           mGreatestID = 0;
-			std::set<T> mFreeIDs;
+
+		void Free(T id)
+		{
+			mFreeIDs.emplace(id);
+		}
+
+	private:
+		T           mGreatestID = 0;
+		std::set<T> mFreeIDs;
 	};
 } // namespace Strawberry::Core

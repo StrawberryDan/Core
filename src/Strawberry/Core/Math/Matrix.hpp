@@ -18,133 +18,133 @@ namespace Strawberry::Core::Math
 	template<typename T, size_t H, size_t W> requires (std::signed_integral<T> || std::floating_point<T>)
 	class Matrix
 	{
-		public:
-			/// Produced a matrix of all zeros;
-			constexpr static Matrix Zeroed()
+	public:
+		/// Produced a matrix of all zeros;
+		constexpr static Matrix Zeroed()
+		{
+			Matrix result;
+			for (size_t i = 0; i < std::min(W, H); i++)
 			{
-				Matrix result;
-				for (size_t i = 0; i < std::min(W, H); i++)
+				result[i][i] = T(0);
+			}
+			return result;
+		}
+
+
+		/// Identity Matrix Constructor
+		constexpr Matrix()
+			: mValue{T(0)}
+		{
+			for (size_t i = 0; i < std::min(H, W); i++) mValue[i][i] = T(1);
+		}
+
+
+		template<typename... Args> requires (sizeof...(Args) == H * W && (std::convertible_to<T, Args> && ...))
+		constexpr Matrix(Args... args)
+		{
+			std::array<T, H * W> values{static_cast<T>(args)...};
+			for (size_t i = 0; i < values.size(); i++) mValue[i / W][i % W] = values[i];
+		}
+
+
+		constexpr T* operator[](size_t col)
+		{
+			Core::Assert(col < W);
+			return mValue[col];
+		}
+
+
+		constexpr const T* operator[](size_t col) const
+		{
+			Core::Assert(col < W);
+			return mValue[col];
+		}
+
+
+		constexpr bool operator==(const Matrix& b) const
+		{
+			for (size_t row = 0; row < H; row++)
+			{
+				for (size_t col = 0; col < W; col++)
 				{
-					result[i][i] = T(0);
+					if (mValue[col][row] != b[col][row]) return false;
 				}
-				return result;
 			}
 
+			return true;
+		}
 
-			/// Identity Matrix Constructor
-			constexpr Matrix()
-				: mValue{T(0)}
+
+		constexpr bool operator!=(const Matrix& b) const
+		{
+			for (size_t row = 0; row < H; row++)
 			{
-				for (size_t i = 0; i < std::min(H, W); i++) mValue[i][i] = T(1);
-			}
-
-
-			template<typename... Args> requires (sizeof...(Args) == H * W && (std::convertible_to<T, Args> && ...))
-			constexpr Matrix(Args... args)
-			{
-				std::array<T, H * W> values{static_cast<T>(args)...};
-				for (size_t i = 0; i < values.size(); i++) mValue[i / W][i % W] = values[i];
-			}
-
-
-			constexpr T* operator[](size_t col)
-			{
-				Core::Assert(col < W);
-				return mValue[col];
-			}
-
-
-			constexpr const T* operator[](size_t col) const
-			{
-				Core::Assert(col < W);
-				return mValue[col];
-			}
-
-
-			constexpr bool operator==(const Matrix& b) const
-			{
-				for (size_t row = 0; row < H; row++)
+				for (size_t col = 0; col < W; col++)
 				{
-					for (size_t col = 0; col < W; col++)
+					if (mValue[col][row] == b[col][row]) return false;
+				}
+			}
+
+			return true;
+		}
+
+
+		constexpr Matrix operator+(const Matrix& b) const
+		{
+			Matrix result;
+			for (size_t row = 0; row < H; row++)
+			{
+				for (size_t col = 0; col < W; col++)
+				{
+					result[col][row] = (*this)[col][row] + b[col][row];
+				}
+			}
+			return result;
+		}
+
+
+		constexpr Matrix operator-(const Matrix& b) const
+		{
+			Matrix result;
+			for (size_t row = 0; row < H; row++)
+			{
+				for (size_t col = 0; col < W; col++)
+				{
+					result[col][row] = (*this)[col][row] - b[col][row];
+				}
+			}
+			return result;
+		}
+
+
+		constexpr Matrix operator*(const Matrix<T, W, H>& b) const
+		{
+			Matrix result = Matrix::Zeroed();
+			for (size_t row = 0; row < H; row++)
+			{
+				for (size_t col = 0; col < W; col++)
+				{
+					for (size_t k = 0; k < W; k++)
 					{
-						if (mValue[col][row] != b[col][row]) return false;
+						result[col][row] += (*this)[k][row] * b[col][k];
 					}
 				}
-
-				return true;
 			}
+			return result;
+		}
 
 
-			constexpr bool operator!=(const Matrix& b) const
-			{
-				for (size_t row = 0; row < H; row++)
-				{
-					for (size_t col = 0; col < W; col++)
-					{
-						if (mValue[col][row] == b[col][row]) return false;
-					}
-				}
+		Matrix Transposed() const
+		{
+			Matrix result;
+			for (int x = 0; x < W; x++)
+				for (int y       = 0; y < H; y++)
+					result[x][y] = mValue[y][x];
+			return result;
+		}
 
-				return true;
-			}
-
-
-			constexpr Matrix operator+(const Matrix& b) const
-			{
-				Matrix result;
-				for (size_t row = 0; row < H; row++)
-				{
-					for (size_t col = 0; col < W; col++)
-					{
-						result[col][row] = (*this)[col][row] + b[col][row];
-					}
-				}
-				return result;
-			}
-
-
-			constexpr Matrix operator-(const Matrix& b) const
-			{
-				Matrix result;
-				for (size_t row = 0; row < H; row++)
-				{
-					for (size_t col = 0; col < W; col++)
-					{
-						result[col][row] = (*this)[col][row] - b[col][row];
-					}
-				}
-				return result;
-			}
-
-
-			constexpr Matrix operator*(const Matrix<T, W, H>& b) const
-			{
-				Matrix result = Matrix::Zeroed();
-				for (size_t row = 0; row < H; row++)
-				{
-					for (size_t col = 0; col < W; col++)
-					{
-						for (size_t k = 0; k < W; k++)
-						{
-							result[col][row] += (*this)[k][row] * b[col][k];
-						}
-					}
-				}
-				return result;
-			}
-
-
-			Matrix Transposed() const
-			{
-				Matrix result;
-				for (int x = 0; x < W; x++)
-					for (int y       = 0; y < H; y++)
-						result[x][y] = mValue[y][x];
-				return result;
-			}
-
-		private:
-			T mValue[H][W];
+	private:
+		T mValue[H][W];
 	};
 
 

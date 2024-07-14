@@ -26,9 +26,9 @@ namespace Strawberry::Core::IO
 	class Receiver
 			: private Receiver<T>, private Receiver<Ts...>
 	{
-		protected:
-			using Receiver<T>::Receive;
-			using Receiver<Ts>::Receive...;
+	protected:
+		using Receiver<T>::Receive;
+		using Receiver<Ts>::Receive...;
 	};
 
 
@@ -38,50 +38,50 @@ namespace Strawberry::Core::IO
 		template<std::copyable, std::copyable...>
 		friend class Broadcaster;
 
-		public:
-			Receiver()
-			{
-				auto receiverList = sReceivers.Lock();
-				receiverList->emplace(this);
-			}
+	public:
+		Receiver()
+		{
+			auto receiverList = sReceivers.Lock();
+			receiverList->emplace(this);
+		}
 
 
-			Receiver(const Receiver& rhs) = delete;
+		Receiver(const Receiver& rhs) = delete;
 
-			Receiver& operator=(const Receiver& rhs) = delete;
+		Receiver& operator=(const Receiver& rhs) = delete;
 
 
-			Receiver(Receiver&& rhs)
+		Receiver(Receiver&& rhs)
+		{
+			auto receiverList = sReceivers.Lock();
+			receiverList->erase(&rhs);
+			receiverList->emplace(this);
+		}
+
+
+		Receiver& operator=(Receiver&& rhs)
+		{
+			if (this != &rhs)
 			{
 				auto receiverList = sReceivers.Lock();
 				receiverList->erase(&rhs);
 				receiverList->emplace(this);
 			}
+			return *this;
+		}
 
 
-			Receiver& operator=(Receiver&& rhs)
-			{
-				if (this != &rhs)
-				{
-					auto receiverList = sReceivers.Lock();
-					receiverList->erase(&rhs);
-					receiverList->emplace(this);
-				}
-				return *this;
-			}
+		~Receiver()
+		{
+			auto receiverList = sReceivers.Lock();
+			receiverList->erase(this);
+		}
 
+	protected:
+		virtual void Receive(T value) = 0;
 
-			~Receiver()
-			{
-				auto receiverList = sReceivers.Lock();
-				receiverList->erase(this);
-			}
-
-		protected:
-			virtual void Receive(T value) = 0;
-
-		private:
-			static Core::Mutex<std::set<Receiver<T>*>> sReceivers;
+	private:
+		static Core::Mutex<std::set<Receiver<T>*>> sReceivers;
 	};
 
 

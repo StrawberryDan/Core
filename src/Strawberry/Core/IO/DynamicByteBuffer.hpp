@@ -22,125 +22,125 @@ namespace Strawberry::Core::IO
 
 	class DynamicByteBuffer
 	{
-		public:
-			// Static Methods
-			static Core::Optional<DynamicByteBuffer>                                     FromFile(const std::filesystem::path& path);
-			static Core::Optional<std::tuple<Core::Math::Vec2u, int, DynamicByteBuffer>> FromImage(const std::filesystem::path& path);
-			static DynamicByteBuffer                                                     Zeroes(size_t len);
-			static DynamicByteBuffer                                                     WithCapacity(size_t len);
+	public:
+		// Static Methods
+		static Core::Optional<DynamicByteBuffer>                                     FromFile(const std::filesystem::path& path);
+		static Core::Optional<std::tuple<Core::Math::Vec2u, int, DynamicByteBuffer>> FromImage(const std::filesystem::path& path);
+		static DynamicByteBuffer                                                     Zeroes(size_t len);
+		static DynamicByteBuffer                                                     WithCapacity(size_t len);
 
 
-			// Constructors
-			DynamicByteBuffer() = default;
-			template<typename T>
-			DynamicByteBuffer(const T* data, size_t len);
-			template<typename T>
-			explicit DynamicByteBuffer(const T& object);
-			DynamicByteBuffer(const std::string& string);
+		// Constructors
+		DynamicByteBuffer() = default;
+		template<typename T>
+		DynamicByteBuffer(const T* data, size_t len);
+		template<typename T>
+		explicit DynamicByteBuffer(const T& object);
+		DynamicByteBuffer(const std::string& string);
 
 
-			// Pushing Data
-			template<typename T>
-			void Push(const T* data, size_t count);
+		// Pushing Data
+		template<typename T>
+		void Push(const T* data, size_t count);
 
-			template<typename T>
-			void Push(const T& data);
+		template<typename T>
+		void Push(const T& data);
 
-			template<typename T>
-			void Push(const std::vector<T>& data);
-
-
-			inline void Push(const IO::DynamicByteBuffer& bytes)
-			{
-				Push(bytes.Data(), bytes.Size());
-			}
+		template<typename T>
+		void Push(const std::vector<T>& data);
 
 
-			template<size_t S>
-			inline void Push(const IO::ByteBuffer<S>& bytes)
-			{
-				Push(bytes.Data(), bytes.Size());
-			}
+		inline void Push(const IO::DynamicByteBuffer& bytes)
+		{
+			Push(bytes.Data(), bytes.Size());
+		}
 
 
-			Result<DynamicByteBuffer, Error> Read(size_t len);
-			Result<size_t, Error>            Write(const DynamicByteBuffer& bytes);
+		template<size_t S>
+		inline void Push(const IO::ByteBuffer<S>& bytes)
+		{
+			Push(bytes.Data(), bytes.Size());
+		}
 
 
-			// Accessors
-			[[nodiscard]] size_t Size() const;
-
-			uint8_t*                     Data();
-			[[nodiscard]] const uint8_t* Data() const;
+		Result<DynamicByteBuffer, Error> Read(size_t len);
+		Result<size_t, Error>            Write(const DynamicByteBuffer& bytes);
 
 
-			uint8_t& operator[](size_t i)
-			{
-				return mData[i];
-			}
+		// Accessors
+		[[nodiscard]] size_t Size() const;
+
+		uint8_t*                     Data();
+		[[nodiscard]] const uint8_t* Data() const;
 
 
-			const uint8_t& operator[](size_t i) const
-			{
-				return mData[i];
-			}
+		uint8_t& operator[](size_t i)
+		{
+			return mData[i];
+		}
 
 
-			// Iterators
-			uint8_t* begin()
-			{
-				return Data();
-			}
+		const uint8_t& operator[](size_t i) const
+		{
+			return mData[i];
+		}
 
 
-			uint8_t* end()
-			{
-				return Data() + Size();
-			}
+		// Iterators
+		uint8_t* begin()
+		{
+			return Data();
+		}
 
 
-			[[nodiscard]] const uint8_t* begin() const
-			{
-				return Data();
-			}
+		uint8_t* end()
+		{
+			return Data() + Size();
+		}
 
 
-			[[nodiscard]] const uint8_t* end() const
-			{
-				return Data() + Size();
-			}
+		[[nodiscard]] const uint8_t* begin() const
+		{
+			return Data();
+		}
 
 
-			// Sizing
-			void Reserve(size_t len);
-			void Resize(size_t len);
+		[[nodiscard]] const uint8_t* end() const
+		{
+			return Data() + Size();
+		}
 
 
-			// Comparison
-			std::strong_ordering operator<=>(const DynamicByteBuffer& rhs) const = default;
+		// Sizing
+		void Reserve(size_t len);
+		void Resize(size_t len);
 
 
-			// Casting
-			template<typename T> requires std::copyable<T> || std::movable<T>
-			T Into() const;
+		// Comparison
+		std::strong_ordering operator<=>(const DynamicByteBuffer& rhs) const = default;
 
-			template<typename T>
-			void Into(T& data) const;
 
-			template<size_t S>
-			ByteBuffer<S> AsStatic() const;
+		// Casting
+		template<typename T> requires std::copyable<T> || std::movable<T>
+		T Into() const;
 
-			template<size_t N>
-			std::array<uint8_t, N> AsArray() const;
+		template<typename T>
+		void Into(T& data) const;
 
-			template<typename T = uint8_t>
-			inline std::vector<T> AsVector();
+		template<size_t S>
+		ByteBuffer<S> AsStatic() const;
 
-			[[nodiscard]] std::string AsString() const;
+		template<size_t N>
+		std::array<uint8_t, N> AsArray() const;
 
-		private:
-			std::vector<uint8_t> mData;
-			size_t               mReadCursor = 0;
+		template<typename T = uint8_t>
+		inline std::vector<T> AsVector();
+
+		[[nodiscard]] std::string AsString() const;
+
+	private:
+		std::vector<uint8_t> mData;
+		size_t               mReadCursor = 0;
 	};
 } // namespace Strawberry::Core::IO
 

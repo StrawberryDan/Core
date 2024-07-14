@@ -11,68 +11,68 @@ namespace Strawberry::Core::IO
 	template<size_t S>
 	class ByteBuffer
 	{
-		public:
-			// Constructors
-			ByteBuffer() = default;
+	public:
+		// Constructors
+		ByteBuffer() = default;
 
-			template<typename T>
-			explicit ByteBuffer(const T* data, size_t len = S);
+		template<typename T>
+		explicit ByteBuffer(const T* data, size_t len = S);
 
-			template<typename T> requires (sizeof(T) == S)
-			explicit ByteBuffer(const T& object);
-
-
-			// Accessors
-			[[nodiscard]] size_t Size() const
-			{
-				return S;
-			}
+		template<typename T> requires (sizeof(T) == S)
+		explicit ByteBuffer(const T& object);
 
 
-			uint8_t* Data()
-			{
-				return mData.data();
-			}
+		// Accessors
+		[[nodiscard]] size_t Size() const
+		{
+			return S;
+		}
 
 
-			[[nodiscard]] const uint8_t* Data() const
-			{
-				return mData.data();
-			}
+		uint8_t* Data()
+		{
+			return mData.data();
+		}
 
 
-			uint8_t& operator[](size_t i)
-			{
-				return mData[i];
-			}
+		[[nodiscard]] const uint8_t* Data() const
+		{
+			return mData.data();
+		}
 
 
-			const uint8_t& operator[](size_t i) const
-			{
-				return mData[i];
-			}
+		uint8_t& operator[](size_t i)
+		{
+			return mData[i];
+		}
 
 
-			// Comparison
-			std::strong_ordering operator<=>(const ByteBuffer<S>& rhs) const;
-			bool                 operator==(const ByteBuffer<S>& rhs) const = default;
-			bool                 operator!=(const ByteBuffer<S>& rhs) const = default;
-			bool                 operator>(const ByteBuffer<S>& rhs) const  = default;
-			bool                 operator<(const ByteBuffer<S>& rhs) const  = default;
-			bool                 operator>=(const ByteBuffer<S>& rhs) const = default;
-			bool                 operator<=(const ByteBuffer<S>& rhs) const = default;
+		const uint8_t& operator[](size_t i) const
+		{
+			return mData[i];
+		}
 
 
-			template<typename T> requires ((sizeof(T) == S) && (std::copyable<T> || std::movable<T>))
-			T Into();
+		// Comparison
+		std::strong_ordering operator<=>(const ByteBuffer<S>& rhs) const;
+		bool                 operator==(const ByteBuffer<S>& rhs) const = default;
+		bool                 operator!=(const ByteBuffer<S>& rhs) const = default;
+		bool                 operator>(const ByteBuffer<S>& rhs) const  = default;
+		bool                 operator<(const ByteBuffer<S>& rhs) const  = default;
+		bool                 operator>=(const ByteBuffer<S>& rhs) const = default;
+		bool                 operator<=(const ByteBuffer<S>& rhs) const = default;
 
-			template<typename T> requires (sizeof(T) == S)
-			void Into(T& data);
 
-			[[nodiscard]] DynamicByteBuffer ToDynamic() const;
+		template<typename T> requires ((sizeof(T) == S) && (std::copyable<T> || std::movable<T>))
+		T Into();
 
-		private:
-			std::array<uint8_t, S> mData;
+		template<typename T> requires (sizeof(T) == S)
+		void Into(T& data);
+
+		[[nodiscard]] DynamicByteBuffer ToDynamic() const;
+
+	private:
+		std::array<uint8_t, S> mData;
 	};
 
 
