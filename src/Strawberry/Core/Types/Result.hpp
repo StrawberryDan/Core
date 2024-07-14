@@ -14,20 +14,24 @@ namespace Strawberry::Core
 	class [[nodiscard]] Result
 	{
 	public:
-		Result(const D& value) requires (std::copy_constructible<D>)
-			: mPayload(value) {}
+		template<typename V> requires (std::same_as<D, V>)
+		Result(V&& value)
+			: mPayload(D(std::forward<V>(value))) {}
 
 
-		Result(D&& value) requires (std::move_constructible<D>)
-			: mPayload(std::move(value)) {}
+		template<typename V> requires (std::same_as<E, V>)
+		Result(V&& value)
+			: mPayload(E(std::forward<V>(value))) {}
 
 
-		Result(const E& value) requires (std::copy_constructible<E>)
-			: mPayload(value) {}
+		template<typename V> requires (std::constructible_from<D, V> && !std::same_as<D, V> && !std::same_as<E, V>)
+		Result(V&& value)
+			: mPayload(D(std::forward<V>(value))) {}
 
 
-		Result(E&& value) requires (std::move_constructible<E>)
-			: mPayload(std::move(value)) {}
+		template<typename V> requires (std::constructible_from<E, V> && !std::same_as<D, V> && !std::same_as<E, V>)
+		Result(V&& value)
+			: mPayload(E(std::forward<V>(value))) {}
 
 
 		static Result Ok(const D& value) requires (std::copy_constructible<D>)
