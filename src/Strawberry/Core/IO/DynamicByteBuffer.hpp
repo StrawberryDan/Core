@@ -134,7 +134,7 @@ namespace Strawberry::Core::IO
 		std::array<uint8_t, N> AsArray() const;
 
 		template<typename T = uint8_t>
-		inline std::vector<T> AsVector();
+		inline std::vector<T> AsVector() const;
 
 		[[nodiscard]] std::string AsString() const;
 
@@ -219,13 +219,13 @@ Strawberry::Core::IO::ByteBuffer<S> Strawberry::Core::IO::DynamicByteBuffer::AsS
 
 
 template<typename T>
-std::vector<T> Strawberry::Core::IO::DynamicByteBuffer::AsVector()
+std::vector<T> Strawberry::Core::IO::DynamicByteBuffer::AsVector() const
 {
 	Assert(Size() % sizeof(T) == 0);
-	std::vector<T> vector(Data(), Data() + Size());
+	std::vector<T> vector(reinterpret_cast<const T*>(Data()), reinterpret_cast<const T*>(Data()) + Size() / sizeof(T));
 	return vector;
 }
 
 
 template<>
-std::vector<uint8_t> Strawberry::Core::IO::DynamicByteBuffer::AsVector<uint8_t>();
+std::vector<uint8_t> Strawberry::Core::IO::DynamicByteBuffer::AsVector<uint8_t>() const;
