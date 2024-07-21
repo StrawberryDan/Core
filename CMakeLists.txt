@@ -38,7 +38,7 @@ if (NOT TARGET StrawberryCore)
 		SOURCE_DIR STB_SOURCE_DIR)
 
 
-	add_library(StrawberryCore STATIC
+	list(APPEND StrawberryCore_Sources
 		src/Strawberry/Core/Assert.hpp
 		src/Strawberry/Core/Collection/CircularBuffer.hpp
 		src/Strawberry/Core/Concepts.hpp
@@ -100,15 +100,15 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Util/STBImplementations.cpp
 	)
 
+	new_strawberry_library(NAME StrawberryCore SOURCE ${StrawberryCore_Sources})
+
 	target_include_directories(StrawberryCore
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
 		PUBLIC ${STB_SOURCE_DIR})
 	target_link_libraries(StrawberryCore PUBLIC nlohmann_json::nlohmann_json fmt::fmt-header-only)
-	set_target_properties(StrawberryCore PROPERTIES CXX_STANDARD 23)
 
 
-	add_executable(StrawberryCoreTest
+	new_strawberry_executable(NAME StrawberryCoreTest SOURCE
 		test/Main.cpp)
 	target_link_libraries(StrawberryCoreTest PRIVATE StrawberryCore)
-	set_target_properties(StrawberryCoreTest PROPERTIES CXX_STANDARD 23)
 endif ()
