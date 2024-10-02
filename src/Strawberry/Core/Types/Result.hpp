@@ -14,24 +14,27 @@ namespace Strawberry::Core
 	class [[nodiscard]] Result
 	{
 	public:
-		template<typename V> requires (std::same_as<D, V>)
-		Result(V&& value)
-			: mPayload(D(std::forward<V>(value))) {}
-
-
-		template<typename V> requires (std::same_as<E, V>)
-		Result(V&& value)
-			: mPayload(E(std::forward<V>(value))) {}
-
-
-		template<typename V> requires (std::constructible_from<D, V> && !std::same_as<D, V> && !std::same_as<E, V>)
-		Result(V&& value)
-			: mPayload(D(std::forward<V>(value))) {}
-
-
-		template<typename V> requires (std::constructible_from<E, V> && !std::same_as<D, V> && !std::same_as<E, V>)
-		Result(V&& value)
-			: mPayload(E(std::forward<V>(value))) {}
+		template <typename... Ts>
+		Result(Ts&&... ts)
+			: mPayload([](Ts&&... ts) {
+				if constexpr (sizeof...(Ts) == 1 && (std::is_same_v<std::decay_t<Ts>, D> && ...))
+				{
+					return D(std::forward<Ts>(ts)...);
+				}
+				else if constexpr (sizeof...(Ts) == 1 && (std::is_same_v<std::decay_t<Ts>, E> && ...))
+				{
+					 return E(std::forward<Ts>(ts)...);
+				}
+				else if constexpr (std::constructible_from<D, Ts...> && !std::constructible_from<E, Ts...>)
+				{
+					return D(std::forward<Ts>(ts)...);
+				}
+				else if constexpr (std::constructible_from<E, Ts...> && !std::constructible_from<D, Ts...>)
+				{
+					return E(std::forward<Ts>(ts)...);
+				}
+			}(std::forward<Ts>(ts)...))
+		{}
 
 
 		static Result Ok(const D& value) requires (std::copy_constructible<D>)
