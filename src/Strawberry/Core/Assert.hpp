@@ -14,7 +14,6 @@ namespace Strawberry::Core
 {
 	constexpr void Assert([[maybe_unused]] bool value)
 	{
-		static_assert(STRAWBERRY_DEBUG);
 #if STRAWBERRY_DEBUG
 		if (!value)
 		{
