@@ -82,6 +82,8 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Timing/ScopedTimer.hpp
 		src/Strawberry/Core/Types/CopyOnWrite.hpp
 		src/Strawberry/Core/Types/Date.cpp
+		src/Strawberry/Core/Types/Date.hpp
+		src/Strawberry/Core/Types/Delayed.hpp
 		src/Strawberry/Core/Types/DynamicValue.hpp
 		src/Strawberry/Core/Types/Lazy.hpp
 		src/Strawberry/Core/Types/NullType.hpp
@@ -93,11 +95,9 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/UTF.cpp
 		src/Strawberry/Core/UTF.hpp
 		src/Strawberry/Core/Util/IDPool.hpp
-		src/Strawberry/Core/Util/Strings.hpp
-		src/Strawberry/Core/Types/Date.hpp
-		src/Strawberry/Core/Types/Delayed.hpp
 		src/Strawberry/Core/Util/Image.hpp
 		src/Strawberry/Core/Util/STBImplementations.cpp
+		src/Strawberry/Core/Util/Strings.hpp
 	)
 
 	new_strawberry_library(NAME StrawberryCore SOURCE ${StrawberryCore_Sources})
