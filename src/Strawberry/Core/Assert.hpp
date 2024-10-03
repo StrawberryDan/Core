@@ -35,4 +35,10 @@ namespace Strawberry::Core
 	{
 		Assert(a != b);
 	}
+
+
+	constexpr void AssertImplication(bool a, bool b)
+	{
+		Assert(!a || b);
+	}
 } // namespace Strawberry::Core
