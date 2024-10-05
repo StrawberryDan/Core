@@ -373,7 +373,7 @@ namespace Strawberry::Core
 	//----------------------------------------------------------------------------------------------------------------------
 	template<typename T>
 	class [[nodiscard]] Optional
-		: public OptionalCommon<T>
+			: public OptionalCommon<T>
 	{
 	public:
 		using Inner = T;
@@ -387,13 +387,13 @@ namespace Strawberry::Core
 
 
 		Optional(NullOpt_t)
-			: mHasValue(false) {}
+			: Optional() {}
 
 
-		template<typename... Ts>
-		Optional(Ts&&... ts) requires (std::constructible_from<T, Ts...>)
+		template<typename Arg>
+		Optional(Arg&& arg) requires (std::constructible_from<T, Arg>)
 			: mHasValue(true)
-			, mPayload(std::forward<Ts>(ts)...) {}
+			, mPayload(std::forward<Arg>(arg)) {}
 
 
 		Optional(const Optional& rhs) requires(std::is_copy_constructible_v<T>)
@@ -407,81 +407,69 @@ namespace Strawberry::Core
 
 
 		Optional(Optional&& rhs) noexcept requires(std::is_move_constructible_v<T>)
-			: mHasValue(rhs.mHasValue)
-		{
-			if (rhs)
-			{
-				std::construct_at(&mPayload, std::forward<T>(rhs.Unwrap()));
-			}
-		}
-
-
-		template<typename T2> requires (std::assignable_from<T, T2> && std::constructible_from<T, T2>)
-		Optional& operator=(T2&& t2)
+			: mHasValue(std::exchange(rhs.mHasValue, false))
 		{
 			if (HasValue())
 			{
-				mPayload = std::forward<T2>(t2);
-			}
-			else
-			{
-				Emplace(std::forward<T2>(t2));
+				std::construct_at(&mPayload, std::move(rhs.Unwrap()));
 			}
 		}
 
 
-		Optional& operator=(const Optional& rhs) noexcept requires(std::is_copy_constructible_v<T> && std::is_copy_assignable_v<T>)
+		template <typename T2>
+		Optional& operator=(T2&& t2)
 		{
-			if (this != &rhs)
+			if constexpr (std::is_lvalue_reference_v<T2>)
 			{
-				if (!rhs.HasValue() && HasValue()) Reset();
-				else if (rhs.HasValue() && HasValue()) mPayload = *rhs;
-				else if (rhs.HasValue() && !HasValue()) Emplace(*rhs);
+				if constexpr (std::assignable_from<T, const T2&>)
+				{
+					mPayload = std::forward<T2>(t2);
+				}
+				else if constexpr (std::constructible_from<T, const T2&>)
+				{
+					Emplace(std::forward<T2>(t2));
+				}
 			}
-
-			return *this;
-		}
-
-
-		Optional& operator=(const Optional& rhs) noexcept requires(std::is_copy_constructible_v<T> && !std::is_copy_assignable_v<T>)
-		{
-			if (this != &rhs)
+			else if constexpr (std::is_rvalue_reference_v<T2>)
 			{
-				if (!rhs.HasValue()) Reset();
-				else Emplace(*rhs);
-			}
-
-			return *this;
-		}
-
-
-		Optional& operator=(Optional&& rhs) noexcept requires(std::is_move_constructible_v<T> && std::is_move_assignable_v<T>)
-		{
-			if (this != &rhs)
-			{
-				if (!rhs.HasValue() && HasValue()) Reset();
-				else if (rhs.HasValue() && HasValue()) mPayload = std::move(rhs.Unwrap());
-				else if (rhs.HasValue() && !HasValue()) Emplace(std::move(rhs.Unwrap()));
+				if constexpr (std::assignable_from<T, T2&&>)
+				{
+					mPayload = std::forward<T2>(t2);
+				}
+				else if constexpr (std::constructible_from<T, T2&&>)
+				{
+					Emplace(std::forward<T2>(t2));
+				}
 			}
 
 			return *this;
 		}
 
 
-		Optional& operator=(T&& rhs) noexcept requires(std::is_move_constructible_v<T> && !std::is_move_assignable_v<T>)
+		Optional& operator=(const Optional& rhs) requires (std::is_copy_constructible_v<T> || std::is_copy_assignable_v<T>)
 		{
-			Emplace(std::move(rhs));
+			if constexpr (std::is_copy_assignable_v<T>)
+			{
+				mPayload = rhs.Value();
+			}
+			else if constexpr (std::is_copy_constructible_v<T>)
+			{
+				Emplace(rhs.Value());
+			}
 
 			return *this;
 		}
 
 
-		Optional& operator=(Optional&& rhs) noexcept requires(std::is_move_constructible_v<T> && !std::is_move_assignable_v<T>)
+		Optional& operator=(Optional&& rhs) requires (std::is_move_constructible_v<T> || std::is_move_assignable_v<T>)
 		{
-			if (this != &rhs)
+			if constexpr (std::is_move_assignable_v<T>)
 			{
-				if (!rhs.HasValue()) Reset();
-				else Emplace(std::move(rhs.Unwrap()));
+				mPayload = std::move(rhs.Unwrap());
+			}
+			else if constexpr (std::is_move_constructible_v<T>)
+			{
+				Emplace(std::move(rhs.Unwrap()));
 			}
 
 			return *this;
