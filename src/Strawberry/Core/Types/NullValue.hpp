@@ -15,6 +15,11 @@ namespace Strawberry::Core
 	class NullValue
 	{
 	public:
+		using Inner = T;
+
+
+		static constexpr T NULL_VALUE = Null;
+
 		NullValue() = default;
 
 
