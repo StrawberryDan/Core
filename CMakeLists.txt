@@ -87,6 +87,7 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Types/DynamicValue.hpp
 		src/Strawberry/Core/Types/Lazy.hpp
 		src/Strawberry/Core/Types/NullType.hpp
+		src/Strawberry/Core/Types/NullValue.hpp
 		src/Strawberry/Core/Types/Optional.hpp
 		src/Strawberry/Core/Types/Overload.hpp
 		src/Strawberry/Core/Types/ReflexivePointer.hpp

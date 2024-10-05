@@ -7,6 +7,8 @@
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Concepts.hpp"
+#include "Strawberry/Core/Types/NullValue.hpp"
+#include "Strawberry/Core/Types/Overload.hpp"
 // Standard Library
 #include <concepts>
 
@@ -57,7 +59,7 @@ namespace Strawberry::Core
 	static const NullOpt_t NullOpt = NullOpt_t{0};
 
 
-	template <typename T>
+	template<typename T>
 	class OptionalCommon
 	{
 	public:
@@ -122,32 +124,28 @@ namespace Strawberry::Core
 		//  Monadic Operations
 		//----------------------------------------------------------------------------------------------------------------------
 		template<std::invocable<const T&> F>
-		Optional<std::invoke_result_t<F, const T&>>
-		Map(this auto const& self, F&& functor)
+		Optional<std::invoke_result_t<F, const T&>> Map(this auto const& self, F&& functor)
 		{
 			return self.HasValue() ? Optional<std::invoke_result_t<F, const T&>>(std::forward<F>(functor)(self.Value())) : NullOpt;
 		}
 
 
 		template<std::invocable<T&&> F>
-		Optional<std::invoke_result_t<F, T&&>>
-		Map(this auto&& self, F&& functor)
+		Optional<std::invoke_result_t<F, T&&>> Map(this auto&& self, F&& functor)
 		{
 			return self.HasValue() ? Optional<std::invoke_result_t<F, T&&>>(std::forward<F>(functor)(self.Unwrap())) : NullOpt;
 		}
 
 
 		template<std::invocable<const T&> F> requires IsOptional<std::invoke_result_t<F, const T&>>
-		std::invoke_result_t<F, const T&>
-		AndThen(this auto const& self, F&& functor)
+		std::invoke_result_t<F, const T&> AndThen(this auto const& self, F&& functor)
 		{
 			return self.Map(std::forward<F>(functor)).Flatten();
 		}
 
 
 		template<std::invocable<T&&> F> requires IsOptional<std::invoke_result_t<F, T&&>>
-		std::invoke_result_t<F, T&&>
-		AndThen(this auto&& self, F&& functor)
+		std::invoke_result_t<F, T&&> AndThen(this auto&& self, F&& functor)
 		{
 			return self.Map(std::forward<F>(functor)).Flatten();
 		}
@@ -594,7 +592,6 @@ namespace Strawberry::Core
 			return std::move(mPayload);
 		}
 
-
 	private:
 		bool mHasValue;
 
@@ -611,7 +608,7 @@ namespace Strawberry::Core
 	//----------------------------------------------------------------------------------------------------------------------
 	template<typename T> requires(std::is_pointer_v<T>)
 	class Optional<T>
-		: public OptionalCommon<T>
+			: public OptionalCommon<T>
 	{
 	public:
 		using Inner = T;
@@ -630,7 +627,7 @@ namespace Strawberry::Core
 
 
 		Optional(const Optional& rhs) noexcept
-			: mPayload(rhs.HasValue() ? *rhs : nullptr) {}
+			: mPayload(rhs.HasValue() ? rhs.Value() : nullptr) {}
 
 
 		Optional(Optional&& rhs) noexcept
@@ -640,7 +637,6 @@ namespace Strawberry::Core
 		Optional& operator=(T rhs) noexcept
 		{
 			mPayload = rhs;
-
 			return *this;
 		}
 
@@ -727,9 +723,84 @@ namespace Strawberry::Core
 			else return nullptr;
 		}
 
-
 	private:
 		T mPayload;
+	};
+
+
+	template<typename T, T Null>
+	class Optional<NullValue<T, Null>>
+			: public OptionalCommon<T>
+	{
+	public:
+		Optional() = default;
+
+
+		Optional(NullOpt_t)
+			: Optional() {}
+
+
+		Optional(T value)
+			: mValue(value)
+		{}
+
+
+		Optional(const Optional& rhs)
+			: mValue(rhs.Value())
+		{}
+
+
+		Optional(Optional&& rhs)
+			: mValue(std::exchange(rhs.mValue, Null))
+		{}
+
+
+		Optional& operator=(T value)
+		{
+			mValue = value;
+		}
+
+
+		Optional& operator=(const Optional& rhs)
+		{
+			mValue = rhs.mValue;
+		}
+
+
+		Optional operator=(Optional&& rhs)
+		{
+			mValue = std::exchange(rhs.mValue, Null);
+		}
+
+
+		bool HasValue() const noexcept
+		{
+			return mValue != Null;
+		}
+
+
+		T Unwrap()
+		{
+			Assert(HasValue());
+			return std::exchange(mValue, Null);
+		}
+
+
+		T& Value()
+		{
+			Assert(HasValue());
+			return mValue;
+		}
+
+
+		const T& Value() const
+		{
+			Assert(HasValue());
+			return mValue;
+		}
+
+	private:
+		T mValue = Null;
 	};
 
 
