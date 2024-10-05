@@ -155,24 +155,24 @@ namespace Strawberry::Core
 		if (path.extension() == ".png")
 		{
 			int  x      = mWidth, y = mHeight;
-			auto result = stbi_write_png(path.string().c_str(), x, y, PixelType::Channels, reinterpret_cast<void*>(mPixels.data()), y * sizeof(PixelType));
+			auto result = stbi_write_png(path.string().c_str(), x, y, PixelType::Channels, reinterpret_cast<const void*>(mPixels.data()), x * sizeof(PixelType));
 			Core::Assert(result != 0);
 		}
 		else if (path.extension() == ".bmp")
 		{
 			int  x      = mWidth, y = mHeight;
-			auto result = stbi_write_bmp(path.string().c_str(), x, y, PixelType::Channels, reinterpret_cast<char*>(mPixels.data()));
+			auto result = stbi_write_bmp(path.string().c_str(), x, y, PixelType::Channels, reinterpret_cast<const void*>(mPixels.data()));
 			Core::Assert(result != 0);
 		}
 		else if (path.extension() == ".jpg")
 		{
 			int  x      = mWidth, y = mHeight;
-			auto result = stbi_write_jpg(path.string().c_str(), x, y, PixelType::Channels, reinterpret_cast<char*>(mPixels.data()), quality);
+			auto result = stbi_write_jpg(path.string().c_str(), x, y, PixelType::Channels, reinterpret_cast<const void*>(mPixels.data()), quality);
 			Core::Assert(result != 0);
 		}
 		else
 		{
-			Core::Logging::Error("Unsupported type extension: {}", path.extension().c_str());
+			Core::Logging::Error("Unsupported type extension: {}", path.extension().string());
 			Core::DebugBreak();
 		}
 	}
