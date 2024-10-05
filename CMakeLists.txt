@@ -88,6 +88,7 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Types/Lazy.hpp
 		src/Strawberry/Core/Types/NullType.hpp
 		src/Strawberry/Core/Types/Optional.hpp
+		src/Strawberry/Core/Types/Overload.hpp
 		src/Strawberry/Core/Types/ReflexivePointer.hpp
 		src/Strawberry/Core/Types/Result.hpp
 		src/Strawberry/Core/Types/Uninitialised.hpp
