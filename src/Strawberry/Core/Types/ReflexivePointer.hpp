@@ -11,7 +11,6 @@
 
 
 
-static_assert(__has_cpp_attribute(__cpp__explicit_this_parameter), "Reflexive Pointers require explicit this parameters.");
 
 
 namespace Strawberry::Core
