@@ -14,7 +14,7 @@
 
 namespace Strawberry::Core
 {
-	std::u32string ToUTF32(const std::u8string& utf8, char32_t placeholder)
+	std::u32string ToUTF32(const std::string& utf8, char32_t placeholder)
 	{
 		std::u32string result;
 
@@ -35,9 +35,9 @@ namespace Strawberry::Core
 	}
 
 
-	std::u8string ToUTF8(const std::u32string& utf32, const std::u8string placeholder)
+	std::string ToUTF8(const std::u32string& utf32, const std::string placeholder)
 	{
-		std::u8string result;
+		std::string result;
 
 		for (char32_t c32: utf32)
 		{
@@ -52,7 +52,7 @@ namespace Strawberry::Core
 	}
 
 
-	Optional<char32_t> ToUTF32(const char8_t* utf8)
+	Optional<char32_t> ToUTF32(const char* utf8)
 	{
 		uint8_t length             = 0;
 		uint8_t firstByteCodePoint = 0;
@@ -104,7 +104,7 @@ namespace Strawberry::Core
 	}
 
 
-	Optional<std::u8string> ToUTF8(char32_t utf32)
+	Optional<std::string> ToUTF8(char32_t utf32)
 	{
 		const auto leadingZeros    = std::countl_zero<uint32_t>(utf32);
 		const auto codepointLength = 32 - leadingZeros;
@@ -149,6 +149,6 @@ namespace Strawberry::Core
 
 		std::reverse(utf8.begin(), utf8.end());
 		utf8.shrink_to_fit();
-		return std::u8string(utf8.data(), utf8.size());
+		return std::string(reinterpret_cast<const char*>(utf8.data()), utf8.size());
 	}
 }
