@@ -745,7 +745,7 @@ namespace Strawberry::Core
 
 
 		Optional(const Optional& rhs)
-			: mValue(rhs.Value()) {}
+			: mValue(rhs.mValue) {}
 
 
 		Optional(Optional&& rhs)
@@ -755,18 +755,21 @@ namespace Strawberry::Core
 		Optional& operator=(T value)
 		{
 			mValue = value;
+			return *this;
 		}
 
 
 		Optional& operator=(const Optional& rhs)
 		{
 			mValue = rhs.mValue;
+			return *this;
 		}
 
 
 		Optional operator=(Optional&& rhs)
 		{
 			mValue = std::exchange(rhs.mValue, Null);
+			return *this;
 		}
 
 
