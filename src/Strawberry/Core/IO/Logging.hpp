@@ -40,37 +40,37 @@ namespace Strawberry::Core
 
 
 		template<typename... Args>
-		static void Trace(std::string message, Args... args)
+		static void Trace(std::string message, Args&&... args)
 		{
-			Log(Level::Trace, message, args...);
+			Log(Level::Trace, message, std::forward<Args>(args)...);
 		}
 
 
 		template<typename... Args>
-		static void Debug(std::string message, Args... args)
+		static void Debug(std::string message, Args&&... args)
 		{
-			Log(Level::Debug, message, args...);
+			Log(Level::Debug, message, std::forward<Args>(args)...);
 		}
 
 
 		template<typename... Args>
-		static void Info(std::string message, Args... args)
+		static void Info(std::string message, Args&&... args)
 		{
-			Log(Level::Info, message, args...);
+			Log(Level::Info, message, std::forward<Args>(args)...);
 		}
 
 
 		template<typename... Args>
-		static void Warning(std::string message, Args... args)
+		static void Warning(std::string message, Args&&... args)
 		{
-			Log(Level::Warning, message, args...);
+			Log(Level::Warning, message, std::forward<Args>(args)...);
 		}
 
 
 		template<typename... Args>
-		static void Error(std::string message, Args... args)
+		static void Error(std::string message, Args&&... args)
 		{
-			Log(Level::Error, message, args...);
+			Log(Level::Error, message, std::forward<Args>(args)...);
 		}
 
 
