@@ -42,7 +42,7 @@ Strawberry::Core::IO::DynamicByteBuffer::FromImage(const std::filesystem::path& 
 		stbi_image_free(data);
 
 		Core::AssertEQ(size[0] * size[1] * desiredChannels, bytes.Size());
-		return {size.AsType<unsigned int>(), desiredChannels, bytes};
+		return std::make_tuple(size.AsType<unsigned int>(), desiredChannels, bytes);
 	}
 	else
 	{
