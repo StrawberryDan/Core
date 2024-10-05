@@ -96,7 +96,7 @@ namespace Strawberry::Core
 		}
 
 
-		template <std::constructible_from<const T&> T2>
+		template<std::constructible_from<const T&> T2>
 		Optional<T2> Cast(this auto const& self)
 		{
 			if (self.HasValue())
@@ -108,7 +108,7 @@ namespace Strawberry::Core
 		}
 
 
-		template <std::constructible_from<T&&> T2>
+		template<std::constructible_from<T&&> T2>
 		Optional<T2> Cast(this auto const& self)
 		{
 			if (self.HasValue())
@@ -438,7 +438,7 @@ namespace Strawberry::Core
 		}
 
 
-		template <typename T2>
+		template<typename T2>
 		Optional& operator=(T2&& t2)
 		{
 			if constexpr (std::is_lvalue_reference_v<T2>)
@@ -741,18 +741,15 @@ namespace Strawberry::Core
 
 
 		Optional(T value)
-			: mValue(value)
-		{}
+			: mValue(value) {}
 
 
 		Optional(const Optional& rhs)
-			: mValue(rhs.Value())
-		{}
+			: mValue(rhs.Value()) {}
 
 
 		Optional(Optional&& rhs)
-			: mValue(std::exchange(rhs.mValue, Null))
-		{}
+			: mValue(std::exchange(rhs.mValue, Null)) {}
 
 
 		Optional& operator=(T value)
@@ -797,6 +794,12 @@ namespace Strawberry::Core
 		{
 			Assert(HasValue());
 			return mValue;
+		}
+
+
+		void Reset()
+		{
+			mValue = Null;
 		}
 
 	private:
