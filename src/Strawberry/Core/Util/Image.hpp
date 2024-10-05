@@ -23,6 +23,10 @@ namespace Strawberry::Core
 		static constexpr size_t Channels = D;
 
 
+		Pixel()
+			: channels{T{0}} {}
+
+
 		template<typename... Args> requires (sizeof...(Args) == D && (std::convertible_to<Args, T> && ...))
 		Pixel(Args&&... args)
 			: channels{std::forward<Args>(args)...} {}
@@ -56,6 +60,18 @@ namespace Strawberry::Core
 		static Core::Result<Image, IO::Error> FromFile(const std::filesystem::path& path) noexcept;
 
 
+		Image()
+			: mWidth(0)
+			, mHeight(0)
+			, mPixels() {}
+
+
+		Image(Core::Math::Vec2u size, PixelType pixel = PixelType{})
+			: mWidth(size[0])
+			, mHeight(size[0])
+			, mPixels(Width() * Height(), pixel) {}
+
+
 		Image(uint32_t width, uint32_t height, const IO::DynamicByteBuffer& bytes) noexcept;
 
 
@@ -72,6 +88,9 @@ namespace Strawberry::Core
 
 
 		void Save(const std::filesystem::path& path, unsigned int quality = 100) const noexcept;
+
+
+		void Blit(const Image& other, Core::Math::Vec2u offset = {0, 0});
 
 	private:
 		uint32_t           mWidth;
@@ -155,7 +174,8 @@ namespace Strawberry::Core
 		if (path.extension() == ".png")
 		{
 			int  x      = mWidth, y = mHeight;
-			auto result = stbi_write_png(path.string().c_str(), x, y, PixelType::Channels, reinterpret_cast<const void*>(mPixels.data()), x * sizeof(PixelType));
+			auto result = stbi_write_png(path.string().c_str(), x, y, PixelType::Channels, reinterpret_cast<const void*>(mPixels.data()),
+			                             x * sizeof(PixelType));
 			Core::Assert(result != 0);
 		}
 		else if (path.extension() == ".bmp")
@@ -174,6 +194,19 @@ namespace Strawberry::Core
 		{
 			Core::Logging::Error("Unsupported type extension: {}", path.extension().string());
 			Core::DebugBreak();
+		}
+	}
+
+
+	template<typename Pixel>
+	void Image<Pixel>::Blit(const Image& other, Core::Math::Vec2u offset)
+	{
+		for (unsigned y = 0; y < other.Height(); ++y)
+		{
+			for (unsigned x = 0; x < other.Width(); ++x)
+			{
+				Write(x + offset[0], y + offset[1], other.Read(x, y));
+			}
 		}
 	}
 }
