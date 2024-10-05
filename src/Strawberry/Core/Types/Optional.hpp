@@ -94,6 +94,30 @@ namespace Strawberry::Core
 		}
 
 
+		template <std::constructible_from<const T&> T2>
+		Optional<T2> Cast(this auto const& self)
+		{
+			if (self.HasValue())
+			{
+				return Optional<T2>(self.Value());
+			}
+
+			return NullOpt;
+		}
+
+
+		template <std::constructible_from<T&&> T2>
+		Optional<T2> Cast(this auto const& self)
+		{
+			if (self.HasValue())
+			{
+				return Optional<T2>(self.Unwrap());
+			}
+
+			return NullOpt;
+		}
+
+
 		//======================================================================================================================
 		//  Monadic Operations
 		//----------------------------------------------------------------------------------------------------------------------
