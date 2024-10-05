@@ -39,6 +39,30 @@ namespace Strawberry::Core
 		}
 
 
+		NullValue& operator++()
+		{
+			return mValue++;
+		}
+
+
+		NullValue& operator++(int)
+		{
+			return ++mValue;
+		}
+
+
+		NullValue& operator--()
+		{
+			return mValue--;
+		}
+
+
+		NullValue& operator--(int)
+		{
+			return --mValue;
+		}
+
+
 	private:
 		T mValue = Null;
 	};
