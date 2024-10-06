@@ -79,8 +79,9 @@ namespace Strawberry::Core
 		void      Write(uint32_t x, uint32_t y, PixelType pixel) noexcept;
 
 
-		uint32_t Width() const noexcept;
-		uint32_t Height() const noexcept;
+		uint32_t    Width() const noexcept;
+		uint32_t    Height() const noexcept;
+		Math::Vec2u Size() const noexcept;
 
 
 		PixelType*       Data() noexcept;
@@ -151,6 +152,13 @@ namespace Strawberry::Core
 	uint32_t Image<PixelType>::Height() const noexcept
 	{
 		return mHeight;
+	}
+
+
+	template<typename Pixel>
+	Math::Vec2u Image<Pixel>::Size() const noexcept
+	{
+		return {Width(), Height()};
 	}
 
 
