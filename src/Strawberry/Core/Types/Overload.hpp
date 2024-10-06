@@ -14,6 +14,10 @@ namespace Strawberry::Core
         : Functions...
     {
     public:
+        Overload(Functions&&... functions)
+            : Functions(std::forward<Functions>(functions))...
+        {}
+
         using Functions::operator ()...;
     };
 
