@@ -154,6 +154,13 @@ namespace Strawberry::Core
 			return !IsType<T>() || Ref<T>() != other;
 		}
 
+
+		template <typename F>
+		auto Visit(F&& function)
+		{
+			return std::visit(std::forward<F>(function), mData);
+		}
+
 	private:
 		std::variant<Types...> mData;
 	};
