@@ -35,23 +35,6 @@ namespace Strawberry::Core
 	}
 
 
-	std::string ToUTF8(const std::u32string& utf32, const std::string placeholder)
-	{
-		std::string result;
-
-		for (char32_t c32: utf32)
-		{
-			auto utf8 = ToUTF8(c32).UnwrapOr(placeholder);
-			for (char8_t c8: utf8)
-			{
-				result.push_back(c8);
-			}
-		}
-
-		return result;
-	}
-
-
 	Optional<char32_t> ToUTF32(const char* utf8)
 	{
 		uint8_t length             = 0;
@@ -101,6 +84,23 @@ namespace Strawberry::Core
 		codepoint = codepoint | (firstByteCodePoint << shift);
 
 		return codepoint;
+	}
+
+
+	std::string ToUTF8(const std::u32string& utf32, const std::string& placeholder)
+	{
+		std::string result;
+
+		for (char32_t c32: utf32)
+		{
+			auto utf8 = ToUTF8(c32).UnwrapOr(placeholder);
+			for (char8_t c8: utf8)
+			{
+				result.push_back(c8);
+			}
+		}
+
+		return result;
 	}
 
 
