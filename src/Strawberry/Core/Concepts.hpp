@@ -17,5 +17,5 @@ namespace Strawberry::Core
 	};
 
 	template <typename T, typename Target>
-	concept DecaysTo = std::same_as<std::decay_t<T>, std::decay_t<Target>>;
+	concept DecaysTo = std::same_as<std::decay_t<T>, Target>;
 }
