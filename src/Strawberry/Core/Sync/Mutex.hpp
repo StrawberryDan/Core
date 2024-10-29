@@ -62,7 +62,7 @@ namespace Strawberry::Core
 	{
 	public:
 		template<typename... Ts>
-		Mutex(Ts... ts) requires (std::constructible_from<T, Ts...>)
+		Mutex(Ts&&... ts) requires (std::constructible_from<T, Ts...>)
 			: mMutex()
 			, mPayload(std::forward<Ts>(ts)...) {}
 
@@ -164,7 +164,7 @@ namespace Strawberry::Core
 
 
 		template<typename... Ts> requires (std::constructible_from<T, Ts...>)
-		explicit SharedMutex(Ts... ts)
+		explicit SharedMutex(Ts&&... ts)
 			: mPayload(std::make_shared<Mutex<T>>(std::forward<Ts>(ts)...)) {}
 
 
@@ -188,7 +188,7 @@ namespace Strawberry::Core
 
 
 		template<typename... Ts> requires std::constructible_from<T, Ts...>
-		void Emplace(Ts... ts) &
+		void Emplace(Ts&&... ts) &
 		{
 			mPayload = std::make_shared<Mutex<T>>(std::forward<Ts>(ts)...);
 		}
