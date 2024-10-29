@@ -429,10 +429,11 @@ namespace Strawberry::Core
 
 
 		Optional(Optional&& rhs) noexcept requires(std::is_move_constructible_v<T>)
-			: mHasValue(std::exchange(rhs.mHasValue, false))
+			: mHasValue(false)
 		{
-			if (HasValue())
+			if (rhs.HasValue())
 			{
+				mHasValue = true;
 				std::construct_at(&mPayload, std::move(rhs.Unwrap()));
 			}
 		}
@@ -441,6 +442,17 @@ namespace Strawberry::Core
 		template<typename T2>
 		Optional& operator=(T2&& t2)
 		{
+			if constexpr (std::is_object_v<T2>)
+			{
+				if constexpr (std::assignable_from<T, T2>)
+				{
+					mPayload = std::forward<T2>(t2);
+				}
+				else if constexpr (std::constructible_from<T, T2>)
+				{
+					Emplace(std::forward<T2>(t2));
+				}
+			}
 			if constexpr (std::is_lvalue_reference_v<T2>)
 			{
 				if constexpr (std::assignable_from<T, const T2&>)
@@ -472,7 +484,17 @@ namespace Strawberry::Core
 		{
 			if constexpr (std::is_copy_assignable_v<T>)
 			{
-				mPayload = rhs.Value();
+				if (rhs.HasValue())
+				{
+					if (HasValue())
+					{
+						mPayload = rhs.Value();
+					}
+					else
+					{
+						Emplace(rhs.Value());
+					}
+				}
 			}
 			else if constexpr (std::is_copy_constructible_v<T>)
 			{
@@ -487,7 +509,17 @@ namespace Strawberry::Core
 		{
 			if constexpr (std::is_move_assignable_v<T>)
 			{
-				mPayload = std::move(rhs.Unwrap());
+				if (rhs.HasValue())
+				{
+					if (HasValue())
+					{
+						mPayload = std::move(rhs.Unwrap());
+					}
+					else
+					{
+						Emplace(std::move(rhs.Unwrap()));
+					}
+				}
 			}
 			else if constexpr (std::is_move_constructible_v<T>)
 			{
