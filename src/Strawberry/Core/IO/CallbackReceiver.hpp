@@ -12,58 +12,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template<std::copyable T>
+	template<typename T>
 	class CallbackReceiver : public Receiver<T>
 	{
 	public:
 		CallbackReceiver() = default;
 
 
-		CallbackReceiver(std::function<void(T)> callback)
+		CallbackReceiver(std::function<void(const T&)> callback)
 			: mCallback(std::move(callback)) {}
 
 
-		CallbackReceiver(const CallbackReceiver& rhs)
-			: Receiver<T>()
-			, mCallback(rhs.mCallback) {}
+		CallbackReceiver(const CallbackReceiver& rhs) = delete;
+		CallbackReceiver& operator=(const CallbackReceiver& rhs) = delete;
 
 
-		CallbackReceiver& operator=(const CallbackReceiver& rhs)
-		{
-			if (this != &rhs)
-			{
-				mCallback = rhs.mCallback;
-			}
-
-			return *this;
-		}
-
-
-		CallbackReceiver(CallbackReceiver&& rhs)
-			: Receiver<T>(std::move(rhs))
-		{
-			mCallback = std::move(rhs.mCallback);
-		}
-
-
-		CallbackReceiver& operator=(CallbackReceiver&& rhs)
-		{
-			if (this != &rhs)
-			{
-				static_cast<Receiver<T>&>(*this) = std::move(static_cast<Receiver<T>&>(rhs));
-				mCallback                        = std::move(rhs.mCallback);
-			}
-
-			return *this;
-		}
+		CallbackReceiver(CallbackReceiver&& rhs) = default;
+		CallbackReceiver& operator=(CallbackReceiver&& rhs) = default;
 
 	protected:
-		virtual void Receive(T value) override final
+		virtual void Receive(const T& value) override final
 		{
 			if (mCallback) mCallback(value);
 		}
 
 	private:
-		std::function<void(T)> mCallback;
+		std::function<void(T&)> mCallback;
 	};
 } // namespace Strawberry::Core::IO

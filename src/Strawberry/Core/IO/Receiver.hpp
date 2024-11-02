@@ -8,12 +8,14 @@
 // Standard Library
 #include <set>
 
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
+
 //======================================================================================================================
 //  Foreward Declarations
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template<std::copyable, std::copyable...>
+	template<typename, typename...>
 	class Broadcaster;
 }
 
@@ -22,7 +24,7 @@ namespace Strawberry::Core::IO
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template<std::copyable T, std::copyable... Ts>
+	template<typename T, typename... Ts>
 	class Receiver
 			: private Receiver<T>, private Receiver<Ts...>
 	{
@@ -32,59 +34,38 @@ namespace Strawberry::Core::IO
 	};
 
 
-	template<std::copyable T>
+	template<typename T>
 	class Receiver<T>
+		: public EnableReflexivePointer
 	{
-		template<std::copyable, std::copyable...>
+		template<typename, typename...>
 		friend class Broadcaster;
 
 	public:
 		Receiver()
 		{
 			auto receiverList = sReceivers.Lock();
-			receiverList->emplace(this);
+			receiverList->emplace(GetReflexivePointer());
 		}
 
 
 		Receiver(const Receiver& rhs) = delete;
-
 		Receiver& operator=(const Receiver& rhs) = delete;
-
-
-		Receiver(Receiver&& rhs)
-		{
-			auto receiverList = sReceivers.Lock();
-			receiverList->erase(&rhs);
-			receiverList->emplace(this);
-		}
-
-
-		Receiver& operator=(Receiver&& rhs)
-		{
-			if (this != &rhs)
-			{
-				auto receiverList = sReceivers.Lock();
-				receiverList->erase(&rhs);
-				receiverList->emplace(this);
-			}
-			return *this;
-		}
+		Receiver(Receiver&& rhs) = default;
+		Receiver& operator=(Receiver&& rhs) = default;
 
 
 		~Receiver()
 		{
 			auto receiverList = sReceivers.Lock();
-			receiverList->erase(this);
+			receiverList->erase(GetReflexivePointer());
 		}
 
 	protected:
-		virtual void Receive(T value) = 0;
+		virtual void Receive(const T& value) = 0;
 
 	private:
-		static Core::Mutex<std::set<Receiver<T>*>> sReceivers;
+		inline static Core::Mutex<std::set<ReflexivePointer<Receiver<T>>>> sReceivers;
 	};
 
-
-	template<std::copyable T>
-	Core::Mutex<std::set<Receiver<T>*>> Receiver<T>::sReceivers;
 } // namespace Strawberry::Core::IO

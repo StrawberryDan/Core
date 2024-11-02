@@ -15,16 +15,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template<std::copyable T, std::copyable... Ts>
+	template<typename T, typename... Ts>
 	class ChannelBroadcaster;
 
 
-	template<std::copyable T, std::copyable... Ts>
+	template<typename T, typename... Ts>
 	class ChannelReceiver
-			: protected ChannelReceiver<T>, protected ChannelReceiver<Ts...>
+			: public ChannelReceiver<T>, public ChannelReceiver<Ts...>
 	{
-		template<std::copyable, std::copyable...>
+		template<typename, typename...>
 		friend class ChannelBroadcaster;
+
+		virtual ~ChannelReceiver() = default;
 
 	protected:
 		using ChannelReceiver<T>::Receive;
@@ -32,27 +34,23 @@ namespace Strawberry::Core::IO
 	};
 
 
-	template<std::copyable T>
+	template<typename T>
 	class ChannelReceiver<T> : public EnableReflexivePointer
 	{
-		template<std::copyable, std::copyable...>
+		template<typename, typename...>
 		friend class ChannelBroadcaster;
 
 	public:
-		ChannelReceiver() {}
+		ChannelReceiver() = default;
+		virtual ~ChannelReceiver() {};
 
 		ChannelReceiver(const ChannelReceiver& rhs)            = delete;
 		ChannelReceiver& operator=(const ChannelReceiver& rhs) = delete;
 
 
-		ChannelReceiver(ChannelReceiver&& rhs)
-		{
-			*rhs.mManagedThis = this;
-		}
+		ChannelReceiver(ChannelReceiver&&) = default;
+		ChannelReceiver& operator=(ChannelReceiver&&) = default;
 
-
-		ChannelReceiver& operator=(ChannelReceiver&& rhs) = delete;
-
-		virtual void Receive(T value) = 0;
+		virtual void Receive(const T& value) = 0;
 	};
 } // namespace Strawberry::Core::IO

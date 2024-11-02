@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template<std::copyable T, std::copyable... Ts>
+	template<typename T, typename... Ts>
 	class Broadcaster
 			: private Broadcaster<T>, private Broadcaster<Ts...>
 	{
@@ -24,11 +24,11 @@ namespace Strawberry::Core::IO
 	};
 
 
-	template<std::copyable T>
+	template<typename T>
 	class Broadcaster<T>
 	{
 	protected:
-		void Broadcast(T value)
+		void Broadcast(const T& value)
 		{
 			auto receivers = Receiver<T>::sReceivers.Lock();
 			for (auto& receiver: *receivers)

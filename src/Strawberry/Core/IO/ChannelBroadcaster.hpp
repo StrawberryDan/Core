@@ -16,50 +16,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template<std::copyable T, std::copyable... Ts>
+	template<typename T, typename... Ts>
 	class ChannelBroadcaster
-			: protected ChannelBroadcaster<T>, protected ChannelBroadcaster<Ts...>
+			: public ChannelBroadcaster<T>, public ChannelBroadcaster<Ts...>
 	{
 	public:
 		using ChannelBroadcaster<T>::Broadcast;
 		using ChannelBroadcaster<Ts>::Broadcast...;
-
-
-		template<typename R, typename... Rs>
-		void Register(ChannelReceiver<R, Rs...>* receiver)
-		{
-			if constexpr (std::is_same_v<R, T> || (std::is_same_v<R, Ts> || ...))
-			{
-				ChannelBroadcaster<R>::Register(static_cast<ChannelReceiver<R>*>(receiver));
-			}
-
-			if constexpr (sizeof...(Rs) >= 1)
-			{
-				ChannelBroadcaster<Ts...>::Register(static_cast<ChannelReceiver<Rs...>*>(receiver));
-			}
-		}
-
-
-		template<typename R, typename... Rs>
-		void Unregister(ChannelReceiver<R, Rs...>* receiver)
-		{
-			if constexpr (std::is_same_v<R, T> || (std::is_same_v<R, Ts> || ...))
-			{
-				ChannelBroadcaster<R>::Unregister(static_cast<ChannelReceiver<R>*>(receiver));
-			}
-
-			if constexpr (sizeof...(Rs) >= 1)
-			{
-				ChannelBroadcaster<Ts...>::Unregister(static_cast<ChannelReceiver<Rs...>*>(receiver));
-			}
-		}
+		using ChannelBroadcaster<T>::Register;
+		using ChannelBroadcaster<Ts>::Register...;
+		using ChannelBroadcaster<T>::Unregister;
+		using ChannelBroadcaster<Ts>::Unregister...;
 	};
 
 
-	template<std::copyable T>
+	template<typename T>
 	class ChannelBroadcaster<T>
 	{
-		template<std::copyable, std::copyable...>
+		template<typename, typename...>
 		friend
 		class ChannelBroadcaster;
 
@@ -72,27 +46,26 @@ namespace Strawberry::Core::IO
 		ChannelBroadcaster& operator=(ChannelBroadcaster&& rhs)      = delete;
 
 
-		void Register(ChannelReceiver<T>* receiver)
+		void Register(ChannelReceiver<T>& receiver)
 		{
-			mReceivers.emplace(receiver->GetReflexivePointer());
+			mReceivers.emplace(receiver.GetReflexivePointer());
 		}
 
 
-		void Unregister(ChannelReceiver<T>* receiver)
+		void Unregister(ChannelReceiver<T>& receiver)
 		{
-			mReceivers.erase(receiver->GetReflexivePointer());
+			mReceivers.erase(receiver.GetReflexivePointer());
 		}
 
 
-		void Broadcast(T value)
+		void Broadcast(const T& value)
 		{
 			std::set<ReflexivePointer<ChannelReceiver<T>>> toRemove;
 
 			for (auto& receiver: mReceivers)
 			{
 				if (receiver) receiver->Receive(value);
-				else
-					toRemove.emplace(receiver);
+				else toRemove.emplace(receiver);
 			}
 
 			for (auto& receiver: toRemove)
@@ -102,6 +75,6 @@ namespace Strawberry::Core::IO
 		}
 
 	protected:
-		std::set<Core::ReflexivePointer<ChannelReceiver<T>>> mReceivers;
+		std::set<ReflexivePointer<ChannelReceiver<T>>> mReceivers;
 	};
 } // namespace Strawberry::Core::IO
