@@ -16,16 +16,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template<typename T, typename... Ts>
+	template<typename... Ts>
 	class ChannelBroadcaster
-			: public ChannelBroadcaster<T>, public ChannelBroadcaster<Ts...>
+			: private ChannelBroadcaster<Ts>...
 	{
 	public:
-		using ChannelBroadcaster<T>::Broadcast;
 		using ChannelBroadcaster<Ts>::Broadcast...;
-		using ChannelBroadcaster<T>::Register;
 		using ChannelBroadcaster<Ts>::Register...;
-		using ChannelBroadcaster<T>::Unregister;
 		using ChannelBroadcaster<Ts>::Unregister...;
 	};
 
@@ -33,9 +30,8 @@ namespace Strawberry::Core::IO
 	template<typename T>
 	class ChannelBroadcaster<T>
 	{
-		template<typename, typename...>
-		friend
-		class ChannelBroadcaster;
+		template<typename...>
+		friend class ChannelBroadcaster;
 
 	public:
 		ChannelBroadcaster() = default;
@@ -58,6 +54,7 @@ namespace Strawberry::Core::IO
 		}
 
 
+	protected:
 		void Broadcast(const T& value)
 		{
 			std::set<ReflexivePointer<ChannelReceiver<T>>> toRemove;
@@ -74,7 +71,7 @@ namespace Strawberry::Core::IO
 			}
 		}
 
-	protected:
+	private:
 		std::set<ReflexivePointer<ChannelReceiver<T>>> mReceivers;
 	};
 } // namespace Strawberry::Core::IO

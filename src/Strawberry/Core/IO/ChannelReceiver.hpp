@@ -15,21 +15,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
-	template<typename T, typename... Ts>
+	template<typename... Ts>
 	class ChannelBroadcaster;
 
 
-	template<typename T, typename... Ts>
+	template<typename... Ts>
 	class ChannelReceiver
-			: public ChannelReceiver<T>, public ChannelReceiver<Ts...>
+			: private ChannelReceiver<Ts>...
 	{
+	public:
 		template<typename, typename...>
 		friend class ChannelBroadcaster;
 
-		virtual ~ChannelReceiver() = default;
+		virtual ~ChannelReceiver() noexcept = default;
 
 	protected:
-		using ChannelReceiver<T>::Receive;
 		using ChannelReceiver<Ts>::Receive...;
 	};
 
@@ -37,20 +37,22 @@ namespace Strawberry::Core::IO
 	template<typename T>
 	class ChannelReceiver<T> : public EnableReflexivePointer
 	{
-		template<typename, typename...>
+		template<typename...>
 		friend class ChannelBroadcaster;
 
 	public:
-		ChannelReceiver() = default;
-		virtual ~ChannelReceiver() {};
+		ChannelReceiver() noexcept = default;
+		virtual ~ChannelReceiver() noexcept = default;
 
 		ChannelReceiver(const ChannelReceiver& rhs)            = delete;
 		ChannelReceiver& operator=(const ChannelReceiver& rhs) = delete;
 
 
-		ChannelReceiver(ChannelReceiver&&) = default;
-		ChannelReceiver& operator=(ChannelReceiver&&) = default;
+		ChannelReceiver(ChannelReceiver&&) noexcept = default;
+		ChannelReceiver& operator=(ChannelReceiver&&) noexcept = default;
 
+
+	protected:
 		virtual void Receive(const T& value) = 0;
 	};
 } // namespace Strawberry::Core::IO
