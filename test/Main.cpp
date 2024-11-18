@@ -162,28 +162,28 @@ namespace Test
 
 		struct R1 : public Strawberry::Core::IO::ChannelReceiver<A, B>
 		{
-			void Receive(A a) {}
+			void Receive(const A& a) override {}
 
-			void Receive(B b) {}
+			void Receive(const B& b)  override {}
 		};
 
 		struct R2 : public Strawberry::Core::IO::ChannelReceiver<A, B, C, D>
 		{
-			void Receive(A a) {}
+			void Receive(const A& a) override {}
 
-			void Receive(B b) {}
+			void Receive(const B& b) override {}
 
-			void Receive(C c) {}
+			void Receive(const C& c) override {}
 
-			void Receive(D d) {}
+			void Receive(const D& d) override {}
 		};
 
 		Strawberry::Core::IO::ChannelBroadcaster<A, B, C> b1;
 		R1                                                r1;
 		R2                                                r2;
 
-		b1.Register(&r1);
-		b1.Register(&r2);
+		b1.Register(r1);
+		b1.Register(r2);
 	}
 
 
