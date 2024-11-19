@@ -100,6 +100,8 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Util/Image.hpp
 		src/Strawberry/Core/Util/STBImplementations.cpp
 		src/Strawberry/Core/Util/Strings.hpp
+		src/Strawberry/Core/Process.hpp
+		src/Strawberry/Core/Process.cpp
 	)
 
 	new_strawberry_library(NAME StrawberryCore SOURCE ${StrawberryCore_Sources})

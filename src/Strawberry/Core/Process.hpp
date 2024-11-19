@@ -5,6 +5,7 @@
 #ifdef STRAWBERRY_TARGET_WINDOWS
 #include <processthreadsapi.h>
 #endif
+#include "Strawberry/Core/Types/Optional.hpp"
 #include <string>
 #include <vector>
 
@@ -20,12 +21,25 @@ namespace Strawberry::Core
 		using Argument   = std::string;
 		using Arguments  = std::vector<std::string>;
 
+		struct Result
+		{
+
+		};
+
 	public:
 		Process(const Executable& executable, const Arguments& arguments);
 		~Process();
 
 
+		Result Wait() noexcept;
+
+
 	private:
-		PROCESS_INFORMATION mProcessInformation;
+#ifdef STRAWBERRY_TARGET_WINDOWS
+		PROCESS_INFORMATION mProcessInformation{};
+		STARTUPINFOA        mProcessStartupInfo{};
+#endif // STRAWBERRY_TARGET_WINDOWS
+
+		Core::Optional<Result> mResult;
 	};
 }
