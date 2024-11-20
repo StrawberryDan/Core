@@ -10,6 +10,10 @@
 
 namespace Strawberry::Core
 {
+	struct Success_t {};
+	static constexpr Success_t Success{};
+
+
 	template<typename D, typename E> requires (!std::same_as<D, E>)
 	class [[nodiscard]] Result
 	{
@@ -207,6 +211,11 @@ namespace Strawberry::Core
 	public:
 		Result()
 			: mPayload() {}
+
+
+		Result(Success_t)
+			: mPayload()
+		{}
 
 
 		Result(const E& value) requires (std::copy_constructible<E>)
