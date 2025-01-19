@@ -5,10 +5,9 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Core
-#include "ChannelReceiver.hpp"
+#include "Strawberry/Core/IO/ChannelReceiver.hpp"
+#include "Strawberry/Core/Types/TypeSet.hpp"
 // Standard Library
-#include <map>
-#include <memory>
 #include <set>
 
 //======================================================================================================================
@@ -16,14 +15,66 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::IO
 {
+	template <typename... Ts>
+	class ChannelBroadcaster;
+
+
 	template<typename... Ts>
 	class ChannelBroadcaster
-			: private ChannelBroadcaster<Ts>...
+			: ChannelBroadcaster<Ts>...
 	{
 	public:
+		template <typename... Args>
+		void Register(ChannelReceiver<Args...>& receiver)
+		{
+			using Intersection = typename TypeSet<Ts...>::template Intersection<Args...>;
+			using RegisterFN = void(*)(void*, void*);
+
+			RegisterFN functions[] = {
+				[](void* pReceiver, void* pBroadcaster) constexpr -> void
+				{
+					if constexpr(Intersection::template Contains<Args>)
+					{
+						ChannelReceiver<Args>& receiver = *static_cast<ChannelReceiver<Args...>*>(pReceiver);
+						ChannelBroadcaster<Args>& broadcaster = *static_cast<ChannelBroadcaster*>(pBroadcaster);
+						broadcaster.Register(receiver);
+					}
+				}...
+			};
+
+			for (auto&& f : functions)
+			{
+				std::invoke(f, &receiver, this);
+			}
+		}
+
+
+		template <typename... Args>
+		void Unregister(ChannelReceiver<Args...>& receiver)
+		{
+			using Intersection = typename TypeSet<Ts...>::template Intersection<Args...>;
+			using RegisterFN = void(*)(void*, void*);
+
+			RegisterFN functions[] = {
+				[](void* pReceiver, void* pBroadcaster) constexpr -> void
+				{
+					if constexpr(Intersection::template Contains<Args>)
+					{
+						ChannelReceiver<Args>& receiver = *static_cast<ChannelReceiver<Args...>*>(pReceiver);
+						ChannelBroadcaster<Args>& broadcaster = *static_cast<ChannelBroadcaster*>(pBroadcaster);
+						broadcaster.Register(receiver);
+					}
+				}...
+			};
+
+			for (auto&& f : functions)
+			{
+				std::invoke(f, &receiver, this);
+			}
+		}
+
+
 		using ChannelBroadcaster<Ts>::Broadcast...;
-		using ChannelBroadcaster<Ts>::Register...;
-		using ChannelBroadcaster<Ts>::Unregister...;
 	};
 
 
@@ -57,18 +108,19 @@ namespace Strawberry::Core::IO
 	protected:
 		void Broadcast(const T& value)
 		{
-			std::set<ReflexivePointer<ChannelReceiver<T>>> toRemove;
+			std::set<ReflexivePointer<ChannelReceiver<T>>> receivers;
 
 			for (auto& receiver: mReceivers)
 			{
-				if (receiver) receiver->Receive(value);
-				else toRemove.emplace(receiver);
+				if (receiver)
+				{
+					receiver->Receive(value);
+					receivers.emplace(receiver);;
+				}
+
 			}
 
-			for (auto& receiver: toRemove)
-			{
-				mReceivers.erase(receiver);
-			}
+			mReceivers = std::move(receivers);
 		}
 
 	private:

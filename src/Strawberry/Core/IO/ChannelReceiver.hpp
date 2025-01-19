@@ -5,10 +5,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Core
-#include "Strawberry/Core/Sync/Mutex.hpp"
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
-// Standard Library
-#include <set>
 
 //======================================================================================================================
 //  Class Declaration
@@ -21,10 +18,10 @@ namespace Strawberry::Core::IO
 
 	template<typename... Ts>
 	class ChannelReceiver
-			: private ChannelReceiver<Ts>...
+			: ChannelReceiver<Ts>...
 	{
 	public:
-		template<typename, typename...>
+		template<typename...>
 		friend class ChannelBroadcaster;
 
 		virtual ~ChannelReceiver() noexcept = default;
