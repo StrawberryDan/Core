@@ -18,65 +18,23 @@ namespace Strawberry::Core
 	class [[nodiscard]] Result
 	{
 	public:
-		template <typename... Ts>
-		Result(Ts&&... ts)
-			: mPayload([](Ts&&... ts) {
-				if constexpr (sizeof...(Ts) == 1 && (std::is_same_v<std::decay_t<Ts>, D> && ...))
+		template <typename T>
+		Result(T&& t)
+			: mPayload([]<typename T2>(T2&& t) {
+				if constexpr (std::same_as<std::decay_t<T2>, D>)
 				{
-					return D(std::forward<Ts>(ts)...);
+					return D(std::forward<T2>(t));
 				}
-				else if constexpr (sizeof...(Ts) == 1 && (std::is_same_v<std::decay_t<Ts>, E> && ...))
+				else if constexpr (std::same_as<std::decay_t<T2>, E>)
 				{
-					 return E(std::forward<Ts>(ts)...);
+					 return E(std::forward<T2>(t));
 				}
-				else if constexpr (std::constructible_from<D, Ts...> && !std::constructible_from<E, Ts...>)
+				else
 				{
-					return D(std::forward<Ts>(ts)...);
+					static_assert(false, "Could not construct Result<D, E> from these args");
 				}
-				else if constexpr (std::constructible_from<E, Ts...> && !std::constructible_from<D, Ts...>)
-				{
-					return E(std::forward<Ts>(ts)...);
-				}
-			}(std::forward<Ts>(ts)...))
+			}(std::forward<T>(t)))
 		{}
-
-
-		static Result Ok(const D& value) requires (std::copy_constructible<D>)
-		{
-			return Result(value);
-		}
-
-
-		static Result Ok(D&& value) requires (std::move_constructible<D>)
-		{
-			return Result(std::forward<D>(value));
-		}
-
-
-		template<typename... Args>
-		static Result Ok(Args... args) requires (std::constructible_from<D, Args...>)
-		{
-			return Result(D(std::forward<Args>(args)...));
-		}
-
-
-		static Result Err(const E& value) requires (std::copy_constructible<E>)
-		{
-			return Result(value);
-		}
-
-
-		static Result Err(E&& value) requires (std::move_constructible<E>)
-		{
-			return Result(std::forward<E>(value));
-		}
-
-
-		template<typename... Args>
-		static Result Err(Args... args) requires (std::constructible_from<E, Args...>)
-		{
-			return Result(E(std::forward<Args>(args)...));
-		}
 
 
 		[[nodiscard]] inline bool IsOk() const
@@ -115,15 +73,22 @@ namespace Strawberry::Core
 		}
 
 
+		D& Value()
+		{
+			Core::Assert(IsOk());
+			return mPayload.template Ref<D>();
+		}
+
+
 		D Unwrap()
 		{
 			return mPayload.template Take<D>().Unwrap();
 		}
 
 
-		D UnwrapOr(D value)
+		D UnwrapOr(auto&& value)
 		{
-			return IsOk() ? Unwrap() : value;
+			return IsOk() ? Unwrap() : D(value);
 		}
 
 
@@ -133,7 +98,7 @@ namespace Strawberry::Core
 		}
 
 
-		explicit inline operator bool() const
+		explicit operator bool() const
 		{
 			return IsOk();
 		}
@@ -153,41 +118,49 @@ namespace Strawberry::Core
 
 
 		template<std::invocable<D&&> F>
-		Result<std::invoke_result_t<F, D&&>, E> Map(F f)
+		Result<std::invoke_result_t<F, D&&>, E> Map(F&& f)
 		{
 			if (*this)
 			{
-				return Result<std::invoke_result_t<F, D&&>, E>::Ok(f(std::move(Unwrap())));
+				return std::invoke(std::forward<F>(f), mPayload.template Take<D>().Unwrap());
 			}
 			else
 			{
-				return Result<std::invoke_result_t<F, D&&>, E>::Err(std::move(Err()));
+				return Err();
 			}
 		}
 
 
-		bool operator==(const D& other) const
+		bool operator<(auto&& value) const
 		{
-			return mPayload == other;
+			return mPayload < value;
 		}
 
-
-		bool operator!=(const D& other) const
+		bool operator>(auto&& value) const
 		{
-			return mPayload != other;
+			return mPayload > value;
 		}
 
-
-		bool operator==(const E& other) const
+		bool operator<=(auto&& value) const
 		{
-			return mPayload == other;
+			return mPayload <= value;
 		}
 
-
-		bool operator!=(const E& other) const
+		bool operator>=(auto&& value) const
 		{
-			return mPayload != other;
+			return mPayload >= value;
 		}
+
+		bool operator==(auto&& value) const
+		{
+			return mPayload == value;
+		}
+
+		bool operator!=(auto&& value) const
+		{
+			return mPayload != value;
+		}
+
 
 	private:
 		using Payload = Variant<D, E>;
@@ -209,85 +182,130 @@ namespace Strawberry::Core
 	class [[nodiscard]] Result<void, E>
 	{
 	public:
-		Result()
-			: mPayload() {}
-
-
-		Result(Success_t)
-			: mPayload()
+		Result(auto&& value)
+			: mPayload([]<typename T>(T&& value)
+			{
+				if constexpr (std::same_as<Success_t, std::decay_t<T>>)
+				{
+					return std::monostate();
+				}
+				else if constexpr (std::constructible_from<E, T>)
+				{
+					return E(std::forward<T>(value));
+				}
+				else
+				{
+					static_assert(false, "Cannot construct Result<void, E> with this argument!");
+				}
+			}(std::forward<decltype(value)>(value)))
 		{}
 
 
-		Result(const E& value) requires (std::copy_constructible<E>)
-			: mPayload(value) {}
-
-
-		Result(E&& value) requires (std::move_constructible<E>)
-			: mPayload(std::move(value)) {}
-
-
-		void Unwrap()
+		void Unwrap() noexcept
 		{
 			Assert(IsOk());
 		}
 
 
-		static Result Err(const E& value) requires (std::copy_constructible<E>)
+		[[nodiscard]] bool IsOk() const
 		{
-			return Result(false, value);
+			return mPayload.template IsType<std::monostate>();
 		}
 
 
-		static Result Err(E&& value) requires (std::move_constructible<E>)
+		[[nodiscard]] bool IsErr() const
 		{
-			return Result(false, std::forward<E>(value));
-		}
-
-
-		template<typename... Args>
-		static Result Err(Args... args) requires (std::constructible_from<E, Args...>)
-		{
-			return Result(false, E(std::forward<Args>(args)...));
-		}
-
-
-		[[nodiscard]] inline bool IsOk() const
-		{
-			return !mPayload;
-		}
-
-
-		[[nodiscard]] inline bool IsErr() const
-		{
-			return mPayload;
+			return mPayload.template IsType<E>();
 		}
 
 
 		const E& Err()
 		{
-			return mPayload.Ref();
+			return mPayload.template Ref<E>();
 		}
 
 
-		explicit inline operator bool()
+		explicit operator bool()
 		{
 			return IsOk();
 		}
 
 
-		bool operator==(const E& other) const
+		bool operator<(auto&& value) const
 		{
-			return mPayload == other;
+			if constexpr (std::same_as<std::monostate, std::decay_t<decltype(value)>>)
+			{
+				return true;
+			}
+			else
+			{
+				return mPayload < value;
+			}
 		}
 
-
-		bool operator!=(const E& other) const
+		bool operator>(auto&& value) const
 		{
-			return mPayload != other;
+			if constexpr (std::same_as<std::monostate, std::decay_t<decltype(value)>>)
+			{
+				return false;
+			}
+			else
+			{
+				return mPayload > value;
+			}
 		}
+
+		bool operator<=(auto&& value) const
+		{
+			if constexpr (std::same_as<std::monostate, std::decay_t<decltype(value)>>)
+			{
+				return true;
+			}
+			else
+			{
+				return mPayload <= value;
+			}
+		}
+
+		bool operator>=(auto&& value) const
+		{
+			if constexpr (std::same_as<std::monostate, std::decay_t<decltype(value)>>)
+			{
+				return false;
+			}
+			else
+			{
+				return mPayload >= value;
+			}
+		}
+
+		bool operator==(auto&& value) const
+		{
+			if constexpr (std::same_as<std::monostate, std::decay_t<decltype(value)>>)
+			{
+				return false;
+			}
+			else
+			{
+				return mPayload == value;
+			}
+		}
+
+		bool operator!=(auto&& value) const
+		{
+			if constexpr (std::same_as<std::monostate, std::decay_t<decltype(value)>>)
+			{
+				return true;
+			}
+			else
+			{
+				return mPayload != value;
+			}
+		}
+
 
 	private:
-		using Payload = Core::Optional<E>;
+		using Payload = Core::Variant<std::monostate, E>;
 
 
 		Result(const Payload& payload)
