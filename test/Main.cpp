@@ -18,13 +18,53 @@
 #include "Strawberry/Core/UTF.hpp"
 #include "Strawberry/Core/Math/Clamped.hpp"
 #include "Strawberry/Core/Math/AABB.hpp"
+#include "Strawberry/Core/Types/TypeSet.hpp"
 
-
-using namespace Strawberry::Core;
 
 namespace Test
 {
+	using namespace Strawberry::Core;
 	using namespace Math;
+
+
+	void TestTypeSets()
+	{
+		struct A {};
+		struct B {};
+		struct C {};
+		struct D {};
+
+
+		static_assert(std::same_as<TypeSet<A, B, C, D>::Into<Variant>, Variant<A, B, C, D>>);
+
+
+		static_assert(
+			TypeSet<A, B>::Union<C>::Equals<
+			TypeSet<A, B, C>
+		>);
+
+		static_assert(
+			TypeSet<A, B>::Union<C>::Union<D>::Equals<
+			TypeSet<A, B, C, D>
+		>);
+
+		static_assert(
+			TypeSet<A, B>::Union<TypeSet<C, D>>::Equals<
+			TypeSet<A, B, C, D>>);
+
+
+		static_assert(
+			TypeSet<A, B, C, D>::Intersection<A>::Equals<
+				TypeSet<A>>);
+
+		static_assert(
+			TypeSet<A, B, C, D>::Intersection<A, B>::Equals<
+				TypeSet<A, B>>);
+
+		static_assert(
+			TypeSet<C, D>::Intersection<TypeSet<A, C>>::Equals<
+				TypeSet<C>>);
+	}
 
 
 	void CheckBytes(const IO::DynamicByteBuffer& bytes)
@@ -111,42 +151,40 @@ namespace Test
 	}
 
 
-	class UninitialisedTester
+	void TestUninitialised()
 	{
-	public:
-		UninitialisedTester()
+		static int numConstructed = 0;
+		numConstructed = 0;
+
+		struct UninitialisedTester
 		{
-			numConstructed++;
-		}
+			UninitialisedTester()
+			{
+				numConstructed++;
+			}
 
 
-		~UninitialisedTester()
-		{
-			numConstructed--;
-		}
+			~UninitialisedTester()
+			{
+				numConstructed--;
+			}
+		};
 
-	public:
-		static int numConstructed;
-	};
+		using T = Uninitialised<UninitialisedTester>;
 
+		std::vector<T> data(5);
 
-	inline int UninitialisedTester::numConstructed = 0;
-
-
-	void Uninitialised()
-	{
-		std::vector<Strawberry::Core::Uninitialised<UninitialisedTester>> data(5);
-
-		Strawberry::Core::Assert(UninitialisedTester::numConstructed == 0);
+		AssertEQ(numConstructed, 0);
 		data[0].Construct();
-		Strawberry::Core::Assert(UninitialisedTester::numConstructed == 1);
+		AssertEQ(numConstructed, 1);
 		data[1].Construct();
 		data[2].Construct();
-		Strawberry::Core::Assert(UninitialisedTester::numConstructed == 3);
+		AssertEQ(numConstructed, 3);
 		data[1].Destruct();
-		Strawberry::Core::Assert(UninitialisedTester::numConstructed == 2);
+		AssertEQ(numConstructed, 2);
 		data[0].Destruct();
 		data[2].Destruct();
+		AssertEQ(numConstructed, 0);
 	}
 
 
@@ -336,17 +374,40 @@ namespace Test
 			Assert(c == 3);
 		}
 	}
+
+
+	void Variants()
+	{
+		using V1 = Variant<std::string, int, uint8_t>;
+		V1 a = std::string();
+		V1 b = int(2);
+		V1 c = uint8_t(2);
+
+		Assert(a.IsType<std::string>());
+		Assert(b.IsType<int>());
+		Assert(c.IsType<uint8_t>());
+
+		Assert(a == "");
+		Assert(b == 2);
+		Assert(c == 2);
+
+		Assert(b == c);
+		Assert(c == b);
+		Assert(a != b);
+	}
 } // namespace Test
 
 int main()
 {
+	Test::TestTypeSets();
 	Test::Base64();
 	Test::PeriodicNumbers();
-	Test::Uninitialised();
+	Test::TestUninitialised();
 	Test::ChannelBroadcasterReceiver();
 	Test::Vectors();
 	Test::Matrices();
 	Test::UTF();
 	Test::ClampedNumbers();
 	Test::StaticClampedNumbers();
+	Test::Variants();
 }
