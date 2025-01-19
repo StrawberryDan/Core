@@ -39,6 +39,8 @@ if (NOT TARGET StrawberryCore)
 
 
 	list(APPEND StrawberryCore_Sources
+		src/Strawberry/Core/Allocator.cpp
+		src/Strawberry/Core/Allocator.hpp
 		src/Strawberry/Core/Assert.hpp
 		src/Strawberry/Core/Collection/CircularBuffer.hpp
 		src/Strawberry/Core/Concepts.hpp
@@ -70,6 +72,10 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Math/Transformations.hpp
 		src/Strawberry/Core/Math/Units.hpp
 		src/Strawberry/Core/Math/Vector.hpp
+		src/Strawberry/Core/Process.cpp
+		src/Strawberry/Core/Process.hpp
+		src/Strawberry/Core/String.hpp
+		src/Strawberry/Core/String.inl
 		src/Strawberry/Core/Sync/ConditionVariable.cpp
 		src/Strawberry/Core/Sync/ConditionVariable.hpp
 		src/Strawberry/Core/Sync/Mutex.hpp
@@ -86,12 +92,13 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Types/Delayed.hpp
 		src/Strawberry/Core/Types/DynamicValue.hpp
 		src/Strawberry/Core/Types/Lazy.hpp
-		src/Strawberry/Core/Types/NullType.hpp
+		src/Strawberry/Core/Types/Lazy.hpp
 		src/Strawberry/Core/Types/NullValue.hpp
 		src/Strawberry/Core/Types/Optional.hpp
 		src/Strawberry/Core/Types/Overload.hpp
 		src/Strawberry/Core/Types/ReflexivePointer.hpp
 		src/Strawberry/Core/Types/Result.hpp
+		src/Strawberry/Core/Types/TypeSet.hpp
 		src/Strawberry/Core/Types/Uninitialised.hpp
 		src/Strawberry/Core/Types/Variant.hpp
 		src/Strawberry/Core/UTF.cpp
@@ -100,8 +107,6 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Util/Image.hpp
 		src/Strawberry/Core/Util/STBImplementations.cpp
 		src/Strawberry/Core/Util/Strings.hpp
-		src/Strawberry/Core/Process.hpp
-		src/Strawberry/Core/Process.cpp
 	)
 
 	new_strawberry_library(NAME StrawberryCore SOURCE ${StrawberryCore_Sources})
