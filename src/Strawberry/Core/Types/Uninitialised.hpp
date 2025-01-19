@@ -25,27 +25,9 @@ namespace Strawberry::Core
 		{}
 
 
-		Uninitialised(const Uninitialised& rhs)
-#if STRAWBERRY_DEBUG
-			: mInitialised(rhs.mInitialised)
-#endif // STRAWBERRY_DEBUG
-		{
-			std::memcpy(&mPayload, &rhs.mPayload, sizeof(T));
-		}
-
-
-		Uninitialised& operator=(const Uninitialised& rhs)
-		{
-#if STRAWBERRY_DEBUG
-			mInitialised = rhs.mInitialised;
-#endif // STRAWBERRY_DEBUG
-			std::memcpy(&mPayload, &rhs.mPayload, sizeof(T));
-		}
-
-
+		Uninitialised(const Uninitialised& rhs) = delete;
+		Uninitialised& operator=(const Uninitialised& rhs) = delete;
 		Uninitialised(Uninitialised&&) = delete;
-
-
 		Uninitialised operator=(Uninitialised&&) = delete;
 
 
@@ -113,13 +95,15 @@ namespace Strawberry::Core
 			return &mPayload;
 		}
 
+
 	private:
 #if STRAWBERRY_DEBUG
 		bool mInitialised = false;
 #endif // STRAWBERRY_DEBUG
 		union
 		{
-			T mPayload;
+			uint8_t mBytes[sizeof(T)] = {};
+			T       mPayload;
 		};
 	};
 } // namespace Strawberry::Core
