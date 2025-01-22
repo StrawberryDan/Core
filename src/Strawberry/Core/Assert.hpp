@@ -1,13 +1,14 @@
 #pragma once
 
 
+// Core
+#include "Strawberry/Core/IO/Logging.hpp"
+#include "Strawberry/Core/Markers.hpp"
+// Standard Library
 #include <csignal>
 #include <cstddef>
 #include <iostream>
 #include <utility>
-
-
-#include "Markers.hpp"
 
 
 namespace Strawberry::Core
@@ -17,7 +18,9 @@ namespace Strawberry::Core
 #if STRAWBERRY_DEBUG
 		if (!value)
 		{
+			Logging::Error("Assertion failed!");
 			DebugBreak();
+			std::terminate();
 		}
 #endif // STRAWBERRY_DEBUG
 	}
