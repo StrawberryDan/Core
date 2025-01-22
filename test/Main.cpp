@@ -6,19 +6,20 @@
 #include <random>
 #include <vector>
 // Core
+#include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/IO/Base64.hpp"
 #include "Strawberry/Core/IO/ChannelBroadcaster.hpp"
 #include "Strawberry/Core/IO/ChannelReceiver.hpp"
+#include "Strawberry/Core/Math/AABB.hpp"
+#include "Strawberry/Core/Math/Clamped.hpp"
 #include "Strawberry/Core/Math/Math.hpp"
 #include "Strawberry/Core/Math/Matrix.hpp"
 #include "Strawberry/Core/Math/Periodic.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
-#include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Process.hpp"
+#include "Strawberry/Core/Types/TypeSet.hpp"
 #include "Strawberry/Core/Types/Uninitialised.hpp"
 #include "Strawberry/Core/UTF.hpp"
-#include "Strawberry/Core/Math/Clamped.hpp"
-#include "Strawberry/Core/Math/AABB.hpp"
-#include "Strawberry/Core/Types/TypeSet.hpp"
 
 
 namespace Test
@@ -395,6 +396,18 @@ namespace Test
 		Assert(c == b);
 		Assert(a != b);
 	}
+
+
+	void Processes()
+	{
+#ifdef STRAWBERRY_TARGET_WINDOWS
+		Process process("dir");
+		Process::Result result = process.Wait();
+		AssertEQ(result, 0);
+#else
+		#warning No test for Core::Process on this platform!
+#endif
+	}
 } // namespace Test
 
 int main()
@@ -410,4 +423,7 @@ int main()
 	Test::ClampedNumbers();
 	Test::StaticClampedNumbers();
 	Test::Variants();
+	Test::Processes();
+
+	return 0;
 }
