@@ -132,7 +132,7 @@ namespace Strawberry::Core
 
 		~Variant()
 		{
-
+			Visit([](auto&& x) { std::destroy_at(&x); });
 		}
 
 
