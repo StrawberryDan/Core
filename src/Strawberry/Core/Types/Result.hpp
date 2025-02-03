@@ -20,14 +20,14 @@ namespace Strawberry::Core
 	public:
 		template <typename T>
 		Result(T&& t)
-			: mPayload([]<typename T2>(T2&& t) {
-				if constexpr (std::same_as<std::decay_t<T2>, D>)
+			: mPayload([](T&& t) {
+				if constexpr (std::constructible_from<D, decltype(t)>)
 				{
-					return D(std::forward<T2>(t));
+					return D(std::forward<T>(t));
 				}
-				else if constexpr (std::same_as<std::decay_t<T2>, E>)
+				else if constexpr (std::constructible_from<E, decltype(t)>)
 				{
-					 return E(std::forward<T2>(t));
+					 return E(std::forward<T>(t));
 				}
 				else
 				{
