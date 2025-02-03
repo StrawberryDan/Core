@@ -90,7 +90,7 @@ namespace Strawberry::Core
 		}
 
 
-		explicit operator bool(this auto const& self)
+		explicit operator bool(this auto&& self)
 		{
 			return self.HasValue();
 		}
