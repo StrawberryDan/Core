@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(StrawberryCore)
+enable_testing()
 include(FetchContent)
 include(ExternalProject)
 
@@ -38,9 +39,7 @@ if (NOT TARGET StrawberryCore)
 		SOURCE_DIR STB_SOURCE_DIR)
 
 
-	list(APPEND StrawberryCore_Sources
-		src/Strawberry/Core/Allocator.cpp
-		src/Strawberry/Core/Allocator.hpp
+	new_strawberry_library(NAME StrawberryCore SOURCE 
 		src/Strawberry/Core/Assert.hpp
 		src/Strawberry/Core/Collection/CircularBuffer.hpp
 		src/Strawberry/Core/Concepts.hpp
@@ -74,8 +73,6 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Math/Vector.hpp
 		src/Strawberry/Core/Process.cpp
 		src/Strawberry/Core/Process.hpp
-		src/Strawberry/Core/String.hpp
-		src/Strawberry/Core/String.inl
 		src/Strawberry/Core/Sync/ConditionVariable.cpp
 		src/Strawberry/Core/Sync/ConditionVariable.hpp
 		src/Strawberry/Core/Sync/Mutex.hpp
@@ -106,10 +103,7 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Util/IDPool.hpp
 		src/Strawberry/Core/Util/Image.hpp
 		src/Strawberry/Core/Util/STBImplementations.cpp
-		src/Strawberry/Core/Util/Strings.hpp
-	)
-
-	new_strawberry_library(NAME StrawberryCore SOURCE ${StrawberryCore_Sources})
+		src/Strawberry/Core/Util/Strings.hpp)
 
 	target_include_directories(StrawberryCore
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -120,4 +114,6 @@ if (NOT TARGET StrawberryCore)
 	new_strawberry_executable(NAME StrawberryCoreTest SOURCE
 		test/Main.cpp)
 	target_link_libraries(StrawberryCoreTest PRIVATE StrawberryCore)
+
+	add_test(NAME StrawberryCoreTest COMMAND StrawberryCoreTest)
 endif ()
