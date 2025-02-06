@@ -57,8 +57,6 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/IO/Error.hpp
 		src/Strawberry/Core/IO/Logging.cpp
 		src/Strawberry/Core/IO/Receiver.hpp
-		src/Strawberry/Core/IO/Table.cpp
-		src/Strawberry/Core/IO/Table.hpp
 		src/Strawberry/Core/Markers.cpp
 		src/Strawberry/Core/Markers.hpp
 		src/Strawberry/Core/Math/AABB.hpp
