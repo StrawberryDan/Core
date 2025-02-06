@@ -27,7 +27,7 @@ namespace Strawberry::Core
 
 
 		template<typename... Args>
-		static void Log(Level level, fmt::format_string<Args...> message, Args&&... args)
+		static void Log(Level level, const std::string& message, Args&&... args)
 		{
 			// Return early if we are ignoring this log level.
 			if (GetLevel() > level) return;
@@ -35,13 +35,13 @@ namespace Strawberry::Core
 			// Create string
 			std::string formatted;
 			// Do as much at compile time as possible
-			if consteval 
+			if consteval
 			{
-				formatted = fmt::format(message, args...);
+				formatted = fmt::format(message, std::forward<Args>(args)...);
 			}
-			 else
+			else
 			{
-				formatted = fmt::format(fmt::runtime(message), args...);
+				formatted = fmt::format(fmt::runtime(message), std::forward<Args>(args)...);
 			}
 
 			// Put the string into the logging syntax.
@@ -51,35 +51,35 @@ namespace Strawberry::Core
 
 
 		template<typename... Args>
-		static void Trace(fmt::format_string<Args...> message, Args&&... args)
+		static void Trace(const std::string& message, Args&&... args)
 		{
 			Log(Level::Trace, message, std::forward<Args>(args)...);
 		}
 
 
 		template<typename... Args>
-		static void Debug(fmt::format_string<Args...> message, Args&&... args)
+		static void Debug(const std::string& message, Args&&... args)
 		{
 			Log(Level::Debug, message, std::forward<Args>(args)...);
 		}
 
 
 		template<typename... Args>
-		static void Info(fmt::format_string<Args...> message, Args&&... args)
+		static void Info(const std::string& message, Args&&... args)
 		{
 			Log(Level::Info, message, std::forward<Args>(args)...);
 		}
 
 
 		template<typename... Args>
-		static void Warning(fmt::format_string<Args...> message, Args&&... args)
+		static void Warning(const std::string& message, Args&&... args)
 		{
 			Log(Level::Warning, message, std::forward<Args>(args)...);
 		}
 
 
 		template<typename... Args>
-		static void Error(fmt::format_string<Args...> message, Args&&... args)
+		static void Error(const std::string& message, Args&&... args)
 		{
 			Log(Level::Error, message, std::forward<Args>(args)...);
 		}
