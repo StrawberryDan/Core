@@ -92,7 +92,8 @@ namespace Strawberry::Core
 			: ReflexivePointer() {}
 
 
-		explicit ReflexivePointer(const std::derived_from<EnableReflexivePointer> auto& base) noexcept
+		template <std::derived_from<EnableReflexivePointer> Base>
+		explicit ReflexivePointer(const Base& base) noexcept
 			: ReflexivePointer(base.GetReflexivePointer()) {}
 
 

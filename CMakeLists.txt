@@ -109,9 +109,18 @@ if (NOT TARGET StrawberryCore)
 	target_link_libraries(StrawberryCore PUBLIC nlohmann_json::nlohmann_json fmt::fmt-header-only)
 
 
-	new_strawberry_executable(NAME StrawberryCoreTest SOURCE
-		test/Main.cpp)
-	target_link_libraries(StrawberryCoreTest PRIVATE StrawberryCore)
+	new_strawberry_tests(NAME "StrawberryCore" TESTS 
+		test/TypeSets.cpp
+		test/Base64.cpp
+		test/PeriodicNumbers.cpp
+		test/Uninitialised.cpp
+		test/ChannelBroadcaster.cpp
+		test/Vectors.cpp
+		test/Matrices.cpp
+		test/UTF.cpp
+		test/ClampedNumbers.cpp
+		test/Variants.cpp
+		test/Processes.cpp)
+endif()
 
-	add_test(NAME StrawberryCoreTest COMMAND StrawberryCoreTest)
-endif ()
+

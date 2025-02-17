@@ -8,6 +8,7 @@
 #include "Strawberry/Core/IO/ChannelReceiver.hpp"
 #include "Strawberry/Core/Types/TypeSet.hpp"
 // Standard Library
+#include <functional>
 #include <set>
 
 //======================================================================================================================

@@ -15,7 +15,7 @@ Strawberry::Core::Optional<Strawberry::Core::IO::DynamicByteBuffer> Strawberry::
 		}
 
 		file.seekg(0, std::ifstream::end);
-		auto length = file.tellg();
+		const auto length = file.tellg();
 		file.seekg(0, std::ifstream::beg);
 		DynamicByteBuffer buffer = DynamicByteBuffer::Zeroes(length);
 		file.read(reinterpret_cast<char*>(buffer.Data()), length);

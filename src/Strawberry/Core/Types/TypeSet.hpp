@@ -6,6 +6,10 @@
 #pragma once
 
 
+#include <concepts>
+#include <cstddef>
+
+
 namespace Strawberry::Core
 {
 	template <typename... Ts>

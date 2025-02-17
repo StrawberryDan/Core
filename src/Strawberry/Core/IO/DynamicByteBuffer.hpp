@@ -168,7 +168,7 @@ void Strawberry::Core::IO::DynamicByteBuffer::Push(const T* data, size_t count)
 template<typename T>
 void Strawberry::Core::IO::DynamicByteBuffer::Push(const T& data)
 {
-	auto bytes = reinterpret_cast<const uint8_t*>(&data);
+	const auto bytes = reinterpret_cast<const uint8_t*>(&data);
 	for (int i = 0; i < sizeof(T); i++)
 	{
 		mData.push_back(bytes[i]);
