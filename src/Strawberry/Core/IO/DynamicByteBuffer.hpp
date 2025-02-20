@@ -39,6 +39,9 @@ namespace Strawberry::Core::IO
 		DynamicByteBuffer(const std::string& string);
 
 
+		void Clear();
+
+
 		// Pushing Data
 		template<typename T>
 		void Push(const T* data, size_t count);

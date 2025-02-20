@@ -71,6 +71,13 @@ Strawberry::Core::IO::DynamicByteBuffer::DynamicByteBuffer(const std::string& st
 	: DynamicByteBuffer(string.data(), string.size()) {}
 
 
+void Strawberry::Core::IO::DynamicByteBuffer::Clear()
+{
+	mData.clear();
+	mReadCursor = 0;
+}
+
+
 size_t Strawberry::Core::IO::DynamicByteBuffer::Size() const
 {
 	return mData.size();
@@ -121,7 +128,9 @@ Strawberry::Core::Result<Strawberry::Core::IO::DynamicByteBuffer, Strawberry::Co
 		return Error::EndOfFile;
 	}
 
-	return DynamicByteBuffer(Data() + mReadCursor, len);
+	auto result = DynamicByteBuffer(Data() + mReadCursor, len);
+	mReadCursor += len;
+	return result;
 }
 
 
