@@ -53,16 +53,33 @@ namespace Strawberry::Core::IO
 		void Push(const std::vector<T>& data);
 
 
-		inline void Push(const IO::DynamicByteBuffer& bytes)
+		void Push(const IO::DynamicByteBuffer& bytes)
 		{
 			Push(bytes.Data(), bytes.Size());
 		}
 
 
 		template<size_t S>
-		inline void Push(const IO::ByteBuffer<S>& bytes)
+		void Push(const IO::ByteBuffer<S>& bytes)
 		{
 			Push(bytes.Data(), bytes.Size());
+		}
+
+
+		void Overwrite(size_t offset, const uint8_t* data, size_t len);
+
+
+		template <size_t S>
+		void Overwrite(size_t offset, const ByteBuffer<S>& bytes)
+		{
+			Overwrite(offset, bytes.Data(), bytes.Size());
+		}
+
+
+		template <typename T>
+		void Overwrite(size_t offset, const T& data)
+		{
+			Overwrite(offset, reinterpret_cast<const uint8_t*>(&data), sizeof(data));
 		}
 
 

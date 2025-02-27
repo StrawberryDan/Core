@@ -121,6 +121,15 @@ std::string Strawberry::Core::IO::DynamicByteBuffer::AsString() const
 }
 
 
+void Strawberry::Core::IO::DynamicByteBuffer::Overwrite(size_t offset, const uint8_t* data, size_t len)
+{
+	for (size_t i = 0; i < len; ++i)
+	{
+		mData[offset + i] = data[i];
+	}
+}
+
+
 Strawberry::Core::Result<Strawberry::Core::IO::DynamicByteBuffer, Strawberry::Core::IO::Error> Strawberry::Core::IO::DynamicByteBuffer::Read(size_t len)
 {
 	if (Size() - mReadCursor < len)
