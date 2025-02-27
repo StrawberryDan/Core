@@ -15,12 +15,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::Math
 {
-	template<typename T, size_t H, size_t W> requires (std::signed_integral<T> || std::floating_point<T>)
+	template<typename T, size_t W, size_t H> requires (std::signed_integral<T> || std::floating_point<T>)
 	class Matrix
 	{
 	public:
 		/// Produced a matrix of all zeros;
-		constexpr static Matrix Zeroed()
+		constexpr static Matrix Zeroed() noexcept
 		{
 			Matrix result;
 			for (size_t i = 0; i < std::min(W, H); i++)
@@ -32,7 +32,7 @@ namespace Strawberry::Core::Math
 
 
 		/// Identity Matrix Constructor
-		constexpr Matrix()
+		constexpr Matrix() noexcept
 			: mValue{T(0)}
 		{
 			for (size_t i = 0; i < std::min(H, W); i++) mValue[i][i] = T(1);
@@ -40,28 +40,48 @@ namespace Strawberry::Core::Math
 
 
 		template<typename... Args> requires (sizeof...(Args) == H * W && (std::convertible_to<T, Args> && ...))
-		constexpr Matrix(Args... args)
+		constexpr explicit Matrix(Args... args) noexcept
 		{
 			std::array<T, H * W> values{static_cast<T>(args)...};
 			for (size_t i = 0; i < values.size(); i++) mValue[i / W][i % W] = values[i];
 		}
 
 
-		constexpr T* operator[](size_t col)
+		constexpr Matrix(const Vector<T, H>& v) noexcept requires (W == 1)
+		{
+			for (int i = 0; i < H; i++)
+			{
+				(*this)[0][i] = v[i];
+			}
+		}
+
+
+		constexpr operator Vector<T, H>() const noexcept requires (W == 1)
+		{
+			Vector<T, H> vector;
+			for (int i = 0; i < H; i++)
+			{
+				vector[i] = (*this)[0][i];
+			}
+			return vector;
+		}
+
+
+		constexpr T* operator[](size_t col) noexcept
 		{
 			Core::Assert(col < W);
 			return mValue[col];
 		}
 
 
-		constexpr const T* operator[](size_t col) const
+		constexpr const T* operator[](size_t col) const noexcept
 		{
 			Core::Assert(col < W);
 			return mValue[col];
 		}
 
 
-		constexpr bool operator==(const Matrix& b) const
+		constexpr bool operator==(const Matrix& b) const noexcept
 		{
 			for (size_t row = 0; row < H; row++)
 			{
@@ -75,7 +95,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		constexpr bool operator!=(const Matrix& b) const
+		constexpr bool operator!=(const Matrix& b) const noexcept
 		{
 			for (size_t row = 0; row < H; row++)
 			{
@@ -89,7 +109,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		constexpr Matrix operator+(const Matrix& b) const
+		constexpr Matrix operator+(const Matrix& b) const noexcept
 		{
 			Matrix result;
 			for (size_t row = 0; row < H; row++)
@@ -103,7 +123,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		constexpr Matrix operator-(const Matrix& b) const
+		constexpr Matrix operator-(const Matrix& b) const noexcept
 		{
 			Matrix result;
 			for (size_t row = 0; row < H; row++)
@@ -117,12 +137,13 @@ namespace Strawberry::Core::Math
 		}
 
 
-		constexpr Matrix operator*(const Matrix<T, W, H>& b) const
+		template <size_t W2, size_t H2>
+		constexpr Matrix<T, W2, H> operator*(const Matrix<T, W2, H2>& b) const noexcept requires (W == H2)
 		{
-			Matrix result = Matrix::Zeroed();
-			for (size_t row = 0; row < H; row++)
+			Matrix<T, W2, H> result = Matrix<T, W2, H>::Zeroed();
+			for (size_t col = 0; col < W2; col++)
 			{
-				for (size_t col = 0; col < W; col++)
+				for (size_t row = 0; row < H; row++)
 				{
 					for (size_t k = 0; k < W; k++)
 					{
@@ -131,6 +152,12 @@ namespace Strawberry::Core::Math
 				}
 			}
 			return result;
+		}
+
+
+		constexpr Vector<T, W> operator*(const Vector<T, W>& vector) const noexcept
+		{
+			return Vector((*this) * Matrix<T, 1, W>(vector));
 		}
 
 
@@ -160,4 +187,13 @@ namespace Strawberry::Core::Math
 	using Mat2i = Matrix<int, 2, 2>;
 	using Mat3i = Matrix<int, 3, 3>;
 	using Mat4i = Matrix<int, 4, 4>;
+
+
+	// Deduction Guides
+	template <typename T, size_t D>
+	Matrix(Vector<T, D>) -> Matrix<T, 1, D>;
+
+	// Deduction Guides
+	template <typename T, size_t D>
+	Vector(Matrix<T, 1, D>) -> Vector<T, D>;
 } // namespace Strawberry::Core::Math
