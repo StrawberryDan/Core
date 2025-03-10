@@ -52,6 +52,9 @@ namespace Strawberry::Core
 
 	void Logging::LogRaw(Level level, const std::string& message)
 	{
+		static std::mutex loggingGuard;
+		std::lock_guard lock(loggingGuard);
+
 		auto* outputStream = &std::cout;
 		if (level == Level::Error) outputStream = &std::cerr;
 
