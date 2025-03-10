@@ -22,4 +22,31 @@ int main()
     auto& [x, y, z] = a;
     x += 1;
     AssertEQ(a, Vector(2, 2, 3));
+
+
+    AssertEQ(Vec2i(0, 0).Embed(), 0);
+    AssertEQ(Vec2i(1, 0).Embed(), 1);
+    AssertEQ(Vec2i(1, 1).Embed(), 2);
+    AssertEQ(Vec2i(0, 1).Embed(), 3);
+    AssertEQ(Vec2i(-1, 1).Embed(), 4);
+    AssertEQ(Vec2i(-1, 0).Embed(), 5);
+    AssertEQ(Vec2i(-1, -1).Embed(), 6);
+    AssertEQ(Vec2i(0, -1).Embed(), 7);
+    AssertEQ(Vec2i(1, -1).Embed(), 8);
+    AssertEQ(Vec2i(2, 0).Embed(), 9);
+    AssertEQ(Vec2i(2, 1).Embed(), 10);
+    AssertEQ(Vec2i(2, 2).Embed(), 11);
+    AssertEQ(Vec2i(1, 2).Embed(), 12);
+    AssertEQ(Vec2i(0, 2).Embed(), 13);
+    AssertEQ(Vec2i(-1, 2).Embed(), 14);
+    AssertEQ(Vec2i(-2, 2).Embed(), 15);
+    AssertEQ(Vec2i(-2, 1).Embed(), 16);
+    AssertEQ(Vec2i(-2, 0).Embed(), 17);
+    AssertEQ(Vec2i(-2, -1).Embed(), 18);
+    AssertEQ(Vec2i(-2, -2).Embed(), 19);
+    AssertEQ(Vec2i(-1, -2).Embed(), 20);
+    AssertEQ(Vec2i(-0, -2).Embed(), 21);
+    AssertEQ(Vec2i(1, -2).Embed(), 22);
+    AssertEQ(Vec2i(2, -2).Embed(), 23);
+    AssertEQ(Vec2i(2, -1).Embed(), 24);
 }

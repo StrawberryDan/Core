@@ -112,17 +112,19 @@ if (NOT TARGET StrawberryCore)
 
 
 	new_strawberry_tests(NAME "StrawberryCore" TESTS 
-		test/TypeSets.cpp
 		test/Base64.cpp
-		test/PeriodicNumbers.cpp
-		test/Uninitialised.cpp
 		test/ChannelBroadcaster.cpp
-		test/Vectors.cpp
-		test/Matrices.cpp
-		test/UTF.cpp
 		test/ClampedNumbers.cpp
+		test/Matrices.cpp
+		test/Noise.cpp
+		test/PeriodicNumbers.cpp
+		test/Processes.cpp
+		test/TypeSets.cpp
+		test/UTF.cpp
+		test/Uninitialised.cpp
 		test/Variants.cpp
-		test/Processes.cpp)
+		test/Vectors.cpp
+	)
 endif()
 
 

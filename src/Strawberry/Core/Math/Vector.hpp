@@ -4,6 +4,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Core
 #include "Units.hpp"
+#include "Strawberry/Core/Markers.hpp"
 // Standard Library
 #include <concepts>
 #include <cmath>
@@ -287,6 +288,46 @@ namespace Strawberry::Core::Math
 		Vector ProjectOntoPlane(const Vector& normal) const noexcept requires (std::floating_point<T>)
 		{
 			return *this - normal.Normalised() * (this->Dot(normal));
+		}
+
+		[[nodiscard]] unsigned int Embed() const noexcept requires (std::same_as<T, int> && D == 2)
+		{
+			auto L_high = [](unsigned int x) { return (2 * x + 1) * (2 * x + 1); };
+			auto L_low  = [](unsigned int x) { if (x == 0) return 0u; return (2 * x - 1) * (2 * x - 1); };
+
+			auto S = [](int x, int y) { return std::max<unsigned int>({0u, static_cast<unsigned int>(std::abs(x)), static_cast<unsigned int>(std::abs(y))}); };
+			auto W = [L_high, L_low](unsigned int x) { return (L_high(x) - L_low(x)) / 4; };
+			auto Q = [](int x, int y)
+			{
+				if (x >= 0 && y >= 0) return 0;
+				if (x <  0 && y >= 0) return 1;
+				if (x <  0) return 2;
+				return 3;
+			};
+
+			auto R = [S](unsigned int x, unsigned int y)
+			{
+				if (x >= y) return y;
+				return 2u * S(x, y) - x;
+			};
+
+			auto [x, y] = mValue;
+
+			unsigned int embeding = L_low(S(x, y)) + Q(x, y) * W(S(x, y));
+			switch (Q(x, y))
+			{
+			case 0: return embeding + R(x, y);
+
+			case 1: return embeding + R(y, -x);
+
+			case 2: return embeding + R(-x, -y);
+
+			case 3: return embeding + R(-y, x);
+
+			default:
+				Unreachable();
+			}
+
 		}
 
 	private:
