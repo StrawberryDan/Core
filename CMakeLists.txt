@@ -64,6 +64,8 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Math/Math.hpp
 		src/Strawberry/Core/Math/Math.inl
 		src/Strawberry/Core/Math/Matrix.hpp
+		src/Strawberry/Core/Math/Noise.hpp
+		src/Strawberry/Core/Math/Noise.cpp
 		src/Strawberry/Core/Math/Periodic.hpp
 		src/Strawberry/Core/Math/Rational.hpp
 		src/Strawberry/Core/Math/Transformations.hpp
