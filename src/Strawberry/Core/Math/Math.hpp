@@ -11,7 +11,7 @@
 namespace Strawberry::Core::Math
 {
 	template<std::integral T>
-	T GreatestCommonDivisor(T a, T b)
+	constexpr T GreatestCommonDivisor(T a, T b)
 	{
 		std::pair<T, T> pair(a, b);
 
@@ -25,7 +25,7 @@ namespace Strawberry::Core::Math
 
 
 	template<std::integral A, std::integral B>
-	auto CeilDiv(A num, B den)
+	constexpr auto CeilDiv(A num, B den)
 	{
 		return (num + den - 1) / den;
 	}
@@ -39,14 +39,14 @@ namespace Strawberry::Core::Math
 
 
 	template<std::integral A, std::integral B>
-	auto RoundDownToMultiple(A value, B multiple)
+	constexpr auto RoundDownToMultiple(A value, B multiple)
 	{
 		return multiple * (value / multiple);
 	}
 
 
 	template<std::floating_point A>
-	A RoundToDecimalPoints(A value, unsigned int decimalPoints)
+	constexpr A RoundToDecimalPoints(A value, unsigned int decimalPoints)
 	{
 		A magnitude = std::pow<A>(10, decimalPoints);
 		return std::round(value * magnitude) / magnitude;
