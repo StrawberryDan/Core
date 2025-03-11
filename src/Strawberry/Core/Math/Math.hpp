@@ -51,4 +51,23 @@ namespace Strawberry::Core::Math
 		A magnitude = std::pow<A>(10, decimalPoints);
 		return std::round(value * magnitude) / magnitude;
 	}
+
+
+	template <std::floating_point T>
+	constexpr T Smoothstep(T x) noexcept
+	{
+		if (x <= 0.0)
+			return 0.0;
+		if (x > 1.0)
+			return 1.0;
+		return 3.0 * x * x - 2.0 * x * x * x;
+	}
+
+
+	template <std::floating_point T>
+	constexpr T Smoothstep(T a, T b, T x) noexcept
+	{
+		auto ratio = Smoothstep(x);
+		return b * ratio + a * (1.0 - ratio);
+	}
 } // namespace Strawberry::Core::Math
