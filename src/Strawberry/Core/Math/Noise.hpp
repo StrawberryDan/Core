@@ -1,6 +1,6 @@
 #pragma once
 #include "Matrix.hpp"
-#include <cstdint>
+#include <functional>
 #include <random>
 
 
@@ -45,6 +45,29 @@ namespace Strawberry::Core::Math::Noise
 	private:
 		// Returns a consistent random value in [-1.0, 1.0] for any input coordinate
 		float WhiteIntegerNoise(Vec2i position) const;
+
+
+		// The seed for this signal
+		unsigned int mSeed;
+		// The orthogonal distance between two white noise values in input space
+		float    mPeriod;
+	};
+
+
+	class Perlin
+	{
+	public:
+		// Creates a new noise signal with the given seed and period.
+		Perlin(int seed, float period);
+
+
+		// Returns the value of this noise signal at the given position.
+		float operator()(Vec2f position) const noexcept;
+
+
+	private:
+		// Returns a consistent random value in [-1.0, 1.0] for any input coordinate
+		float VectorNoise(Vec2f samplePosition, Vec2i gridPosition) const;
 
 
 		// The seed for this signal
@@ -165,5 +188,29 @@ namespace Strawberry::Core::Math::Noise
 
 		template <typename T>
 		Layer(unsigned int, T&&) -> Layer<std::decay_t<std::invoke_result_t<T, unsigned int>>>;
+
+
+		template <typename Base>
+		class TransformInput
+		{
+		public:
+			template <typename F>
+			TransformInput(F&& function, Base&& base)
+				: mFunctor(std::forward<F>(function))
+				, mBase(std::move(base))
+			{}
+
+
+			float operator()(Vec2f position) const
+			{
+				position = mFunctor(position);
+				return mBase(position);
+			}
+
+
+		private:
+			std::function<Vec2f(Vec2f)>    mFunctor;
+			Base mBase;
+		};
 	}
 }
