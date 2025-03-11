@@ -64,8 +64,8 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Math/Math.hpp
 		src/Strawberry/Core/Math/Math.inl
 		src/Strawberry/Core/Math/Matrix.hpp
-		src/Strawberry/Core/Math/Noise.hpp
 		src/Strawberry/Core/Math/Noise.cpp
+		src/Strawberry/Core/Math/Noise.hpp
 		src/Strawberry/Core/Math/Periodic.hpp
 		src/Strawberry/Core/Math/Rational.hpp
 		src/Strawberry/Core/Math/Transformations.hpp
@@ -77,6 +77,7 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Sync/ConditionVariable.hpp
 		src/Strawberry/Core/Sync/Mutex.hpp
 		src/Strawberry/Core/Thread/RepeatingTask.hpp
+		src/Strawberry/Core/Thread/ThreadPool.hpp
 		src/Strawberry/Core/Timing/Clock.cpp
 		src/Strawberry/Core/Timing/Clock.hpp
 		src/Strawberry/Core/Timing/Metronome.cpp
@@ -103,7 +104,8 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Util/IDPool.hpp
 		src/Strawberry/Core/Util/Image.hpp
 		src/Strawberry/Core/Util/STBImplementations.cpp
-		src/Strawberry/Core/Util/Strings.hpp)
+		src/Strawberry/Core/Util/Strings.hpp
+	)
 
 	target_include_directories(StrawberryCore
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
