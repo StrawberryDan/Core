@@ -24,12 +24,22 @@ namespace Strawberry::Core
 						bool wasEmpty = false;
 
 						{
-							auto jobQueue = queue->Lock();
-							if (!jobQueue->empty())
+							Optional<Job> job = [queue]()-> Optional<Job>
 							{
-								auto job = std::move(jobQueue->front());
-								jobQueue->pop_front();
-								std::invoke(job);
+								auto jobQueue = queue->Lock();
+								if (!jobQueue->empty())
+								{
+									auto job = std::move(jobQueue->front());
+									jobQueue->pop_front();
+									return Optional(job);
+								}
+
+								return NullOpt;
+							}();
+
+							if (job)
+							{
+								std::invoke(job.Unwrap());
 							}
 							else
 							{
@@ -131,6 +141,13 @@ namespace Strawberry::Core
 
 
 			std::vector<Math::Vector<T, D>> inputs;
+			inputs.reserve([input]()
+			{
+				T acc = 1;
+				for (int i = 0; i < D; i++)
+					acc *= input[i];
+				return acc;
+			}());
 			Math::Vector<T, D> accumulator;
 
 			while (!finished(accumulator))
