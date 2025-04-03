@@ -8,6 +8,7 @@
 // Standard Library
 #include <concepts>
 #include <cmath>
+#include <functional>
 #include <memory>
 #include <tuple>
 
@@ -96,12 +97,32 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Fold the vectors with the given operation
+		template <typename F>
+		constexpr auto Fold(F&& function) const noexcept
+		{
+			if constexpr (D == 1)
+			{
+				return mValue[0];
+			}
+			else if constexpr (D >= 2)
+			{
+				auto acc = mValue[0];
+				for (int i = 1; i < D; i++)
+				{
+					acc = std::invoke(function, acc, mValue[i]);
+				}
+				return acc;
+			}
+		}
+
+
 		/// Apply function to all members
 		template<typename F>
-		constexpr Vector Map(F function) const noexcept
+		constexpr Vector Map(F&& function) const noexcept
 		{
 			Vector result;
-			for (int i = 0; i < D; i++) result[i] = function((*this)[i]);
+			for (int i = 0; i < D; i++) result[i] = std::invoke(std::forward<F>(function), (*this)[i]);
 			return result;
 		}
 
