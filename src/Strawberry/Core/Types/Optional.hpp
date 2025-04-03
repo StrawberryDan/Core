@@ -393,7 +393,7 @@ namespace Strawberry::Core
 		//  Construction, Destruction and Assignment
 		//----------------------------------------------------------------------------------------------------------------------
 		Optional()
-			: mHasValue(false), mPayload{}
+			: mHasValue(false)
 		{
 		}
 
