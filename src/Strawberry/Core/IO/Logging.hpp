@@ -27,7 +27,7 @@ namespace Strawberry::Core
 
 
 		template<typename... Args>
-		static void Log(Level level, const std::string& message, Args&&... args)
+		static constexpr void Log(Level level, const std::string& message, Args&&... args)
 		{
 			// Return early if we are ignoring this log level.
 			if (GetLevel() > level) return;
