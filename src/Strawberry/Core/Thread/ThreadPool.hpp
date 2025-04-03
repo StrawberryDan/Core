@@ -4,6 +4,7 @@
 #include <functional>
 #include <thread>
 #include <vector>
+#include <latch>
 
 #include "Strawberry/Core/Sync/Mutex.hpp"
 
@@ -111,8 +112,9 @@ namespace Strawberry::Core
 
 
 		template <std::unsigned_integral T, size_t D, typename F>
-		void QueueJobs(Math::Vector<T, D> input, F&& function)
+		[[nodiscard]] std::future<void> QueueJobs(Math::Vector<T, D> input, F&& function)
 		{
+
 			auto incrementVector = [input](this const auto& self, Math::Vector<T, D>& v, size_t place = 0) -> void
 			{
 				if (v[place] == input[place] - 1)
@@ -139,34 +141,48 @@ namespace Strawberry::Core
 				return true;
 			};
 
-
-			std::vector<Math::Vector<T, D>> inputs;
-			inputs.reserve([input]()
-			{
-				T acc = 1;
-				for (int i = 0; i < D; i++)
-					acc *= input[i];
-				return acc;
-			}());
-			Math::Vector<T, D> accumulator;
-
-			while (!finished(accumulator))
-			{
-				inputs.emplace_back(accumulator);
-				incrementVector(accumulator);
-			}
-
-
-			for (auto&& x : inputs)
-			{
-				auto jobLock = mJobQueues[nextQueue++]->Lock();
-				if (nextQueue == mThreads.size())
+			auto future = std::async(std::launch::async, [this, incrementVector, finished, input, function = std::forward<F>(function)](){
+				const size_t inputCount = [input]()
 				{
-					nextQueue = 0;
+					T acc = 1;
+					for (int i = 0; i < D; i++)
+						acc *= input[i];
+					return acc;
+				}();
+
+				std::vector<Math::Vector<T, D>> inputs;
+				inputs.reserve(inputCount);
+
+				Math::Vector<T, D> accumulator;
+				while (!finished(accumulator))
+				{
+					inputs.emplace_back(accumulator);
+					incrementVector(accumulator);
 				}
 
-				jobLock->emplace_back(std::move([x, function](){ function(x); }));
-			}
+
+				std::latch latch(inputCount - 1);
+				for (auto&& x : inputs)
+				{
+					auto jobLock = mJobQueues[nextQueue++]->Lock();
+					if (nextQueue == mThreads.size())
+					{
+						nextQueue = 0;
+					}
+
+					jobLock->emplace_back(
+						std::move(
+							[x, function, &latch]()
+							{
+								function(x);
+								latch.count_down();
+							}));
+				}
+
+				latch.wait();
+			});
+
+			return future;
 		}
 
 	private:
