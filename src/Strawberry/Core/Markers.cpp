@@ -2,6 +2,7 @@
 
 
 #include <csignal>
+#include <cstdlib>
 
 
 #if defined(_WIN32)
