@@ -71,8 +71,6 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Math/Transformations.hpp
 		src/Strawberry/Core/Math/Units.hpp
 		src/Strawberry/Core/Math/Vector.hpp
-		src/Strawberry/Core/Process.cpp
-		src/Strawberry/Core/Process.hpp
 		src/Strawberry/Core/Sync/ConditionVariable.cpp
 		src/Strawberry/Core/Sync/ConditionVariable.hpp
 		src/Strawberry/Core/Sync/Mutex.hpp
@@ -120,7 +118,6 @@ if (NOT TARGET StrawberryCore)
 		test/Matrices.cpp
 		test/Noise.cpp
 		test/PeriodicNumbers.cpp
-		test/Processes.cpp
 		test/TypeSets.cpp
 		test/UTF.cpp
 		test/Uninitialised.cpp
