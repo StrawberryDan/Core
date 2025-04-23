@@ -3,6 +3,7 @@
 #include "Strawberry/Core/Types/Optional.hpp"
 #include <fstream>
 #include <utility>
+#include <mutex>
 
 
 namespace Strawberry::Core
