@@ -31,8 +31,8 @@ namespace Strawberry::Core::Math::Noise
 		const float waveX = std::floor(x / mPeriod);
 		const float waveY = std::floor(y / mPeriod);
 		// Calculate the phase of the input point relative to the period.
-		const float phaseX = waveX >= 0 ? std::fmod(x, mPeriod) : mPeriod + std::fmod(x, mPeriod);
-		const float phaseY = waveY >= 0 ? std::fmod(y, mPeriod) : mPeriod + std::fmod(y, mPeriod);
+		const float phaseX = x - (waveX * mPeriod);
+		const float phaseY = y - (waveY * mPeriod);
 		// Calculate the ratio between the phase and the period
 		const float phaseRatioX = phaseX / mPeriod;
 		const float phaseRatioY = phaseY / mPeriod;
