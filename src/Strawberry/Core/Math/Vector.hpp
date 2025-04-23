@@ -12,6 +12,7 @@
 #include <cmath>
 #include <functional>
 #include <memory>
+#include <ranges>
 #include <tuple>
 
 //======================================================================================================================
@@ -83,6 +84,47 @@ namespace Strawberry::Core::Math
 				result[D + i] = argsAsVector[i];
 			return result;
 		};
+
+
+		static std::vector<Vector> Rectangle(Vector size) requires (std::unsigned_integral<T>)
+		{
+			auto addDimRange = [](std::vector<Vector<T, D - 1>>&& acc, std::vector<T>&& dimension ) -> std::vector<Vector<T, D>>
+			{
+				std::vector<Vector> results;
+
+				for (auto&& v : acc)
+				{
+					for (auto&& d : dimension)
+					{
+						results.emplace_back(v.AppendedWith(d));
+					}
+				}
+
+				return results;
+			};
+
+			std::vector<T> dimension;
+			for (int i = 0; i < size[D - 1]; i++)
+			{
+				dimension.emplace_back(i);
+			}
+
+			if constexpr (D == 1)
+			{
+				return dimension | std::views::transform([](auto&& x) -> Vector { return Vector(x); }) | std::ranges::to<std::vector>();
+			}
+			else
+			{
+				Vector<T, D - 1> subVector(size);
+				return addDimRange(subVector.Rectangle(), std::move(dimension));
+			}
+		}
+
+
+		std::vector<Vector> Rectangle() requires(std::unsigned_integral<T>)
+		{
+			return Rectangle(*this);
+		}
 
 
 		/// Mutable accessor
