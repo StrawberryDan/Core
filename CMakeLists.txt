@@ -18,7 +18,7 @@ if (NOT TARGET StrawberryCore)
 	FetchContent_Declare(FMT
 		EXCLUDE_FROM_ALL
 		GIT_REPOSITORY "https://github.com/fmtlib/fmt.git"
-		GIT_TAG "10.1.1")
+		GIT_TAG "11.1.4")
 	FetchContent_MakeAvailable(FMT)
 
 	FetchContent_Declare(JSON
