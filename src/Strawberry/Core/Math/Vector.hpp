@@ -5,6 +5,8 @@
 // Core
 #include "Units.hpp"
 #include "Strawberry/Core/Markers.hpp"
+#include "fmt/base.h"
+#include "fmt/core.h"
 // Standard Library
 #include <concepts>
 #include <cmath>
@@ -409,3 +411,25 @@ namespace std
 		}
 	};
 } // namespace std
+
+
+template <typename T, size_t D>
+struct fmt::formatter<Strawberry::Core::Math::Vector<T, D>>
+	: formatter<std::string>
+{
+	template <typename CTX>
+	auto format(const Strawberry::Core::Math::Vector<T, D>& v, CTX& ctx) const
+	{
+		auto out = ctx.out();
+
+		out = format_to(out, "[");
+		for (unsigned i = 0; i < D - 1; i++)
+		{
+			out = format_to(out, "{}, ", v[i]);
+		}
+		out = format_to(out, "{}", v[D - 1]);
+		out = format_to(out, "]");
+
+		return out;
+	}
+};
