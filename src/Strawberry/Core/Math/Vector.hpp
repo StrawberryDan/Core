@@ -161,6 +161,17 @@ namespace Strawberry::Core::Math
 		}
 
 
+		template <typename... Args>
+		Vector<T, sizeof...(Args)> Swizzle(Args... args)
+		{
+			std::array _args{args...};
+			Vector<T, sizeof...(Args)> result;
+			for (int i = 0; i < sizeof...(Args); i++)
+				result[i] = (*this)[_args[i]];
+			return result;
+		}
+
+
 		/// Apply function to all members
 		template<typename F>
 		constexpr Vector Map(F&& function) const noexcept
