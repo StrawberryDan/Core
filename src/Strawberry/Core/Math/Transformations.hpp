@@ -3,6 +3,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "Matrix.hpp"
+#include "Units.hpp"
 
 
 //======================================================================================================================
@@ -41,6 +42,51 @@ namespace Strawberry::Core::Math
 	Matrix<T, sizeof...(Ts) + 1, sizeof...(Ts) + 1> Scale(Ts... args)
 	{
 		return Scale(Core::Math::Vector<T, sizeof...(Ts)>(args...));
+	}
+
+
+	template <typename T>
+	Matrix<T, 4, 4> RotateX(Radians radians)
+	{
+		T cosx = std::cos(radians);
+		T sinx = std::sin(radians);
+
+		return Matrix<T, 4, 4>{
+			1.0f, 0.0f,  0.0f, 0.0f,
+			0.0f, cosx, -sinx, 0.0f,
+			0.0f, sinx,  cosx, 0.0f,
+			0.0f, 0.0f,  0.0f, 1.0f,
+		};
+	}
+
+
+	template <typename T>
+	Matrix<T, 4, 4> RotateY(Radians radians)
+	{
+		T cosx = std::cos(radians);
+		T sinx = std::sin(radians);
+
+		return Matrix<T, 4, 4>{
+			 cosx, 0.0f, sinx, 0.0f,
+			 0.0f, 1.0f, 0.0f, 0.0f,
+			-sinx, 0.0f, cosx, 0.0f,
+			 0.0f, 0.0f, 0.0f, 1.0f,
+		};
+	}
+
+
+	template <typename T>
+	Matrix<T, 4, 4> RotateZ(Radians radians)
+	{
+		T cosx = std::cos(radians);
+		T sinx = std::sin(radians);
+
+		return Matrix<T, 4, 4>{
+			cosx, -sinx, 0.0f, 0.0f,
+			sinx, cosx, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+		};
 	}
 
 
