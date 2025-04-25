@@ -108,7 +108,7 @@ namespace Strawberry::Core::Math::Noise
 			float operator()(Vec2f position) const
 			{
 				float value = mBase(mOrientation * position);
-				if (std::isfinite(value)) Core::DebugBreak();
+				Core::Assert(std::isfinite(value));
 				return value;
 			}
 
