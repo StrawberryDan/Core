@@ -114,54 +114,12 @@ namespace Strawberry::Core
 		template <std::unsigned_integral T, size_t D, typename F>
 		[[nodiscard]] std::future<void> QueueJobs(Math::Vector<T, D> input, F&& function)
 		{
+			auto future = std::async(std::launch::async, [this, input, function = std::forward<F>(function)](){
+				const size_t inputCount = input.Fold(std::multiplies());
 
-			auto incrementVector = [input](this const auto& self, Math::Vector<T, D>& v, size_t place = 0) -> void
-			{
-				if (v[place] == input[place] - 1)
-				{
-					v[place] = 0;
-					self(v, place + 1);
-				}
-				else
-				{
-					++v[place];
-				}
-			};
+				std::vector<Math::Vector<T, D>> inputs = input.Rectangle();
 
-			auto finished = [input](Math::Vector<T, D> v)
-			{
-				for (int i = 0; i < D; ++i)
-				{
-					if (v[i] != input[i] - 1)
-					{
-						return false;
-					}
-				}
-
-				return true;
-			};
-
-			auto future = std::async(std::launch::async, [this, incrementVector, finished, input, function = std::forward<F>(function)](){
-				const size_t inputCount = [input]()
-				{
-					T acc = 1;
-					for (int i = 0; i < D; i++)
-						acc *= input[i];
-					return acc;
-				}();
-
-				std::vector<Math::Vector<T, D>> inputs;
-				inputs.reserve(inputCount);
-
-				Math::Vector<T, D> accumulator;
-				while (!finished(accumulator))
-				{
-					inputs.emplace_back(accumulator);
-					incrementVector(accumulator);
-				}
-
-
-				std::latch latch(inputCount - 1);
+				std::latch latch(inputCount);
 				for (auto&& x : inputs)
 				{
 					auto jobLock = mJobQueues[nextQueue++]->Lock();
