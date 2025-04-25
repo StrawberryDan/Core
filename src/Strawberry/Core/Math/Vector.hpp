@@ -4,6 +4,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Core
 #include "Units.hpp"
+#include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Markers.hpp"
 #include "fmt/base.h"
 #include "fmt/core.h"
@@ -14,6 +15,7 @@
 #include <memory>
 #include <ranges>
 #include <tuple>
+
 
 //======================================================================================================================
 //  Class Definition
@@ -331,7 +333,12 @@ namespace Strawberry::Core::Math
 		/// Define vector normalisation
 		Vector Normalised() const noexcept requires (std::floating_point<T>)
 		{
-			return *this / Magnitude();
+			Vector result = *this / Magnitude();
+			for (int i = 0; i < D; i++)
+			{
+				Core::Assert(std::isfinite((*this)[i]));
+			}
+			return result;
 		}
 
 

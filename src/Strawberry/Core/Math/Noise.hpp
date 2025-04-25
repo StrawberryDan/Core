@@ -107,7 +107,9 @@ namespace Strawberry::Core::Math::Noise
 
 			float operator()(Vec2f position) const
 			{
-				return mBase(mOrientation * position);
+				float value = mBase(mOrientation * position);
+				if (std::isfinite(value)) Core::DebugBreak();
+				return value;
 			}
 
 
@@ -135,7 +137,9 @@ namespace Strawberry::Core::Math::Noise
 
 			float operator()(Vec2f position) const
 			{
-				return mAmplitude * mBase(position);
+				float value = mAmplitude * mBase(position);
+				Core::Assert(std::isfinite(value));
+				return value;
 			}
 
 
@@ -177,6 +181,7 @@ namespace Strawberry::Core::Math::Noise
 				for (auto&& signal : mSignals)
 				{
 					value += signal(position);
+					Core::Assert(std::isfinite(value));
 				}
 
 				return value;
