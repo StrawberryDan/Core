@@ -123,7 +123,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		std::vector<Vector> Rectangle() requires(std::unsigned_integral<T>)
+		std::vector<Vector> Rectangle() const requires(std::unsigned_integral<T>)
 		{
 			return Rectangle(*this);
 		}
