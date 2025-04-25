@@ -143,6 +143,7 @@ namespace Strawberry::Core::Math::Noise
 		// Calculate offset of sample point
 		Vec2f offset = samplePosition - gridPosition.AsType<float>();
 		// Calculate normalised dot product
-		return gridVector.Dot(offset.Normalised());
+		float result = gridVector.Dot(offset.Normalised());
+		return std::isfinite(result) ? result : 0.0f;
 	}
 }
