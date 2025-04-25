@@ -14,6 +14,9 @@ namespace Strawberry::Core::Math::Noise
 		Linear(int seed, float period);
 
 
+		float Amplitude() const { return 1.0f; }
+
+
 		// Returns the value of this noise signal at the given position.
 		float operator()(Vec2f position) const noexcept;
 
@@ -36,6 +39,9 @@ namespace Strawberry::Core::Math::Noise
 	public:
 		// Creates a new noise signal with the given seed and period.
 		SmoothLinear(int seed, float period);
+
+
+		float Amplitude() const { return 1.0f; }
 
 
 		// Returns the value of this noise signal at the given position.
@@ -105,6 +111,12 @@ namespace Strawberry::Core::Math::Noise
 			}
 
 
+			float Amplitude() const noexcept
+			{
+				return mBase.Amplitude();
+			}
+
+
 			float operator()(Vec2f position) const
 			{
 				float value = mBase(mOrientation * position);
@@ -160,6 +172,11 @@ namespace Strawberry::Core::Math::Noise
 				{
 					mSignals.emplace_back(generator(i));
 				}
+			}
+
+			float Amplitude() const noexcept
+			{
+				return std::ranges::fold_left(mSignals | std::views::transform([] (auto&& x) { return x.Amplitude(); }), 0.0f, std::plus());
 			}
 
 
