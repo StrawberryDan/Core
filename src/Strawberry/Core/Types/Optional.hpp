@@ -251,9 +251,13 @@ namespace Strawberry::Core
 			{
 				if (t2.HasValue())
 				{
-					if (requires { mPayload = std::forward<T2>(t2); } && HasValue())
+					if (requires { mPayload = t2.Unwrap(); } && HasValue())
 					{
-						mPayload = std::forward<T2>(t2);
+						mPayload = t2.Unwrap();
+					}
+					else if (requires { mPayload = t2.Value(); } && HasValue())
+					{
+						mPayload = t2.Value();
 					}
 					else
 					{
