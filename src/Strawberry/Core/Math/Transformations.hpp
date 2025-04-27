@@ -46,6 +46,18 @@ namespace Strawberry::Core::Math
 
 
 	template <typename T>
+	constexpr Matrix<T, 2, 2> Rotate2D(Radians radians)
+	{
+		const T cosx = std::cos(radians);
+		const T sinx = std::sin(radians);
+		return Matrix<T, 2, 2>{
+			cosx, -sinx,
+			sinx, cosx
+		};
+	}
+
+
+	template <typename T>
 	Matrix<T, 4, 4> RotateX(Radians radians)
 	{
 		T cosx = std::cos(radians);
@@ -91,23 +103,23 @@ namespace Strawberry::Core::Math
 
 
 	template<typename T>
-	Matrix<T, 4, 4> Orthographic(float left, float right, float top, float bottom, float near, float far)
+	Matrix<T, 4, 4> Orthographic(float left, float right, float top, float bottom, float _near, float _far)
 	{
-		return Matrix<T, 4, 4>(2.0 / (right - left),
-		                       0.0,
-		                       0.0,
-		                       -(right + left) / (right - left),
-		                       0.0,
-		                       2.0 / (top - bottom),
-		                       0.0,
-		                       -(top + bottom) / (top - bottom),
-		                       0.0,
-		                       0.0,
-		                       -2.0 / (far - near),
-		                       -(far + near) / (far - near),
-		                       0.0,
-		                       0.0,
-		                       0.0,
-		                       1.0);
+		return Matrix<T, 4, 4>{2.0 / (right - left),
+							   0.0,
+							   0.0,
+							   -(right + left) / (right - left),
+							   0.0,
+							   2.0 / (top - bottom),
+							   0.0,
+							   -(top + bottom) / (top - bottom),
+							   0.0,
+							   0.0,
+							   -2.0 / (_far - _near),
+							   -(_far + _near) / (_far - _near),
+							   0.0,
+							   0.0,
+							   0.0,
+							   1.0};
 	}
 }
