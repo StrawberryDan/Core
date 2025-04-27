@@ -6,7 +6,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
-#include "Strawberry/Core/Concepts.hpp"
 #include "Strawberry/Core/Types/NullValue.hpp"
 // Standard Library
 #include <concepts>
@@ -125,15 +124,6 @@ namespace Strawberry::Core
 		//======================================================================================================================
 		//  Monadic Operations
 		//----------------------------------------------------------------------------------------------------------------------
-		template <std::invocable<const T&> F>
-		Optional<std::invoke_result_t<F, const T&>> Map(this auto const& self, F&& functor)
-		{
-			return self.HasValue()
-					   ? Optional<std::invoke_result_t<F, const T&>>(std::forward<F>(functor)(self.Value()))
-					   : NullOpt;
-		}
-
-
 		template <std::invocable<T&&> F>
 		Optional<std::invoke_result_t<F, T&&>> Map(this auto&& self, F&& functor)
 		{
@@ -143,25 +133,11 @@ namespace Strawberry::Core
 		}
 
 
-		template <std::invocable<const T&> F> requires IsOptional<std::invoke_result_t<F, const T&>>
-		std::invoke_result_t<F, const T&> AndThen(this auto const& self, F&& functor)
-		{
-			return self.Map(std::forward<F>(functor)).Flatten();
-		}
-
-
 		template <std::invocable<T&&> F> requires IsOptional<std::invoke_result_t<F, T&&>>
 		std::invoke_result_t<F, T&&> AndThen(this auto&& self, F&& functor)
 		{
 			return self.Map(std::forward<F>(functor)).Flatten();
 		}
-
-
-		auto Flatten(this auto const& self) requires (IsOptional<T>)
-		{
-			return self.HasValue() ? self.Value() : NullOpt;
-		}
-
 
 		auto Flatten(this auto&& self) requires (IsOptional<T>)
 		{
@@ -169,19 +145,19 @@ namespace Strawberry::Core
 		}
 
 
-		auto AsPtr(this auto& self)
+		auto AsPtr(this auto&& self)
 		{
 			return self.HasValue() ? Optional(&self.Value()) : NullOpt;
 		}
 
 
-		auto Deref(this auto& self) requires (Dereferencable<T>)
+		auto Deref(this auto&& self) requires requires { *self.Value(); }
 		{
 			return self.HasValue() ? Optional(*self.Value()) : NullOpt;
 		}
 
 
-		auto& Ref(this auto& self)
+		auto& Ref(this auto&& self)
 		{
 			Assert(self.HasValue());
 			return self.Value();
@@ -261,7 +237,7 @@ namespace Strawberry::Core
 					}
 					else
 					{
-						Emplace(std::forward<T2>(t2));
+						Emplace(t2.Value());
 					}
 				}
 				else
