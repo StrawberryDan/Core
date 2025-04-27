@@ -117,6 +117,7 @@ if (NOT TARGET StrawberryCore)
 		test/ClampedNumbers.cpp
 		test/Matrices.cpp
 		test/Noise.cpp
+		test/Optional.cpp
 		test/PeriodicNumbers.cpp
 		test/TypeSets.cpp
 		test/UTF.cpp
