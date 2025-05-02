@@ -66,9 +66,16 @@ namespace Strawberry::Core
 
 
 		template<typename T>
-		auto GetReflexivePointer(this const T& self) -> ReflexivePointer<T>
+		auto GetReflexivePointer(this T& self) -> ReflexivePointer<T>
 		{
 			return ReflexivePointer<T>(self.mPtr);
+		}
+
+
+		template<typename T>
+		auto GetReflexivePointer(this const T& self) -> ReflexivePointer<const T>
+		{
+			return ReflexivePointer<const T>(self.mPtr);
 		}
 
 	private:
@@ -93,7 +100,7 @@ namespace Strawberry::Core
 
 
 		template <std::derived_from<EnableReflexivePointer> Base>
-		explicit ReflexivePointer(const Base& base) noexcept
+		explicit ReflexivePointer(Base& base) noexcept
 			: ReflexivePointer(base.GetReflexivePointer()) {}
 
 
