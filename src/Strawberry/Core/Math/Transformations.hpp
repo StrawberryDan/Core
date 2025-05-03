@@ -124,6 +124,13 @@ namespace Strawberry::Core::Math
 	}
 
 
+	template<typename T>
+	Matrix<T, 4, 4> Orthographic(float width, float height, float depth)
+	{
+		return Orthographic<float>(-width / 2.0f, width / 2.0f, height / 2.0f, -height / 2.0f, 0.0f, depth);
+	}
+
+
 	template <typename T>
 	Matrix<T, 4, 4> Perspective(float fov = 1.0f)
 	{
