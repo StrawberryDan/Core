@@ -115,11 +115,21 @@ namespace Strawberry::Core::Math
 							   -(top + bottom) / (top - bottom),
 							   0.0,
 							   0.0,
-							   -2.0 / (_far - _near),
+							   -1.0 / (_far - _near),
 							   -(_far + _near) / (_far - _near),
 							   0.0,
 							   0.0,
 							   0.0,
 							   1.0};
+	}
+
+
+	template <typename T>
+	Matrix<T, 4, 4> Perspective(float fov = 1.0f)
+	{
+		Matrix<T, 4, 4> matrix;
+		matrix[2][3] = 1.0f / fov;
+		matrix[3][3] = 0.0f;
+		return matrix;
 	}
 }
