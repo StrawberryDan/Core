@@ -43,7 +43,7 @@ namespace Strawberry::Core::Math
 		constexpr explicit Matrix(Args... args) noexcept
 		{
 			std::array<T, H * W> values{static_cast<T>(args)...};
-			for (size_t i = 0; i < values.size(); i++) mValue[i / W][i % W] = values[i];
+			for (size_t i = 0; i < values.size(); i++) mValue[i % W][i / W] = values[i];
 		}
 
 
