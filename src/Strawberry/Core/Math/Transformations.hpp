@@ -103,40 +103,32 @@ namespace Strawberry::Core::Math
 
 
 	template<typename T>
-	Matrix<T, 4, 4> Orthographic(float left, float right, float top, float bottom, float _near, float _far)
+	Matrix<T, 4, 4> Orthographic(float l, float r, float t, float b, float n, float f)
 	{
-		return Matrix<T, 4, 4>{2.0 / (right - left),
-							   0.0,
-							   0.0,
-							   -(right + left) / (right - left),
-							   0.0,
-							   2.0 / (top - bottom),
-							   0.0,
-							   -(top + bottom) / (top - bottom),
-							   0.0,
-							   0.0,
-							   -1.0 / (_far - _near),
-							   -(_far + _near) / (_far - _near),
-							   0.0,
-							   0.0,
-							   0.0,
-							   1.0};
+		return Matrix<T, 4, 4>{
+			2.0f / (r - l), 0.0f, 0.0f, (-2.0f * l) / (r - l) - 1.0f,
+			0.0f, 2.0f / (t - b), 0.0f, (-2.0f * b) / (t - b) - 1.0f,
+			0.0f, 0.0f, 1.0f / (f - n), -n / (f - n),
+			0.0f, 0.0f, 0.0f, 1.0f
+		};
 	}
 
 
 	template<typename T>
-	Matrix<T, 4, 4> Orthographic(float width, float height, float depth)
+	Matrix<T, 4, 4> Orthographic(float width, float height, float minDepth, float maxDepth)
 	{
-		return Orthographic<float>(-width / 2.0f, width / 2.0f, height / 2.0f, -height / 2.0f, 0.0f, depth);
+		return Orthographic<float>(-width / 2.0f, width / 2.0f, height / 2.0f, -height / 2.0f, minDepth, maxDepth);
 	}
 
 
 	template <typename T>
-	Matrix<T, 4, 4> Perspective(float fov = 1.0f)
+	Matrix<T, 4, 4> Perspective(float fov, float aspectRatio, float near, float far)
 	{
-		Matrix<T, 4, 4> matrix;
-		matrix[2][3] = 1.0f / fov;
-		matrix[3][3] = 0.0f;
-		return matrix;
+		return Matrix<T, 4, 4>(
+			1.0f / (aspectRatio * std::tanf(fov / 2.0f)), 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f / (std::tanf(fov / 2)), 0.0f, 0.0f,
+			0.0f, 0.0f, -1.0f / (near - far), near / (near - far),
+			0.0f, 0.0f, 1.0f, 0.0f
+		);
 	}
 }
