@@ -134,8 +134,8 @@ namespace Strawberry::Core
 	private:
 		unsigned int GetNextThreadIndex()
 		{
-			auto result = nextQueue;
-			nextQueue = ++nextQueue % mThreads.size();
+			auto result = mNextQueueIndex;
+			mNextQueueIndex = ++mNextQueueIndex % mThreads.size();
 			return result;
 		}
 
@@ -146,7 +146,7 @@ namespace Strawberry::Core
 		std::vector<std::thread> mThreads;
 		std::unique_ptr<std::atomic<bool>> mRunning = std::make_unique<std::atomic<bool>>(true);
 
-		unsigned int nextQueue = 0;
+		unsigned int mNextQueueIndex = 0;
 		std::vector<JobQueue> mJobQueues;
 	};
 }
