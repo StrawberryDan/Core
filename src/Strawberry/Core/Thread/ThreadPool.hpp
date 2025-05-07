@@ -87,11 +87,7 @@ namespace Strawberry::Core
 
 		void QueueJob(Job&& job)
 		{
-			auto jobLock = mJobQueues[nextQueue++]->Lock();
-			if (nextQueue == mThreads.size() - 1)
-			{
-				nextQueue = 0;
-			}
+			auto jobLock = mJobQueues[GetNextThreadIndex()]->Lock();
 
 			jobLock->emplace_back(std::move(job));
 		}
@@ -100,11 +96,7 @@ namespace Strawberry::Core
 		{
 			for (auto&& job : jobs)
 			{
-				auto jobLock = mJobQueues[nextQueue++]->Lock();
-				if (nextQueue == mThreads.size() - 1)
-				{
-					nextQueue = 0;
-				}
+				auto jobLock = mJobQueues[GetNextThreadIndex()]->Lock();
 
 				jobLock->emplace_back(std::move(job));
 			}
@@ -122,11 +114,7 @@ namespace Strawberry::Core
 				std::latch latch(inputCount);
 				for (auto&& x : inputs)
 				{
-					auto jobLock = mJobQueues[nextQueue++]->Lock();
-					if (nextQueue == mThreads.size())
-					{
-						nextQueue = 0;
-					}
+					auto jobLock = mJobQueues[GetNextThreadIndex()]->Lock();
 
 					jobLock->emplace_back(
 						std::move(
@@ -144,6 +132,14 @@ namespace Strawberry::Core
 		}
 
 	private:
+		unsigned int GetNextThreadIndex()
+		{
+			auto result = nextQueue;
+			nextQueue = ++nextQueue % mThreads.size();
+			return result;
+		}
+
+
 		using JobQueue = std::unique_ptr<Mutex<std::deque<Job>>>;
 
 
