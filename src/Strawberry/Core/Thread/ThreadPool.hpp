@@ -36,7 +36,7 @@ namespace Strawberry::Core
 		template <typename T>
 		std::future<T> QueueTask(Task<T>&& task)
 		{
-			mWorkers[GetNextThreadIndex()].Queue(std::move(task));
+			return mWorkers[GetNextThreadIndex()].Queue(std::move(task));
 		}
 
 
