@@ -39,6 +39,20 @@ if (NOT TARGET StrawberryCore)
 		SOURCE_DIR STB_SOURCE_DIR)
 
 
+	option(TRACY_ENABLE "" OFF)
+	option(TRACY_ON_DEMAND "" ${TRACY_ENABLE})
+	FetchContent_Declare (
+		tracy
+		GIT_REPOSITORY "https://github.com/wolfpld/tracy.git"
+		GIT_TAG 5d542dc
+		GIT_SHALLOW TRUE
+		GIT_PROGRESS TRUE
+	)
+	FetchContent_MakeAvailable(tracy)
+	FetchContent_GetProperties(tracy
+		SOURCE_DIR TRACY_SRC_DIR)
+
+
 	new_strawberry_library(NAME StrawberryCore SOURCE 
 		src/Strawberry/Core/Assert.hpp
 		src/Strawberry/Core/Collection/CircularBuffer.hpp
@@ -112,6 +126,12 @@ if (NOT TARGET StrawberryCore)
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
 		PUBLIC ${STB_SOURCE_DIR})
 	target_link_libraries(StrawberryCore PUBLIC nlohmann_json::nlohmann_json fmt::fmt-header-only)
+
+	if (${TRACY_ENABLE})
+		target_link_libraries(StrawberryCore PUBLIC TracyClient)
+		target_precompile_headers(StrawberryCore PUBLIC ${TRACY_SRC_DIR}/public/tracy/Tracy.hpp)
+		target_precompile_headers(StrawberryCore PUBLIC ${TRACY_SRC_DIR}/public/tracy/TracySystem.hpp)
+	endif()
 
 
 	new_strawberry_tests(NAME "StrawberryCore" TESTS 
