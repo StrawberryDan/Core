@@ -15,7 +15,7 @@ namespace Strawberry::Core
 	class ThreadPool
 	{
 	public:
-		ThreadPool(unsigned int threadCount = std::thread::hardware_concurrency());
+		ThreadPool(int threadCount = std::thread::hardware_concurrency());
 		ThreadPool(float percentageOfThreads);
 
 

@@ -3,9 +3,9 @@
 
 namespace Strawberry::Core
 {
-	ThreadPool::ThreadPool(const unsigned int threadCount)
-		: mThreadCount(threadCount)
-		, mWorkers(std::make_unique<Worker[]>(threadCount))
+	ThreadPool::ThreadPool(const int threadCount)
+		: mThreadCount(std::clamp<int>(threadCount >= 0 ? threadCount : std::thread::hardware_concurrency() + threadCount, 0, std::thread::hardware_concurrency()))
+		, mWorkers(std::make_unique<Worker[]>(mThreadCount))
 	{}
 
 
