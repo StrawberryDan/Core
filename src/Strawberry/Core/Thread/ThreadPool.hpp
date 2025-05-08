@@ -79,23 +79,16 @@ namespace Strawberry::Core
 
 			std::vector<Math::Vector<T, D>> inputs = input.Rectangle();
 
-			unsigned int tasksEach = Math::CeilDiv(inputCount, mThreadCount);
-			auto batches = inputs
-				| std::views::chunk(tasksEach);
-
-			for (auto batch : batches)
-			{
-				auto tasks = batch | std::views::transform(
-					[=] (auto&& x)
-					{
-						return std::bind(function, x);
-					});
-
-				auto batchFutures = std::views::zip(batch, QueueTasks(std::move(tasks)));
-				for (auto&& [x, future] : batchFutures)
+			auto tasks = inputs | std::views::transform(
+				[=] (auto&& x)
 				{
-					futures.emplace_back(std::move(x), std::move(future));
-				}
+					return std::bind(function, x);
+				});
+
+			auto packaged = std::views::zip(inputs, QueueTasks(std::move(tasks)));
+			for (auto&& [x, future] : packaged)
+			{
+				futures.emplace_back(std::move(x), std::move(future));
 			}
 
 			return futures;
