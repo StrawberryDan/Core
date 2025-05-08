@@ -4,12 +4,9 @@
 namespace Strawberry::Core
 {
 	ThreadPool::ThreadPool(const unsigned int threadCount)
-	{
-		for (int i = 0; i < threadCount; i++)
-		{
-			mWorkers.emplace_back(std::make_unique<WorkerThread>(&mRunning));
-		}
-	}
+		: threadCount(threadCount)
+		, mWorkers(std::make_unique<WorkerThread[]>(threadCount))
+	{}
 
 
 	ThreadPool::~ThreadPool()
@@ -20,15 +17,17 @@ namespace Strawberry::Core
 
 	void ThreadPool::Join()
 	{
-		mRunning = false;
+		for (int i = 0; i < threadCount; i++)
+		{
+			mWorkers[i].Join();
+		}
 	}
 
 
-	ThreadPool::WorkerThread::WorkerThread(RunningFlag* runningFlag)
-	{
-		this->runningFlag = runningFlag;
-		thread = std::thread([this] { Run(); });
-	}
+	ThreadPool::WorkerThread::WorkerThread()
+		: mRunningFlag(true)
+		, mThread([this] { Run(); })
+	{}
 
 
 	ThreadPool::WorkerThread::~WorkerThread()
@@ -38,16 +37,19 @@ namespace Strawberry::Core
 
 	void ThreadPool::WorkerThread::Queue(Job&& job)
 	{
-		jobQueue.Lock()->emplace_back(std::move(job));
+		mJobQueue.Lock()->emplace_back(std::move(job));
 	}
+
 
 	void ThreadPool::WorkerThread::Join()
 	{
-		if (thread.joinable())
+		mRunningFlag = false;
+		if (mThread.joinable())
 		{
-			thread.join();
+			mThread.join();
 		}
 	}
+
 
 	void ThreadPool::WorkerThread::Run()
 	{
@@ -58,12 +60,12 @@ namespace Strawberry::Core
 			{
 				Optional<Job> job = [&]()-> Optional<Job>
 				{
-					auto jobQueueLock = jobQueue.Lock();
+					auto jobQueueLock = mJobQueue.Lock();
 					if (!jobQueueLock->empty())
 					{
 						auto job = std::move(jobQueueLock->front());
 						jobQueueLock->pop_front();
-						return Optional(job);
+						return Optional(std::move(job));
 					}
 
 					return NullOpt;
@@ -81,7 +83,7 @@ namespace Strawberry::Core
 
 			if (wasEmpty)
 			{
-				if (!*runningFlag)
+				if (!mRunningFlag)
 				{
 					return;
 				}

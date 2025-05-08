@@ -34,7 +34,7 @@ namespace Strawberry::Core
 
 		void QueueJob(Job&& job)
 		{
-			mWorkers[GetNextThreadIndex()]->Queue(std::move(job));
+			mWorkers[GetNextThreadIndex()].Queue(std::move(job));
 		}
 
 
@@ -42,7 +42,7 @@ namespace Strawberry::Core
 		{
 			for (auto&& job : jobs)
 			{
-				mWorkers[GetNextThreadIndex()]->Queue(std::move(job));
+				mWorkers[GetNextThreadIndex()].Queue(std::move(job));
 			}
 		}
 
@@ -58,12 +58,13 @@ namespace Strawberry::Core
 				std::latch latch(inputCount);
 				for (auto&& x : inputs)
 				{
-					mWorkers[GetNextThreadIndex()]->Queue(
+					mWorkers[GetNextThreadIndex()].Queue(
 						[x, function, &latch]()
 						{
 							function(x);
 							latch.count_down();
-						});
+						}
+					);
 				}
 
 				latch.wait();
@@ -73,14 +74,13 @@ namespace Strawberry::Core
 		}
 
 	private:
-		using RunningFlag = std::atomic<bool>;
 		using JobQueue = Mutex<std::deque<Job>>;
 
 
 		unsigned int GetNextThreadIndex()
 		{
 			auto result = mNextQueueIndex;
-			mNextQueueIndex = ++mNextQueueIndex % mWorkers.size();
+			mNextQueueIndex = ++mNextQueueIndex % threadCount;
 			return result;
 		}
 
@@ -88,12 +88,12 @@ namespace Strawberry::Core
 		class WorkerThread
 		{
 		public:
-			explicit WorkerThread(RunningFlag* runningFlag);
+			WorkerThread();
 			WorkerThread(const WorkerThread&) = delete;
 			WorkerThread(WorkerThread&&) = delete;
-
 			WorkerThread& operator=(const WorkerThread&) = delete;
 			WorkerThread& operator=(WorkerThread&&) = delete;
+
 
 			~WorkerThread();
 
@@ -104,14 +104,14 @@ namespace Strawberry::Core
 
 
 		private:
-			RunningFlag* runningFlag;
-			JobQueue jobQueue;
-			std::thread thread;
+			std::atomic_bool mRunningFlag;
+			std::thread mThread;
+			JobQueue mJobQueue;
 		};
 
 
+		const size_t threadCount;
 		unsigned int mNextQueueIndex = 0;
-		RunningFlag mRunning = true;
-		std::vector<std::unique_ptr<WorkerThread>> mWorkers;
+		std::unique_ptr<WorkerThread[]> mWorkers;
 	};
 }
