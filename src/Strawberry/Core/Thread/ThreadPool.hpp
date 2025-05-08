@@ -1,6 +1,6 @@
 #pragma once
 #include "Strawberry/Core/Math/Vector.hpp"
-#include <deque>
+#include "Strawberry/Core/Thread/Worker.hpp"
 #include <functional>
 #include <thread>
 #include <vector>
@@ -74,9 +74,6 @@ namespace Strawberry::Core
 		}
 
 	private:
-		using JobQueue = Mutex<std::deque<Job>>;
-
-
 		unsigned int GetNextThreadIndex()
 		{
 			auto result = mNextQueueIndex;
@@ -85,33 +82,8 @@ namespace Strawberry::Core
 		}
 
 
-		class WorkerThread
-		{
-		public:
-			WorkerThread();
-			WorkerThread(const WorkerThread&) = delete;
-			WorkerThread(WorkerThread&&) = delete;
-			WorkerThread& operator=(const WorkerThread&) = delete;
-			WorkerThread& operator=(WorkerThread&&) = delete;
-
-
-			~WorkerThread();
-
-
-			void Queue(Job&& job);
-			void Join();
-			void Run();
-
-
-		private:
-			std::atomic_bool mRunningFlag;
-			std::thread mThread;
-			JobQueue mJobQueue;
-		};
-
-
 		const size_t threadCount;
 		unsigned int mNextQueueIndex = 0;
-		std::unique_ptr<WorkerThread[]> mWorkers;
+		std::unique_ptr<Worker[]> mWorkers;
 	};
 }
