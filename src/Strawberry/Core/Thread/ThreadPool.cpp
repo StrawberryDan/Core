@@ -4,7 +4,7 @@
 namespace Strawberry::Core
 {
 	ThreadPool::ThreadPool(const unsigned int threadCount)
-		: threadCount(threadCount)
+		: mThreadCount(threadCount)
 		, mWorkers(std::make_unique<Worker[]>(threadCount))
 	{}
 
@@ -17,7 +17,7 @@ namespace Strawberry::Core
 
 	void ThreadPool::Join()
 	{
-		for (int i = 0; i < threadCount; i++)
+		for (int i = 0; i < mThreadCount; i++)
 		{
 			mWorkers[i].Join();
 		}

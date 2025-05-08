@@ -7,6 +7,7 @@
 #include <latch>
 #include <future>
 
+#include "Strawberry/Core/Math/Math.hpp"
 #include "Strawberry/Core/Sync/Mutex.hpp"
 
 namespace Strawberry::Core
@@ -32,57 +33,84 @@ namespace Strawberry::Core
 		using Job = std::function<void()>;
 
 
-		void QueueJob(Job&& job)
+		template <typename T>
+		std::future<T> QueueTask(Task<T>&& task)
 		{
-			mWorkers[GetNextThreadIndex()].Queue(std::move(job));
+			mWorkers[GetNextThreadIndex()].Queue(std::move(task));
 		}
 
 
-		void QueueJobs(std::vector<Job>&& jobs)
+		template <std::ranges::viewable_range Range, typename T = std::invoke_result_t<std::ranges::range_value_t<Range>>>
+		std::vector<std::future<T>> QueueTasks(Range&& tasks)
 		{
-			for (auto&& job : jobs)
+			unsigned int tasksEach = Math::CeilDiv(tasks.size(), mThreadCount);
+			auto batches = tasks
+				| std::views::chunk(tasksEach);
+
+			std::vector<std::future<T>> futures;
+			if constexpr (std::ranges::sized_range<Range>)
 			{
-				mWorkers[GetNextThreadIndex()].Queue(std::move(job));
+				futures.reserve(tasks.size());
 			}
+
+
+			for (auto&& batch : batches)
+			{
+				auto threadIndex = GetNextThreadIndex();
+				std::vector<std::future<T>> batchFutures = mWorkers[threadIndex].Queue(batch);
+				for (auto&& future : batchFutures)
+				{
+					futures.emplace_back(std::move(future));
+				}
+			}
+
+
+			return futures;
 		}
 
 
-		template <std::unsigned_integral T, size_t D, typename F>
-		[[nodiscard]] std::future<void> QueueJobs(Math::Vector<T, D> input, F&& function)
+		template <std::unsigned_integral T, size_t D, typename F, typename R = std::invoke_result_t<F, Math::Vector<T, D>>>
+		[[nodiscard]] std::vector<std::pair<Math::Vector<T, D>, std::future<R>>> QueueTasks(Math::Vector<T, D> input, F&& function)
 		{
-			auto future = std::async(std::launch::async, [this, input, function = std::forward<F>(function)](){
-				const size_t inputCount = input.Fold(std::multiplies());
+			const size_t inputCount = input.Fold(std::multiplies());
 
-				std::vector<Math::Vector<T, D>> inputs = input.Rectangle();
+			std::vector<std::pair<Math::Vector<T, D>, std::future<R>>> futures;
+			futures.reserve(inputCount);
 
-				std::latch latch(inputCount);
-				for (auto&& x : inputs)
+			std::vector<Math::Vector<T, D>> inputs = input.Rectangle();
+
+			unsigned int tasksEach = Math::CeilDiv(inputCount, mThreadCount);
+			auto batches = inputs
+				| std::views::chunk(tasksEach);
+
+			for (auto batch : batches)
+			{
+				auto tasks = batch | std::views::transform(
+					[=] (auto&& x)
+					{
+						return std::bind(function, x);
+					});
+
+				auto batchFutures = std::views::zip(batch, QueueTasks(std::move(tasks)));
+				for (auto&& [x, future] : batchFutures)
 				{
-					mWorkers[GetNextThreadIndex()].Queue(
-						[x, function, &latch]()
-						{
-							function(x);
-							latch.count_down();
-						}
-					);
+					futures.emplace_back(std::move(x), std::move(future));
 				}
+			}
 
-				latch.wait();
-			});
-
-			return future;
+			return futures;
 		}
 
 	private:
 		unsigned int GetNextThreadIndex()
 		{
 			auto result = mNextQueueIndex;
-			mNextQueueIndex = ++mNextQueueIndex % threadCount;
+			mNextQueueIndex = ++mNextQueueIndex % mThreadCount;
 			return result;
 		}
 
 
-		const size_t threadCount;
+		const size_t mThreadCount;
 		unsigned int mNextQueueIndex = 0;
 		std::unique_ptr<Worker[]> mWorkers;
 	};

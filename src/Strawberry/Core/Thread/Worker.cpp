@@ -14,11 +14,6 @@ namespace Strawberry::Core
 		Join();
 	}
 
-	void Worker::Queue(Task&& job)
-	{
-		mJobQueue.Lock()->emplace_back(std::move(job));
-	}
-
 
 	void Worker::Join()
 	{
@@ -34,20 +29,14 @@ namespace Strawberry::Core
 	{
 		while (true)
 		{
-			bool wasEmpty = false;
+			std::deque<PackagedTask> tasks = std::move(*mJobQueue.Lock());
 
-			Optional<Task> job = GetNextJob();
-
-			if (job)
+			for (auto&& task : tasks)
 			{
-				std::invoke(job.Unwrap());
-			}
-			else
-			{
-				wasEmpty = true;
+				std::invoke(task);
 			}
 
-			if (wasEmpty)
+			if (tasks.empty())
 			{
 				if (!mRunningFlag)
 				{
@@ -57,20 +46,5 @@ namespace Strawberry::Core
 				std::this_thread::yield();
 			}
 		}
-	}
-
-
-	Optional<Task> Worker::GetNextJob()
-	{
-		Optional<Task> nextJob;
-
-		auto jobQueueLock = mJobQueue.Lock();
-		if (!jobQueueLock->empty())
-		{
-			nextJob = std::move(jobQueueLock->front());
-			jobQueueLock->pop_front();
-		}
-
-		return nextJob;
 	}
 }
