@@ -75,6 +75,7 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Sync/Mutex.hpp
 		src/Strawberry/Core/Thread/RepeatingTask.hpp
 		src/Strawberry/Core/Thread/ThreadPool.hpp
+		src/Strawberry/Core/Thread/ThreadPool.cpp
 		src/Strawberry/Core/Timing/Clock.cpp
 		src/Strawberry/Core/Timing/Clock.hpp
 		src/Strawberry/Core/Timing/Metronome.cpp

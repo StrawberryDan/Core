@@ -5,6 +5,7 @@
 #include <thread>
 #include <vector>
 #include <latch>
+#include <future>
 
 #include "Strawberry/Core/Sync/Mutex.hpp"
 
@@ -13,73 +14,19 @@ namespace Strawberry::Core
 	class ThreadPool
 	{
 	public:
-		ThreadPool(const unsigned int threadCount = std::thread::hardware_concurrency())
-		{
-			for (int i = 0; i < threadCount; i++)
-			{
-				mJobQueues.emplace_back(std::make_unique<Mutex<std::deque<Job>>>());
-				mThreads.emplace_back([queue = mJobQueues[i].get(), running = mRunning.get()]()
-				{
-					while (true)
-					{
-						bool wasEmpty = false;
-
-						{
-							Optional<Job> job = [queue]()-> Optional<Job>
-							{
-								auto jobQueue = queue->Lock();
-								if (!jobQueue->empty())
-								{
-									auto job = std::move(jobQueue->front());
-									jobQueue->pop_front();
-									return Optional(job);
-								}
-
-								return NullOpt;
-							}();
-
-							if (job)
-							{
-								std::invoke(job.Unwrap());
-							}
-							else
-							{
-								wasEmpty = true;
-							}
-						}
-
-						if (wasEmpty)
-						{
-							if (!*running)
-							{
-								return;
-							}
-
-							std::this_thread::yield();
-						}
-					}
-				});
-			}
-		}
+		ThreadPool(unsigned int threadCount = std::thread::hardware_concurrency());
 
 
-		~ThreadPool()
-		{
-			Join();
-		}
+		ThreadPool(const ThreadPool&) = delete;
+		ThreadPool(ThreadPool&&) = delete;
+		ThreadPool& operator=(const ThreadPool&) = delete;
+		ThreadPool& operator=(ThreadPool&&) = delete;
 
 
-		void Join()
-		{
-			*mRunning = false;
-			for (auto&& thread : mThreads)
-			{
-				if (thread.joinable())
-				{
-					thread.join();
-				}
-			}
-		}
+		~ThreadPool();
+
+
+		void Join();
 
 
 		using Job = std::function<void()>;
@@ -87,18 +34,15 @@ namespace Strawberry::Core
 
 		void QueueJob(Job&& job)
 		{
-			auto jobLock = mJobQueues[GetNextThreadIndex()]->Lock();
-
-			jobLock->emplace_back(std::move(job));
+			mWorkers[GetNextThreadIndex()]->Queue(std::move(job));
 		}
+
 
 		void QueueJobs(std::vector<Job>&& jobs)
 		{
 			for (auto&& job : jobs)
 			{
-				auto jobLock = mJobQueues[GetNextThreadIndex()]->Lock();
-
-				jobLock->emplace_back(std::move(job));
+				mWorkers[GetNextThreadIndex()]->Queue(std::move(job));
 			}
 		}
 
@@ -114,15 +58,12 @@ namespace Strawberry::Core
 				std::latch latch(inputCount);
 				for (auto&& x : inputs)
 				{
-					auto jobLock = mJobQueues[GetNextThreadIndex()]->Lock();
-
-					jobLock->emplace_back(
-						std::move(
-							[x, function, &latch]()
-							{
-								function(x);
-								latch.count_down();
-							}));
+					mWorkers[GetNextThreadIndex()]->Queue(
+						[x, function, &latch]()
+						{
+							function(x);
+							latch.count_down();
+						});
 				}
 
 				latch.wait();
@@ -132,21 +73,45 @@ namespace Strawberry::Core
 		}
 
 	private:
+		using RunningFlag = std::atomic<bool>;
+		using JobQueue = Mutex<std::deque<Job>>;
+
+
 		unsigned int GetNextThreadIndex()
 		{
 			auto result = mNextQueueIndex;
-			mNextQueueIndex = ++mNextQueueIndex % mThreads.size();
+			mNextQueueIndex = ++mNextQueueIndex % mWorkers.size();
 			return result;
 		}
 
 
-		using JobQueue = std::unique_ptr<Mutex<std::deque<Job>>>;
+		class WorkerThread
+		{
+		public:
+			explicit WorkerThread(RunningFlag* runningFlag);
+			WorkerThread(const WorkerThread&) = delete;
+			WorkerThread(WorkerThread&&) = delete;
+
+			WorkerThread& operator=(const WorkerThread&) = delete;
+			WorkerThread& operator=(WorkerThread&&) = delete;
+
+			~WorkerThread();
 
 
-		std::vector<std::thread> mThreads;
-		std::unique_ptr<std::atomic<bool>> mRunning = std::make_unique<std::atomic<bool>>(true);
+			void Queue(Job&& job);
+			void Join();
+			void Run();
+
+
+		private:
+			RunningFlag* runningFlag;
+			JobQueue jobQueue;
+			std::thread thread;
+		};
+
 
 		unsigned int mNextQueueIndex = 0;
-		std::vector<JobQueue> mJobQueues;
+		RunningFlag mRunning = true;
+		std::vector<std::unique_ptr<WorkerThread>> mWorkers;
 	};
 }
