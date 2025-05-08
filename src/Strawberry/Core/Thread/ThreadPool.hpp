@@ -104,14 +104,12 @@ namespace Strawberry::Core
 	private:
 		unsigned int GetNextThreadIndex()
 		{
-			auto result = mNextQueueIndex;
-			mNextQueueIndex = ++mNextQueueIndex % mThreadCount;
-			return result;
+			return mNextQueueIndex.fetch_add(1, std::memory_order_relaxed) % mThreadCount;
 		}
 
 
 		const size_t mThreadCount;
-		unsigned int mNextQueueIndex = 0;
+		std::atomic<unsigned int> mNextQueueIndex = 0;
 		std::unique_ptr<Worker[]> mWorkers;
 	};
 }
