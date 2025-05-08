@@ -129,9 +129,8 @@ if (NOT TARGET StrawberryCore)
 
 	if (${TRACY_ENABLE})
 		target_link_libraries(StrawberryCore PUBLIC TracyClient)
-		target_precompile_headers(StrawberryCore PUBLIC ${TRACY_SRC_DIR}/public/tracy/Tracy.hpp)
-		target_precompile_headers(StrawberryCore PUBLIC ${TRACY_SRC_DIR}/public/tracy/TracySystem.hpp)
 	endif()
+	target_precompile_headers(StrawberryCore PUBLIC ${TRACY_SRC_DIR}/public/tracy/Tracy.hpp)
 
 
 	new_strawberry_tests(NAME "StrawberryCore" TESTS 
