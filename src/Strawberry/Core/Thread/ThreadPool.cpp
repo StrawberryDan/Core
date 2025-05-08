@@ -9,6 +9,12 @@ namespace Strawberry::Core
 	{}
 
 
+	ThreadPool::ThreadPool(float percentageOfThreads)
+		: mThreadCount(percentageOfThreads * std::thread::hardware_concurrency())
+		, mWorkers(std::make_unique<Worker[]>(mThreadCount))
+	{}
+
+
 	ThreadPool::~ThreadPool()
 	{
 		Join();

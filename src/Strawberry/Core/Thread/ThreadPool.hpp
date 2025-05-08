@@ -16,6 +16,7 @@ namespace Strawberry::Core
 	{
 	public:
 		ThreadPool(unsigned int threadCount = std::thread::hardware_concurrency());
+		ThreadPool(float percentageOfThreads);
 
 
 		ThreadPool(const ThreadPool&) = delete;
