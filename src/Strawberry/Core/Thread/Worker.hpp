@@ -11,8 +11,8 @@
 
 namespace Strawberry::Core
 {
-	using Job = std::function<void()>;
-	using JobQueue = Mutex<std::deque<Job>>;
+	using Task = std::function<void()>;
+	using TaskQueue = Mutex<std::deque<Task>>;
 
 
 	class Worker
@@ -28,17 +28,17 @@ namespace Strawberry::Core
 		~Worker();
 
 
-		void Queue(Job&& job);
+		void Queue(Task&& job);
 		void Join();
 		void Run();
 
 
 	private:
-		Optional<Job> GetNextJob();
+		Optional<Task> GetNextJob();
 
 
 		std::atomic_bool mRunningFlag;
 		std::thread mThread;
-		JobQueue mJobQueue;
+		TaskQueue mJobQueue;
 	};
 }

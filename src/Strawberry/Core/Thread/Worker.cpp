@@ -14,7 +14,7 @@ namespace Strawberry::Core
 		Join();
 	}
 
-	void Worker::Queue(Job&& job)
+	void Worker::Queue(Task&& job)
 	{
 		mJobQueue.Lock()->emplace_back(std::move(job));
 	}
@@ -36,7 +36,7 @@ namespace Strawberry::Core
 		{
 			bool wasEmpty = false;
 
-			Optional<Job> job = GetNextJob();
+			Optional<Task> job = GetNextJob();
 
 			if (job)
 			{
@@ -60,9 +60,9 @@ namespace Strawberry::Core
 	}
 
 
-	Optional<Job> Worker::GetNextJob()
+	Optional<Task> Worker::GetNextJob()
 	{
-		Optional<Job> nextJob;
+		Optional<Task> nextJob;
 
 		auto jobQueueLock = mJobQueue.Lock();
 		if (!jobQueueLock->empty())
