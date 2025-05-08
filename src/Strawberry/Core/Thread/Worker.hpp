@@ -29,10 +29,10 @@ namespace Strawberry::Core
 		~Worker();
 
 
-		template <typename T>
-		std::future<T> Queue(Task<T>&& task)
+		template <typename F, typename T = std::invoke_result_t<F>>
+		std::future<T> Queue(F&& task)
 		{
-			auto [future, packagedTask] = PackageTask(std::move(task));
+			auto [future, packagedTask] = PackageTask(std::forward<F>(task));
 			mJobQueue.Lock()->emplace_back(std::move(packagedTask));
 			return future;
 		}
@@ -68,13 +68,13 @@ namespace Strawberry::Core
 		using TaskQueue = Mutex<std::deque<PackagedTask>>;
 
 
-		template <typename T>
-		static std::pair<std::future<T>, PackagedTask> PackageTask(Task<T>&& task)
+		template <typename F, typename T = std::invoke_result_t<F>>
+		static std::pair<std::future<T>, PackagedTask> PackageTask(F&& task)
 		{
 			std::promise<T> promise;
 			auto future = promise.get_future();
 
-			PackagedTask packagedTask = [promise = std::move(promise), task = std::move(task)] mutable
+			PackagedTask packagedTask = [promise = std::move(promise), task = std::forward<F>(task)] mutable
 			{
 				if constexpr (std::is_void_v<T>)
 				{

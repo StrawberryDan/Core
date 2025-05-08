@@ -33,10 +33,10 @@ namespace Strawberry::Core
 		using Job = std::function<void()>;
 
 
-		template <typename T>
-		std::future<T> QueueTask(Task<T>&& task)
+		template <typename F, typename T = std::invoke_result_t<F>>
+		std::future<T> QueueTask(F&& task)
 		{
-			return mWorkers[GetNextThreadIndex()].Queue(std::move(task));
+			return mWorkers[GetNextThreadIndex()].Queue(std::forward<F>(task));
 		}
 
 
