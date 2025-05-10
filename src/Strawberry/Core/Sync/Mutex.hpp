@@ -87,6 +87,7 @@ namespace Strawberry::Core
 		~Mutex()
 		{
 			ZoneScoped;
+
 			auto lock = Lock();
 			std::destroy_at(&*lock);
 		}
@@ -96,7 +97,6 @@ namespace Strawberry::Core
 		{
 			ZoneScoped;
 
-
 			return {std::unique_lock(mMutex), &mPayload};
 		}
 
@@ -105,7 +105,6 @@ namespace Strawberry::Core
 		{
 			ZoneScoped;
 
-
 			return {std::unique_lock(mMutex), &mPayload};
 		}
 
@@ -113,7 +112,6 @@ namespace Strawberry::Core
 		Optional<MutexGuard<T>> TryLock() &
 		{
 			ZoneScoped;
-
 
 			std::unique_lock<std::recursive_mutex> lk(mMutex, std::defer_lock);
 			if (lk.try_lock())
@@ -130,7 +128,6 @@ namespace Strawberry::Core
 		Optional<MutexGuard<const T>> TryLock() const &
 		{
 			ZoneScoped;
-
 
 			std::unique_lock lk(mMutex, std::defer_lock);
 			if (lk.try_lock())

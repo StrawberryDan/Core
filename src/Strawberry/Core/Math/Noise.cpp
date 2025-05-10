@@ -13,6 +13,8 @@ namespace Strawberry::Core::Math::Noise
 
 	float Linear::WhiteIntegerNoise(Vec2i position) const
 	{
+		ZoneScoped;
+
 		// Seed a mersenne twister engine with this pairing combined with the seed.
 		std::mt19937_64 engine(mSeed xor position.Embed());
 		// Sample the real distribution between -1.0 and 1.0 with this engine.
@@ -25,6 +27,8 @@ namespace Strawberry::Core::Math::Noise
 
 	float Linear::operator()(Vec2f position) const noexcept
 	{
+		ZoneScoped;
+
 		// Decompose input coordinates.
 		const auto& [x, y] = position;
 		// Calculate the index of the wave that the input point is inside.
@@ -59,6 +63,8 @@ namespace Strawberry::Core::Math::Noise
 
 	float SmoothLinear::WhiteIntegerNoise(Vec2i position) const
 	{
+		ZoneScoped;
+
 		// Seed a mersenne twister engine with this pairing combined with the seed.
 		std::mt19937_64 engine(mSeed xor position.Embed());
 		// Sample the real distribution between -1.0 and 1.0 with this engine.
@@ -71,6 +77,8 @@ namespace Strawberry::Core::Math::Noise
 
 	float SmoothLinear::operator()(Vec2f position) const noexcept
 	{
+		ZoneScoped;
+
 		// Decompose input coordinates.
 		const auto& [x, y] = position;
 		// Calculate the index of the wave that the input point is inside.
@@ -102,8 +110,11 @@ namespace Strawberry::Core::Math::Noise
 		, mPeriod(period)
 	{}
 
+
 	float Perlin::operator()(Vec2f position) const noexcept
 	{
+		ZoneScoped;
+
 		// Decompose input coordinates.
 		const auto& [x, y] = position;
 		// Calculate the index of the wave that the input point is inside.
@@ -132,6 +143,8 @@ namespace Strawberry::Core::Math::Noise
 
 	float Perlin::VectorNoise(Vec2f samplePosition, Vec2i gridPosition) const
 	{
+		ZoneScoped;
+
 		// Seed engine with embedding
 		std::mt19937_64 engine(mSeed xor gridPosition.Embed());
 		// Sample the real distribution between 0 and 2.0 * M_PI with this engine.

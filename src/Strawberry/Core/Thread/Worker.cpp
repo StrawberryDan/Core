@@ -11,12 +11,16 @@ namespace Strawberry::Core
 
 	Worker::~Worker()
 	{
+		ZoneScoped;
+
 		Join();
 	}
 
 
 	void Worker::Join()
 	{
+		ZoneScoped;
+
 		mRunningFlag = false;
 		if (mThread.joinable())
 		{
@@ -27,6 +31,8 @@ namespace Strawberry::Core
 
 	void Worker::Run()
 	{
+		ZoneScoped;
+
 		while (true)
 		{
 			std::deque<PackagedTask> tasks = std::move(*mJobQueue.Lock());

@@ -37,6 +37,8 @@ namespace Strawberry::Core
 		template <typename F, typename T = std::invoke_result_t<F>>
 		std::future<T> QueueTask(F&& task)
 		{
+			ZoneScoped;
+
 			return mWorkers[GetNextThreadIndex()].Queue(std::forward<F>(task));
 		}
 
@@ -44,6 +46,8 @@ namespace Strawberry::Core
 		template <std::ranges::viewable_range Range, typename T = std::invoke_result_t<std::ranges::range_value_t<Range>>>
 		std::vector<std::future<T>> QueueTasks(Range&& tasks)
 		{
+			ZoneScoped;
+
 			unsigned int tasksEach = Math::CeilDiv(tasks.size(), mThreadCount);
 			auto batches = tasks
 				| std::views::chunk(tasksEach);
@@ -73,6 +77,8 @@ namespace Strawberry::Core
 		template <std::unsigned_integral T, size_t D, typename F, typename R = std::invoke_result_t<F, Math::Vector<T, D>>>
 		[[nodiscard]] std::vector<std::pair<Math::Vector<T, D>, std::future<R>>> QueueTasks(Math::Vector<T, D> input, F&& function)
 		{
+			ZoneScoped;
+
 			const size_t inputCount = input.Fold(std::multiplies());
 
 			std::vector<std::pair<Math::Vector<T, D>, std::future<R>>> futures;

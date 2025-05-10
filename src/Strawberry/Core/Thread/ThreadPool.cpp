@@ -17,12 +17,16 @@ namespace Strawberry::Core
 
 	ThreadPool::~ThreadPool()
 	{
+		ZoneScoped;
+
 		Join();
 	}
 
 
 	void ThreadPool::Join()
 	{
+		ZoneScoped;
+
 		for (int i = 0; i < mThreadCount; i++)
 		{
 			mWorkers[i].Join();

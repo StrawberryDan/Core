@@ -32,6 +32,8 @@ namespace Strawberry::Core
 		template <typename F, typename T = std::invoke_result_t<F>>
 		std::future<T> Queue(F&& task)
 		{
+			ZoneScoped;
+
 			auto [future, packagedTask] = PackageTask(std::forward<F>(task));
 			mJobQueue.Lock()->emplace_back(std::move(packagedTask));
 			return future;
@@ -41,6 +43,8 @@ namespace Strawberry::Core
 		template <std::ranges::viewable_range Range, typename T = std::invoke_result_t<std::ranges::range_value_t<Range>>>
 		std::vector<std::future<T>> Queue(Range&& tasks)
 		{
+			ZoneScoped;
+
 			std::vector<std::future<T>> futures;
 			if constexpr (std::ranges::sized_range<Range>)
 			{
@@ -71,6 +75,8 @@ namespace Strawberry::Core
 		template <typename F, typename T = std::invoke_result_t<F>>
 		static std::pair<std::future<T>, PackagedTask> PackageTask(F&& task)
 		{
+			ZoneScoped;
+
 			std::promise<T> promise;
 			auto future = promise.get_future();
 
