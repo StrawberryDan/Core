@@ -129,6 +129,9 @@ if (NOT TARGET StrawberryCore)
 
 	if (${TRACY_ENABLE})
 		target_link_libraries(StrawberryCore PUBLIC TracyClient)
+		if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+			target_compile_options(StrawberryCore PUBLIC "-fno-omit-frame-pointer")
+		endif()
 	endif()
 	target_precompile_headers(StrawberryCore PUBLIC ${TRACY_SRC_DIR}/public/tracy/Tracy.hpp)
 
