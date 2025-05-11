@@ -35,6 +35,10 @@ namespace Strawberry::Core
 		MutexGuard& operator=(MutexGuard&& other) noexcept = default;
 
 
+		const LockType& GetLock() const { return mLock; }
+		      LockType& GetLock()       { return mLock; }
+
+
 		inline T& operator*() const
 		{
 			return *mPayload;
