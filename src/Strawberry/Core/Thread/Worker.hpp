@@ -35,7 +35,12 @@ namespace Strawberry::Core
 			ZoneScoped;
 
 			auto [future, packagedTask] = PackageTask(std::forward<F>(task));
-			mJobQueue.Lock()->emplace_back(std::move(packagedTask));
+
+			std::unique_lock lock(mTaskQueueMutex);
+			mTaskQueue.emplace_back(std::move(packagedTask));
+			mTaskQueueCV.notify_one();
+			lock.unlock();
+
 			return future;
 		}
 
@@ -51,13 +56,15 @@ namespace Strawberry::Core
 				futures.reserve(tasks.size());
 			}
 
-			auto queueLock = mJobQueue.Lock();
+			std::unique_lock lock(mTaskQueueMutex);
 			for (Task<T>&& task : tasks)
 			{
 				auto [future, packagedTask] = PackageTask(std::move(task));
-				queueLock->emplace_back(std::move(packagedTask));
+				mTaskQueue.emplace_back(std::move(packagedTask));
 				futures.emplace_back(std::move(future));
 			}
+			mTaskQueueCV.notify_one();
+			lock.unlock();
 
 			return futures;
 		}
@@ -69,7 +76,7 @@ namespace Strawberry::Core
 
 	private:
 		using PackagedTask = std::move_only_function<void()>;
-		using TaskQueue = Mutex<std::deque<PackagedTask>>;
+		using TaskQueue = std::deque<PackagedTask>;
 
 
 		template <typename F, typename T = std::invoke_result_t<F>>
@@ -99,6 +106,9 @@ namespace Strawberry::Core
 
 		std::atomic_bool mRunningFlag;
 		std::thread mThread;
-		TaskQueue mJobQueue;
+
+		std::mutex mTaskQueueMutex;
+		std::condition_variable mTaskQueueCV;
+		TaskQueue mTaskQueue;
 	};
 }

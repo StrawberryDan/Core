@@ -22,6 +22,11 @@ namespace Strawberry::Core
 		ZoneScoped;
 
 		mRunningFlag = false;
+
+		std::unique_lock lock(mTaskQueueMutex);
+		mTaskQueueCV.notify_one();
+		lock.unlock();
+
 		if (mThread.joinable())
 		{
 			mThread.join();
@@ -35,7 +40,10 @@ namespace Strawberry::Core
 
 		while (true)
 		{
-			std::deque<PackagedTask> tasks = std::move(*mJobQueue.Lock());
+			std::unique_lock lock(mTaskQueueMutex);
+			mTaskQueueCV.wait(lock, [&] { return !mRunningFlag || !mTaskQueue.empty(); });
+			std::deque<PackagedTask> tasks = std::move(mTaskQueue);
+			lock.unlock();
 
 			for (auto&& task : tasks)
 			{
