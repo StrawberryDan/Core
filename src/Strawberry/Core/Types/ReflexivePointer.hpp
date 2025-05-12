@@ -46,12 +46,16 @@ namespace Strawberry::Core
 		EnableReflexivePointer(EnableReflexivePointer&& rhs) noexcept
 			: mPtr(std::move(rhs.mPtr))
 		{
+			ZoneScoped;
+
 			*mPtr = this;
 		}
 
 
 		EnableReflexivePointer& operator=(EnableReflexivePointer&& rhs) noexcept
 		{
+			ZoneScoped;
+
 			if (this != &rhs)
 			{
 				mPtr  = std::move(rhs.mPtr);
@@ -68,6 +72,8 @@ namespace Strawberry::Core
 		template<typename T>
 		auto GetReflexivePointer(this T& self) -> ReflexivePointer<T>
 		{
+			ZoneScoped;
+
 			return ReflexivePointer<T>(self.mPtr);
 		}
 
@@ -75,8 +81,11 @@ namespace Strawberry::Core
 		template<typename T>
 		auto GetReflexivePointer(this const T& self) -> ReflexivePointer<const T>
 		{
+			ZoneScoped;
+
 			return ReflexivePointer<const T>(self.mPtr);
 		}
+
 
 	private:
 		std::shared_ptr<std::atomic<EnableReflexivePointer*>> mPtr;
@@ -110,6 +119,8 @@ namespace Strawberry::Core
 
 		ReflexivePointer& operator=(const ReflexivePointer& rhs) noexcept
 		{
+			ZoneScoped;
+
 			if (this != &rhs)
 			{
 				mPtr = rhs.mPtr;
@@ -125,6 +136,8 @@ namespace Strawberry::Core
 
 		ReflexivePointer& operator=(ReflexivePointer&& rhs) noexcept
 		{
+			ZoneScoped;
+
 			if (this != &rhs)
 			{
 				std::destroy_at(this);
@@ -184,32 +197,42 @@ namespace Strawberry::Core
 
 		T& operator*() const noexcept
 		{
-			Core::Assert(IsValid());
+			ZoneScoped;
+
+			Assert(IsValid());
 			return *static_cast<T*>(mPtr->load());
 		}
 
 
 		T* operator->() const noexcept
 		{
-			Core::Assert(IsValid());
+			ZoneScoped;
+
+			Assert(IsValid());
 			return static_cast<T*>(mPtr->load());
 		}
 
 
 		[[nodiscard]] bool IsValid() const noexcept
 		{
+			ZoneScoped;
+
 			return mPtr && *mPtr != nullptr;
 		}
 
 
 		explicit operator bool() const noexcept
 		{
+			ZoneScoped;
+
 			return IsValid();
 		}
 
 
 		T* Get() const noexcept
 		{
+			ZoneScoped;
+
 			return IsValid() ? static_cast<T*>(mPtr->load()) : nullptr;
 		}
 
@@ -218,6 +241,7 @@ namespace Strawberry::Core
 		{
 			return Get();
 		}
+
 
 	protected:
 		explicit ReflexivePointer(std::shared_ptr<std::atomic<EnableReflexivePointer*>> rawPtr) noexcept
