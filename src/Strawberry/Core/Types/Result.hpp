@@ -20,21 +20,20 @@ namespace Strawberry::Core
 	public:
 		template <typename T>
 		Result(T&& t)
-			: mPayload([](T&& t) {
-				if constexpr (std::constructible_from<D, decltype(t)>)
-				{
-					return D(std::forward<T>(t));
-				}
-				else if constexpr (std::constructible_from<E, decltype(t)>)
-				{
-					 return E(std::forward<T>(t));
-				}
-				else
-				{
-					static_assert(false, "Could not construct Result<D, E> from these args");
-				}
-			}(std::forward<T>(t)))
-		{}
+		{
+			if constexpr (std::same_as<D, std::decay_t<T>>)
+			{
+				mPayload = D(std::forward<T>(t));
+			}
+			else if constexpr (std::same_as<E, std::decay_t<T>>)
+			{
+				mPayload = E(std::forward<T>(t));
+			}
+			else
+			{
+				static_assert(false, "Could not construct Result<D, E> from these args");
+			}
+		}
 
 
 		[[nodiscard]] inline bool IsOk() const
@@ -46,12 +45,6 @@ namespace Strawberry::Core
 		[[nodiscard]] inline bool IsErr() const
 		{
 			return mPayload.template IsType<E>();
-		}
-
-
-		D& operator*()
-		{
-			return mPayload.template Ref<D>();
 		}
 
 
@@ -73,9 +66,9 @@ namespace Strawberry::Core
 		}
 
 
-		D& Value()
+		const D& Value() const
 		{
-			Core::Assert(IsOk());
+			Assert(IsOk());
 			return mPayload.template Ref<D>();
 		}
 
