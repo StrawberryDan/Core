@@ -15,28 +15,24 @@ namespace Strawberry::Core
 	{
 	public:
 		/// Accepts a function taking no arguments.
-		explicit RepeatingTask(std::function<void()> function)
-			: mShouldRun(false)
-			, mStartUp()
-			, mFunction(std::move(function))
-		{
-			Start();
-		}
-
-
-		/// Accepts a function taking no arguments.
 		explicit RepeatingTask(
 			std::function<void()> function,
-			Optional<std::function<void>> startUp = NullOpt,
-			Optional<std::function<void>> shutDown = NullOpt
+			Optional<std::function<void()>> startUp = NullOpt,
+			Optional<std::function<void()>> shutDown = NullOpt
 		)
 			: mShouldRun(false)
-			, mStartUp(std::move(startup))
+			, mStartUp(std::move(startUp))
 			, mShutdown(std::move(shutDown))
 			, mFunction(std::move(function))
 		{
 			Start();
 		}
+
+
+		RepeatingTask(const RepeatingTask&) = delete;
+		RepeatingTask& operator=(const RepeatingTask&) = delete;
+		RepeatingTask(RepeatingTask&&) = delete;
+		RepeatingTask& operator=(RepeatingTask&&) = delete;
 
 
 		~RepeatingTask()
@@ -61,9 +57,9 @@ namespace Strawberry::Core
 					std::invoke(mStartUp.Value());
 				}
 
-				while (self->mShouldRun)
+				while (mShouldRun)
 				{
-					self->mFunction();
+					std::invoke(mFunction);
 				}
 
 				if (mShutdown)
@@ -82,12 +78,6 @@ namespace Strawberry::Core
 				mThread.join();
 			}
 		}
-
-
-		RepeatingTask(const RepeatingTask& rhs)            = delete;
-		RepeatingTask& operator=(const RepeatingTask& rhs) = delete;
-		RepeatingTask(RepeatingTask&& rhs) = delete;
-		RepeatingTask& operator=(RepeatingTask&& rhs) = delete;
 
 
 	private:
