@@ -55,7 +55,6 @@ if (NOT TARGET StrawberryCore)
 
 	new_strawberry_library(NAME StrawberryCore SOURCE 
 		src/Strawberry/Core/Assert.hpp
-		src/Strawberry/Core/Collection/CircularBuffer.hpp
 		src/Strawberry/Core/IO/Base64.cpp
 		src/Strawberry/Core/IO/Base64.hpp
 		src/Strawberry/Core/IO/Broadcaster.hpp
