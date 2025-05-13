@@ -122,17 +122,73 @@ namespace Strawberry::Core
 		using Union = typename VariantUnion<Variant, Additional...>::Type;
 
 
+		Variant()
+			: mTypeIndex(std::numeric_limits<size_t>::max())
+		{}
+
+
 		template<typename Arg> requires IsInVariant<std::decay_t<Arg>, Variant>::value
 		Variant(Arg&& arg)
 			: mTypeIndex(VariantTypeIndex<Arg, Ts...>::Value)
 		{
-			std::construct_at(reinterpret_cast<std::add_pointer_t<std::decay_t<Arg>>>(mData), std::forward<Arg>(arg));
+			std::construct_at(reinterpret_cast<std::decay_t<Arg>*>(mData), std::forward<Arg>(arg));
+		}
+
+
+		Variant(const Variant& x) requires (... && std::is_copy_constructible_v<Ts>)
+		{
+			mTypeIndex = x.mTypeIndex;
+			x.Visit([this](auto&& value)
+			{
+				using T = std::decay_t<decltype(value)>;
+				std::construct_at<T>(reinterpret_cast<T*>(mData), value);
+			});
+		}
+
+		Variant& operator=(const Variant& x) requires (... && std::is_copy_constructible_v<Ts>)
+		{
+			if (this != &x)
+			{
+				std::destroy_at(this);
+				std::construct_at(this, x);
+			}
+
+			return *this;
+		}
+
+
+		Variant(Variant&& x) noexcept requires (... && std::is_move_constructible_v<Ts>)
+		{
+			mTypeIndex = x.mTypeIndex;
+			x.Visit([this](auto&& x)
+			{
+				using T = std::decay_t<decltype(x)>;
+				std::construct_at<std::decay_t<decltype(x)>>(reinterpret_cast<T*>(mData), std::move(x));
+			});
+		}
+
+
+		Variant& operator=(Variant&& x) noexcept requires (... && std::is_move_constructible_v<Ts>)
+		{
+			if (this != &x)
+			{
+				std::destroy_at(this);
+				std::construct_at(this, std::move(x));
+			}
+
+			return *this;
 		}
 
 
 		~Variant()
 		{
-			Visit([](auto&& x) { std::destroy_at(&x); });
+			if (mTypeIndex != std::numeric_limits<size_t>::max())
+			{
+				Visit([](auto&& x)
+				{
+					std::destroy_at(&x);
+				});
+			}
 		}
 
 
@@ -148,17 +204,10 @@ namespace Strawberry::Core
 		{
 			if (IsType<Arg>()) [[likely]]
 			{
+				mTypeIndex = std::numeric_limits<size_t>::max();
 				return std::move(*reinterpret_cast<Arg*>(mData));
 			}
 			return NullOpt;
-		}
-
-
-		template<typename Arg>
-		Arg& Ref()
-		{
-			Core::Assert(IsType<Arg>());
-			return *reinterpret_cast<Arg*>(mData);
 		}
 
 
@@ -195,15 +244,31 @@ namespace Strawberry::Core
 
 
 		template <typename F>
-		decltype(auto) Visit(F&& functor)
+		decltype(auto) Visit(this auto&& self, F&& functor)
 		{
 			using Arg = typename std::tuple_element<0, std::tuple<Ts...>>::type;
 			using Ret = std::invoke_result_t<F, Arg>;
 
-			using FN  = Ret(*)(void*, F&&);
-			static constexpr FN sDispatchTable[] = { [](void* data, F&& functor) -> Ret { return std::invoke(functor, *static_cast<Ts*>(data)); }... };
+			if constexpr (std::same_as<const Variant&, decltype(self)>)
+			{
+				using FN  = Ret(*)(const void*, F&&);
+				static constexpr FN sDispatchTable[] = { [](const void* data, F&& functor) -> Ret
+				{
+					return std::invoke(std::forward<F>(functor), *static_cast<const Ts*>(data));
+				}... };
 
-			return std::invoke(sDispatchTable[mTypeIndex], reinterpret_cast<void*>(mData), std::forward<F>(functor));
+				return std::invoke(sDispatchTable[self.mTypeIndex], reinterpret_cast<const void*>(self.mData), std::forward<F>(functor));
+			}
+			else
+			{
+				using FN  = Ret(*)(void*, F&&);
+				static constexpr FN sDispatchTable[] = { [](void* data, F&& functor) -> Ret
+				{
+					return std::invoke(std::forward<F>(functor), *static_cast<Ts*>(data));
+				}... };
+
+				return std::invoke(sDispatchTable[self.mTypeIndex], reinterpret_cast<void*>(self.mData), std::forward<F>(functor));
+			}
 		}
 
 
@@ -287,6 +352,6 @@ namespace Strawberry::Core
 
 
 		size_t                     mTypeIndex;
-		alignas(Alignment) uint8_t mData[Size];
+		alignas(Alignment) uint8_t mData[Size] = { 0 };
 	};
 } // namespace Strawberry::Core
