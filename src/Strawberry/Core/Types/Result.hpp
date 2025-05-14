@@ -21,17 +21,21 @@ namespace Strawberry::Core
 		template <typename T>
 		Result(T&& t)
 		{
-			if constexpr (std::same_as<D, std::decay_t<T>>)
+			if constexpr (std::same_as<D, std::decay_t<T>> || std::constructible_from<D, decltype(t)> && !std::constructible_from<E, decltype(t)>)
 			{
 				mPayload = D(std::forward<T>(t));
 			}
-			else if constexpr (std::same_as<E, std::decay_t<T>>)
+			else if constexpr (std::same_as<E, std::decay_t<T>> || std::constructible_from<E, decltype(t)> && !std::constructible_from<D, decltype(t)>)
 			{
 				mPayload = E(std::forward<T>(t));
 			}
+			else if constexpr (std::constructible_from<D, decltype(t)> && std::constructible_from<E, decltype(t)>)
+			{
+				static_assert(false, "Ambiguous construction as D and E can be constructed from these args");
+			}
 			else
 			{
-				static_assert(false, "Could not construct Result<D, E> from these args");
+				static_assert(false, "Could not construct either D or E from this argument");
 			}
 		}
 
