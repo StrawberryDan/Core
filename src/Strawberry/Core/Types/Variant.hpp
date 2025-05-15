@@ -204,7 +204,6 @@ namespace Strawberry::Core
 		{
 			if (IsType<Arg>()) [[likely]]
 			{
-				mTypeIndex = std::numeric_limits<size_t>::max();
 				return std::move(*reinterpret_cast<Arg*>(mData));
 			}
 			return NullOpt;
