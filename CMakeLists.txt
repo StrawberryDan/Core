@@ -55,6 +55,8 @@ if (NOT TARGET StrawberryCore)
 
 	new_strawberry_library(NAME StrawberryCore SOURCE 
 		src/Strawberry/Core/Assert.hpp
+		src/Strawberry/Core/Error.cpp
+		src/Strawberry/Core/Error.hpp
 		src/Strawberry/Core/IO/Base64.cpp
 		src/Strawberry/Core/IO/Base64.hpp
 		src/Strawberry/Core/IO/Broadcaster.hpp
@@ -83,6 +85,8 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Math/Transformations.hpp
 		src/Strawberry/Core/Math/Units.hpp
 		src/Strawberry/Core/Math/Vector.hpp
+		src/Strawberry/Core/Process.cpp
+		src/Strawberry/Core/Process.hpp
 		src/Strawberry/Core/Sync/ConditionVariable.cpp
 		src/Strawberry/Core/Sync/ConditionVariable.hpp
 		src/Strawberry/Core/Sync/Mutex.hpp
