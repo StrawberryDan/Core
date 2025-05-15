@@ -95,12 +95,6 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Thread/ThreadPool.hpp
 		src/Strawberry/Core/Thread/Worker.cpp
 		src/Strawberry/Core/Thread/Worker.hpp
-		src/Strawberry/Core/Timing/Clock.cpp
-		src/Strawberry/Core/Timing/Clock.hpp
-		src/Strawberry/Core/Timing/Metronome.cpp
-		src/Strawberry/Core/Timing/Metronome.hpp
-		src/Strawberry/Core/Timing/ScopedTimer.cpp
-		src/Strawberry/Core/Timing/ScopedTimer.hpp
 		src/Strawberry/Core/Types/CopyOnWrite.hpp
 		src/Strawberry/Core/Types/Date.cpp
 		src/Strawberry/Core/Types/Date.hpp
