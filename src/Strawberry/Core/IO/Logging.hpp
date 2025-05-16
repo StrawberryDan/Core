@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <stacktrace>
 
 
 namespace Strawberry::Core
@@ -29,6 +30,10 @@ namespace Strawberry::Core
 		template<typename... Args>
 		static constexpr void Log(Level level, const std::string& message, Args&&... args)
 		{
+#ifndef STRAWBERRY_RELEASE
+			std::stacktrace_entry caller = std::stacktrace::current().at(2);
+#endif
+
 			// Return early if we are ignoring this log level.
 			if (GetLevel() > level) return;
 
@@ -45,7 +50,28 @@ namespace Strawberry::Core
 			}
 
 			// Put the string into the logging syntax.
-			formatted = fmt::format("[{}]\t{}", LevelToString(level), formatted);
+#ifndef STRAWBERRY_RELEASE
+			if (!caller.source_file().empty())
+			{
+				// Put the string into the logging syntax.
+				formatted = fmt::format(
+					"[{}]\t{}:{}\t{}",
+					LevelToString(level),
+					caller.source_file(),
+					caller.source_line(),
+					formatted);
+			}
+			else
+			{
+#endif
+				formatted = fmt::format(
+					"[{}]\t{}",
+					LevelToString(level),
+					formatted);
+#ifndef STRAWBERRY_RELEASE
+			}
+#endif
+
 			LogRaw(level, formatted);
 		}
 
