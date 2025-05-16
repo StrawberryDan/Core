@@ -3,10 +3,16 @@
 
 #include "fmt/format.h"
 #include <fstream>
-#include <iostream>
-#include <sstream>
 #include <string>
-#include <stacktrace>
+
+#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
+	#include <stacktrace>
+#endif
+
+#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_TIMESTAMPS
+	#include <chrono>
+	#include <fmt/chrono.h>
+#endif
 
 
 namespace Strawberry::Core
@@ -22,58 +28,6 @@ namespace Strawberry::Core
 			Warning,
 			Error,
 		};
-
-
-		static std::string LevelToString(Logging::Level logLevel);
-
-
-		template<typename... Args>
-		static constexpr void Log(Level level, const std::string& message, Args&&... args)
-		{
-#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
-			std::stacktrace_entry caller = std::stacktrace::current().at(2);
-#endif
-
-			// Return early if we are ignoring this log level.
-			if (GetLevel() > level) return;
-
-			// Create string
-			std::string formatted;
-			// Do as much at compile time as possible
-			if consteval
-			{
-				formatted = fmt::format(message, std::forward<Args>(args)...);
-			}
-			else
-			{
-				formatted = fmt::format(fmt::runtime(message), std::forward<Args>(args)...);
-			}
-
-			// Put the string into the logging syntax.
-#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
-			if (!caller.source_file().empty())
-			{
-				// Put the string into the logging syntax.
-				formatted = fmt::format(
-					"[{}]\t{}:{}\t{}",
-					LevelToString(level),
-					caller.source_file(),
-					caller.source_line(),
-					formatted);
-			}
-			else
-			{
-#endif
-				formatted = fmt::format(
-					"[{}]\t{}",
-					LevelToString(level),
-					formatted);
-#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
-			}
-#endif
-
-			LogRaw(level, formatted);
-		}
 
 
 		template<typename... Args>
@@ -116,6 +70,63 @@ namespace Strawberry::Core
 		static void  SetOutputFile(std::string filename);
 
 	private:
+		static std::string LevelToString(Logging::Level logLevel);
+
+
+		template<typename... Args>
+		static constexpr void Log(Level level, const std::string& message, Args&&... args)
+		{
+#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
+			std::stacktrace_entry caller = std::stacktrace::current().at(2);
+#endif
+
+			// Return early if we are ignoring this log level.
+			if (GetLevel() > level) return;
+
+			// Create string
+			std::string formatted;
+			// Do as much at compile time as possible
+			if consteval
+			{
+				formatted = fmt::format(message, std::forward<Args>(args)...);
+			}
+			else
+			{
+				formatted = fmt::format(fmt::runtime(message), std::forward<Args>(args)...);
+			}
+
+
+#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
+			// Prepend source code location
+			if (!caller.source_file().empty())
+			{
+				// Put the string into the logging syntax.
+				formatted = fmt::format(
+					"{}:{}\t{}",
+					caller.source_file(),
+					caller.source_line(),
+					formatted);
+			}
+#endif
+
+
+#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_TIMESTAMPS
+			formatted = fmt::format(
+				"{}\t{}",
+				std::chrono::system_clock::now(),
+				formatted);
+#endif
+
+			// Put the string into the logging syntax.
+			formatted = fmt::format(
+				"[{}]\t{}",
+				LevelToString(level),
+				formatted);
+
+			LogRaw(level, formatted);
+		}
+
+
 		static void LogRaw(Level level, const std::string& message);
 	};
 } // namespace Strawberry::Core
