@@ -8,6 +8,8 @@
 #include <csignal>
 #include <cstddef>
 #include <iostream>
+#include <ranges>
+#include <stacktrace>
 #include <utility>
 
 
@@ -18,7 +20,17 @@ namespace Strawberry::Core
 #if STRAWBERRY_DEBUG
 		if (!value)
 		{
+#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
+			std::string trace =
+				std::ranges::fold_left_first(
+					std::stacktrace::current()
+					| std::views::filter([] (auto&& x) { return !x.source_file().ends_with("Strawberry/Core/Assert.hpp"); })
+					| std::views::transform([](auto&& x) { return fmt::format("\t{}:{}", x.source_file(), x.source_line()); }),
+					[](auto&& x, auto&& y) { return x + "\n" + y; }).value_or("N/A");
+			std::cout << fmt::format("Assertion failed at \n{}!", trace) << std::endl;
+#else
 			Logging::Error("Assertion failed!");
+#endif
 			DebugBreak();
 			std::terminate();
 		}

@@ -73,11 +73,37 @@ namespace Strawberry::Core
 		static std::string LevelToString(Logging::Level logLevel);
 
 
+#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
+		static std::stacktrace_entry GetCaller()
+		{
+			auto stacktrace = std::stacktrace::current();
+
+			int i = 0;
+			for (i = 2; i < stacktrace.size(); i++)
+			{
+				if (stacktrace.at(i).source_file().ends_with("Strawberry/Core/Assert.hpp"))
+				{
+					continue;
+				}
+
+				if (stacktrace.at(i).source_file().ends_with("Strawberry/Core/IO/Logging.hpp"))
+				{
+					continue;
+				}
+
+				return stacktrace.at(i);
+			}
+
+			return stacktrace.at(i);
+		}
+#endif
+
+
 		template<typename... Args>
 		static constexpr void Log(Level level, const std::string& message, Args&&... args)
 		{
 #ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
-			std::stacktrace_entry caller = std::stacktrace::current().at(2);
+			std::stacktrace_entry caller = GetCaller();
 #endif
 
 			// Return early if we are ignoring this log level.
