@@ -30,7 +30,7 @@ namespace Strawberry::Core
 		template<typename... Args>
 		static constexpr void Log(Level level, const std::string& message, Args&&... args)
 		{
-#ifndef STRAWBERRY_RELEASE
+#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
 			std::stacktrace_entry caller = std::stacktrace::current().at(2);
 #endif
 
@@ -50,7 +50,7 @@ namespace Strawberry::Core
 			}
 
 			// Put the string into the logging syntax.
-#ifndef STRAWBERRY_RELEASE
+#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
 			if (!caller.source_file().empty())
 			{
 				// Put the string into the logging syntax.
@@ -68,7 +68,7 @@ namespace Strawberry::Core
 					"[{}]\t{}",
 					LevelToString(level),
 					formatted);
-#ifndef STRAWBERRY_RELEASE
+#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
 			}
 #endif
 

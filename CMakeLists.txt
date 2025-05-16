@@ -15,6 +15,8 @@ endif ()
 
 
 if (NOT TARGET StrawberryCore)
+	option(STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE "" OFF)
+
 	FetchContent_Declare(FMT
 		EXCLUDE_FROM_ALL
 		GIT_REPOSITORY "https://github.com/fmtlib/fmt.git"
@@ -118,6 +120,10 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Util/Strings.hpp
 	)
 
+
+	if (${STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE})
+		target_compile_definitions(StrawberryCore PUBLIC "STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE=${STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE}")
+	endif()
 
 	target_include_directories(StrawberryCore
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
