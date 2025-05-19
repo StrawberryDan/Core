@@ -360,6 +360,21 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// De-homogenize a homogenous coordinate
+		constexpr Vector<T, D - 1> Dehomogenize() const noexcept requires (D > 1)
+		{
+			const float w = (*this)[D - 1];
+
+			// If w is zero then we return without dividing
+			if (std::fpclassify(w) == FP_ZERO)
+			{
+				return AsSize<D - 1>();
+			}
+
+			return this->Map([=] (auto&& x) { return x / w; }).template AsSize<D - 1>();
+		}
+
+
 		/// Calculate the angle between this and another vector in radians.
 		Radians AngleBetween(const Vector& b) const noexcept
 		{
