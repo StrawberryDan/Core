@@ -342,6 +342,57 @@ namespace Strawberry::Core::Math
 		}
 
 
+		Vector NormalisedOrZero() const noexcept requires (std::floating_point<T>)
+		{
+			bool allZero = true;
+			for (int i = 0; i < D; i++)
+			{
+				if (std::fpclassify(mValue[i]) != FP_ZERO)
+				{
+					allZero = false;
+				}
+			}
+
+			if (allZero)
+			{
+				return Vector();
+			}
+			else
+			{
+				return Normalised();
+			}
+		}
+
+
+		Vector WithLength(T length) const noexcept requires (std::floating_point<T>)
+		{
+			auto magnitude = Magnitude();
+			return this->Map([=] (auto&& x) { return length / magnitude * x; });
+		}
+
+
+		Vector WithLengthOrZero(T length) const noexcept requires (std::floating_point<T>)
+		{
+			bool allZero = true;
+			for (int i = 0; i < D; i++)
+			{
+				if (std::fpclassify(mValue[i]) != FP_ZERO)
+				{
+					allZero = false;
+				}
+			}
+
+			if (allZero)
+			{
+				return Vector();
+			}
+			else
+			{
+				return WithLength(length);
+			}
+		}
+
+
 		/// Define Dot Product
 		constexpr T Dot(const Vector& b) const noexcept
 		{
