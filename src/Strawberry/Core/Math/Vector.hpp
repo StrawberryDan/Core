@@ -314,6 +314,20 @@ namespace Strawberry::Core::Math
 		}
 
 
+		[[nodiscard]] bool IsZero() const noexcept
+		{
+			bool allZero = true;
+			for (int i = 0; i < D; i++)
+			{
+				if (std::fpclassify(mValue[i]) != FP_ZERO)
+				{
+					allZero = false;
+				}
+			}
+			return allZero;
+		}
+
+
 		/// Define Magnitude
 		[[nodiscard]] double Magnitude() const noexcept
 		{
@@ -344,16 +358,7 @@ namespace Strawberry::Core::Math
 
 		Vector NormalisedOrZero() const noexcept requires (std::floating_point<T>)
 		{
-			bool allZero = true;
-			for (int i = 0; i < D; i++)
-			{
-				if (std::fpclassify(mValue[i]) != FP_ZERO)
-				{
-					allZero = false;
-				}
-			}
-
-			if (allZero)
+			if (IsZero())
 			{
 				return Vector();
 			}
@@ -373,16 +378,7 @@ namespace Strawberry::Core::Math
 
 		Vector WithLengthOrZero(T length) const noexcept requires (std::floating_point<T>)
 		{
-			bool allZero = true;
-			for (int i = 0; i < D; i++)
-			{
-				if (std::fpclassify(mValue[i]) != FP_ZERO)
-				{
-					allZero = false;
-				}
-			}
-
-			if (allZero)
+			if (IsZero())
 			{
 				return Vector();
 			}
