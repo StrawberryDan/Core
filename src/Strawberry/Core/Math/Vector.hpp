@@ -120,6 +120,39 @@ namespace Strawberry::Core::Math
 		};
 
 
+		/// Unflattens an index into a rectangular space
+		constexpr Vector Unflatten(T i) const noexcept
+		{
+			if constexpr (D == 1)
+			{
+				return Vector(i);
+			}
+			else
+			{
+				T interval = Skip<1>().Fold(std::multiplies());
+				Vector<T, D - 1> subEmbedding = Skip<1>().Unflatten(i % interval);
+
+				Vector unflattened = Vector<T, 1>(i / interval).AppendedWith(subEmbedding);
+				return unflattened;
+			}
+		}
+
+
+		/// Flattens the given position into a 1D index.
+		constexpr T Flatten(Vector x) const noexcept
+		{
+			if constexpr (D == 1)
+			{
+				return x[0];
+			}
+			else
+			{
+				T flattened = x[0] * Skip<1>().Fold(std::multiplies()) + Skip<1>().Flatten(x.Skip<1>());
+				return flattened;
+			}
+		}
+
+
 		static std::vector<Vector> Rectangle(Vector size) requires (std::unsigned_integral<T>)
 		{
 			auto addDimRange = [](std::vector<Vector<T, D - 1>>&& acc, std::vector<T>&& dimension ) -> std::vector<Vector<T, D>>

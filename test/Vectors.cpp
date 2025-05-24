@@ -54,4 +54,43 @@ int main()
         AssertEQ(Vector(1, 2, 3).Skip<1>(), Vector(2, 3));
         AssertEQ(Vector(1, 2, 3).Skip<2>(), Vector(3));
     }
+
+
+    {   // Test embedding
+        Vector<unsigned int, 1> embedding(3);
+        AssertEQ(embedding.Unflatten(0), Vector<unsigned int, 1>(0));
+        AssertEQ(embedding.Unflatten(1), Vector<unsigned int, 1>(1));
+        AssertEQ(embedding.Unflatten(2), Vector<unsigned int, 1>(2));
+
+
+        Vector<unsigned int, 2> embedding2(2, 2);
+        AssertEQ(embedding2.Unflatten(0), Vector<unsigned int, 2>(0, 0));
+        AssertEQ(embedding2.Unflatten(1), Vector<unsigned int, 2>(0, 1));
+        AssertEQ(embedding2.Unflatten(2), Vector<unsigned int, 2>(1, 0));
+        AssertEQ(embedding2.Unflatten(3), Vector<unsigned int, 2>(1, 1));
+
+        Vector<unsigned int, 3> embedding3(2, 2, 2);
+        AssertEQ(embedding3.Unflatten(0), Vector<unsigned int, 3>(0, 0, 0));
+        AssertEQ(embedding3.Unflatten(1), Vector<unsigned int, 3>(0, 0, 1));
+        AssertEQ(embedding3.Unflatten(2), Vector<unsigned int, 3>(0, 1, 0));
+        AssertEQ(embedding3.Unflatten(3), Vector<unsigned int, 3>(0, 1, 1));
+        AssertEQ(embedding3.Unflatten(4), Vector<unsigned int, 3>(1, 0, 0));
+        AssertEQ(embedding3.Unflatten(5), Vector<unsigned int, 3>(1, 0, 1));
+        AssertEQ(embedding3.Unflatten(6), Vector<unsigned int, 3>(1, 1, 0));
+        AssertEQ(embedding3.Unflatten(7), Vector<unsigned int, 3>(1, 1, 1));
+
+        Vector<unsigned int, 3> embedding4(2, 3, 2);
+        AssertEQ(embedding4.Unflatten( 0), Vector<unsigned int, 3>(0, 0, 0));
+        AssertEQ(embedding4.Unflatten( 1), Vector<unsigned int, 3>(0, 0, 1));
+        AssertEQ(embedding4.Unflatten( 2), Vector<unsigned int, 3>(0, 1, 0));
+        AssertEQ(embedding4.Unflatten( 3), Vector<unsigned int, 3>(0, 1, 1));
+        AssertEQ(embedding4.Unflatten( 4), Vector<unsigned int, 3>(0, 2, 0));
+        AssertEQ(embedding4.Unflatten( 5), Vector<unsigned int, 3>(0, 2, 1));
+        AssertEQ(embedding4.Unflatten( 6), Vector<unsigned int, 3>(1, 0, 0));
+        AssertEQ(embedding4.Unflatten( 7), Vector<unsigned int, 3>(1, 0, 1));
+        AssertEQ(embedding4.Unflatten( 8), Vector<unsigned int, 3>(1, 1, 0));
+        AssertEQ(embedding4.Unflatten( 9), Vector<unsigned int, 3>(1, 1, 1));
+        AssertEQ(embedding4.Unflatten(10), Vector<unsigned int, 3>(1, 2, 0));
+        AssertEQ(embedding4.Unflatten(11), Vector<unsigned int, 3>(1, 2, 1));
+    }
 }
