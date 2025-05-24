@@ -89,6 +89,25 @@ namespace Strawberry::Core::Math
 		}
 
 
+		template <size_t D2>
+		constexpr Vector<T, D + D2> AppendedWith(const Vector<T, D2>& args) noexcept
+		{
+			Vector<T, D + D2> res;
+			for (int i = 0; i < D + D2; i++)
+			{
+				if (i < D)
+				{
+					res[i] = (*this)[i];
+				}
+				else
+				{
+					res[i] = args[i - D];
+				}
+			}
+			return res;
+		}
+
+
 		/// Appends additional values to the end of the vector
 		template<typename... Args> requires (std::convertible_to<Args, T> && ...)
 		constexpr Vector<T, D + sizeof...(Args)> AppendedWith(Args... args) const
