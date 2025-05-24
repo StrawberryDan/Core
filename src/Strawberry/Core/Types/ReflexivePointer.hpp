@@ -243,6 +243,12 @@ namespace Strawberry::Core
 		}
 
 
+		operator ReflexivePointer<const T>() const
+		{
+			return ReflexivePointer(std::static_pointer_cast<const T>(mPtr));
+		}
+
+
 	protected:
 		explicit ReflexivePointer(std::shared_ptr<std::atomic<EnableReflexivePointer*>> rawPtr) noexcept
 			: mPtr(std::move(rawPtr)) {}
