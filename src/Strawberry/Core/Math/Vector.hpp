@@ -48,6 +48,19 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Returns this vector without the first N elements.
+		template <size_t N> requires (D - N >= 1)
+		constexpr Vector<T, D - N> Skip() const noexcept
+		{
+			Vector<T, D - N> res;
+			for (int i = N; i < D; i++)
+			{
+				res[i - N] = (*this)[i];
+			}
+			return res;
+		}
+
+
 		/// Copy Conversion to a different sized vector
 		template<size_t D2>
 		constexpr Vector<T, D2> AsSize() const noexcept
