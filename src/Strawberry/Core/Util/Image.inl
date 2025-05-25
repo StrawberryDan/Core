@@ -6,7 +6,7 @@ namespace Strawberry::Core
 {
 	template <typename PixelType>
 	Core::Result<Image<PixelType>, IO::Error> Image<PixelType>::FromFile(const std::filesystem::path& path) noexcept
-	{
+	{	ZoneScoped;
 		int x, y, channelsInFile;
 		auto bytes = stbi_load(path.string().c_str(), &x, &y, &channelsInFile, PixelType::Channels);
 
@@ -95,7 +95,7 @@ namespace Strawberry::Core
 
 	template <typename PixelType>
 	void Image<PixelType>::Save(const std::filesystem::path& path, unsigned int quality) const noexcept
-	{
+	{	ZoneScoped;
 		int x = Width(), y = Height();
 		if (path.extension() == ".png")
 		{
@@ -135,7 +135,7 @@ namespace Strawberry::Core
 
 	template <typename Pixel>
 	void Image<Pixel>::Blit(const Image& other, Math::Vec2u offset)
-	{
+	{	ZoneScoped;
 		for (unsigned y = 0; y < other.Height(); ++y)
 		{
 			for (unsigned x = 0; x < other.Width(); ++x)
