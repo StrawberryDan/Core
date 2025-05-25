@@ -38,9 +38,29 @@ namespace Strawberry::Core
 
 
 		template<typename... Args>
+		static void TraceIf(bool condition, const std::string& message, Args&&... args)
+		{
+			if (condition)
+			{
+				Log(Level::Trace, message, std::forward<Args>(args)...);
+			}
+		}
+
+
+		template<typename... Args>
 		static void Debug(const std::string& message, Args&&... args)
 		{
 			Log(Level::Debug, message, std::forward<Args>(args)...);
+		}
+
+
+		template<typename... Args>
+		static void DebugIf(bool condition, const std::string& message, Args&&... args)
+		{
+			if (condition)
+			{
+				Log(Level::Debug, message, std::forward<Args>(args)...);
+			}
 		}
 
 
@@ -52,6 +72,16 @@ namespace Strawberry::Core
 
 
 		template<typename... Args>
+		static void InfoIf(bool condition, const std::string& message, Args&&... args)
+		{
+			if (condition)
+			{
+				Log(Level::Info, message, std::forward<Args>(args)...);
+			}
+		}
+
+
+		template<typename... Args>
 		static void Warning(const std::string& message, Args&&... args)
 		{
 			Log(Level::Warning, message, std::forward<Args>(args)...);
@@ -59,9 +89,29 @@ namespace Strawberry::Core
 
 
 		template<typename... Args>
+		static void WarningIf(bool condition, const std::string& message, Args&&... args)
+		{
+			if (condition)
+			{
+				Log(Level::Warning, message, std::forward<Args>(args)...);
+			}
+		}
+
+
+		template<typename... Args>
 		static void Error(const std::string& message, Args&&... args)
 		{
 			Log(Level::Error, message, std::forward<Args>(args)...);
+		}
+
+
+		template<typename... Args>
+		static void ErrorIf(bool condition, const std::string& message, Args&&... args)
+		{
+			if (condition)
+			{
+				Log(Level::Error, message, std::forward<Args>(args)...);
+			}
 		}
 
 
