@@ -120,7 +120,33 @@ namespace Strawberry::Core::Math
 		};
 
 
-		/// Unflattens an index into a rectangular space
+		/// Flattens the given position into a 1D index lexicographically.
+		/// Increasing x[D -1] by one increases Flatten(x) by 1.
+		constexpr T Flatten(Vector x) const noexcept
+		{
+			if constexpr (D == 1)
+			{
+				return x[0];
+			}
+			else
+			{
+				T flattened = x[0] * Skip<1>().Fold(std::multiplies()) + Skip<1>().Flatten(x.Skip<1>());
+				return flattened;
+			}
+		}
+
+
+		/// Returns the reverse lexicographical flattening of x within this rectangle.
+		/// Increasing x[0] by one increases FlattenR(x) by 1.
+		constexpr T FlattenR(Vector x) const noexcept
+		{
+			return Reversed().Flatten(x.Reversed());
+		}
+
+
+
+		/// Unflattens an index into a rectangular space lexicographically.
+		/// Incrementing i by 1 increments Unflatten(i) from the right.
 		constexpr Vector Unflatten(T i) const noexcept
 		{
 			if constexpr (D == 1)
@@ -138,18 +164,11 @@ namespace Strawberry::Core::Math
 		}
 
 
-		/// Flattens the given position into a 1D index.
-		constexpr T Flatten(Vector x) const noexcept
+		/// Unflattens an index into a rectangular space lexicographically.
+		/// Incrementing i by 1 increments UnflattenR(i) from the left.
+		constexpr Vector UnflattenR(T i) const noexcept
 		{
-			if constexpr (D == 1)
-			{
-				return x[0];
-			}
-			else
-			{
-				T flattened = x[0] * Skip<1>().Fold(std::multiplies()) + Skip<1>().Flatten(x.Skip<1>());
-				return flattened;
-			}
+			return Reversed().Unflatten(i).Reversed();
 		}
 
 
