@@ -228,8 +228,20 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Returns this vector in reverse
+		constexpr Vector Reversed() const noexcept
+		{
+			Vector res;
+			for (int i = 0; i < D; i++)
+			{
+				res[i] = (*this)[D - i - 1];
+			}
+			return res;
+		}
+
+
 		template <typename... Args>
-		Vector<T, sizeof...(Args)> Swizzle(Args... args)
+		constexpr Vector<T, sizeof...(Args)> Swizzle(Args... args)
 		{
 			std::array _args{args...};
 			Vector<T, sizeof...(Args)> result;

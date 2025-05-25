@@ -50,9 +50,13 @@ int main()
     AssertEQ(Vec2i(2, -2).Embed(), 23);
     AssertEQ(Vec2i(2, -1).Embed(), 24);
 
-    {
+    {   // Skipping
         AssertEQ(Vector(1, 2, 3).Skip<1>(), Vector(2, 3));
         AssertEQ(Vector(1, 2, 3).Skip<2>(), Vector(3));
+    }
+
+    {   //
+        AssertEQ(Vector(1, 2, 3).Reversed(), Vector(3, 2, 1));
     }
 
 
