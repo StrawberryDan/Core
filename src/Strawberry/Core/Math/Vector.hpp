@@ -272,9 +272,9 @@ namespace Strawberry::Core::Math
 
 		/// Apply function to all members
 		template<typename F>
-		constexpr Vector Map(F&& function) const noexcept
+		constexpr Vector<std::invoke_result_t<F, T>, D> Map(F&& function) const noexcept
 		{
-			Vector result;
+			Vector<std::invoke_result_t<F, T>, D> result;
 			for (int i = 0; i < D; i++) result[i] = std::invoke(std::forward<F>(function), (*this)[i]);
 			return result;
 		}
