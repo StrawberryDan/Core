@@ -179,9 +179,10 @@ namespace Strawberry::Core
 		//======================================================================================================================
 		//  Construction, Destruction and Assignment
 		//----------------------------------------------------------------------------------------------------------------------
+		// Disable uninitialized warning since this is on purpose.
+		// ReSharper disable once CppPossiblyUninitializedMember
 		Optional()
 			: mHasValue(false)
-			, mPayload{}
 		{
 		}
 
