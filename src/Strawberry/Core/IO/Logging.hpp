@@ -2,7 +2,6 @@
 
 
 #include "fmt/format.h"
-#include "fmt/ranges.h"
 #include <string>
 
 #ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
