@@ -181,6 +181,7 @@ namespace Strawberry::Core
 		//----------------------------------------------------------------------------------------------------------------------
 		Optional()
 			: mHasValue(false)
+			, mPayload{}
 		{
 		}
 
@@ -261,8 +262,8 @@ namespace Strawberry::Core
 		}
 
 
-		Optional& operator=(const Optional& rhs) requires (std::is_copy_constructible_v<T> || std::is_copy_assignable_v<
-			T>)
+		Optional& operator=(const Optional& rhs)
+			requires (std::is_copy_constructible_v<T> || std::is_copy_assignable_v<T>)
 		{
 			if constexpr (std::is_copy_assignable_v<T>)
 			{
@@ -287,7 +288,8 @@ namespace Strawberry::Core
 		}
 
 
-		Optional& operator=(Optional&& rhs) requires (std::is_move_constructible_v<T> || std::is_move_assignable_v<T>)
+		Optional& operator=(Optional&& rhs) noexcept
+			requires (std::is_move_constructible_v<T> || std::is_move_assignable_v<T>)
 		{
 			if constexpr (std::is_move_assignable_v<T>)
 			{
@@ -578,7 +580,7 @@ namespace Strawberry::Core
 		}
 
 
-		Optional(Optional&& rhs)
+		Optional(Optional&& rhs) noexcept
 			: mValue(std::exchange(rhs.mValue, Null))
 		{
 		}
@@ -598,7 +600,7 @@ namespace Strawberry::Core
 		}
 
 
-		Optional operator=(Optional&& rhs)
+		Optional operator=(Optional&& rhs) noexcept
 		{
 			mValue = std::exchange(rhs.mValue, Null);
 			return *this;
