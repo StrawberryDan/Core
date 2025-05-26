@@ -48,9 +48,7 @@ namespace Strawberry::Core::Math
 
 		T Mensuration() const
 		{
-			T result = mExtent[0];
-			for (int i = 1; i < D; ++i) result *= mExtent[i];
-			return result;
+			return mExtent.Fold(std::multiplies());
 		}
 
 
