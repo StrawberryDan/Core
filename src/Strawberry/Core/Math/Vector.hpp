@@ -468,7 +468,7 @@ namespace Strawberry::Core::Math
 		Vector WithLength(T length) const noexcept requires (std::floating_point<T>)
 		{
 			auto magnitude = Magnitude();
-			return this->Map([=] (auto&& x) { return length / magnitude * x; });
+			return this->Map([=] (auto&& x) -> T { return length / magnitude * x; });
 		}
 
 
