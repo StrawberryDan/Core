@@ -94,6 +94,7 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Sync/ConditionVariable.cpp
 		src/Strawberry/Core/Sync/ConditionVariable.hpp
 		src/Strawberry/Core/Sync/Mutex.hpp
+		src/Strawberry/Core/Sync/ProducerConsumerQueue.hpp
 		src/Strawberry/Core/Thread/RepeatingTask.hpp
 		src/Strawberry/Core/Thread/ThreadPool.cpp
 		src/Strawberry/Core/Thread/ThreadPool.hpp
@@ -155,6 +156,7 @@ if (NOT TARGET StrawberryCore)
 		test/Noise.cpp
 		test/Optional.cpp
 		test/PeriodicNumbers.cpp
+		test/ProducerConsumer.cpp
 		test/TypeSets.cpp
 		test/UTF.cpp
 		test/Uninitialised.cpp
