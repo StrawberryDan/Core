@@ -116,6 +116,7 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Types/Variant.hpp
 		src/Strawberry/Core/UTF.cpp
 		src/Strawberry/Core/UTF.hpp
+		src/Strawberry/Core/Util/Alloc.hpp
 		src/Strawberry/Core/Util/IDPool.hpp
 		src/Strawberry/Core/Util/Image.inl
 		src/Strawberry/Core/Util/Image.hpp
