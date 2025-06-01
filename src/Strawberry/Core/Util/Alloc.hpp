@@ -10,7 +10,7 @@
 namespace Strawberry::Core
 {
 #ifdef STRAWBERRY_TARGET_WINDOWS
-	void* AlignedAlloc(size_t alignment, size_t size) noexcept
+	inline void* AlignedAlloc(size_t alignment, size_t size) noexcept
 	{
 		Assert(size % alignment == 0);
 		void* ptr = _aligned_malloc(size, alignment);
@@ -18,13 +18,14 @@ namespace Strawberry::Core
 		return ptr;
 	}
 
-	void AlignedFree(void* ptr) noexcept
+
+	inline void AlignedFree(void* ptr) noexcept
 	{
 		AssertNEQ(ptr, nullptr);
 		_aligned_free(ptr);
 	}
 #else
-	void* AlignedAlloc(size_t alignment, size_t size) noexcept
+	inline void* AlignedAlloc(size_t alignment, size_t size) noexcept
 	{
 		Assert(size % alignment == 0);
 		void* ptr =  std::aligned_alloc(alignment, size);
@@ -32,7 +33,8 @@ namespace Strawberry::Core
 		return ptr;
 	}
 
-	void AlignedFree(void* ptr) noexcept
+
+	inline void AlignedFree(void* ptr) noexcept
 	{
 		AssertNEQ(ptr, nullptr);
 		std::free(ptr);
