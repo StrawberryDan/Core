@@ -95,6 +95,8 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Sync/ConditionVariable.hpp
 		src/Strawberry/Core/Sync/Mutex.hpp
 		src/Strawberry/Core/Sync/ProducerConsumerQueue.hpp
+		src/Strawberry/Core/Sync/Spinlock.cpp
+		src/Strawberry/Core/Sync/Spinlock.hpp
 		src/Strawberry/Core/Thread/RepeatingTask.hpp
 		src/Strawberry/Core/Thread/ThreadPool.cpp
 		src/Strawberry/Core/Thread/ThreadPool.hpp
