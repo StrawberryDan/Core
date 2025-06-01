@@ -4,14 +4,16 @@ using namespace Strawberry;
 using namespace Core;
 
 
-int main()
+void Test_LockFreeSWSRQueue()
 {
-	LockFreeSWSRQueue<int, 4> queue;
+	static constexpr size_t LIMIT = 1'000'000;
+
+	LockFreeSWSRQueue<int, 256> queue;
 
 
 	std::thread producer([&]()
 	{
-		for (int i = 0; i < 1'000'000; i++)
+		for (int i = 0; i < LIMIT; i++)
 		{
 			while (!queue.Push(i));
 		}
@@ -20,7 +22,7 @@ int main()
 
 	std::thread consume([&]()
 	{
-		for (int i = 0; i < 1'000'000; i++)
+		for (int i = 0; i < LIMIT; i++)
 		{
 			Optional<int> x = queue.Pop();
 			while (!x.HasValue()) x = queue.Pop();
@@ -31,4 +33,10 @@ int main()
 
 	producer.join();
 	consume.join();
+}
+
+
+int main()
+{
+	Test_LockFreeSWSRQueue();
 }

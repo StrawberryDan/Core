@@ -81,9 +81,7 @@ namespace Strawberry::Core
 
 		template <typename F, typename T = std::invoke_result_t<F>>
 		static std::pair<std::future<T>, PackagedTask> PackageTask(F&& task)
-		{
-			ZoneScoped;
-
+		{	ZoneScoped;
 			std::promise<T> promise;
 			auto future = promise.get_future();
 

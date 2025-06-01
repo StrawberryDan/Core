@@ -10,18 +10,17 @@
 
 namespace Strawberry::Core
 {
-	/// Class for a LockFree Single Writer Single Reader Queue.
-	template <typename T, size_t CAPACITY>
-	class LockFreeSWSRQueue;
-
-	/// Lock Free Single Write Single Reader Queue with a finite capacity.
+	/// Lock Free Single Writer Single Reader Queue with a finite capacity.
+	///
+	/// Allocates one more slot than CAPACITY, as an empty slot is required as a sentinel to check if
+	/// the queue is full or not.
 	template <typename T, size_t CAPACITY>
 	class LockFreeSWSRQueue
 	{
 	public:
 		/// Construct a fresh queue
 		LockFreeSWSRQueue()
-			: mData(AlignedAlloc(alignof(T), CAPACITY * sizeof(T)))
+			: mData(AlignedAlloc(alignof(T), (CAPACITY + 1) * sizeof(T)))
 		{}
 
 
@@ -47,6 +46,7 @@ namespace Strawberry::Core
 		{
 			if (mData)
 			{
+				while (Pop()) {};
 				AlignedFree(mData);
 			}
 		}
@@ -54,10 +54,10 @@ namespace Strawberry::Core
 
 		/// Push a value onto the queue. Returns true if the value was pushed, and false otherwise.
 		bool Push(std::common_reference_with<T> auto value) noexcept
-		{
+		{	ZoneScoped;
 			// Since this thread is the only one to write to mTail, we can use relaxed ordering.
 			size_t tail = mTail.load(std::memory_order::relaxed);
-			size_t nextTail = (tail + 1) % CAPACITY;
+			size_t nextTail = (tail + 1) % (CAPACITY + 1);
 
 			// If the next position is the head, then we're full.
 			if (nextTail == mHead.load(std::memory_order::acquire))
@@ -72,9 +72,9 @@ namespace Strawberry::Core
 		}
 
 
-		/// Pop a value from the queue, if there is one.
+		/// Pop a value from the queue if there is one.
 		Optional<T> Pop() noexcept
-		{
+		{	ZoneScoped;
 			// Since this thread is the only one to write to mTail, we can use relaxed ordering.
 			size_t head = mHead.load(std::memory_order::relaxed);
 			// If head is equal to tail, then this queue is empty.
@@ -88,7 +88,7 @@ namespace Strawberry::Core
 			// Clean up the value.
 			std::destroy_at(static_cast<T*>(mData) + head);
 			// Increment the head.
-			mHead.store((head + 1) % CAPACITY, std::memory_order::release);
+			mHead.store((head + 1) % (CAPACITY + 1), std::memory_order::release);
 			// Return the value.
 			return value;
 		}
