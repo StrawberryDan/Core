@@ -3,9 +3,9 @@
 // Strawberry Core
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/Util/Alloc.hpp"
+#include "Strawberry/Core/Sync/Spinlock.hpp"
 // Standard Library
 #include <atomic>
-
 
 
 namespace Strawberry::Core::LockFree
@@ -50,7 +50,7 @@ namespace Strawberry::Core::LockFree
 
 
 		/// Push a value onto the queue. Returns true if the value was pushed, and false otherwise.
-		bool Push(std::common_reference_with<T> auto value) noexcept
+		[[nodiscard]] bool Push(std::common_reference_with<T> auto value) noexcept
 		{	ZoneScoped;
 			// Since this thread is the only one to write to mTail, we can use relaxed ordering.
 			size_t tail = mTail.load(std::memory_order::relaxed);
@@ -72,7 +72,7 @@ namespace Strawberry::Core::LockFree
 
 
 		/// Pop a value from the queue if there is one.
-		Optional<T> Pop() noexcept
+		[[nodiscard]] Optional<T> Pop() noexcept
 		{	ZoneScoped;
 			// Since this thread is the only one to write to mTail, we can use relaxed ordering.
 			size_t head = mHead.load(std::memory_order::relaxed);
@@ -115,6 +115,38 @@ namespace Strawberry::Core::LockFree
 		/// The index of the next position to be popped from.
 		std::atomic<size_t> mTail = 0;
 		/// A pointer to the underlying data for this queue.
-		void* mData;
+		void* mData = nullptr;
+	};
+
+
+	/// Class for a wait-free Multiple Producer, Multiple Consumer queue.
+	///
+	/// Uses Core::Spinlock to ensure there is only ever one concurrent pusher, and one concurrent popper.
+	template <typename T, size_t CAPACITY>
+	class MPMCQueue
+	{
+	public:
+		[[nodiscard]] bool Push(std::common_reference_with<T> auto value) noexcept
+		{
+			mPushLock.Lock();
+			bool pop = mUnderlyingQueue.Push(std::forward<decltype(value)>(value));
+			mPushLock.Unlock();
+			return pop;
+		}
+
+
+		[[nodiscard]] Optional<T> Pop() noexcept
+		{
+			mPopLock.Lock();
+			auto pop = mUnderlyingQueue.Pop();
+			mPopLock.Unlock();
+			return pop;
+		}
+
+
+	private:
+		Spinlock mPushLock;
+		Spinlock mPopLock;
+		SPSCQueue<T, CAPACITY> mUnderlyingQueue;
 	};
 }
