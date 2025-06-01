@@ -8,7 +8,8 @@ void Test_LockFreeSWSRQueue()
 {
 	static constexpr size_t LIMIT = 1'000'000;
 
-	LockFreeSWSRQueue<int, 256> queue;
+
+	LockFree::SPSCQueue<int, 256> queue;
 
 
 	std::thread producer([&]()

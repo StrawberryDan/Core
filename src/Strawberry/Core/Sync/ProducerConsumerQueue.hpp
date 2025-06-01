@@ -8,41 +8,38 @@
 
 
 
-namespace Strawberry::Core
+namespace Strawberry::Core::LockFree
 {
 	/// Lock Free Single Writer Single Reader Queue with a finite capacity.
-	///
-	/// Allocates one more slot than CAPACITY, as an empty slot is required as a sentinel to check if
-	/// the queue is full or not.
 	template <typename T, size_t CAPACITY>
-	class LockFreeSWSRQueue
+	class SPSCQueue
 	{
 	public:
 		/// Construct a fresh queue
-		LockFreeSWSRQueue()
-			: mData(AlignedAlloc(alignof(T), (CAPACITY + 1) * sizeof(T)))
+		SPSCQueue()
+			: mData(AlignedAlloc(alignof(T), CAPACITY * sizeof(T)))
 		{}
 
 
 		/// Queue is not copyable.
-		LockFreeSWSRQueue(const LockFreeSWSRQueue&) = delete;
+		SPSCQueue(const SPSCQueue&) = delete;
 		/// Queue is not Copy Assignable.
-		LockFreeSWSRQueue& operator=(const LockFreeSWSRQueue&) = delete;
+		SPSCQueue& operator=(const SPSCQueue&) = delete;
 
 
 		/// Queues are move-constructible.
-		LockFreeSWSRQueue(LockFreeSWSRQueue&& x)
-			: mHead(x.mHead.load())
+		SPSCQueue(SPSCQueue&& x)
+ noexcept 			: mHead(x.mHead.load())
 			, mTail(x.mTail.load())
 			, mData(std::exchange(x.mData, nullptr))
 		{}
 
 		/// Queues are not move-assignable.
-		LockFreeSWSRQueue& operator=(LockFreeSWSRQueue&&) = delete;
+		SPSCQueue& operator=(SPSCQueue&&) = delete;
 
 
 		/// Clean up the data if needed.
-		~LockFreeSWSRQueue()
+		~SPSCQueue()
 		{
 			if (mData)
 			{
@@ -57,17 +54,19 @@ namespace Strawberry::Core
 		{	ZoneScoped;
 			// Since this thread is the only one to write to mTail, we can use relaxed ordering.
 			size_t tail = mTail.load(std::memory_order::relaxed);
-			size_t nextTail = (tail + 1) % (CAPACITY + 1);
 
-			// If the next position is the head, then we're full.
-			if (nextTail == mHead.load(std::memory_order::acquire))
+			// Don't insert if the queue is full.
+			if (IsFull())
 			{
 				return false;
 			}
 
 			// Construct the value in the position.
 			std::construct_at(static_cast<T*>(mData) + tail, std::forward<decltype(value)>(value));
-			mTail.store(nextTail, std::memory_order::release);
+			// Store the new tail
+			mTail.store((tail + 1) % CAPACITY, std::memory_order::release);
+			// Increment the size counter
+			mSize.fetch_add(1, std::memory_order_release);
 			return true;
 		}
 
@@ -77,8 +76,8 @@ namespace Strawberry::Core
 		{	ZoneScoped;
 			// Since this thread is the only one to write to mTail, we can use relaxed ordering.
 			size_t head = mHead.load(std::memory_order::relaxed);
-			// If head is equal to tail, then this queue is empty.
-			if (head == mTail.load(std::memory_order_acquire))
+			// Can't pop if the queue is empty.
+			if (IsEmpty())
 			{
 				return NullOpt;
 			}
@@ -88,13 +87,29 @@ namespace Strawberry::Core
 			// Clean up the value.
 			std::destroy_at(static_cast<T*>(mData) + head);
 			// Increment the head.
-			mHead.store((head + 1) % (CAPACITY + 1), std::memory_order::release);
+			mHead.store((head + 1) % CAPACITY, std::memory_order::release);
+			// Decrease the size of the queue
+			mSize.fetch_sub(1, std::memory_order_release);
 			// Return the value.
 			return value;
 		}
 
 
+		[[nodiscard]] bool IsFull() const noexcept
+		{
+			return mSize.load(std::memory_order::acquire) == CAPACITY;
+		}
+
+
+		[[nodiscard]] bool IsEmpty() const noexcept
+		{
+			return mSize.load(std::memory_order::acquire) == 0;
+		}
+
+
 	private:
+		/// The number of items stored in this queue
+		std::atomic<size_t> mSize = 0;
 		/// The index of the next position to be pushed to.
 		std::atomic<size_t> mHead = 0;
 		/// The index of the next position to be popped from.
