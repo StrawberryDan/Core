@@ -144,6 +144,18 @@ namespace Strawberry::Core::LockFree
 		}
 
 
+		[[nodiscard]] bool IsFull() const noexcept
+		{
+			return mUnderlyingQueue.IsFull();
+		}
+
+
+		[[nodiscard]] bool IsEmpty() const noexcept
+		{
+			return mUnderlyingQueue.IsEmpty();
+		}
+
+
 	private:
 		Spinlock mPushLock;
 		Spinlock mPopLock;
