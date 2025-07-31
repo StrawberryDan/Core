@@ -24,10 +24,10 @@ namespace Strawberry::Core::IO
 	{
 	public:
 		// Static Methods
-		static Core::Optional<DynamicByteBuffer>                                     FromFile(const std::filesystem::path& path);
-		static Core::Optional<std::tuple<Core::Math::Vec2u, int, DynamicByteBuffer>> FromImage(const std::filesystem::path& path);
-		static DynamicByteBuffer                                                     Zeroes(size_t len);
-		static DynamicByteBuffer                                                     WithCapacity(size_t len);
+		static Optional<DynamicByteBuffer>                               FromFile(const std::filesystem::path& path);
+		static Optional<std::tuple<Math::Vec2u, int, DynamicByteBuffer>> FromImage(const std::filesystem::path& path);
+		static DynamicByteBuffer                                         Zeroes(size_t len);
+		static DynamicByteBuffer                                         WithCapacity(size_t len);
 
 
 		// Constructors
