@@ -102,6 +102,7 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/Thread/ThreadPool.hpp
 		src/Strawberry/Core/Thread/Worker.cpp
 		src/Strawberry/Core/Thread/Worker.hpp
+		src/Strawberry/Core/Traits.hpp
 		src/Strawberry/Core/Types/CopyOnWrite.hpp
 		src/Strawberry/Core/Types/Date.cpp
 		src/Strawberry/Core/Types/Date.hpp
@@ -121,8 +122,8 @@ if (NOT TARGET StrawberryCore)
 		src/Strawberry/Core/UTF.hpp
 		src/Strawberry/Core/Util/Alloc.hpp
 		src/Strawberry/Core/Util/IDPool.hpp
-		src/Strawberry/Core/Util/Image.inl
 		src/Strawberry/Core/Util/Image.hpp
+		src/Strawberry/Core/Util/Image.inl
 		src/Strawberry/Core/Util/STBImplementations.cpp
 		src/Strawberry/Core/Util/Strings.hpp
 	)
@@ -154,6 +155,7 @@ if (NOT TARGET StrawberryCore)
 		test/Base64.cpp
 		test/ChannelBroadcaster.cpp
 		test/ClampedNumbers.cpp
+		test/DynamicByteBuffer.cpp
 		test/Matrices.cpp
 		test/Noise.cpp
 		test/Optional.cpp
