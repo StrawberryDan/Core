@@ -140,7 +140,10 @@ if (NOT TARGET StrawberryCore)
 	target_include_directories(StrawberryCore
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
 		PUBLIC ${STB_SOURCE_DIR})
-	target_link_libraries(StrawberryCore PUBLIC nlohmann_json::nlohmann_json fmt::fmt-header-only stdc++exp)
+	target_link_libraries(StrawberryCore PUBLIC nlohmann_json::nlohmann_json fmt::fmt-header-only)
+	if (${STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE})
+		target_link_libraries(StrawberryCore PUBLIC stdc++exp)
+	endif()
 
 	if (${TRACY_ENABLE})
 		target_link_libraries(StrawberryCore PUBLIC TracyClient)
