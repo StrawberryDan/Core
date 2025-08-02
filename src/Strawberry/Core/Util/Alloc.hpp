@@ -27,8 +27,11 @@ namespace Strawberry::Core
 #else
 	inline void* AlignedAlloc(size_t alignment, size_t size) noexcept
 	{
-		Assert(size % alignment == 0);
-		void* ptr =  std::aligned_alloc(alignment, size);
+		// On some platforms (e.g. AppleClang on Intel), alignment must be at least the size of void*.
+		alignment = std::max(alignment, sizeof(void*));
+		// Size must be a multiple of alignment
+		AssertEQ(size % alignment, 0);
+		void* ptr = std::aligned_alloc(alignment, size);
 		AssertNEQ(ptr, nullptr);
 		return ptr;
 	}
