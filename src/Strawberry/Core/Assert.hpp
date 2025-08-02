@@ -9,8 +9,10 @@
 #include <cstddef>
 #include <iostream>
 #include <ranges>
-#include <stacktrace>
 #include <utility>
+#ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
+#include <stacktrace>
+#endif
 
 
 namespace Strawberry::Core
