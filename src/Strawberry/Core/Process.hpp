@@ -12,6 +12,8 @@
 
 #ifdef STRAWBERRY_TARGET_WINDOWS
 	#include <windows.h>
+#elifdef STRAWBERRY_TARGET_MAC
+	#include <spawn.h>
 #endif // STRAWBERRY_TARGET_WINDOWS
 
 
@@ -20,7 +22,7 @@ namespace Strawberry::Core
 	class Process
 	{
 	public:
-		static Result<Process, Error> Spawn(const std::filesystem::path& executable, const std::vector<std::string>& arguments);
+		static Result<Process, Error> Spawn(const std::filesystem::path& executable, std::vector<std::string> arguments);
 
 
 		Process(const Process&) = delete;
@@ -47,6 +49,8 @@ namespace Strawberry::Core
 		DWORD mProcessID = 0;
 		HANDLE mThread = nullptr;
 		DWORD mThreadID = 0;
+#elifdef STRAWBERRY_TARGET_MAC
+		pid_t mPid{};
 #endif
 	};
 }

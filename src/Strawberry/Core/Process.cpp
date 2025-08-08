@@ -1,24 +1,29 @@
 #include "Process.hpp"
 
+#ifdef STRAWBERRY_TARGET_MAC
+	#include <sys/wait.h>
+
+	extern char** environ;
+#endif
+
 
 namespace Strawberry::Core
 {
 	Result<Process, Error> Process::Spawn(const std::filesystem::path& executable,
-		const std::vector<std::string>& arguments)
+		std::vector<std::string> arguments)
 	{
 		if (!exists(executable))
 		{
 			return ErrorFileNotFound(executable);
 		}
 
-
-		auto argumentsString = std::ranges::fold_left(
+#ifdef STRAWBERRY_TARGET_WINDOWS
+		std::string argumentsString = std::ranges::fold_left(
 			arguments | std::views::transform([](auto&& x) { return std::format("\"{}\"", x); }),
 			executable.string(),
 			[](auto&& x, auto&& y) { return fmt::format("{} {}", x, y); }
 		);
 
-#ifdef STRAWBERRY_TARGET_WINDOWS
 		STARTUPINFOA startupInfo
 		{
 			.cb = sizeof(STARTUPINFOA)
@@ -49,6 +54,39 @@ namespace Strawberry::Core
 		}
 
 		return ErrorSystem();
+#elifdef STRAWBERRY_TARGET_MAC
+		std::vector<char*> argumentsArray =
+			arguments
+			| std::views::transform([](auto&& x) { return x.data(); })
+			| std::ranges::to<std::vector>();
+		pid_t pid{};
+
+		const char* path = executable.c_str();
+
+		int result = -1;
+		AssertNEQ(executable.is_absolute(), executable.is_relative());
+		if (executable.is_absolute())
+		{
+			result = posix_spawn(&pid, path, nullptr, nullptr, argumentsArray.data(), environ);
+		}
+		else
+		{
+			result = posix_spawnp(&pid, path, nullptr, nullptr, argumentsArray.data(), environ);
+		}
+
+		switch (result)
+		{
+			case 0:
+				break;
+			default:
+				Core::DebugBreak();
+		}
+
+		Process process;
+		process.mPid = pid;
+		return process;
+#else
+	#error "No Implementation for Strawberry::Core::Process::Spawn!"
 #endif
 	}
 
@@ -59,6 +97,9 @@ namespace Strawberry::Core
 		, mProcessID(std::exchange(other.mProcessID, 0))
 		, mThread(std::exchange(other.mThread, nullptr))
 		, mThreadID(std::exchange(other.mThreadID, 0))
+#elifdef STRAWBERRY_TARGET_MAC
+#else
+		#error "No Implementation for Strawberry::Core::Process::Spawn!"
 #endif
 	{}
 
@@ -80,6 +121,10 @@ namespace Strawberry::Core
 #ifdef STRAWBERRY_TARGET_WINDOWS
 		if (mThread) CloseHandle(mThread);
 		if (mThread) CloseHandle(mProcess);
+#elifdef STRAWBERRY_TARGET_MAC
+		// Nothing required.
+#else
+		#error "No Implementation for Strawberry::Core::Process::Spawn!"
 #endif
 	}
 
@@ -88,6 +133,13 @@ namespace Strawberry::Core
 	{
 #ifdef STRAWBERRY_TARGET_WINDOWS
 		WaitForSingleObject(mProcess, INFINITE);
+#elifdef STRAWBERRY_TARGET_MAC
+		int status = 0;
+		pid_t result = waitpid(mPid, &status, 0);
+
+
+#else
+		#error "No Implementation for Strawberry::Core::Process::Spawn!"
 #endif
 	}
 }
