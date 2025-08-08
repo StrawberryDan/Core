@@ -4,6 +4,7 @@
 #include <thread>
 
 #include "Strawberry/Core/Sync/Mutex.hpp"
+#include "Strawberry/Core/Util/Ranges.hpp"
 using namespace Strawberry;
 using namespace Core;
 
@@ -57,7 +58,7 @@ void Test_LockFreeMPMCQueue()
 	std::set<int> results;
 
 
-	for (auto&& [i, batch] : std::views::enumerate(batches))
+	for (auto&& [i, batch] : Enumerate(batches))
 	{
 		pushingThreads[i] = std::thread([&, batch]
 		{

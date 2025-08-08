@@ -41,7 +41,7 @@ namespace Strawberry::Core
 			mTaskQueueCV.notify_one();
 			lock.unlock();
 
-			return future;
+			return std::move(future);
 		}
 
 
@@ -53,7 +53,8 @@ namespace Strawberry::Core
 			std::vector<std::future<T>> futures;
 			if constexpr (std::ranges::sized_range<Range>)
 			{
-				futures.reserve(tasks.size());
+				auto size = tasks.size();
+				futures.reserve(size);
 			}
 
 			std::unique_lock lock(mTaskQueueMutex);
@@ -75,7 +76,7 @@ namespace Strawberry::Core
 
 
 	private:
-		using PackagedTask = std::move_only_function<void()>;
+		using PackagedTask = std::packaged_task<void()>;
 		using TaskQueue = std::deque<PackagedTask>;
 
 
@@ -85,7 +86,7 @@ namespace Strawberry::Core
 			std::promise<T> promise;
 			auto future = promise.get_future();
 
-			PackagedTask packagedTask = [promise = std::move(promise), task = std::forward<F>(task)] mutable
+			PackagedTask packagedTask([promise = std::move(promise), task = std::forward<F>(task)] mutable
 			{
 				if constexpr (std::is_void_v<T>)
 				{
@@ -96,7 +97,7 @@ namespace Strawberry::Core
 				{
 					promise.set_value(std::invoke(task));
 				}
-			};
+			});
 
 			return std::make_pair(std::move(future), std::move(packagedTask));
 		}

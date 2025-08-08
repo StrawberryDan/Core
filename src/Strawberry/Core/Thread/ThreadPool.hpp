@@ -43,26 +43,25 @@ namespace Strawberry::Core
 		}
 
 
-		template <std::ranges::viewable_range Range, typename T = std::invoke_result_t<std::ranges::range_value_t<Range>>>
-		std::vector<std::future<T>> QueueTasks(Range&& tasks)
+		template <std::ranges::viewable_range Range, typename Input = std::ranges::range_value_t<Range>, typename Result = std::invoke_result_t<Input>>
+		std::vector<std::future<Result>> QueueTasks(Range&& tasks)
 		{
 			ZoneScoped;
 
 			unsigned int tasksEach = Math::CeilDiv(tasks.size(), mThreadCount);
-			auto batches = tasks
-				| std::views::chunk(tasksEach);
 
-			std::vector<std::future<T>> futures;
+			std::vector<std::future<Result>> futures;
 			if constexpr (std::ranges::sized_range<Range>)
 			{
 				futures.reserve(tasks.size());
 			}
 
 
-			for (auto&& batch : batches)
+			for (auto iter = tasks.begin(); iter != tasks.end(); std::advance(iter, tasksEach))
 			{
 				auto threadIndex = GetNextThreadIndex();
-				std::vector<std::future<T>> batchFutures = mWorkers[threadIndex].Queue(batch);
+				auto batch = std::ranges::subrange(iter, tasks.end()) | std::views::take(tasksEach);
+				std::vector<std::future<Result>> batchFutures = mWorkers[threadIndex].Queue(std::move(batch));
 				for (auto&& future : batchFutures)
 				{
 					futures.emplace_back(std::move(future));
