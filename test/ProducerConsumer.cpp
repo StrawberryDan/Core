@@ -52,13 +52,12 @@ void Test_LockFreeMPMCQueue()
 
 	std::thread pushingThreads[COUNT];
 	std::thread poppingThreads[COUNT];
-	auto batches = std::views::iota(0) | std::views::take(LIMIT) | std::views::chunk(LIMIT / COUNT);
+	auto batches = std::views::iota(0) | std::views::take(LIMIT) | Chunk(LIMIT / COUNT);
 
 	Spinlock resultsLock;
 	std::set<int> results;
 
-
-	for (auto&& [i, batch] : Enumerate(batches))
+	for (auto&& [i, batch] : batches | Enumerate())
 	{
 		pushingThreads[i] = std::thread([&, batch]
 		{

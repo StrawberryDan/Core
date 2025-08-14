@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <ranges>
 
 
@@ -8,48 +9,41 @@ namespace Strawberry::Core
         : public std::ranges::range_adaptor_closure<Chunk>
     {
     public:
-        Chunk(unsigned chunkSize)
-            : mSize(chunkSize)
+        Chunk(unsigned int chunkSize)
+            : mChunkSize(chunkSize)
         {}
 
 
         template <std::ranges::range Range>
-        class ChunkedRange
-            : public std::ranges::view_interface<ChunkedRange<Range>>
+        constexpr auto operator()(Range range) const
         {
-            using Iter = std::ranges::iterator_t<Range>;
+            std::vector<std::vector<std::ranges::range_value_t<Range>>> results;
 
-
-            ChunkedRange(Range range)
-                : mInput(std::move(range))
-            {}
-
-
-            Iter begin() const
+            if constexpr (std::ranges::sized_range<Range>)
             {
-                return Iter(mInput.begin());
+                results.resize(CeilDiv(std::ranges::size(range), mChunkSize));
             }
 
-
-            Iter end() const
+            int i = 0;
+            for (auto&& v : range)
             {
-                return Iter(mInput.begin());
+                if constexpr (!std::ranges::sized_range<Range>)
+                {
+                    if (results.size() <= i / mChunkSize)
+                    {
+                        results.emplace_back();
+                    }
+                }
+
+                results[i / mChunkSize].emplace_back(v);
+                i++;
             }
 
-
-        private:
-            Range mInput;
-        };
-
-
-        template <std::ranges::range Range>
-        constexpr ChunkedRange<Range> operator()(Range range) const
-        {
-            return ChunkedRange(std::move(range));
+            return results;
         }
 
     private:
-        unsigned mSize;
+        unsigned mChunkSize;
     };
 
 
@@ -60,7 +54,7 @@ namespace Strawberry::Core
         template <std::ranges::range Range>
         constexpr auto operator()(Range range) const
         {
-            return std::views::zip(std::views::iota(0), range);
+            return std::views::zip(std::views::iota(0), std::move(range));
         }
     };
 }
