@@ -137,8 +137,7 @@ namespace Strawberry::Core::Math::Noise
 		const float b = Smoothstep(grid[1][0], grid[1][1], phaseRatioX);
 		const float c = Smoothstep(a, b, phaseRatioY);
 
-		Core::Assert(std::isfinite(c));
-		return c;
+		return std::isfinite(c) ? c : 0.0f;
 	}
 
 	float Perlin::VectorNoise(Vec2f samplePosition, Vec2i gridPosition) const
