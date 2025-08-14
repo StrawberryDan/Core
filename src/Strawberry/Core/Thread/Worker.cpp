@@ -24,11 +24,12 @@ namespace Strawberry::Core
 		mRunningFlag = false;
 
 		std::unique_lock lock(mTaskQueueMutex);
-		mTaskQueueCV.notify_one();
-		lock.unlock();
+		mTaskQueue.clear();
 
 		if (mThread.joinable())
 		{
+			mTaskQueueCV.notify_one();
+			lock.unlock();
 			mThread.join();
 		}
 	}
@@ -47,6 +48,7 @@ namespace Strawberry::Core
 
 			for (auto&& task : tasks)
 			{
+				if (!mRunningFlag) return;
 				std::invoke(task);
 			}
 

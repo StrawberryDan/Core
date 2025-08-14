@@ -35,7 +35,7 @@ namespace Strawberry::Core
 
 
 		template <typename F, typename T = std::invoke_result_t<F>>
-		std::future<T> QueueTask(F&& task)
+		QueueResult<PendingTask<T>> QueueTask(F&& task)
 		{
 			ZoneScoped;
 
@@ -44,7 +44,7 @@ namespace Strawberry::Core
 
 
 		template <std::ranges::viewable_range Range, typename Input = std::ranges::range_value_t<Range>, typename Result = std::invoke_result_t<Input>>
-		std::vector<std::future<Result>> QueueTasks(Range&& tasks)
+		QueueResult<PendingTaskList<Result>> QueueTasks(Range&& tasks)
 		{
 			ZoneScoped;
 
@@ -61,8 +61,13 @@ namespace Strawberry::Core
 			{
 				auto threadIndex = GetNextThreadIndex();
 				auto batch = std::ranges::subrange(iter, tasks.end()) | std::views::take(tasksEach);
-				std::vector<std::future<Result>> batchFutures = mWorkers[threadIndex].Queue(std::move(batch));
-				for (auto&& future : batchFutures)
+				auto batchFutures = mWorkers[threadIndex].Queue(std::move(batch));
+				if (!batchFutures)
+				{
+					return batchFutures;
+				}
+
+				for (auto&& future : batchFutures.Unwrap())
 				{
 					futures.emplace_back(std::move(future));
 				}
@@ -74,7 +79,7 @@ namespace Strawberry::Core
 
 
 		template <std::unsigned_integral T, size_t D, typename F, typename R = std::invoke_result_t<F, Math::Vector<T, D>>>
-		[[nodiscard]] std::vector<std::pair<Math::Vector<T, D>, std::future<R>>> QueueTasks(Math::Vector<T, D> input, F&& function)
+		[[nodiscard]] QueueResult<std::vector<std::pair<Math::Vector<T, D>, std::future<R>>>> QueueTasks(Math::Vector<T, D> input, F&& function)
 		{
 			ZoneScoped;
 
@@ -91,7 +96,13 @@ namespace Strawberry::Core
 					return std::bind(function, x);
 				});
 
-			auto packaged = std::views::zip(inputs, QueueTasks(std::move(tasks)));
+			auto queueResult = QueueTasks(std::move(tasks));
+			if (!queueResult)
+			{
+				return queueResult.Err();
+			}
+
+			auto packaged = std::views::zip(inputs, queueResult.Unwrap());
 			for (auto&& [x, future] : packaged)
 			{
 				futures.emplace_back(std::move(x), std::move(future));

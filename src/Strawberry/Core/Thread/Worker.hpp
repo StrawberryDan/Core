@@ -8,12 +8,35 @@
 #include <future>
 #include <thread>
 
+#include "Strawberry/Core/Types/Result.hpp"
+#include "Strawberry/Core/Types/Variant.hpp"
 
 
 namespace Strawberry::Core
 {
 	template<typename T = void>
 	using Task = std::function<T()>;
+
+	template <typename T>
+	using PendingTask = std::future<T>;
+
+	template <typename T>
+	using PendingTaskList = std::vector<PendingTask<T>>;
+
+	class QueueError
+	{
+	public:
+		struct Interupted {};
+
+		template <typename T>
+		QueueError(T&& x) : mError(std::forward<T>(x)) {}
+
+	private:
+		Core::Variant<Interupted> mError;
+	};
+
+	template <typename R>
+	using QueueResult = Result<R, QueueError>;
 
 
 	class Worker
@@ -24,13 +47,11 @@ namespace Strawberry::Core
 		Worker(Worker&&) = delete;
 		Worker& operator=(const Worker&) = delete;
 		Worker& operator=(Worker&&) = delete;
-
-
 		~Worker();
 
 
 		template <typename F, typename T = std::invoke_result_t<F>>
-		std::future<T> Queue(F&& task)
+		QueueResult<PendingTask<T>> Queue(F&& task)
 		{
 			ZoneScoped;
 
@@ -46,8 +67,7 @@ namespace Strawberry::Core
 
 
 		template <std::ranges::viewable_range Range, typename T = std::invoke_result_t<std::ranges::range_value_t<Range>>>
-		std::vector<std::future<T>> Queue(Range&& tasks)
-		{
+		QueueResult<PendingTaskList<T>> Queue(Range&& tasks) {
 			ZoneScoped;
 
 			std::vector<std::future<T>> futures;
@@ -57,15 +77,28 @@ namespace Strawberry::Core
 				futures.reserve(size);
 			}
 
-			std::unique_lock lock(mTaskQueueMutex);
-			for (Task<T>&& task : tasks)
+
+			std::unique_lock lock(mTaskQueueMutex, std::defer_lock);
+			while (true)
 			{
-				auto [future, packagedTask] = PackageTask(std::move(task));
-				mTaskQueue.emplace_back(std::move(packagedTask));
-				futures.emplace_back(std::move(future));
+				if (lock.try_lock())
+				{
+					for (Task<T>&& task : tasks)
+					{
+						auto [future, packagedTask] = PackageTask(std::move(task));
+						mTaskQueue.emplace_back(std::move(packagedTask));
+						futures.emplace_back(std::move(future));
+					}
+					mTaskQueueCV.notify_one();
+					lock.unlock();
+					break;
+				}
+
+				if (!mRunningFlag)
+				{
+					return QueueError::Interupted{};
+				}
 			}
-			mTaskQueueCV.notify_one();
-			lock.unlock();
 
 			return futures;
 		}
