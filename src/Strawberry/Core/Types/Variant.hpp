@@ -6,10 +6,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Core
 #include "Optional.hpp"
+#include "Overload.hpp"
 // Standard Library
 #include <concepts>
 #include <functional>
-#include <unordered_map>
 
 
 //======================================================================================================================
@@ -245,11 +245,12 @@ namespace Strawberry::Core
 		template <typename F>
 		decltype(auto) Visit(this auto&& self, F&& functor)
 		{
-			using Arg = typename std::tuple_element<0, std::tuple<Ts...>>::type;
-			using Ret = std::invoke_result_t<F, Arg>;
+			using Arg = std::tuple_element<0, std::tuple<Ts...>>::type;
 
 			if constexpr (std::same_as<const Variant&, decltype(self)>)
 			{
+				using Ret = std::invoke_result_t<F, const Arg&>;
+
 				using FN  = Ret(*)(const void*, F&&);
 				static constexpr FN sDispatchTable[] = { [](const void* data, F&& functor) -> Ret
 				{
@@ -260,6 +261,8 @@ namespace Strawberry::Core
 			}
 			else
 			{
+				using Ret = std::invoke_result_t<F, Arg&>;
+
 				using FN  = Ret(*)(void*, F&&);
 				static constexpr FN sDispatchTable[] = { [](void* data, F&& functor) -> Ret
 				{
@@ -268,6 +271,13 @@ namespace Strawberry::Core
 
 				return std::invoke(sDispatchTable[self.mTypeIndex], reinterpret_cast<void*>(self.mData), std::forward<F>(functor));
 			}
+		}
+
+
+		template <typename... Fs> requires (sizeof...(Fs) > 1)
+		decltype(auto) Visit(this auto&& self, Fs&&... fs)
+		{
+			return self.Visit(Overload(std::forward<Fs>(fs)...));
 		}
 
 
