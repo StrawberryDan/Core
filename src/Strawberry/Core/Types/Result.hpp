@@ -21,11 +21,11 @@ namespace Strawberry::Core
 		template <typename T>
 		Result(T&& t)
 		{
-			if constexpr (std::same_as<D, std::decay_t<T>> || std::constructible_from<D, decltype(t)> && !std::constructible_from<E, decltype(t)>)
+			if constexpr (std::same_as<D, std::decay_t<T>> || (std::constructible_from<D, decltype(t)> && !std::constructible_from<E, decltype(t)>))
 			{
 				mPayload = D(std::forward<T>(t));
 			}
-			else if constexpr (std::same_as<E, std::decay_t<T>> || std::constructible_from<E, decltype(t)> && !std::constructible_from<D, decltype(t)>)
+			else if constexpr (std::same_as<E, std::decay_t<T>> || (std::constructible_from<E, decltype(t)> && !std::constructible_from<D, decltype(t)>))
 			{
 				mPayload = E(std::forward<T>(t));
 			}
