@@ -11,7 +11,7 @@ namespace Strawberry::Core::Math::Noise
 	{
 	public:
 		// Creates a new noise signal with the given seed and period.
-		Linear(int seed, float period);
+		Linear(uint64_t seed, float period);
 
 
 		float Amplitude() const { return 1.0f; }
@@ -27,7 +27,7 @@ namespace Strawberry::Core::Math::Noise
 
 
 		// The seed for this signal
-		unsigned int mSeed;
+		uint64_t mSeed;
 		// The orthogonal distance between two white noise values in input space
 		float    mPeriod;
 	};
@@ -38,7 +38,7 @@ namespace Strawberry::Core::Math::Noise
 	{
 	public:
 		// Creates a new noise signal with the given seed and period.
-		SmoothLinear(int seed, float period);
+		SmoothLinear(uint64_t seed, float period);
 
 
 		float Amplitude() const { return 1.0f; }
@@ -54,7 +54,7 @@ namespace Strawberry::Core::Math::Noise
 
 
 		// The seed for this signal
-		unsigned int mSeed;
+		uint64_t mSeed;
 		// The orthogonal distance between two white noise values in input space
 		float    mPeriod;
 	};
@@ -64,7 +64,7 @@ namespace Strawberry::Core::Math::Noise
 	{
 	public:
 		// Creates a new noise signal with the given seed and period.
-		Perlin(int seed, float period);
+		Perlin(uint64_t seed, float period);
 
 
 		float Amplitude() const { return 1.0f; }
@@ -80,7 +80,7 @@ namespace Strawberry::Core::Math::Noise
 
 
 		// The seed for this signal
-		unsigned int mSeed;
+		uint64_t mSeed;
 		// The orthogonal distance between two white noise values in input space
 		float    mPeriod;
 	};

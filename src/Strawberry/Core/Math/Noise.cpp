@@ -5,7 +5,7 @@
 
 namespace Strawberry::Core::Math::Noise
 {
-	Linear::Linear(int seed, float period)
+	Linear::Linear(uint64_t seed, float period)
 			: mSeed(seed)
 			, mPeriod(period)
 	{}
@@ -55,7 +55,7 @@ namespace Strawberry::Core::Math::Noise
 	}
 
 
-	SmoothLinear::SmoothLinear(int seed, float period)
+	SmoothLinear::SmoothLinear(uint64_t seed, float period)
 			: mSeed(seed)
 			, mPeriod(period)
 	{}
@@ -105,7 +105,7 @@ namespace Strawberry::Core::Math::Noise
 	}
 
 
-	Perlin::Perlin(int seed, float period)
+	Perlin::Perlin(uint64_t seed, float period)
 		: mSeed(seed)
 		, mPeriod(period)
 	{}

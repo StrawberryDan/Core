@@ -48,7 +48,7 @@ namespace Strawberry::Core
 		{
 			ZoneScoped;
 
-			unsigned int tasksEach = Math::CeilDiv(tasks.size(), mThreadCount);
+			unsigned long tasksEach = Math::CeilDiv(tasks.size(), mThreadCount);
 
 			std::vector<std::future<Result>> futures;
 			if constexpr (std::ranges::sized_range<Range>)
