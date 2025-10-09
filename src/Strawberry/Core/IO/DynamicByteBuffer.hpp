@@ -29,6 +29,20 @@ namespace Strawberry::Core::IO
 		static DynamicByteBuffer                                         Zeroes(size_t len);
 		static DynamicByteBuffer                                         WithCapacity(size_t len);
 
+		template <typename Arg, typename... Args>
+		static constexpr DynamicByteBuffer FromObjects(Arg&& arg, Args&&... args)
+		{
+			DynamicByteBuffer buffer;
+
+			buffer.Push(std::forward<Arg>(arg));
+			if constexpr (sizeof...(args) > 0)
+			{
+				buffer.Push(FromObjects(std::forward<Args>(args)...));
+			}
+
+			return buffer;
+		}
+
 
 		// Constructors
 		DynamicByteBuffer() = default;
