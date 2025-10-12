@@ -168,7 +168,7 @@ namespace Strawberry::Core::IO
 		std::array<uint8_t, N> AsArray() const;
 
 		template<typename T = uint8_t>
-		inline std::vector<T> AsVector() const;
+		std::vector<T> AsVector() const;
 
 		[[nodiscard]] std::string AsString() const;
 
