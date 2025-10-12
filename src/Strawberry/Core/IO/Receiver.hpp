@@ -5,10 +5,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Core
 #include "Strawberry/Core/Sync/Mutex.hpp"
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
 // Standard Library
 #include <set>
 
-#include "Strawberry/Core/Types/ReflexivePointer.hpp"
 
 //======================================================================================================================
 //  Foreward Declarations
