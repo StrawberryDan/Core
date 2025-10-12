@@ -5,6 +5,7 @@
 // Core
 #include "Vector.hpp"
 #include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
 // Standard Library
 #include <algorithm>
 #include <array>
@@ -19,6 +20,10 @@ namespace Strawberry::Core::Math
 	class Matrix
 	{
 	public:
+		constexpr static size_t COLUMNS = W;
+		constexpr static size_t ROWS = H;
+
+
 		/// Produced a matrix of all zeros;
 		constexpr static Matrix Zeroed() noexcept
 		{
@@ -158,6 +163,80 @@ namespace Strawberry::Core::Math
 		constexpr Vector<T, W> operator*(const Vector<T, W>& vector) const noexcept
 		{
 			return Vector((*this) * Matrix<T, 1, W>(vector));
+		}
+
+
+		Optional<Matrix> Inverse() const requires std::floating_point<T> && (W == H)
+		{
+			// Gaussian Elimination
+			struct AugmentedMatrix
+			{
+				AugmentedMatrix(Matrix matrix)
+					: original(matrix)
+					, augmentation(Matrix()) {}
+
+
+				T& operator[](unsigned int column, unsigned int row)
+				{
+					if (column >= COLUMNS)
+					{
+						return augmentation[column - COLUMNS][ row];
+					}
+					else
+					{
+						return original[column][row];
+					}
+				}
+
+
+				void MultiplyRow(unsigned rowIndex, T value)
+				{
+					for (int i = 0; i < 2 * COLUMNS; i++)
+					{
+						(*this)[i, rowIndex] *= value;
+					}
+				}
+
+
+				void AddRows(unsigned subject, T multiplier, unsigned operand)
+				{
+					for (int i = 0; i < 2 * COLUMNS; i++)
+					{
+						(*this)[i, subject] = (*this)[i, subject] + multiplier * (*this)[i, operand];
+					}
+				}
+
+
+				void ResolveColumn(unsigned int columnIndex)
+				{
+					MultiplyRow(columnIndex, 1.0 / (*this)[columnIndex, columnIndex]);
+					for (int i = 0; i < ROWS; i++)
+					{
+						if (i != columnIndex)
+						{
+							AddRows(i, -(*this)[columnIndex, i], columnIndex);
+						}
+					}
+				}
+
+
+				Matrix Resolve()
+				{
+					for (int i = 0; i < COLUMNS; i++)
+					{
+						ResolveColumn(i);
+					}
+
+					return augmentation;
+				}
+
+
+				Matrix original;
+				Matrix augmentation;
+			};
+
+
+			return AugmentedMatrix(*this).Resolve();
 		}
 
 
