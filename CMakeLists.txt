@@ -173,4 +173,8 @@ if (NOT TARGET StrawberryCore)
 	)
 endif()
 
+    # Setup LLDB for type summaries
+    set(STRAWBERRY_CORE_TYPE_FORMATTERS ${CMAKE_CURRENT_SOURCE_DIR}/share/TypeRenderers.py)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/share/.lldbinit ${CMAKE_CURRENT_SOURCE_DIR}/.lldbinit)
+
 
