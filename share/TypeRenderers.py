@@ -3,17 +3,12 @@ import re
 
 
 def VectorSummary(vector, dict, options):
-    typename = vector.GetType().GetCanonicalType().GetName()
-    template_args = re.search('Vector<(.+),(.+)>', typename)
-    valueType = template_args.group(1)
-    vectorSize = int(template_args.group(2))
-
     arrayValue = vector.GetChildMemberWithName("mValue")
 
     summary = "["
     for i in range(arrayValue.GetNumChildren()):
         summary += arrayValue.GetChildAtIndex(i).GetValue()
-        if i != vectorSize - 1:
+        if i != arrayValue.GetNumChildren() - 1:
             summary += ", "
     summary += "]"
 
@@ -22,13 +17,7 @@ def VectorSummary(vector, dict, options):
 
 
 def MatrixSummary(value, dict, options):
-    summary = ""
-
-    typename = value.GetType().GetCanonicalType().GetName()
-    template_args = re.search('Matrix<(.+),(.+),(.+)>', typename)
-    valueType = template_args.group(1)
-    width = int(template_args.group(2))
-    height = int(template_args.group(3))
+    summary = "["
 
     arrayValue = value.GetChildMemberWithName("mValue")
     for i in range(arrayValue.GetNumChildren()):
@@ -36,7 +25,9 @@ def MatrixSummary(value, dict, options):
             summary += arrayValue.GetChildAtIndex(i).GetChildAtIndex(j).GetValue()
             if j < arrayValue.GetChildAtIndex(i).GetNumChildren() - 1:
                 summary += ", "
-        summary += "    "
+        summary += "] "
+        if i != arrayValue.GetNumChildren() - 1:
+            summary += "["
 
     return summary
 
