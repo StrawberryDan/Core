@@ -32,9 +32,19 @@ def MatrixSummary(value, dict, options):
     return summary
 
 
+def OptionalSummary(value, dict, options):
+    has_value = value.GetChildMemberWithName("mHasValue").GetValue() == "true"
+
+    if has_value:
+        return "value.GetChildAtIndex(1).GetChildAtIndex(0).GetValue()
+    else:
+        return "None"
+
+
 
 
 def __lldb_init_module(debugger, _dict):
+    debugger.HandleCommand('type summary add -C true -w Strawberry -F TypeRenderers.OptionalSummary -x Strawberry::Core::Optional<.+>')
     debugger.HandleCommand('type summary add -C true -w Strawberry -F TypeRenderers.VectorSummary -x Strawberry::Core::Math::Vector<.+>')
     debugger.HandleCommand('type summary add -C true -w Strawberry -F TypeRenderers.MatrixSummary -x Strawberry::Core::Math::Matrix<.+>')
     debugger.HandleCommand('type category enable Strawberry')
