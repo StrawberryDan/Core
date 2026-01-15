@@ -1,15 +1,14 @@
 #pragma once
 // Strawberry Core
 #include "Strawberry/Core/Sync/Mutex.hpp"
+#include "Strawberry/Core/Types/Result.hpp"
+#include "Strawberry/Core/Types/Variant.hpp"
 // Standard Library
 #include <atomic>
 #include <deque>
 #include <functional>
 #include <future>
 #include <thread>
-
-#include "Strawberry/Core/Types/Result.hpp"
-#include "Strawberry/Core/Types/Variant.hpp"
 
 
 namespace Strawberry::Core
