@@ -126,10 +126,6 @@ if (NOT TARGET StrawberryCore)
             src/Strawberry/Core/Util/Ranges.hpp
             src/Strawberry/Core/Util/STBImplementations.cpp
             src/Strawberry/Core/Util/Strings.hpp
-            src/Strawberry/Core/Math/Geometry/AABB.hpp
-            src/Strawberry/Core/Math/Geometry/Delaunay.hpp
-            src/Strawberry/Core/Math/Geometry/Plane.hpp
-            src/Strawberry/Core/Math/Geometry/Simplex.hpp
     )
 
 
