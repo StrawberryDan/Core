@@ -1,6 +1,7 @@
 #pragma once
 // Standard Library
 #include <concepts>
+#include <limits>
 
 
 namespace Strawberry::Core::Math
@@ -50,5 +51,74 @@ namespace Strawberry::Core::Math
 #else
 #error "No implementation for CheckedMultiplication for this compiler"
 #endif
+	}
+
+	template <std::integral T>
+	constexpr T SaturatingAddition(T a, T b) noexcept
+	{
+		CheckedResult<T> result = CheckedAddition(a, b);
+		if (result.overflow)
+		{
+			if constexpr (std::unsigned_integral<T>)
+			{
+				return std::numeric_limits<T>::max();
+			}
+			else
+			{
+				return (b > 0)
+					? std::numeric_limits<T>::max()
+					: std::numeric_limits<T>::lowest();
+			}
+		}
+		else
+		{
+			return result.value;
+		}
+	}
+
+	template <std::integral T>
+	constexpr T SaturatingSubtraction(T a, T b) noexcept
+	{
+		CheckedResult<T> result = CheckedSubtraction<T>(a, b);
+		if (result.overflow)
+		{
+			if constexpr (std::unsigned_integral<T>)
+			{
+				return 0;
+			}
+			else
+			{
+				return (b > 0)
+					? std::numeric_limits<T>::lowest()
+					: std::numeric_limits<T>::max();
+			}
+		}
+		else
+		{
+			return result.value;
+		}
+	}
+
+	template <std::integral T>
+	constexpr T SaturatingMultiplication(T a, T b) noexcept
+	{
+		CheckedResult<T> result = CheckedMultiplication<T>(a, b);
+		if (result.overflow)
+		{
+			if constexpr (std::unsigned_integral<T>)
+			{
+				return std::numeric_limits<T>::max();
+			}
+			else
+			{
+				return (b > 0)
+					? std::numeric_limits<T>::max()
+					: std::numeric_limits<T>::lowest();
+			}
+		}
+		else
+		{
+			return result.value;
+		}
 	}
 }
