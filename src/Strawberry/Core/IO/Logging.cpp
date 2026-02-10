@@ -1,9 +1,11 @@
+// Strawberry Core
 #include "Strawberry/Core/IO/Logging.hpp"
-
 #include "Strawberry/Core/Types/Optional.hpp"
+// Standard Library
 #include <fstream>
-#include <utility>
+#include <iostream>
 #include <mutex>
+#include <utility>
 
 
 namespace Strawberry::Core
