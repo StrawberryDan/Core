@@ -77,6 +77,7 @@ if (NOT TARGET StrawberryCore)
             src/Strawberry/Core/IO/Receiver.hpp
             src/Strawberry/Core/Markers.cpp
             src/Strawberry/Core/Markers.hpp
+	    src/Strawberry/Core/Math/Checked.hpp
             src/Strawberry/Core/Math/Clamped.hpp
             src/Strawberry/Core/Math/Math.hpp
             src/Strawberry/Core/Math/Math.inl
@@ -157,6 +158,7 @@ if (NOT TARGET StrawberryCore)
     new_strawberry_tests(NAME "StrawberryCore" TESTS
             test/Base64.cpp
             test/ChannelBroadcaster.cpp
+	    test/Checked.cpp
             test/ClampedNumbers.cpp
             test/DynamicByteBuffer.cpp
             test/Matrices.cpp
