@@ -1,9 +1,11 @@
 #pragma once
+// Standard Library
+#include <concepts>
 
 
 namespace Strawberry::Core::Math
 {
-	template <typename T>
+	template <std::integral T>
 	struct CheckedResult
 	{
 	bool overflow;
@@ -14,7 +16,7 @@ namespace Strawberry::Core::Math
 	};
 
 
-	template <typename T>
+	template <std::integral T>
 	constexpr CheckedResult<T> CheckedAddition(T a, T b) noexcept
 	{
 #if STRAWBERRY_COMPILER_GCC || STRAWBERRY_COMPILER_CLANG
@@ -26,7 +28,7 @@ namespace Strawberry::Core::Math
 #endif
 	}
 
-	template <typename T>
+	template <std::integral T>
 	constexpr CheckedResult<T> CheckedSubtraction(T a, T b) noexcept
 	{
 #if STRAWBERRY_COMPILER_GCC || STRAWBERRY_COMPILER_CLANG
@@ -38,7 +40,7 @@ namespace Strawberry::Core::Math
 #endif
 	}
 
-	template <typename T>
+	template <std::integral T>
 	constexpr CheckedResult<T> CheckedMultiplication(T a, T b) noexcept
 	{
 #if STRAWBERRY_COMPILER_GCC || STRAWBERRY_COMPILER_CLANG
