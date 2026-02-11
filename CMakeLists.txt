@@ -89,8 +89,8 @@ if (NOT TARGET StrawberryCore)
             src/Strawberry/Core/Math/Transformations.hpp
             src/Strawberry/Core/Math/Units.hpp
             src/Strawberry/Core/Math/Vector.hpp
-            src/Strawberry/Core/Process.cpp
-            src/Strawberry/Core/Process.hpp
+            src/Strawberry/Core/IO/Process.cpp
+            src/Strawberry/Core/IO/Process.hpp
             src/Strawberry/Core/Sync/ConditionVariable.cpp
             src/Strawberry/Core/Sync/ConditionVariable.hpp
             src/Strawberry/Core/Sync/Mutex.hpp
