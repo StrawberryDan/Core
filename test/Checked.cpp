@@ -31,7 +31,6 @@ int main()
 	AssertEQ(e.overflow, true);
 
 	auto f = CheckedMultiplication<uint8_t>(255, 2);
-	Logging::Info("{}", f.value);
 	AssertEQ(f.value, 254);
 	AssertEQ(f.overflow, true);
 
