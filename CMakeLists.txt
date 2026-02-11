@@ -103,20 +103,14 @@ if (NOT TARGET StrawberryCore)
             src/Strawberry/Core/Thread/Worker.cpp
             src/Strawberry/Core/Thread/Worker.hpp
             src/Strawberry/Core/Traits.hpp
-            src/Strawberry/Core/Types/CopyOnWrite.hpp
             src/Strawberry/Core/Types/Date.cpp
             src/Strawberry/Core/Types/Date.hpp
-            src/Strawberry/Core/Types/Delayed.hpp
-            src/Strawberry/Core/Types/DynamicValue.hpp
-            src/Strawberry/Core/Types/Lazy.hpp
-            src/Strawberry/Core/Types/Lazy.hpp
             src/Strawberry/Core/Types/NullValue.hpp
             src/Strawberry/Core/Types/Optional.hpp
             src/Strawberry/Core/Types/Overload.hpp
             src/Strawberry/Core/Types/ReflexivePointer.hpp
             src/Strawberry/Core/Types/Result.hpp
             src/Strawberry/Core/Types/TypeSet.hpp
-            src/Strawberry/Core/Types/Uninitialised.hpp
             src/Strawberry/Core/Types/Variant.hpp
             src/Strawberry/Core/UTF.cpp
             src/Strawberry/Core/UTF.hpp
@@ -168,7 +162,6 @@ if (NOT TARGET StrawberryCore)
             test/ProducerConsumer.cpp
             test/TypeSets.cpp
             test/UTF.cpp
-            test/Uninitialised.cpp
             test/Variants.cpp
             test/Vectors.cpp
     )
