@@ -14,7 +14,7 @@ int main()
 	Reader<IO::DynamicByteBuffer> byteBufferReader(byteBuffer);
 	Writer<IO::DynamicByteBuffer> byteBufferWriter(byteBuffer);
 
-	byteBufferWriter.Write(IO::DynamicByteBuffer('u')).Unwrap();
+	byteBufferWriter.Write(IO::DynamicByteBuffer::FromObjects<char>('u')).Unwrap();
 
 	auto read = byteBufferReader.Read(1).Unwrap();
 	AssertEQ(read.Into<char>(), 'u');
