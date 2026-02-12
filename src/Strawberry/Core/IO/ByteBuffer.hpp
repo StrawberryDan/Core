@@ -72,7 +72,7 @@ namespace Strawberry::Core::IO
 		[[nodiscard]] DynamicByteBuffer ToDynamic() const;
 
 	private:
-		std::array<uint8_t, S> mData;
+		std::array<uint8_t, S> mData = {0};
 	};
 
 
