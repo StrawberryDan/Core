@@ -48,8 +48,6 @@ namespace Strawberry::Core::IO
 		DynamicByteBuffer() = default;
 		template<typename T>
 		DynamicByteBuffer(const T* data, size_t len);
-		template<typename T>
-		explicit DynamicByteBuffer(const T& object);
 		DynamicByteBuffer(const std::string& string);
 
 
@@ -182,11 +180,6 @@ namespace Strawberry::Core::IO
 template<typename T>
 Strawberry::Core::IO::DynamicByteBuffer::DynamicByteBuffer(const T* data, size_t len)
 	: mData(reinterpret_cast<const uint8_t*>(data), reinterpret_cast<const uint8_t*>(data) + len) {}
-
-
-template<typename T>
-Strawberry::Core::IO::DynamicByteBuffer::DynamicByteBuffer(const T& object)
-	: mData(reinterpret_cast<const uint8_t*>(&object), reinterpret_cast<const uint8_t*>(&object) + sizeof(T)) {}
 
 
 template<typename T>
