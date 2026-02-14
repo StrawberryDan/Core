@@ -121,6 +121,17 @@ std::string Strawberry::Core::IO::DynamicByteBuffer::AsString() const
 }
 
 
+std::string Strawberry::Core::IO::DynamicByteBuffer::AsHexString() const
+{
+	std::string str;
+	for (auto byte : mData)
+	{
+		str = fmt::format("{}{:x}", str, byte);
+	}
+	return str;
+}
+
+
 void Strawberry::Core::IO::DynamicByteBuffer::Overwrite(size_t offset, const uint8_t* data, size_t len)
 {
 	for (size_t i = 0; i < len; ++i)

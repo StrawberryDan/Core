@@ -170,6 +170,9 @@ namespace Strawberry::Core::IO
 
 		[[nodiscard]] std::string AsString() const;
 
+
+		[[nodiscard]] std::string AsHexString() const;
+
 	private:
 		std::vector<uint8_t> mData;
 		size_t               mReadCursor = 0;
