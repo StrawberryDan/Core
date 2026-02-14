@@ -57,7 +57,7 @@ namespace Strawberry::Core
 			else
 				Assert(a == b, message);
 		}
-		else Assert(a == b);
+		else Assert(a == b, message);
 	}
 
 
@@ -71,7 +71,7 @@ namespace Strawberry::Core
 			else
 				Assert(a != b, message);
 		}
-		else Assert(a != b);
+		else Assert(a != b, message);
 	}
 
 
