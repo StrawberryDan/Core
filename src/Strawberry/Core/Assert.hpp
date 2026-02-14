@@ -4,6 +4,9 @@
 // Core
 #include "Strawberry/Core/IO/Logging.hpp"
 #include "Strawberry/Core/Markers.hpp"
+// Libfmt
+#include "fmt/base.h"
+#include "fmt/format.h"
 // Standard Library
 #include <csignal>
 #include <cstddef>
@@ -14,7 +17,7 @@
 
 namespace Strawberry::Core
 {
-	constexpr void Assert([[maybe_unused]] bool value)
+	constexpr void Assert([[maybe_unused]] bool value, std::string message = "")
 	{
 #if STRAWBERRY_DEBUG
 		if (!value)
@@ -28,7 +31,14 @@ namespace Strawberry::Core
 					[](auto&& x, auto&& y) { return x + "\n" + y; }).value_or("N/A");
 			std::cout << fmt::format("Assertion failed at \n{}!", trace) << std::endl;
 #else
-			Logging::Error("Assertion failed!");
+			if (message.empty())
+			{
+				Logging::Error("Assertion failed!");
+			}
+			else
+			{
+				Logging::Error("Assertion failed: {}", message);
+			}
 #endif
 			DebugBreak();
 			std::terminate();
@@ -38,21 +48,35 @@ namespace Strawberry::Core
 
 
 	template<typename A, typename B>
-	constexpr void AssertEQ([[maybe_unused]] A a, [[maybe_unused]] B b)
+	constexpr void AssertEQ([[maybe_unused]] A a, [[maybe_unused]] B b, std::string message = "")
 	{
-		Assert(a == b);
+		if constexpr (fmt::is_formattable<A>::value && fmt::is_formattable<B>::value)
+		{
+			if (message.empty())
+				Assert(a == b, fmt::format("Expected {} == {}", a, b));
+			else
+				Assert(a == b, message);
+		}
+		else Assert(a == b);
 	}
 
 
 	template<typename A, typename B>
-	constexpr void AssertNEQ([[maybe_unused]] A a, [[maybe_unused]] B b)
+	constexpr void AssertNEQ([[maybe_unused]] A a, [[maybe_unused]] B b, std::string message = "")
 	{
-		Assert(a != b);
+		if constexpr (fmt::is_formattable<A>::value && fmt::is_formattable<B>::value)
+		{
+			if (message.empty())
+				Assert(a != b, fmt::format("Expected {} != {}", a, b));
+			else
+				Assert(a != b, message);
+		}
+		else Assert(a != b);
 	}
 
 
-	constexpr void AssertImplication(bool a, bool b)
+	constexpr void AssertImplication(bool a, bool b, std::string message = "")
 	{
-		Assert(!a || b);
+		Assert(!a || b, message);
 	}
 } // namespace Strawberry::Core
