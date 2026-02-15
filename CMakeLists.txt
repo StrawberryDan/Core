@@ -166,6 +166,7 @@ src/Strawberry/Core/Math/Checked.hpp
     test/PeriodicNumbers.cpp
     test/Plane.cpp
     test/ProducerConsumer.cpp
+    test/Simplex.cpp
     test/Sphere.cpp
     test/TypeSets.cpp
     test/UTF.cpp
