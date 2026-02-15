@@ -20,7 +20,7 @@ namespace Strawberry::Core::Math
 
 
 		Plane(const Vector<T, D>& normal, T dotProduct)
-			: mNormal(normal) , mDotProduct(dotProduct) {}
+			: mNormal(normal.Normalised()) , mDotProduct(dotProduct) {}
 
 
 	private:
