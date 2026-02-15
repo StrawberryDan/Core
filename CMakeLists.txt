@@ -163,6 +163,7 @@ src/Strawberry/Core/Math/Checked.hpp
     test/Optional.cpp
     test/PeriodicNumbers.cpp
     test/ProducerConsumer.cpp
+    test/Sphere.cpp
     test/TypeSets.cpp
     test/UTF.cpp
     test/Variants.cpp
