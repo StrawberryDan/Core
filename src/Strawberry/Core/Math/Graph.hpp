@@ -2,7 +2,9 @@
 
 #include "Strawberry/Core/IO/Logging.hpp"
 #include "fmt/ranges.h"
+#include <algorithm>
 #include <array>
+#include <deque>
 #include <type_traits>
 #include <vector>
 
@@ -31,6 +33,24 @@ namespace Strawberry::Core::Math
 	class Graph
 	{
 	public:
+		struct Edge
+		{
+			Edge(unsigned int a, unsigned int b) : nodes{ a, b }
+			{
+				if constexpr (!Config::Directed::value)
+				{
+					if (nodes[0] > nodes[1]) std::swap(nodes[0], nodes[1]);
+				}
+			}
+
+
+			auto operator<=>(const Edge& other) const = default;
+
+
+			std::array<unsigned int, 2> nodes;
+		};
+
+
 		template <typename T> requires (std::same_as<Payload, std::decay_t<T>>)
 		unsigned AddNode(T&& node)
 		{
@@ -41,32 +61,22 @@ namespace Strawberry::Core::Math
 
 		void AddEdge(unsigned nodeAIndex, unsigned nodeBIndex)
 		{
-			// If this is an undirected graph, then sort the edge indices
-			if constexpr (!Config::Directed::value)
-			{
-				if (nodeAIndex > nodeBIndex) std::swap(nodeAIndex, nodeBIndex);
-			}
-
 			// Insert edge
-			mEdges.emplace_back(std::array{nodeAIndex, nodeBIndex});
+			Edge edge(nodeAIndex, nodeBIndex);
+			auto lowerBound = std::lower_bound(mEdges.begin(), mEdges.end(), edge);
+			mEdges.insert(lowerBound, edge);
 		}
 
 
 		bool IsConnected(unsigned nodeAIndex, unsigned nodeBIndex) const
 		{
-			Core::Logging::Info("{}", mEdges);
-			if constexpr (!Config::Directed::value)
-			{
-				if (nodeAIndex > nodeBIndex) std::swap(nodeAIndex, nodeBIndex);
-			}
-
-			return std::find(mEdges.begin(), mEdges.end(), std::array{nodeAIndex, nodeBIndex}) != mEdges.end();
+			return std::binary_search(mEdges.begin(), mEdges.end(), Edge(nodeAIndex, nodeBIndex));
 		}
 
 
 	private:
 		std::vector<Payload> mNodes;
-		std::vector<std::array<unsigned, 2>> mEdges;
+		std::deque<Edge> mEdges;
 	};
 
 
