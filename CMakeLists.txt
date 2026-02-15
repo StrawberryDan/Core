@@ -164,6 +164,7 @@ src/Strawberry/Core/Math/Checked.hpp
     test/Noise.cpp
     test/Optional.cpp
     test/PeriodicNumbers.cpp
+    test/Plane.cpp
     test/ProducerConsumer.cpp
     test/Sphere.cpp
     test/TypeSets.cpp
