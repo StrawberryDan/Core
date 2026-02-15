@@ -70,20 +70,20 @@ namespace Strawberry::Core
 
 
 		template<typename T>
-		auto GetReflexivePointer(this T& self) -> ReflexivePointer<T>
+		auto GetReflexivePointer(this T&& self) -> ReflexivePointer<std::decay_t<T>>
 		{
 			ZoneScoped;
 
-			return ReflexivePointer<T>(self.mPtr);
+			return ReflexivePointer<std::decay_t<T>>(self.mPtr);
 		}
 
 
 		template<typename T>
-		auto GetReflexivePointer(this const T& self) -> ReflexivePointer<const T>
+		auto GetConstReflexivePointer(this T&& self) -> ReflexivePointer<const std::decay_t<T>>
 		{
 			ZoneScoped;
 
-			return ReflexivePointer<const T>(self.mPtr);
+			return ReflexivePointer<const std::decay_t<T>>(self.mPtr);
 		}
 
 
@@ -109,8 +109,8 @@ namespace Strawberry::Core
 
 
 		template <std::derived_from<EnableReflexivePointer> Base>
-		explicit ReflexivePointer(Base& base) noexcept
-			: ReflexivePointer(base.GetReflexivePointer()) {}
+		explicit ReflexivePointer(Base&& base) noexcept
+			: ReflexivePointer(std::forward<Base>(base).GetReflexivePointer()) {}
 
 
 		ReflexivePointer(const ReflexivePointer& rhs) noexcept
