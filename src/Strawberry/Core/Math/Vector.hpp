@@ -518,6 +518,13 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Returns the counterclockwise perpendicular vector to this one.
+		constexpr Vector<T, D> Perpendicular() const noexcept requires (D == 2)
+		{
+			return { -mValue[1], mValue[0] };
+		}
+
+
 		/// Calculate the angle between this and another vector in radians.
 		Radians AngleBetween(const Vector& b) const noexcept
 		{
