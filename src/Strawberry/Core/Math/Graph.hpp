@@ -27,7 +27,7 @@ namespace Strawberry::Core::Math
 	};
 
 
-	template <typename Payload, GraphConfig Config>
+	template <typename Payload, GraphConfig Config = GraphTypeUndirected>
 	class Graph
 	{
 	public:
