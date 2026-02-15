@@ -27,6 +27,14 @@ namespace Strawberry::Core::Math
 		{
 			return mNormal.Dot(point);
 		}
+
+
+		void SetNormal(const Vector<T, D>& normal)
+		{
+			mNormal = normal.Normalised();
+		}
+
+
 	private:
 		Vector<T, D> mNormal;
 		T            mDotProduct;
