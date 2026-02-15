@@ -6,6 +6,7 @@
 #include "Strawberry/Core/Types/Optional.hpp"
 #include <atomic>
 #include <functional>
+#include <memory>
 #include <thread>
 
 
@@ -20,7 +21,8 @@ namespace Strawberry::Core
 			Optional<std::function<void()>> startUp = NullOpt,
 			Optional<std::function<void()>> shutDown = NullOpt
 		)
-			: mShouldRun(false)
+			: mShouldRun(std::make_unique<std::atomic<bool>>(false))
+			, mThread(std::make_unique<std::thread>())
 			, mStartUp(std::move(startUp))
 			, mShutdown(std::move(shutDown))
 			, mFunction(std::move(function))
@@ -31,8 +33,8 @@ namespace Strawberry::Core
 
 		RepeatingTask(const RepeatingTask&) = delete;
 		RepeatingTask& operator=(const RepeatingTask&) = delete;
-		RepeatingTask(RepeatingTask&&) = delete;
-		RepeatingTask& operator=(RepeatingTask&&) = delete;
+		RepeatingTask(RepeatingTask&&) = default;
+		RepeatingTask& operator=(RepeatingTask&&) = default;
 
 
 		~RepeatingTask()
@@ -43,14 +45,14 @@ namespace Strawberry::Core
 
 		[[nodiscard]] bool IsRunning() const
 		{
-			return mThread.joinable();
+			return mThread->joinable();
 		}
 
 
 		void Start()
 		{
-			mShouldRun = true;
-			mThread    = std::thread([this]
+			*mShouldRun = true;
+			*mThread    = std::thread([this]
 			{
 				if (mStartUp)
 				{
@@ -74,17 +76,17 @@ namespace Strawberry::Core
 		{
 			if (IsRunning())
 			{
-				mShouldRun = false;
-				mThread.join();
+				*mShouldRun = false;
+				mThread->join();
 			}
 		}
 
 
 	private:
-		std::atomic<bool>               mShouldRun;
-		std::thread                     mThread;
-		Optional<std::function<void()>> mStartUp;
-		Optional<std::function<void()>> mShutdown;
-		std::function<void()>           mFunction;
+		std::unique_ptr<std::atomic<bool>> mShouldRun;
+		std::unique_ptr<std::thread>       mThread;
+		Optional<std::function<void()>>    mStartUp;
+		Optional<std::function<void()>>    mShutdown;
+		std::function<void()>              mFunction;
 	};
 } // namespace Strawberry::Core
