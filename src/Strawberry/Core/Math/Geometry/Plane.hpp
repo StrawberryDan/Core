@@ -23,6 +23,10 @@ namespace Strawberry::Core::Math
 			: mNormal(normal.Normalised()) , mDotProduct(dotProduct) {}
 
 
+		T SignedDistance(const Vector<T, D>& point) const requires (std::floating_point<T>)
+		{
+			return mNormal.Dot(point);
+		}
 	private:
 		Vector<T, D> mNormal;
 		T            mDotProduct;
