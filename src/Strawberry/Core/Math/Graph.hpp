@@ -37,6 +37,7 @@ namespace Strawberry::Core::Math
 		{
 			Edge(unsigned int a, unsigned int b) : nodes{ a, b }
 			{
+				// Puts edges in normalised order for undirected graphs
 				if constexpr (!Config::Directed::value)
 				{
 					if (nodes[0] > nodes[1]) std::swap(nodes[0], nodes[1]);
