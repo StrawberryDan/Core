@@ -84,6 +84,7 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Math/Geometry/Ray.hpp
     src/Strawberry/Core/Math/Geometry/Plane.hpp
     src/Strawberry/Core/Math/Geometry/Sphere.hpp
+    src/Strawberry/Core/Math/Geometry/Simplex.hpp
     src/Strawberry/Core/Math/Math.hpp
     src/Strawberry/Core/Math/Math.inl
     src/Strawberry/Core/Math/Matrix.hpp
