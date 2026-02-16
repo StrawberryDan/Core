@@ -103,6 +103,12 @@ namespace Strawberry::Core::Math
 			}
 
 
+			Edge GetEdge(unsigned int i) const
+			{
+				return Edge(nodes[(0 + i) % 3], nodes[(1 + i) % 3]);
+			}
+
+
 			bool ContainsEdge(Edge edge) const
 			{
 				if constexpr (Config::Directed::value)
