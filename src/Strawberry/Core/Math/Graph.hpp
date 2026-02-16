@@ -69,6 +69,26 @@ namespace Strawberry::Core::Math
 		}
 
 
+		void RemoveEdge(unsigned int nodeA, unsigned int nodeB)
+		{
+			Edge edge(nodeA, nodeB);
+			auto search = std::lower_bound(mEdges.begin(), mEdges.end(), edge);
+			if (search != mEdges.end() && *search == edge)
+			{
+				mEdges.erase(search);
+			}
+
+			if constexpr (!Config::Directed::value)
+			{
+				search = std::lower_bound(mEdges.begin(), mEdges.end(), Edge(nodeB, nodeA));
+				if (search != mEdges.end() && *search == Edge(nodeB, nodeA))
+				{
+					mEdges.erase(search);
+				}
+			}
+		}
+
+
 		bool IsConnected(unsigned nodeAIndex, unsigned nodeBIndex) const
 		{
 			return std::binary_search(mEdges.begin(), mEdges.end(), Edge(nodeAIndex, nodeBIndex));
