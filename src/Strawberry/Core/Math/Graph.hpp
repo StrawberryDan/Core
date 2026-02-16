@@ -183,8 +183,6 @@ namespace Strawberry::Core::Math
 		{
 			// Insert edge
 			mEdges.insert({nodeAIndex, nodeBIndex});
-			// Update face list
-			UpdateFacesNewEdge(Edge(nodeAIndex, nodeBIndex));
 		}
 
 
@@ -198,10 +196,6 @@ namespace Strawberry::Core::Math
 		{
 			Edge edge(nodeA, nodeB);
 			mEdges.erase(edge);
-
-			mFaces = mFaces
-				| std::views::filter([edge] (auto f) { return !f.ContainsEdge(edge); })
-				| std::ranges::to<std::set>();
 		}
 
 
@@ -211,26 +205,11 @@ namespace Strawberry::Core::Math
 		}
 
 
-		void RemoveFace(Face face)
-		{
-			Edge edgeA = face.GetEdge(0);
-			Edge edgeB = face.GetEdge(1);
-			Edge edgeC = face.GetEdge(2);
-
-			bool isRedundantA = std::count_if(mFaces.begin(), mFaces.end(), [&] (Face face) { return face.ContainsEdge(edgeA); }) <= 1;
-			bool isRedundantB = std::count_if(mFaces.begin(), mFaces.end(), [&] (Face face) { return face.ContainsEdge(edgeB); }) <= 1;
-			bool isRedundantC = std::count_if(mFaces.begin(), mFaces.end(), [&] (Face face) { return face.ContainsEdge(edgeC); }) <= 1;
-
-			if (isRedundantA) RemoveEdge(edgeA);
-			if (isRedundantB) RemoveEdge(edgeB);
-			if (isRedundantC) RemoveEdge(edgeC);
-		}
-
-
 		bool IsConnected(unsigned nodeAIndex, unsigned nodeBIndex) const
 		{
 			return mEdges.contains({nodeAIndex, nodeBIndex});
 		}
+
 
 		bool IsConnected(Edge edge) const
 		{
@@ -286,50 +265,10 @@ namespace Strawberry::Core::Math
 		}
 
 
-		const std::set<Face>& GetFaces() const
-		{
-			return mFaces;
-		}
-
-
 	private:
-		void UpdateFacesNewEdge(Edge newEdge)
-		{
-			if constexpr (!Config::Directed::value)
-			{
-				std::set<unsigned int> neighboursA = GetNeighourIndices(newEdge.nodes[0]);
-				std::set<unsigned int> neighboursB = GetNeighourIndices(newEdge.nodes[1]);
-				std::set<unsigned int> mutualNeighbours;
-				std::set_intersection(neighboursA.begin(), neighboursA.end(),
-									  neighboursB.begin(), neighboursB.end(),
-									  std::inserter(mutualNeighbours, mutualNeighbours.begin()));
-
-				for (auto mn : mutualNeighbours)
-				{
-					mFaces.insert(Face(newEdge.nodes[0], newEdge.nodes[1], mn));
-				}
-			}
-			else
-			{
-				auto incomingNeighbours = GetIncomingNeighbourIndices(newEdge.nodes[0]);
-				auto outgoingNeighbours = GetOutgoingNeighbourIndices(newEdge.nodes[1]);
-				std::set<unsigned int> mutualNeighbours;
-				std::set_intersection(incomingNeighbours.begin(), incomingNeighbours.end(),
-									  outgoingNeighbours.begin(), outgoingNeighbours.end(),
-									  std::inserter(mutualNeighbours, mutualNeighbours.begin()));
-
-				for (auto mn : mutualNeighbours)
-				{
-					mFaces.emplace(newEdge.nodes[0], newEdge.nodes[1], mn);
-				}
-			}
-		}
-
-
 		unsigned int mNextID = 0;
 		std::map<unsigned int, Payload> mNodes;
 		std::set<Edge> mEdges;
-		std::set<Face> mFaces;
 	};
 
 
