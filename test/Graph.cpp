@@ -25,6 +25,10 @@ int main()
 	Assert(graphA.IsConnected(0, 2));
 	Assert(graphA.IsConnected(2, 0));
 
+	AssertEQ(graphA.GetNeighourIndices(0), std::set<unsigned int>{1, 2});
+	AssertEQ(graphA.GetNeighourIndices(1), std::set<unsigned int>{0, 2});
+	AssertEQ(graphA.GetNeighourIndices(2), std::set<unsigned int>{0, 1});
+
 
 	Strawberry::Core::Math::DirectedGraph<int> graphB;
 
@@ -42,6 +46,10 @@ int main()
 	Assert(!graphB.IsConnected(2, 1));
 	Assert(!graphB.IsConnected(0, 2));
 	Assert(graphB.IsConnected(2, 0));
+
+	AssertEQ(graphB.GetNeighourIndices(0), std::set<unsigned int>{1});
+	AssertEQ(graphB.GetNeighourIndices(1), std::set<unsigned int>{2});
+	AssertEQ(graphB.GetNeighourIndices(2), std::set<unsigned int>{0});
 
 	return 0;
 }

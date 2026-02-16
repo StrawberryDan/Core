@@ -75,6 +75,25 @@ namespace Strawberry::Core::Math
 		}
 
 
+
+
+		std::set<unsigned int> GetNeighourIndices(unsigned int node) const
+		{
+			std::set<unsigned int> neighbours;
+
+			for (const auto& edge : mEdges)
+			{
+				if (edge.nodes[0] == node) neighbours.insert(edge.nodes[1]);
+				if constexpr (!Config::Directed::value)
+				{
+					if (edge.nodes[1] == node) neighbours.insert(edge.nodes[0]);
+				}
+			}
+
+			return neighbours;
+		}
+
+
 	private:
 		std::vector<Payload> mNodes;
 		std::deque<Edge> mEdges;
