@@ -7,6 +7,8 @@
 #include <deque>
 #include <type_traits>
 #include <vector>
+#include <set>
+#include <ranges>
 
 
 namespace Strawberry::Core::Math
@@ -95,6 +97,12 @@ namespace Strawberry::Core::Math
 		}
 
 
+		std::set<std::pair<unsigned int, Payload&>> GetNeighbours(unsigned int node)
+		{
+			return GetNeighourIndices(node)
+				| std::views::transform([] (auto x) { return std::make_pair<unsigned int, Payload&>(x, GetValue(x)); })
+				| std::ranges::to<std::set>();
+		}
 
 
 		std::set<unsigned int> GetNeighourIndices(unsigned int node) const
