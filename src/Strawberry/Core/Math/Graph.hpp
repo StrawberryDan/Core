@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Strawberry/Core/IO/Logging.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
 #include "fmt/ranges.h"
 #include <algorithm>
 #include <array>
 #include <deque>
+#include <iterator>
 #include <type_traits>
 #include <vector>
 #include <set>
@@ -54,6 +56,65 @@ namespace Strawberry::Core::Math
 		};
 
 
+		struct Face
+		{
+			Face(unsigned int a, unsigned int b, unsigned int c)
+				: nodes{a, b, c}
+			{
+				if constexpr (!Config::Directed::value)
+				{
+					std::sort(nodes.begin(), nodes.end());
+				}
+			}
+
+
+			bool ContainsNode(unsigned int node)
+			{
+				return nodes[0] == node || nodes[1] == node || nodes[2] == node;
+			}
+
+
+			Optional<unsigned int> IndexOf(unsigned int node)
+			{
+				if (nodes[0] == node) return 0;
+				if (nodes[1] == node) return 1;
+				if (nodes[2] == node) return 2;
+				return NullOpt;
+			}
+
+
+			bool ContainsEdge(Edge edge) const
+			{
+				if constexpr (Config::Directed::value)
+				{
+					return ContainsNode(edge.nodes[0]) && ContainsNode(edge.nodes[1]);
+				}
+				else
+				{
+					unsigned int base = edge.nodes[0];
+					Optional<unsigned int> baseIndex = IndexOf(base);
+					if (!baseIndex) return false;
+
+					Face rotated = Rotate(-*baseIndex);
+					return edge.nodes[0] == rotated.nodes[0] && edge.nodes[1] == rotated.nodes[1] ||
+						edge.nodes[1] == rotated.nodes[1] && edge.nodes[2] = rotated.nodes[2];
+				}
+			}
+
+			Face Rotate(int rotation) const
+			{
+				Face face(
+					nodes[(0 + rotation) % 3],
+					nodes[(1 + rotation) % 3],
+					nodes[(2 + rotation) % 3]);
+			}
+
+			auto operator<=>(const Face& other) const = default;
+
+			std::array<unsigned int, 3> nodes;
+		};
+
+
 		Payload& GetValue(unsigned int nodeIndex)
 		{
 			return mNodes[nodeIndex];
@@ -77,35 +138,26 @@ namespace Strawberry::Core::Math
 		void AddEdge(unsigned nodeAIndex, unsigned nodeBIndex)
 		{
 			// Insert edge
-			Edge edge(nodeAIndex, nodeBIndex);
-			auto lowerBound = std::lower_bound(mEdges.begin(), mEdges.end(), edge);
-			mEdges.insert(lowerBound, edge);
+			mEdges.insert({nodeAIndex, nodeBIndex});
+			// Update face list
+			UpdateFaces(Edge(nodeAIndex, nodeBIndex));
 		}
 
 
 		void RemoveEdge(unsigned int nodeA, unsigned int nodeB)
 		{
 			Edge edge(nodeA, nodeB);
-			auto search = std::lower_bound(mEdges.begin(), mEdges.end(), edge);
-			if (search != mEdges.end() && *search == edge)
-			{
-				mEdges.erase(search);
-			}
+			mEdges.erase(edge);
 
-			if constexpr (!Config::Directed::value)
-			{
-				search = std::lower_bound(mEdges.begin(), mEdges.end(), Edge(nodeB, nodeA));
-				if (search != mEdges.end() && *search == Edge(nodeB, nodeA))
-				{
-					mEdges.erase(search);
-				}
-			}
+			mFaces = mFaces
+				| std::views::filter([] (auto f) { return !f.ContainsEdge(edge); })
+				| std::ranges::to<std::set>();
 		}
 
 
 		bool IsConnected(unsigned nodeAIndex, unsigned nodeBIndex) const
 		{
-			return std::binary_search(mEdges.begin(), mEdges.end(), Edge(nodeAIndex, nodeBIndex));
+			return mEdges.contains({nodeAIndex, nodeBIndex});
 		}
 
 
@@ -117,26 +169,89 @@ namespace Strawberry::Core::Math
 		}
 
 
-		std::set<unsigned int> GetNeighourIndices(unsigned int node) const
+		std::set<unsigned int> GetNeighourIndices(unsigned int node) const requires (!Config::Directed::value)
 		{
 			std::set<unsigned int> neighbours;
 
 			for (const auto& edge : mEdges)
 			{
 				if (edge.nodes[0] == node) neighbours.insert(edge.nodes[1]);
-				if constexpr (!Config::Directed::value)
-				{
-					if (edge.nodes[1] == node) neighbours.insert(edge.nodes[0]);
-				}
+				if (edge.nodes[1] == node) neighbours.insert(edge.nodes[0]);
 			}
 
 			return neighbours;
 		}
 
 
+		std::set<unsigned int> GetIncomingNeighbourIndices(unsigned int node) const requires (Config::Directed::value)
+		{
+			std::set<unsigned int> incomingNeighbours;
+
+			incomingNeighbours = mEdges
+				| std::views::filter([node] (Edge e) { return e.nodes[1] == node; })
+				| std::views::transform([] (Edge e) { return e.nodes[0]; })
+				| std::ranges::to<std::set>();
+
+			return incomingNeighbours;
+		}
+
+
+		std::set<unsigned int> GetOutgoingNeighbourIndices(unsigned int node) const requires (Config::Directed::value)
+		{
+			std::set<unsigned int> outgoingNeighbours;
+
+			outgoingNeighbours = mEdges
+				| std::views::filter([node] (Edge e) { return e.nodes[0] == node; })
+				| std::views::transform([] (Edge e) { return e.nodes[1]; })
+				| std::ranges::to<std::set>();
+
+			return outgoingNeighbours;
+		}
+
+
+		const std::set<Face>& GetFaces() const
+		{
+			return mFaces;
+		}
+
+
 	private:
+		void UpdateFaces(Edge newEdge)
+		{
+			if constexpr (!Config::Directed::value)
+			{
+				std::set<unsigned int> neighboursA = GetNeighourIndices(newEdge.nodes[0]);
+				std::set<unsigned int> neighboursB = GetNeighourIndices(newEdge.nodes[1]);
+				std::set<unsigned int> mutualNeighbours;
+				std::set_intersection(neighboursA.begin(), neighboursA.end(),
+									  neighboursB.begin(), neighboursB.end(),
+									  std::inserter(mutualNeighbours, mutualNeighbours.begin()));
+
+				for (auto mn : mutualNeighbours)
+				{
+					mFaces.insert(Face(newEdge.nodes[0], newEdge.nodes[1], mn));
+				}
+			}
+			else
+			{
+				auto incomingNeighbours = GetIncomingNeighbourIndices(newEdge.nodes[0]);
+				auto outgoingNeighbours = GetOutgoingNeighbourIndices(newEdge.nodes[1]);
+				std::set<unsigned int> mutualNeighbours;
+				std::set_intersection(incomingNeighbours.begin(), incomingNeighbours.end(),
+									  outgoingNeighbours.begin(), outgoingNeighbours.end(),
+									  std::inserter(mutualNeighbours, mutualNeighbours.begin()));
+
+				for (auto mn : mutualNeighbours)
+				{
+					mFaces.emplace(newEdge.nodes[0], newEdge.nodes[1], mn);
+				}
+			}
+		}
+
+
 		std::vector<Payload> mNodes;
-		std::deque<Edge> mEdges;
+		std::set<Edge> mEdges;
+		std::set<Face> mFaces;
 	};
 
 

@@ -29,6 +29,8 @@ int main()
 	AssertEQ(graphA.GetNeighourIndices(1), std::set<unsigned int>{0, 2});
 	AssertEQ(graphA.GetNeighourIndices(2), std::set<unsigned int>{0, 1});
 
+	Assert(graphA.GetFaces().contains(decltype(graphA)::Face(0, 1, 2)));
+
 
 	Strawberry::Core::Math::DirectedGraph<int> graphB;
 
@@ -47,9 +49,12 @@ int main()
 	Assert(!graphB.IsConnected(0, 2));
 	Assert(graphB.IsConnected(2, 0));
 
-	AssertEQ(graphB.GetNeighourIndices(0), std::set<unsigned int>{1});
-	AssertEQ(graphB.GetNeighourIndices(1), std::set<unsigned int>{2});
-	AssertEQ(graphB.GetNeighourIndices(2), std::set<unsigned int>{0});
+	AssertEQ(graphB.GetOutgoingNeighbourIndices(0), std::set<unsigned int>{1});
+	AssertEQ(graphB.GetOutgoingNeighbourIndices(1), std::set<unsigned int>{2});
+	AssertEQ(graphB.GetOutgoingNeighbourIndices(2), std::set<unsigned int>{0});
+
+
+	AssertEQ(graphB.GetFaces().size(), 1);
 
 	return 0;
 }
