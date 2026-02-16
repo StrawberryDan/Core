@@ -294,29 +294,8 @@ namespace Strawberry::Core::Math
 			return mValue[I];
 		}
 
-
-		/// Define Vector Equality
-		friend constexpr bool operator==(const Vector& a, const Vector& b)
-		{
-			for (size_t i = 0; i < D; i++)
-			{
-				if (a[i] != b[i]) return false;
-			}
-
-			return true;
-		}
-
-
-		/// Define Vector Inequality
-		friend constexpr bool operator!=(const Vector& a, const Vector& b)
-		{
-			for (size_t i = 0; i < D; i++)
-			{
-				if (a[i] == b[i]) return false;
-			}
-
-			return true;
-		}
+		// Default comparison operators
+		auto operator<=>(const Vector& other) const = default;
 
 
 		/// Define addition
