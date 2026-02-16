@@ -8,7 +8,7 @@
 
 namespace Strawberry::Core::Math
 {
-	template <typename T, unsigned Dimension, unsigned Order>
+	template <typename T, unsigned Dimension, unsigned Order> requires (Order <= Dimension + 1)
 	class Simplex
 	{
 	public:
