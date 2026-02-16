@@ -56,9 +56,21 @@ if (NOT TARGET StrawberryCore)
   FetchContent_GetProperties(tracy
     SOURCE_DIR TRACY_SRC_DIR)
 
+  FetchContent_Declare(
+    canvas_ity
+    GIT_REPOSITORY "https://github.com/a-e-k/canvas_ity.git"
+    GIT_TAG "main"
+  )
+  FetchContent_MakeAvailable(canvas_ity)
+  FetchContent_GetProperties(canvas_ity SOURCE_DIR CANVAS_ITY_SOURCE_DIR)
+
+
+  add_library(CanvasIty STATIC
+    src/Strawberry/Core/Util/STBImplementations.cpp)
+  target_include_directories(CanvasIty PUBLIC ${STB_SOURCE_DIR})
 
   new_strawberry_library(NAME StrawberryCore SOURCE
-        src/Strawberry/Core/Assert.hpp
+    src/Strawberry/Core/Assert.hpp
     src/Strawberry/Core/Error.cpp
     src/Strawberry/Core/Error.hpp
     src/Strawberry/Core/IO/Base64.cpp
@@ -127,9 +139,9 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Util/Image.hpp
     src/Strawberry/Core/Util/Image.inl
     src/Strawberry/Core/Util/Ranges.hpp
-    src/Strawberry/Core/Util/STBImplementations.cpp
+    src/Strawberry/Core/Util/CanvasItyImplementation.cpp
     src/Strawberry/Core/Util/Strings.hpp
-src/Strawberry/Core/Math/Checked.hpp
+    src/Strawberry/Core/Math/Checked.hpp
   )
 
 
@@ -143,8 +155,9 @@ src/Strawberry/Core/Math/Checked.hpp
 
   target_include_directories(StrawberryCore
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
-    PUBLIC ${STB_SOURCE_DIR})
-  target_link_libraries(StrawberryCore PUBLIC nlohmann_json::nlohmann_json fmt::fmt-header-only)
+    PUBLIC ${STB_SOURCE_DIR}
+    PUBLIC ${CANVAS_ITY_SOURCE_DIR}/src)
+  target_link_libraries(StrawberryCore PUBLIC CanvasIty nlohmann_json::nlohmann_json fmt::fmt-header-only)
   if (${STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE})
     target_link_libraries(StrawberryCore PUBLIC stdc++exp)
   endif ()
