@@ -178,7 +178,7 @@ namespace Strawberry::Core::Math
 			// Insert edge
 			mEdges.insert({nodeAIndex, nodeBIndex});
 			// Update face list
-			UpdateFaces(Edge(nodeAIndex, nodeBIndex));
+			UpdateFacesNewEdge(Edge(nodeAIndex, nodeBIndex));
 		}
 
 
@@ -266,7 +266,7 @@ namespace Strawberry::Core::Math
 
 
 	private:
-		void UpdateFaces(Edge newEdge)
+		void UpdateFacesNewEdge(Edge newEdge)
 		{
 			if constexpr (!Config::Directed::value)
 			{
