@@ -31,6 +31,23 @@ namespace Strawberry::Core::Math
 		}
 
 
+		bool IsCounterClockwise() const requires (Dimension == 2 && Order == 3)
+		{
+			return (Point(2) - Point(0)).Dot((Point(1) - Point(0)).Perpendicular()) > 0;
+		}
+
+
+		void MakeCounterClockwise() requires (Dimension == 2 && Order == 3)
+		{
+			if (!IsCounterClockwise())
+			{
+				std::swap(Point(1), Point(2));
+			}
+
+			Core::Assert(IsCounterClockwise());
+		}
+
+
 		Plane<T, Dimension> IntoPlane() const requires (Order == 3)
 		{
 			return Plane<T, Dimension>::FromTriangle(mPoints[0], mPoints[1], mPoints[2]);
