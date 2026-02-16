@@ -78,13 +78,13 @@ namespace Strawberry::Core::Math
 
 		Payload& GetValue(unsigned int nodeIndex)
 		{
-			return mNodes[nodeIndex];
+			return mNodes.at(nodeIndex);
 		}
 
 
 		const Payload& GetValue(unsigned int nodeIndex) const
 		{
-			return mNodes[nodeIndex];
+			return mNodes.at(nodeIndex);
 		}
 
 
@@ -109,6 +109,12 @@ namespace Strawberry::Core::Math
 			{
 				RemoveEdge(edge);
 			}
+		}
+
+
+		const std::map<unsigned int, Payload>& GetNodes() const
+		{
+			return mNodes;
 		}
 
 
@@ -138,6 +144,12 @@ namespace Strawberry::Core::Math
 		}
 
 
+		const std::set<Edge>& GetEdges() const
+		{
+			return mEdges;
+		}
+
+
 		bool IsConnected(unsigned nodeAIndex, unsigned nodeBIndex) const
 		{
 			return mEdges.contains({nodeAIndex, nodeBIndex});
@@ -152,13 +164,13 @@ namespace Strawberry::Core::Math
 
 		std::set<std::pair<unsigned int, Payload&>> GetNeighbours(unsigned int node)
 		{
-			return GetNeighourIndices(node)
+			return GetNeighbourIndices(node)
 				| std::views::transform([this] (auto x) { return std::make_pair<unsigned int, Payload&>(x, GetValue(x)); })
 				| std::ranges::to<std::set>();
 		}
 
 
-		std::set<unsigned int> GetNeighourIndices(unsigned int node) const requires (!Config::Directed::value)
+		std::set<unsigned int> GetNeighbourIndices(unsigned int node) const requires (!Config::Directed::value)
 		{
 			std::set<unsigned int> neighbours;
 

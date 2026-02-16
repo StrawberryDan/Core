@@ -25,9 +25,9 @@ int main()
 	Assert(graphA.IsConnected(0, 2));
 	Assert(graphA.IsConnected(2, 0));
 
-	AssertEQ(graphA.GetNeighourIndices(0), std::set<unsigned int>{1, 2});
-	AssertEQ(graphA.GetNeighourIndices(1), std::set<unsigned int>{0, 2});
-	AssertEQ(graphA.GetNeighourIndices(2), std::set<unsigned int>{0, 1});
+	AssertEQ(graphA.GetNeighbourIndices(0), std::set<unsigned int>{1, 2});
+	AssertEQ(graphA.GetNeighbourIndices(1), std::set<unsigned int>{0, 2});
+	AssertEQ(graphA.GetNeighbourIndices(2), std::set<unsigned int>{0, 1});
 
 	graphA.AddNode(3);
 	graphA.AddEdge(1, 3);
