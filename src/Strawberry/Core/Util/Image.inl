@@ -129,6 +129,7 @@ namespace Strawberry::Core
 		else
 		{
 			Logging::Error("Could not save image! Unsupported type extension: {}", path.extension().string());
+			Core::Unreachable();
 		}
 	}
 
