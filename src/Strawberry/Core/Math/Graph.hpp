@@ -54,6 +54,18 @@ namespace Strawberry::Core::Math
 		};
 
 
+		Payload& GetValue(unsigned int nodeIndex)
+		{
+			return mNodes[nodeIndex];
+		}
+
+
+		const Payload& GetValue(unsigned int nodeIndex) const
+		{
+			return mNodes[nodeIndex];
+		}
+
+
 		template <typename T> requires (std::same_as<Payload, std::decay_t<T>>)
 		unsigned AddNode(T&& node)
 		{
@@ -100,7 +112,7 @@ namespace Strawberry::Core::Math
 		std::set<std::pair<unsigned int, Payload&>> GetNeighbours(unsigned int node)
 		{
 			return GetNeighourIndices(node)
-				| std::views::transform([] (auto x) { return std::make_pair<unsigned int, Payload&>(x, GetValue(x)); })
+				| std::views::transform([this] (auto x) { return std::make_pair<unsigned int, Payload&>(x, GetValue(x)); })
 				| std::ranges::to<std::set>();
 		}
 
