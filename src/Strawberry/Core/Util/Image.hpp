@@ -21,6 +21,7 @@ namespace Strawberry::Core
 	public:
 		using Type = T;
 		static constexpr size_t Channels = D;
+		static constexpr size_t Size = sizeof(Type) * Channels;
 
 
 		Pixel()
