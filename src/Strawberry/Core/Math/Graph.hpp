@@ -211,9 +211,30 @@ namespace Strawberry::Core::Math
 		}
 
 
+		void RemoveFace(Face face)
+		{
+			Edge edgeA = face.GetEdge(0);
+			Edge edgeB = face.GetEdge(1);
+			Edge edgeC = face.GetEdge(2);
+
+			bool isRedundantA = std::count_if(mFaces.begin(), mFaces.end(), [&] (Face face) { return face.ContainsEdge(edgeA); }) <= 1;
+			bool isRedundantB = std::count_if(mFaces.begin(), mFaces.end(), [&] (Face face) { return face.ContainsEdge(edgeB); }) <= 1;
+			bool isRedundantC = std::count_if(mFaces.begin(), mFaces.end(), [&] (Face face) { return face.ContainsEdge(edgeC); }) <= 1;
+
+			if (isRedundantA) RemoveEdge(edgeA);
+			if (isRedundantB) RemoveEdge(edgeB);
+			if (isRedundantC) RemoveEdge(edgeC);
+		}
+
+
 		bool IsConnected(unsigned nodeAIndex, unsigned nodeBIndex) const
 		{
 			return mEdges.contains({nodeAIndex, nodeBIndex});
+		}
+
+		bool IsConnected(Edge edge) const
+		{
+			return IsConnected(edge.nodes[0], edge.nodes[1]);
 		}
 
 
