@@ -177,6 +177,7 @@ src/Strawberry/Core/Math/Checked.hpp
     test/UTF.cpp
     test/Variants.cpp
     test/Vectors.cpp
+    test/Delauney.cpp
   )
 
 
