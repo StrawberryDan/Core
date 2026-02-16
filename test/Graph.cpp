@@ -31,6 +31,20 @@ int main()
 
 	Assert(graphA.GetFaces().contains(decltype(graphA)::Face(0, 1, 2)));
 
+	graphA.AddNode(3);
+	graphA.AddEdge(1, 3);
+	graphA.AddEdge(2, 3);
+
+	Assert(graphA.IsConnected(1, 3));
+	Assert(graphA.IsConnected(2, 3));
+
+	AssertEQ(graphA.GetFaces().size(), 2);
+	Assert(graphA.GetFaces().contains(decltype(graphA)::Face(1, 2, 3)));
+
+	graphA.RemoveNode(0);
+
+	AssertEQ(graphA.GetFaces().size(), 1);
+
 
 	Strawberry::Core::Math::DirectedGraph<int> graphB;
 

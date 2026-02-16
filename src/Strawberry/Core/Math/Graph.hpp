@@ -7,6 +7,7 @@
 #include <array>
 #include <deque>
 #include <iterator>
+#include <map>
 #include <type_traits>
 #include <vector>
 #include <set>
@@ -49,6 +50,25 @@ namespace Strawberry::Core::Math
 			}
 
 
+			std::string ToString() const
+			{
+				if constexpr (Config::Directed::value)
+				{
+					return fmt::format("{} -> {}", nodes[0], nodes[1]);
+				}
+				else
+				{
+					return fmt::format("{} <-> {}", nodes[0], nodes[1]);
+				}
+			}
+
+
+			bool ContainsNode(unsigned int node) const
+			{
+				return nodes[0] == node || nodes[1] == node;
+			}
+
+
 			auto operator<=>(const Edge& other) const = default;
 
 
@@ -74,7 +94,7 @@ namespace Strawberry::Core::Math
 			}
 
 
-			Optional<unsigned int> IndexOf(unsigned int node)
+			Optional<unsigned int> IndexOf(unsigned int node) const
 			{
 				if (nodes[0] == node) return 0;
 				if (nodes[1] == node) return 1;
@@ -96,8 +116,9 @@ namespace Strawberry::Core::Math
 					if (!baseIndex) return false;
 
 					Face rotated = Rotate(-*baseIndex);
-					return edge.nodes[0] == rotated.nodes[0] && edge.nodes[1] == rotated.nodes[1] ||
-						edge.nodes[1] == rotated.nodes[1] && edge.nodes[2] = rotated.nodes[2];
+					return
+						edge.nodes[0] == rotated.nodes[0] && edge.nodes[1] == rotated.nodes[1] ||
+						edge.nodes[1] == rotated.nodes[1] && edge.nodes[2] == rotated.nodes[2];
 				}
 			}
 
@@ -107,6 +128,7 @@ namespace Strawberry::Core::Math
 					nodes[(0 + rotation) % 3],
 					nodes[(1 + rotation) % 3],
 					nodes[(2 + rotation) % 3]);
+				return face;
 			}
 
 			auto operator<=>(const Face& other) const = default;
@@ -130,8 +152,24 @@ namespace Strawberry::Core::Math
 		template <typename T> requires (std::same_as<Payload, std::decay_t<T>>)
 		unsigned AddNode(T&& node)
 		{
-			mNodes.emplace_back(std::forward<T>(node));
-			return mNodes.size() - 1;
+			mNodes.insert({mNextID++, std::forward<T>(node)});
+			return mNextID - 1;
+		}
+
+
+		void RemoveNode(unsigned int index)
+		{
+			mNodes.erase(index);
+
+			auto affectedEdges =  mEdges
+				| std::views::filter([index] (Edge e) { return e.ContainsNode(index); })
+				| std::ranges::to<std::vector>();
+
+
+			for (auto edge : affectedEdges)
+			{
+				RemoveEdge(edge);
+			}
 		}
 
 
@@ -144,14 +182,26 @@ namespace Strawberry::Core::Math
 		}
 
 
+		void AddEdge(Edge e)
+		{
+			AddEdge(e.nodes[0], e.nodes[1]);
+		}
+
+
 		void RemoveEdge(unsigned int nodeA, unsigned int nodeB)
 		{
 			Edge edge(nodeA, nodeB);
 			mEdges.erase(edge);
 
 			mFaces = mFaces
-				| std::views::filter([] (auto f) { return !f.ContainsEdge(edge); })
+				| std::views::filter([edge] (auto f) { return !f.ContainsEdge(edge); })
 				| std::ranges::to<std::set>();
+		}
+
+
+		void RemoveEdge(Edge e)
+		{
+			RemoveEdge(e.nodes[0], e.nodes[1]);
 		}
 
 
@@ -249,7 +299,8 @@ namespace Strawberry::Core::Math
 		}
 
 
-		std::vector<Payload> mNodes;
+		unsigned int mNextID = 0;
+		std::map<unsigned int, Payload> mNodes;
 		std::set<Edge> mEdges;
 		std::set<Face> mFaces;
 	};
