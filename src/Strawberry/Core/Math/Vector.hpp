@@ -6,8 +6,7 @@
 #include "Units.hpp"
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Markers.hpp"
-#include "fmt/base.h"
-#include "fmt/core.h"
+#include "fmt/format.h"
 // Standard Library
 #include <concepts>
 #include <cmath>
@@ -586,6 +585,37 @@ namespace Strawberry::Core::Math
 } // namespace Strawberry::Core::Math
 
 
+namespace fmt
+{
+	template <typename T, size_t D>
+	struct formatter<Strawberry::Core::Math::Vector<T, D>>
+		: public formatter<std::string>
+	{
+		auto format(const Strawberry::Core::Math::Vector<T, D>& v, format_context& ctx) const -> format_context::iterator
+		{
+			auto out = ctx.out();
+			if constexpr (D == 1)
+			{
+				out = fmt::format_to(out, "[{}]", v[0]);
+			}
+			else
+			{
+				std::string str = fmt::format("[{}", v[0]);
+				for (int i = 1; i < D; i++)
+				{
+					str = fmt::format("{}, {}", str, v[i]);
+				}
+				str = fmt::format("{}]", str);
+				out = fmt::format_to(out, "{}", str);
+			}
+
+			return out;
+		}
+	};
+}
+
+
+
 // Standard Library Helper Structs
 namespace std
 {
@@ -617,23 +647,3 @@ namespace std
 } // namespace std
 
 
-template <typename T, size_t D>
-struct fmt::formatter<Strawberry::Core::Math::Vector<T, D>>
-	: formatter<std::string>
-{
-	template <typename CTX>
-	auto format(const Strawberry::Core::Math::Vector<T, D>& v, CTX& ctx) const
-	{
-		auto out = ctx.out();
-
-		out = format_to(out, "[");
-		for (unsigned i = 0; i < D - 1; i++)
-		{
-			out = format_to(out, "{}, ", v[i]);
-		}
-		out = format_to(out, "{}", v[D - 1]);
-		out = format_to(out, "]");
-
-		return out;
-	}
-};
