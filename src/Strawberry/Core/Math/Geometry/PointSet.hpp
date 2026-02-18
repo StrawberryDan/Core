@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 
 
 #include "Strawberry/Core/Math/Vector.hpp"
