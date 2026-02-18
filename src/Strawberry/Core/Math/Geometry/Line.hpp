@@ -77,7 +77,7 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		Line() = default;
-		Line(const Vector<T, D> a, const Vector<T, D>& b)
+		Line(const Vector<T, D>& a, const Vector<T, D>& b)
 			: mPoints{a, b} {}
 
 
