@@ -101,7 +101,10 @@ namespace fmt
 	struct formatter<Strawberry::Core::Math::Simplex<T, D, O>>
 		: public formatter<std::string>
 	{
-		auto format(const Strawberry::Core::Math::Simplex<T, D, O>& s, format_context& ctx) const
+		using formatter<std::string>::parse;
+
+
+		auto format(const Strawberry::Core::Math::Simplex<T, D, O>& s, format_context& ctx) const -> format_context::iterator
 		{
 			auto out = ctx.out();
 			out = fmt::format_to(out, "Simplex(");
