@@ -83,7 +83,6 @@ namespace Strawberry::Core::Math
 				return lines;
 			}
 		}
-		}
 
 
 	private:
