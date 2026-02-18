@@ -96,7 +96,6 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Math/Geometry/Line.hpp
     src/Strawberry/Core/Math/Geometry/Plane.hpp
     src/Strawberry/Core/Math/Geometry/PointSet.hpp
-    src/Strawberry/Core/Math/Geometry/Ray.hpp
     src/Strawberry/Core/Math/Geometry/Simplex.hpp
     src/Strawberry/Core/Math/Geometry/Sphere.hpp
     src/Strawberry/Core/Math/Geometry/Voronoi.hpp
