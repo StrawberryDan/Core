@@ -2,6 +2,7 @@
 
 
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Math/Geometry/Line.hpp"
 #include <array>
 #include <set>
 
@@ -57,9 +58,31 @@ namespace Strawberry::Core::Math
 		}
 
 
-		Plane<T, Dimension> IntoPlane() const requires (Order == 3)
+		std::set<LineSegment<T, Dimension>> GetLineSegments() const
 		{
-			return Plane<T, Dimension>::FromTriangle(mPoints[0], mPoints[1], mPoints[2]);
+			if constexpr (Dimension == 2 && Order == 3)
+			{
+				return {
+					LineSegment<T, Dimension>(Point(0), Point(1)),
+					LineSegment<T, Dimension>(Point(1), Point(2)),
+					LineSegment<T, Dimension>(Point(2), Point(0))
+				};
+			}
+			else
+			{
+				std::set<LineSegment<T, Dimension>> lines;
+				for (int i = 0; i < Order; i++)
+				{
+					for (int j = i + 1; j < Order; j++)
+					{
+						lines.emplace(Point(i), Point(j));
+					}
+				}
+
+				Core::AssertEQ(lines.size(), (Order * (Order - 1)) / 2);
+				return lines;
+			}
+		}
 		}
 
 
