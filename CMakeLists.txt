@@ -176,8 +176,10 @@ if (NOT TARGET StrawberryCore)
     test/ChannelBroadcaster.cpp
     test/Checked.cpp
     test/ClampedNumbers.cpp
+    test/Delauney.cpp
     test/DynamicByteBuffer.cpp
     test/Graph.cpp
+    test/Line.cpp
     test/Matrices.cpp
     test/Noise.cpp
     test/Optional.cpp
@@ -190,7 +192,6 @@ if (NOT TARGET StrawberryCore)
     test/UTF.cpp
     test/Variants.cpp
     test/Vectors.cpp
-    test/Delauney.cpp
   )
 
 
