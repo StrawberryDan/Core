@@ -82,7 +82,10 @@ namespace Strawberry::Core::Math
 
 
 		Vector<T, D>& A() { return mPoints[0]; }
+		const Vector<T, D>& A() const { return mPoints[0]; }
 		Vector<T, D>& B() { return mPoints[1]; }
+		const Vector<T, D>& B() const { return mPoints[1]; }
+
 
 
 	private:
