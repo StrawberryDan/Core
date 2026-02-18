@@ -40,7 +40,10 @@ namespace Strawberry::Core::Math
 
 		bool IsCounterClockwise() const requires (Dimension == 2 && Order == 3)
 		{
-			return (Point(2) - Point(0)).Dot((Point(1) - Point(0)).Perpendicular()) > 0;
+			auto a = Point(1) - Point(0);
+			auto b = Point(2) - Point(1);
+
+			return b.Dot(a.Perpendicular()) >= 0.0;
 		}
 
 
