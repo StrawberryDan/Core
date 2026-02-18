@@ -331,31 +331,6 @@ namespace Strawberry::Core::Math
 		}
 
 
-		/// Define Component-wise multiplication
-		constexpr friend Vector operator*(const Vector& a, const Vector& b)
-		{
-			Vector result;
-			for (int i = 0; i < D; i++) result[i] = a[i] * b[i];
-			return result;
-		}
-
-
-		/// Define division by scalars
-		constexpr friend Vector operator/(const Vector& a, T b) noexcept
-		{
-			return a * (T(1) / b);
-		}
-
-
-		/// Define Component-wise division
-		constexpr friend Vector operator/(const Vector& a, const Vector& b)
-		{
-			Vector result;
-			for (int i = 0; i < D; i++) result[i] = a[i] / b[i];
-			return result;
-		}
-
-
 		/// Define addition assignment
 		Vector& operator+=(const Vector& rhs) noexcept
 		{
@@ -421,7 +396,7 @@ namespace Strawberry::Core::Math
 		/// Define vector normalisation
 		Vector Normalised() const noexcept requires (std::floating_point<T>)
 		{
-			Vector result = *this / Magnitude();
+			Vector result = *this * (1.0 / Magnitude());
 			for (int i = 0; i < D; i++)
 			{
 				Core::Assert(std::isfinite((*this)[i]));
