@@ -72,3 +72,29 @@ namespace Strawberry::Core::Math
 	template <typename T, unsigned Dimension>
 	using Triangle = Simplex<T, Dimension, 3>;
 }
+
+
+namespace fmt
+{
+	template <typename T, unsigned int D, unsigned int O>
+	struct formatter<Strawberry::Core::Math::Simplex<T, D, O>>
+		: public formatter<std::string>
+	{
+		auto format(const Strawberry::Core::Math::Simplex<T, D, O>& s, format_context& ctx) const
+		{
+			auto out = ctx.out();
+			out = fmt::format_to(out, "Simplex(");
+
+			for (int i = 0; i < O; i++)
+			{
+				out = fmt::format_to(out, "{}", s.Point(i));
+				if (i < O - 1) out = fmt::format_to(out, " --- ");
+			}
+
+			out = fmt::format_to(out, ")");
+
+			return out;
+		}
+	};
+}
+
