@@ -2,6 +2,7 @@
 
 
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "fmt/format.h"
 
 
 namespace Strawberry::Core::Math
@@ -31,5 +32,20 @@ namespace Strawberry::Core::Math
 	private:
 		Vector<T, D> mCenter;
 		T            mRadius;
+	};
+}
+
+
+namespace fmt
+{
+	template <typename T, unsigned D>
+	struct formatter<Strawberry::Core::Math::Sphere<T, D>> : formatter<std::string>
+	{
+		using formatter<std::string>::parse;
+
+		auto format(const Strawberry::Core::Math::Sphere<T, D>& s, format_context& ctx) -> format_context::iterator
+		{
+			return fmt::format_to(ctx.out(), "Sphere({} -- {})", s.Center(), s.Radius());
+		}
 	};
 }
