@@ -1,7 +1,6 @@
 #pragma once
 
 
-#include "Strawberry/Core/Math/Geometry/Plane.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 #include <array>
 #include <set>
