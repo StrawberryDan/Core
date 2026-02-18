@@ -4,6 +4,7 @@
 #include "Strawberry/Core/Math/Geometry/Plane.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 #include <array>
+#include <set>
 
 
 namespace Strawberry::Core::Math
@@ -26,6 +27,7 @@ namespace Strawberry::Core::Math
 
 		Vector<T, Dimension>& Point(unsigned index) { return mPoints[index]; }
 		const Vector<T, Dimension>& Point(unsigned index) const { return mPoints[index]; }
+		const std::array<Vector<T, Dimension>, Order>& Points() const { return mPoints; }
 
 		bool Contains(const Vector<T, Dimension>& point) const requires (Dimension == 2 && Order == 3)
 		{
