@@ -15,8 +15,13 @@ namespace Strawberry::Core::Math
 		Simplex() = default;
 		template <typename... Args>
 		Simplex(Args&&... args)
-			: mPoints{std::forward<Args>(args)...} {}
-		Simplex(std::array<Vector<T, Dimension>, Order> points);
+			: mPoints{std::forward<Args>(args)...}
+		{
+			if constexpr (Dimension == 2 && Order == 3)
+			{
+				MakeCounterClockwise();
+			}
+		}
 
 
 		Vector<T, Dimension>& Point(unsigned index) { return mPoints[index]; }
