@@ -564,8 +564,10 @@ namespace fmt
 {
 	template <typename T, size_t D>
 	struct formatter<Strawberry::Core::Math::Vector<T, D>>
-		: public formatter<std::string>
+		: formatter<std::string>
 	{
+		using formatter<std::string>::parse;
+		
 		auto format(const Strawberry::Core::Math::Vector<T, D>& v, format_context& ctx) const -> format_context::iterator
 		{
 			auto out = ctx.out();
