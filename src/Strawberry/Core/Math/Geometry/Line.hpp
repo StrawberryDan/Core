@@ -2,6 +2,7 @@
 
 
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
 
 
 namespace Strawberry::Core::Math
