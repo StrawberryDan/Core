@@ -19,6 +19,28 @@ namespace Strawberry::Core
 	class Logging
 	{
 	public:
+		template <typename T>
+		constexpr static decltype(auto) Stringify(T&& t) noexcept
+		{
+			if constexpr (requires (T t) { std::same_as<std::decay_t<decltype(t.ToString())>, std::string>; })
+			{
+				return std::forward<T>(t).ToString();
+			}
+			else if constexpr (requires (T t) { std::same_as<std::decay_t<decltype(t.AsString())>, std::string>; })
+			{
+				return std::forward<T>(t).AsString();
+			}
+			else if constexpr (fmt::is_formattable<T>::value)
+			{
+				return std::forward<T>(t);
+			}
+			else
+			{
+				static_assert(false, "Attempting to use unformattable type!");
+			}
+		}
+
+
 		enum class Level
 		{
 			Trace,
@@ -32,7 +54,14 @@ namespace Strawberry::Core
 		template<typename... Args>
 		static void Trace(const std::string& message, Args&&... args)
 		{
-			Log(Level::Trace, message, std::forward<Args>(args)...);
+			if constexpr (sizeof...(Args) > 0)
+			{
+				Log(Level::Trace, message, Stringify(std::forward<Args>(args))...);
+			}
+			else
+			{
+				Log(Level::Trace, message);
+			}
 		}
 
 
@@ -41,7 +70,7 @@ namespace Strawberry::Core
 		{
 			if (condition)
 			{
-				Log(Level::Trace, message, std::forward<Args>(args)...);
+				Log(Level::Trace, message, Stringify(std::forward<Args>(args))...);
 			}
 		}
 
@@ -49,7 +78,14 @@ namespace Strawberry::Core
 		template<typename... Args>
 		static void Debug(const std::string& message, Args&&... args)
 		{
-			Log(Level::Debug, message, std::forward<Args>(args)...);
+			if (sizeof...(Args) > 0)
+			{
+				Log(Level::Debug, message, Stringify(std::forward<Args>(args))...);
+			}
+			else
+			{
+				Log(Level::Debug, message);
+			}
 		}
 
 
@@ -58,7 +94,7 @@ namespace Strawberry::Core
 		{
 			if (condition)
 			{
-				Log(Level::Debug, message, std::forward<Args>(args)...);
+				Log(Level::Debug, message, Stringify(std::forward<Args>(args))...);
 			}
 		}
 
@@ -66,7 +102,14 @@ namespace Strawberry::Core
 		template<typename... Args>
 		static void Info(const std::string& message, Args&&... args)
 		{
-			Log(Level::Info, message, std::forward<Args>(args)...);
+			if constexpr (sizeof...(Args))
+			{
+				Log(Level::Info, message, Stringify(std::forward<Args>(args))...);
+			}
+			else
+			{
+				Log(Level::Info, message);
+			}
 		}
 
 
@@ -75,7 +118,7 @@ namespace Strawberry::Core
 		{
 			if (condition)
 			{
-				Log(Level::Info, message, std::forward<Args>(args)...);
+				Log(Level::Info, message, Stringify(std::forward<Args>(args))...);
 			}
 		}
 
@@ -83,7 +126,14 @@ namespace Strawberry::Core
 		template<typename... Args>
 		static void Warning(const std::string& message, Args&&... args)
 		{
-			Log(Level::Warning, message, std::forward<Args>(args)...);
+			if constexpr (sizeof...(Args))
+			{
+				Log(Level::Warning, message, Stringify(std::forward<Args>(args))...);
+			}
+			else
+			{
+				Log(Level::Warning, message);
+			}
 		}
 
 
@@ -92,7 +142,7 @@ namespace Strawberry::Core
 		{
 			if (condition)
 			{
-				Log(Level::Warning, message, std::forward<Args>(args)...);
+				Log(Level::Warning, message, Stringify(std::forward<Args>(args))...);
 			}
 		}
 
@@ -100,7 +150,14 @@ namespace Strawberry::Core
 		template<typename... Args>
 		static void Error(const std::string& message, Args&&... args)
 		{
-			Log(Level::Error, message, std::forward<Args>(args)...);
+			if constexpr (sizeof...(Args) > 0)
+			{
+				Log(Level::Error, message, Stringify(std::forward<Args>(args))...);
+			}
+			else
+			{
+				Log(Level::Error, message);
+			}
 		}
 
 
@@ -109,7 +166,7 @@ namespace Strawberry::Core
 		{
 			if (condition)
 			{
-				Log(Level::Error, message, std::forward<Args>(args)...);
+				Log(Level::Error, message, Stringify(std::forward<Args>(args))...);
 			}
 		}
 
