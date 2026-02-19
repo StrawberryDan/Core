@@ -6,14 +6,13 @@
 #include "Units.hpp"
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Markers.hpp"
-#include "fmt/format.h"
 // Standard Library
 #include <concepts>
 #include <cmath>
 #include <functional>
-#include <memory>
 #include <ranges>
 #include <tuple>
+#include <sstream>
 
 
 //======================================================================================================================
@@ -76,6 +75,19 @@ namespace Strawberry::Core::Math
 			for (int i    = 0; i < D; i++)
 				result[i] = static_cast<T2>((*this)[i]);
 			return result;
+		}
+
+
+		std::string ToString() const noexcept
+		{
+			std::stringstream ss;
+			ss << "(" << mValue[0];
+			for (int i = 1; i < D; i++)
+			{
+				ss << " ," << mValue[i];
+			}
+			ss << ")";
+			return ss.str();
 		}
 
 
@@ -567,7 +579,7 @@ namespace fmt
 		: formatter<std::string>
 	{
 		using formatter<std::string>::parse;
-		
+
 		auto format(const Strawberry::Core::Math::Vector<T, D>& v, format_context& ctx) const -> format_context::iterator
 		{
 			auto out = ctx.out();
