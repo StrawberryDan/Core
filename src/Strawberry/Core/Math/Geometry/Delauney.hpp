@@ -4,6 +4,7 @@
 #include "Strawberry/Core/Markers.hpp"
 #include "Strawberry/Core/Math/Geometry/PointSet.hpp"
 #include "Strawberry/Core/Math/Geometry/Simplex.hpp"
+#include "Strawberry/Core/Math/Geometry/Sphere.hpp"
 #include "Strawberry/Core/Math/Graph.hpp"
 #include <algorithm>
 #include <ranges>
@@ -22,14 +23,26 @@ namespace Strawberry::Core::Math
 		struct Face
 		{
 			Face(unsigned int a, unsigned int b, unsigned int c)
-				: mFaces{a, b, c}
+				: nodes{a, b, c}
 			{
-				std::sort(mFaces.begin(), mFaces.end());
+				std::sort(nodes.begin(), nodes.end());
 			}
 
 			auto operator<=>(const Face& other) const = default;
 
-			std::array<unsigned int, 3> mFaces;
+			bool ContainsEdge(Edge edge) const noexcept
+			{
+				return GetEdges().contains(edge);
+			}
+
+			std::set<Edge> GetEdges() const noexcept
+			{
+				return { Edge(nodes[0], nodes[1]),
+						 Edge(nodes[1], nodes[2]),
+						 Edge(nodes[2], nodes[0])};
+			}
+
+			std::array<unsigned int, 3> nodes;
 		};
 
 
@@ -39,8 +52,8 @@ namespace Strawberry::Core::Math
 
 			auto min = points.MinExtreme();
 			auto max = points.MaxExtreme();
-			min = min + 0.1 * (min - max);
-			max = max + 0.1 * (max - min);
+			min = (min + 0.1 * (min - max)).Offset(-50, -50);
+			max = (max + 0.1 * (max - min)).Offset(50, 50);
 
 			delaunay.Graph::AddNode(min);
 			delaunay.Graph::AddNode(Vector{max[0], min[1]});
@@ -52,11 +65,16 @@ namespace Strawberry::Core::Math
 			delaunay.AddEdge(2, 0);
 			delaunay.AddEdge(1, 3);
 			delaunay.AddEdge(2, 3);
+			delaunay.AddEdge(3, 1);
+			Core::AssertEQ(delaunay.mFaces.size(), 2);
 
 			for (int i = 0; i < points.Size(); i++)
 			{
 				delaunay.AddNode(points.Get(i));
 			}
+
+			AssertEQ(delaunay.GetNodes().size() - delaunay.GetEdges().size() + delaunay.GetFaces().size(), 2,
+					 "Delaunay graph was not planar!");
 
 			return delaunay;
 		}
@@ -83,11 +101,30 @@ namespace Strawberry::Core::Math
 
 			unsigned int newNode = Graph::AddNode(value);
 
-			Face containingFace = FindContainingFace(value);
+			auto conflictingFaces = mFaces
+				| std::views::filter([this, value](Face face)
+				{
+					Triangle<T, 2> triangle(
+						this->GetValue(face.nodes[0]),
+						this->GetValue(face.nodes[1]),
+						this->GetValue(face.nodes[2]));
 
-			AddEdge(newNode, containingFace.mFaces[0]);
-			AddEdge(newNode, containingFace.mFaces[1]);
-			AddEdge(newNode, containingFace.mFaces[2]);
+					Optional<Sphere<T, 2>> circumcircle = Sphere<T, 2>::Circumcsphere(triangle);
+					bool circumcircleTest = !circumcircle || circumcircle.Value().Contains(value);
+					return circumcircleTest;
+				}) | std::ranges::to<std::vector>();
+
+			for (auto face : conflictingFaces)
+			{
+				EraseFace(face);
+			}
+
+			for (auto face : conflictingFaces)
+			{
+				AddEdge(face.nodes[0], newNode);
+				AddEdge(face.nodes[1], newNode);
+				AddEdge(face.nodes[2], newNode);
+			}
 		}
 
 
@@ -101,15 +138,15 @@ namespace Strawberry::Core::Math
 		{
 			Graph::AddEdge(edge);
 
+			// Get the neighbours.
 			auto neighboursA = this->GetNeighbourIndices(edge.nodes[0]);
 			auto neighboursB = this->GetNeighbourIndices(edge.nodes[1]);
-
+			// Find mutual neighbours
 			std::set<unsigned int> mutualNeighbours;
-
 			std::set_intersection(neighboursA.begin(), neighboursA.end(),
 								  neighboursB.begin(), neighboursB.end(),
 								  std::inserter(mutualNeighbours, mutualNeighbours.begin()));
-
+			// Create face for each mutual neighbour.
 			for (auto mn : mutualNeighbours)
 			{
 				mFaces.emplace(edge.nodes[0], edge.nodes[1], mn);
@@ -117,20 +154,19 @@ namespace Strawberry::Core::Math
 		}
 
 
+		const std::set<Face>& GetFaces() const noexcept
+		{
+			return mFaces;
+		}
+
+
 		Face FindContainingFace(const Vector<T, 2>& value)
 		{
+			// Check all faces to find containing one.
 			for (auto face : std::views::reverse(mFaces))
 			{
-				Triangle<T, 2> triangle(this->GetValue(face.mFaces[0]), this->GetValue(face.mFaces[1]), this->GetValue(face.mFaces[2]));
+				Triangle<T, 2> triangle(this->GetValue(face.nodes[0]), this->GetValue(face.nodes[1]), this->GetValue(face.nodes[2]));
 				triangle.MakeCounterClockwise();
-
-				Core::Logging::Trace("Checking point {}, {} against triangle ({}, {}), ({}, {}),.({}, {}) -> {}",
-									 value[0], value[1],
-									 triangle.Point(0)[0], triangle.Point(0)[1],
-									 triangle.Point(1)[0], triangle.Point(1)[1],
-									 triangle.Point(2)[0], triangle.Point(2)[1],
-									 triangle.Contains(value)
-			);
 
 				if (triangle.Contains(value))
 					return face;
@@ -139,7 +175,36 @@ namespace Strawberry::Core::Math
 			Core::Unreachable();
 		}
 
+		void EraseFace(const Face& face)
+		{
+			mFaces.erase(face);
 
+			for (auto edge : face.GetEdges())
+			{
+				// Do not remove bounding edges
+				auto isBoundingEdge = [] (Graph::Edge e)
+				{
+					return e == Edge(0, 1) || e == Edge(2, 0) || e == Edge(2, 3) || e == Edge(1, 3);
+				};
+				if (isBoundingEdge(edge)) continue;
+
+				// Check if any other face contains this edge
+				bool otherFaceHas = std::ranges::any_of(
+					mFaces,
+					[edge] (Face f)
+					{
+						return f.ContainsEdge(edge);
+					});
+				// If no other face has thie edge, then remove it.
+				if (!otherFaceHas)
+				{
+					this->RemoveEdge(edge);
+				}
+			}
+		}
+
+
+	private:
 		Delauney() = default;
 
 
