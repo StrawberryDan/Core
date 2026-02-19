@@ -67,6 +67,12 @@ namespace Strawberry::Core::Math
 		}
 
 
+		std::string ToString() const noexcept
+		{
+			return fmt::format("Ray(from {} direction  {})", Origin().ToString(), Direction().ToString());
+		}
+
+
 	private:
 		Vector<T, D> mOrigin;
 		Vector<T, D> mDirection;
@@ -118,6 +124,12 @@ namespace Strawberry::Core::Math
 		auto operator<=>(const Line& line) const = default;
 
 
+		std::string ToString() const noexcept
+		{
+			return fmt::format("Line({} --> {})", A().ToString(), B().ToString());
+		}
+
+
 	private:
 		std::array<Vector<T, D>, 2> mPoints;
 	};
@@ -167,13 +179,19 @@ namespace Strawberry::Core::Math
 		{
 			return Line<T, D>(this->A(), this->B());
 		}
+
+
+		std::string ToString() const noexcept
+		{
+			return fmt::format("LineSegment({} --> {})", this->A().ToString(), this->B().ToString());
+		}
 	};
 }
 
 
 namespace fmt
 {
-	template <typename T, unsigned D>
+	template <typename T, size_t D>
 	struct formatter<Strawberry::Core::Math::Line<T, D>> : formatter<std::string>
 	{
 		using formatter<std::string>::parse;
