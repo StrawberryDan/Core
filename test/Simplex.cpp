@@ -18,7 +18,7 @@ int main()
 	Assert(!s1.Contains(Vector{-1., -1.}));
 
 
-	auto sphere = Sphere<double, 2>::Circumcsphere(s1);
+	auto sphere = Sphere<double, 2>::Circumsphere(s1);
 	AssertEQ(sphere->Center(), Vector<double, 2>{0.5, 0.5});
 	Assert((sphere->Radius() - std::sqrt(2.0) / 2.0 ) < std::numeric_limits<double>::epsilon());
 

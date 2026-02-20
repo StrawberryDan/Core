@@ -84,7 +84,7 @@ namespace Strawberry::Core::Math
 			ss << "(" << mValue[0];
 			for (int i = 1; i < D; i++)
 			{
-				ss << " ," << mValue[i];
+				ss << ", " << mValue[i];
 			}
 			ss << ")";
 			return ss.str();

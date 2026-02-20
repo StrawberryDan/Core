@@ -18,7 +18,7 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		template <unsigned int O>
-		static Core::Optional<Sphere> Circumcsphere(const Simplex<T, D, O>& s)
+		static Core::Optional<Sphere> Circumsphere(const Simplex<T, D, O>& s)
 		{
 			Sphere sphere;
 
