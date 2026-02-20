@@ -18,6 +18,9 @@ namespace Strawberry::Core::Math
 		Vector<T, D>& Get(unsigned int i) { return mPoints[i]; }
 
 
+		const auto& Points() const noexcept { return mPoints; }
+
+
 		unsigned int Size() const { return mPoints.size(); }
 
 

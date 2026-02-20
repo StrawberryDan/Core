@@ -1,57 +1,80 @@
+#include "Strawberry/Core/Math/Geometry/PointSet.hpp"
 #include "Strawberry/Core/Math/Geometry/Delauney.hpp"
 #include "Strawberry/Core/Util/Image.hpp"
 #include "canvas_ity.hpp"
+#include <random>
 
 
 using namespace Strawberry::Core;
 using namespace Math;
 
+static PointSet<double, 2> GeneratePointSet()
+{
+	static size_t POINT_COUNT = 32;
+	PointSet<double, 2> points;
+
+	std::random_device rng;
+	std::uniform_real_distribution<double> dist(0.0, 1000.0);
+
+	for (int i = 0; i < POINT_COUNT; i++)
+	{
+		Vector<double, 2> v(dist(rng), dist(rng));
+		points.Add(v.AsType<int>().AsType<double>());
+	}
+	return points;
+}
+
 int main()
 {
-	PointSet<double, 2> pointSet;
+	PointSet<double, 2> pointSet = GeneratePointSet();
 
-	pointSet.Add({0.0, 0.0});
-	pointSet.Add({1000.0, 1000.0});
-	pointSet.Add({800, 900});
-	pointSet.Add({900, 800});
-	pointSet.Add({700, 800});
-	pointSet.Add({800, 700});
+	Delauney delauney(Vector{0., 0.}, Vector{1000., 1000.});
 
-	auto delauney = Delauney<double>::FromPoints(pointSet);
+	auto drawGraph = [&](int i) {
+		auto min = delauney.GetMin();
+		auto max = delauney.GetMax();
+		auto span = max - min;
 
-	auto min = delauney.GetMinPoint();
-	auto max = delauney.GetMaxPoint();
-	auto span = max - min;
-	span[0] += 20; span[1] += 20;
+		Image<PixelRGBA> image(span.AsType<unsigned int>());
+		canvas_ity::canvas context(span[0], span[1]);
 
-	Image<PixelRGBA> image(span.AsType<unsigned int>());
+		for (auto edge : delauney.Edges())
+		{
+			context.set_line_width(8.0);
+			Vector<double, 2> posA = delauney.GetValue(edge.nodes[0]) - min;
+			Vector<double, 2> posB = delauney.GetValue(edge.nodes[1]) - min;
+			context.set_color(canvas_ity::brush_type::stroke_style, 1.0f, 1.0f, 1.0f, 1.0f);
+			context.begin_path();
+			context.move_to(posA[0], posA[1]);
+			context.line_to(posB[0], posB[1]);
+			context.stroke();
+		}
 
-	canvas_ity::canvas context(span[0], span[1]);
 
-	for (auto nodes : delauney.GetNodes())
+		for (auto node : delauney.Nodes())
+		{
+			auto pos = delauney.GetValue(node) - min;
+			context.set_line_width(8.0);
+			context.set_color(canvas_ity::brush_type::fill_style, 1.0f, 0.0f, 0.0f, 1.0f);
+			context.begin_path();
+			context.arc(pos[0], pos[1], 20, 0, 360);
+			context.fill();
+
+			context.fill_text(std::to_string(node).c_str(), pos[0], pos[1]);
+		}
+
+		context.get_image_data((unsigned char*) image.Data(), image.Width(), image.Height(), image.Width() * decltype(image)::PixelType::Size, 0, 0);
+		image.Save(fmt::format("delauney_output_{}.png", i));
+	};
+
+
+	int i = 0;
+	for (auto point : pointSet.Points())
 	{
-		auto pos = nodes.second.Offset(10, 10) - min;
-		Logging::Info("Drawing node at {}, {}", pos[0], pos[1]);
-		context.set_line_width(5.0);
-		context.set_color(canvas_ity::brush_type::stroke_style, 1.0f, 1.0f, 1.0f, 1.0f);
-		context.begin_path();
-		context.arc(pos[0], pos[1], 5, 0, 360);
-		context.stroke();
+		delauney.AddNode(point);
+		drawGraph(i++);
 	}
 
-	for (auto edge : delauney.GetEdges())
-	{
-		Vector<double, 2> posA = delauney.GetValue(edge.nodes[0]).Offset(10, 10) - min;
-		Vector<double, 2> posB = delauney.GetValue(edge.nodes[1]).Offset(10, 10) - min;
-		context.move_to(posA[0], posA[1]);
-		context.line_to(posB[0], posB[1]);
-		context.stroke();
-	}
-
-	context.get_image_data((unsigned char*) image.Data(), image.Width(), image.Height(), image.Width() * decltype(image)::PixelType::Size, 0, 0);
-
-
-	image.Save("delauney_output.png");
 
 	return 0;
 }

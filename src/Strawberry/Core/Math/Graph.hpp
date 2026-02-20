@@ -47,6 +47,8 @@ namespace Strawberry::Core::Math
 				{
 					if (nodes[0] > nodes[1]) std::swap(nodes[0], nodes[1]);
 				}
+
+				AssertNEQ(a, b);
 			}
 
 
@@ -88,6 +90,18 @@ namespace Strawberry::Core::Math
 		}
 
 
+		auto Nodes() const noexcept
+		{
+			return mNodes | std::views::transform([] (auto&& x) { return x.first; });
+		}
+
+
+		auto Values() const noexcept
+		{
+			return mNodes | std::views::transform([] (auto&& x) { return x.second; });
+		}
+
+
 		template <typename T> requires (std::same_as<Payload, std::decay_t<T>>)
 		unsigned AddNode(T&& node)
 		{
@@ -109,12 +123,6 @@ namespace Strawberry::Core::Math
 			{
 				RemoveEdge(edge);
 			}
-		}
-
-
-		const std::map<unsigned int, Payload>& GetNodes() const
-		{
-			return mNodes;
 		}
 
 
@@ -144,7 +152,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		const std::set<Edge>& GetEdges() const
+		const std::set<Edge>& Edges() const
 		{
 			return mEdges;
 		}
