@@ -72,8 +72,8 @@ int main()
 	for (auto point : pointSet.Points())
 	{
 		delauney.AddNode(point);
-		drawGraph(i++);
 	}
+	drawGraph(0);
 
 
 	return 0;

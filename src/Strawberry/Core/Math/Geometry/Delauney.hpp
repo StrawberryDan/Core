@@ -61,12 +61,11 @@ namespace Strawberry::Core::Math
 
 
 		Delauney(const Vector<T, 2>& min, const Vector<T, 2>& max) noexcept
-			: mMin(min), mMax(max)
 		{
-			this->Graph::AddNode(Vector{mMin[0], mMin[1]});
-			this->Graph::AddNode(Vector{mMax[0], mMin[1]});
-			this->Graph::AddNode(Vector{mMin[0], mMax[1]});
-			this->Graph::AddNode(Vector{mMax[0], mMax[1]});
+			this->Graph::AddNode(Vector{min[0], min[1]});
+			this->Graph::AddNode(Vector{max[0], min[1]});
+			this->Graph::AddNode(Vector{min[0], max[1]});
+			this->Graph::AddNode(Vector{max[0], max[1]});
 
 			this->AddEdge(Edge(0, 1));
 			this->AddEdge(Edge(0, 2));
@@ -159,11 +158,13 @@ namespace Strawberry::Core::Math
 		}
 
 
-		const Vector<T, 2> GetMin() const noexcept { return mMin; }
-		const Vector<T, 2> GetMax() const noexcept { return mMax; }
+		const Vector<T, 2> GetMin() const noexcept { return this->GetValue(0); }
+		const Vector<T, 2> GetMax() const noexcept { return this->GetValue(3); }
 
 
 	private:
+		/// Return the set of faces that conflict with the node given.
+		/// Faces conflict with a node if their circumcircle contains that node.
 		std::set<Face> GetConflictingFaces(unsigned int node) const
 		{
 			std::set<Face> conflicingFaces;
@@ -180,6 +181,7 @@ namespace Strawberry::Core::Math
 			return conflicingFaces;
 		}
 
+		/// Get the corresponding triangle of the face.
 		Triangle<T, 2> FaceToTriangle(Face face) const
 		{
 			return Triangle<T, 2>{
@@ -189,6 +191,8 @@ namespace Strawberry::Core::Math
 			};
 		}
 
+		/// Returns the set of edges that are shared by more than one
+		/// of the set of faces given.
 		std::set<Edge> GetSharedEdges(const std::set<Face>& faces) const
 		{
 			std::map<Edge, unsigned int> mVotes;
@@ -219,8 +223,6 @@ namespace Strawberry::Core::Math
 
 
 	private:
-		Vector<T, 2> mMin;
-		Vector<T, 2> mMax;
 		std::set<Face> mFaces;
 	};
 }
