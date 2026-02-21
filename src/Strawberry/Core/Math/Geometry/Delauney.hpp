@@ -186,6 +186,7 @@ namespace Strawberry::Core::Math
 			}
 		}
 
+		/// Use Remove Edge here and make it private to hide it.
 		using Graph::RemoveEdge;
 
 		/// Adds a face to this graph.
