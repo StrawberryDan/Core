@@ -108,9 +108,9 @@ namespace Strawberry::Core::Math
 				this->AddEdge(edge);
 			}
 
-			Core::AssertEQ(
+			Core::Assert(
 				IsPlanar(),
-				"Delaunay graph is not planar!");
+				"Delaunay graph is not planar after call to Delaunay::AddNode!");
 		}
 
 
