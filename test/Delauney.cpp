@@ -30,19 +30,20 @@ int main()
 
 	Delauney delauney(Vector{0., 0.}, Vector{1000., 1000.});
 
-	auto drawGraph = [&](int i) {
-		auto min = delauney.GetMin();
-		auto max = delauney.GetMax();
+	auto drawGraph = [&](const auto& graph, int i) {
+		auto pruned = graph.PruneSupportingVertices();
+		auto min = graph.GetMin();
+		auto max = graph.GetMax();
 		auto span = max - min;
 
-		Image<PixelRGBA> image(span.AsType<unsigned int>());
+		Image<PixelRGBA> image(span.template AsType<unsigned int>());
 		canvas_ity::canvas context(span[0], span[1]);
 
-		for (auto edge : delauney.Edges())
+		for (auto edge : pruned.Edges())
 		{
 			context.set_line_width(8.0);
-			Vector<double, 2> posA = delauney.GetValue(edge.nodes[0]) - min;
-			Vector<double, 2> posB = delauney.GetValue(edge.nodes[1]) - min;
+			Vector<double, 2> posA = pruned.GetValue(edge.nodes[0]) - min;
+			Vector<double, 2> posB = pruned.GetValue(edge.nodes[1]) - min;
 			context.set_color(canvas_ity::brush_type::stroke_style, 1.0f, 1.0f, 1.0f, 1.0f);
 			context.begin_path();
 			context.move_to(posA[0], posA[1]);
@@ -51,9 +52,9 @@ int main()
 		}
 
 
-		for (auto node : delauney.Nodes())
+		for (auto node : pruned.Nodes())
 		{
-			auto pos = delauney.GetValue(node) - min;
+			auto pos = pruned.GetValue(node) - min;
 			context.set_line_width(8.0);
 			context.set_color(canvas_ity::brush_type::fill_style, 1.0f, 0.0f, 0.0f, 1.0f);
 			context.begin_path();
@@ -73,7 +74,7 @@ int main()
 	{
 		delauney.AddNode(point);
 	}
-	drawGraph(0);
+	drawGraph(delauney, 0);
 
 
 	return 0;

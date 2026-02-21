@@ -126,29 +126,15 @@ namespace Strawberry::Core::Math
 		}
 
 
-		void AddEdge(unsigned nodeAIndex, unsigned nodeBIndex)
-		{
-			// Insert edge
-			mEdges.insert({nodeAIndex, nodeBIndex});
-		}
-
-
 		void AddEdge(Edge e)
 		{
-			AddEdge(e.nodes[0], e.nodes[1]);
-		}
-
-
-		void RemoveEdge(unsigned int nodeA, unsigned int nodeB)
-		{
-			Edge edge(nodeA, nodeB);
-			mEdges.erase(edge);
+			mEdges.insert(e);
 		}
 
 
 		void RemoveEdge(Edge e)
 		{
-			RemoveEdge(e.nodes[0], e.nodes[1]);
+			mEdges.erase(e);
 		}
 
 
@@ -219,8 +205,11 @@ namespace Strawberry::Core::Math
 
 
 	private:
+		/// Incrementing counter for generating node IDs
 		unsigned int mNextID = 0;
+		/// The map of nodes, associates node ids to values.
 		std::map<unsigned int, Payload> mNodes;
+		/// The set of edges in this graph.
 		std::set<Edge> mEdges;
 	};
 

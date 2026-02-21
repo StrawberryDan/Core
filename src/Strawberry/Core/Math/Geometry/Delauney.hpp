@@ -19,6 +19,7 @@ namespace Strawberry::Core::Math
 		using typename UndirectedGraph<Vector<T, 2>>::Edge;
 
 
+		/// Struct for faces represented in this graph.
 		struct Face
 		{
 		public:
@@ -60,6 +61,7 @@ namespace Strawberry::Core::Math
 		};
 
 
+		/// Constructs a basic Delaunay triangulation with rectangular bounds.
 		Delauney(const Vector<T, 2>& min, const Vector<T, 2>& max) noexcept
 		{
 			this->Graph::AddNode(Vector{min[0], min[1]});
@@ -76,8 +78,11 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Adds a node to this graph and connects it to the triangulation.
 		void AddNode(const Vector<T, 2>& value)
 		{
+			Core::Assert(InBounds(value), "Attempted to call Delaunay::AddNode() with out of bounds point!");
+
 			auto newNode = Graph::AddNode(value);
 
 			auto conflictingFaces = GetConflictingFaces(newNode);
@@ -113,6 +118,60 @@ namespace Strawberry::Core::Math
 		}
 
 
+		void RemoveNode(unsigned int node)
+		{
+			Graph::RemoveNode(node);
+			auto edgesToRemove = this->Edges()
+				| std::views::filter([node] (Edge e) { return e.ContainsNode(node); })
+				| std::ranges::to<std::set>();
+			auto facesToRemove = this->Faces()
+				| std::views::filter([node] (Face f) { return f.ContainsNode(node); })
+				| std::ranges::to<std::set>();
+
+			for (auto edge : edgesToRemove)
+			{
+				Graph::RemoveEdge(edge);
+			}
+
+			for (auto face : facesToRemove)
+			{
+				mFaces.erase(face);
+			}
+		}
+
+
+		/// Const accessor to the set of all faces in the graph.
+		const auto& Faces() const noexcept
+		{
+			return mFaces;
+		}
+
+
+		/// Return the minumum point of this graph.
+		const Vector<T, 2> GetMin() const noexcept { return this->GetValue(0); }
+		/// Return the maximum point of this graph.
+		const Vector<T, 2> GetMax() const noexcept { return this->GetValue(3); }
+
+
+		/// Returns this triangulation with the supporting vertices removed.
+		///
+		/// Since, without the bounding vertices, this graph cannot support further addition to the graph,
+		/// it is demoted to a normal graph.
+		Graph PruneSupportingVertices() const
+		{
+			Delauney copy = *this;
+
+			copy.RemoveNode(0);
+			copy.RemoveNode(1);
+			copy.RemoveNode(2);
+			copy.RemoveNode(3);
+
+			return std::move(static_cast<Graph>(copy));
+		}
+
+
+	private:
+		/// Adds an edge to this graph, and forms any faces resulting from the addition.
 		void AddEdge(Edge edge)
 		{
 			this->Graph::AddEdge(edge);
@@ -127,7 +186,10 @@ namespace Strawberry::Core::Math
 			}
 		}
 
+		using Graph::RemoveEdge;
 
+		/// Adds a face to this graph.
+		/// Excludes faces which contain other nodes.
 		void AddFace(Face face)
 		{
 			auto triangle = FaceToTriangle(face);
@@ -151,18 +213,14 @@ namespace Strawberry::Core::Math
 			}
 		}
 
-
-		const auto& Faces() const noexcept
+		/// Returns whether the point v is within the bounds of this graph.
+		bool InBounds(const Vector<T, 2>& v) const
 		{
-			return mFaces;
+			auto& min = GetMin();
+			auto& max = GetMax();
+
+			return v[0] >= min[0] && v[1] >= min[1] && v[0] <= max[0] && v[1] <= max[1];
 		}
-
-
-		const Vector<T, 2> GetMin() const noexcept { return this->GetValue(0); }
-		const Vector<T, 2> GetMax() const noexcept { return this->GetValue(3); }
-
-
-	private:
 		/// Return the set of faces that conflict with the node given.
 		/// Faces conflict with a node if their circumcircle contains that node.
 		std::set<Face> GetConflictingFaces(unsigned int node) const
