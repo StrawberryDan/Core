@@ -210,6 +210,10 @@ namespace Strawberry::Core::Math
 
 		bool IsPlanar() const noexcept
 		{
+			// If this graph is planar, then the following identity will be true.
+			// Based on Euler's V - E + F = 2 indentity.
+			// That identity includes the mega-face outside the graph. Since we don't include
+			// that, we check equality to 1 and not 2.
 			return this->Nodes().size() - this->Edges().size() + this->Faces().size() == 1;
 		}
 
