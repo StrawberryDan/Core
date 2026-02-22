@@ -320,7 +320,9 @@ namespace Strawberry::Core::Math
 		/// Get the center of the cicumcirle of the triangle represented by this face.
 		Vector<T, 2> GetFaceCenter(Face face) const
 		{
-			return FaceToTriangle(face).GetCircumsphere().Unwrap().Center();
+			auto circumsphere = FaceToTriangle(face).GetCircumsphere();
+			Assert(circumsphere.HasValue(), "Attempted to get the center of a degenerate face in Delaunay!");
+			return circumsphere->Center();
 		}
 
 		/// Return the set of faces that share an edge with this face.
