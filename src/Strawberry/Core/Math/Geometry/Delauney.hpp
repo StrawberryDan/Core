@@ -276,14 +276,39 @@ namespace Strawberry::Core::Math
 				| std::ranges::to<std::set>();
 		}
 
-
+		// If this graph is planar, then the following identity will be true.
+		// Based on Euler's V - E + F = 2 indentity.
+		// That identity includes the mega-face outside the graph. Since we don't include
+		// that, we check equality to 1 and not 2.
 		bool IsPlanar() const noexcept
 		{
-			// If this graph is planar, then the following identity will be true.
-			// Based on Euler's V - E + F = 2 indentity.
-			// That identity includes the mega-face outside the graph. Since we don't include
-			// that, we check equality to 1 and not 2.
 			return this->Nodes().size() - this->Edges().size() + this->Faces().size() == 1;
+		}
+
+
+		/// Get the center of the cicumcirle of the triangle represented by this face.
+		Vector<T, 2> GetFaceCenter(Face face) const
+		{
+			return FaceToTriangle(face).GetCircumsphere().Unwrap().Center();
+		}
+
+		/// Return the set of faces that share an edge with this face.
+		std::set<Face> GetAdjacentFaces(Face face) const
+		{
+			std::set<Face> adjacentFaces;
+
+			for (auto edge : face.GetEdges())
+			{
+				for (auto otherFace : mFaces)
+				{
+					if (otherFace != face && otherFace.ContainsEdge(edge))
+					{
+						adjacentFaces.insert(otherFace);
+					}
+				}
+			}
+
+			return adjacentFaces;
 		}
 
 
