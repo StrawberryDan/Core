@@ -5,6 +5,7 @@
 #include "Strawberry/Core/Math/Geometry/Sphere.hpp"
 #include "Strawberry/Core/Math/Graph.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Math/Geometry/Voronoi.hpp"
 #include <algorithm>
 #include <map>
 
@@ -173,6 +174,36 @@ namespace Strawberry::Core::Math
 			copy.RemoveNode(3);
 
 			return std::move(static_cast<Graph>(copy));
+		}
+
+		/// Returns the voronoi edge graph for this delaunay triangulation.
+		///
+		/// This works because delauney triangulations and voronoi diagrams are duals of eachother.
+		Voronoi<T> ToVoronoi() const
+		{
+			Voronoi<T> graph;
+
+
+			std::map<Face, unsigned int> faceCenterNodeIDs;
+
+
+			for (auto face : this->Faces())
+			{
+				faceCenterNodeIDs.emplace(face, graph.AddNode(GetFaceCenter(face)));
+			}
+
+			for (auto face : this->Faces())
+			{
+				auto neighbours = this->GetAdjacentFaces(face);
+
+				for (auto n : neighbours)
+				{
+					graph.AddEdge(typename Graph::Edge(faceCenterNodeIDs[face], faceCenterNodeIDs[n]));
+				}
+			}
+
+
+			return graph;
 		}
 
 
