@@ -43,6 +43,12 @@ namespace Strawberry::Core::Math
 			}
 
 
+			bool ContainsEdge(Edge e) const noexcept
+			{
+				return GetEdges().contains(e);
+			}
+
+
 			std::set<Edge> GetEdges() const noexcept
 			{
 				return {
