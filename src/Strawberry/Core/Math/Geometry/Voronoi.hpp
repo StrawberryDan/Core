@@ -9,7 +9,7 @@ namespace Strawberry::Core::Math
 {
 	template <typename T>
 	class Voronoi
-		: protected Graph<Vector<T, 2>>
+		: public Graph<Vector<T, 2>>
 	{
 	public:
 		Voronoi() = default;
