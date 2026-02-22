@@ -231,7 +231,7 @@ namespace Strawberry::Core::Math
 			for (auto face : mFaces)
 			{
 				Triangle<double, 2> triangle = FaceToTriangle(face);
-				Optional<Sphere<double, 2>> circumcircle = Sphere<double, 2>::Circumsphere(triangle);
+				Optional<Sphere<double, 2>> circumcircle = triangle.GetCircumsphere();
 				if (circumcircle && circumcircle->Contains(v))
 				{
 					conflicingFaces.emplace(face);

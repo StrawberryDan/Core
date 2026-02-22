@@ -1,14 +1,7 @@
 #pragma once
 
-
-
-#include "Strawberry/Core/IO/Logging.hpp"
-#include "Strawberry/Core/Math/Geometry/Simplex.hpp"
-#include "Strawberry/Core/Math/Geometry/Line.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "fmt/format.h"
-#include "fmt/ranges.h"
-#include <ranges>
 
 
 namespace Strawberry::Core::Math
@@ -17,33 +10,6 @@ namespace Strawberry::Core::Math
 	class Sphere
 	{
 	public:
-		template <unsigned int O>
-		static Core::Optional<Sphere> Circumsphere(const Simplex<T, D, O>& s)
-		{
-			Sphere sphere;
-
-			auto lines = s.GetLineSegments()
-				| std::views::transform([] (LineSegment<T, D> l)
-				{
-					return Line<T, D>(l.Midpoint(), l.Midpoint() + l.Direction().Perpendicular());
-				})
-				| std::ranges::to<std::vector>();
-
-
-			auto intersection = lines[0].Intersection(lines[1]);
-			if (intersection)
-			{
-				sphere.Center() = intersection.Value();
-				sphere.Radius() = (s.Point(0) - sphere.Center()).Magnitude();
-				return sphere;
-			}
-			else
-			{
-				return NullOpt;
-			}
-		}
-
-
 		Sphere() = default;
 		Sphere(const Vector<T, D>& center, T radius)
 			: mCenter(center), mRadius(radius) {}

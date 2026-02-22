@@ -3,6 +3,7 @@
 
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Math/Geometry/Line.hpp"
+#include "Strawberry/Core/Math/Geometry/Sphere.hpp"
 #include <array>
 #include <set>
 
@@ -82,6 +83,25 @@ namespace Strawberry::Core::Math
 				Core::AssertEQ(lines.size(), (Order * (Order - 1)) / 2);
 				return lines;
 			}
+		}
+
+
+		Core::Optional<Sphere<T, Dimension>> GetCircumsphere() const requires (Dimension == 2 && Order == 3)
+		{
+			auto perps = GetLineSegments() | std::views::take(2) | std::views::transform([] (LineSegment<T, Dimension> l)
+			{
+				return Line<T, Dimension>(l.Midpoint(), l.Midpoint() + l.Direction().Perpendicular());
+			}) | std::ranges::to<std::vector>();
+
+			auto center = perps[0].Intersection(perps[1]);
+
+			if (center)
+			{
+				auto radius = (Point(0) - *center).Magnitude();
+				return Sphere<T, Dimension>(*center, radius);
+			}
+
+			return NullOpt;
 		}
 
 
