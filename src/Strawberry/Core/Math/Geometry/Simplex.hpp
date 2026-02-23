@@ -2,7 +2,7 @@
 
 
 #include "Strawberry/Core/Math/Vector.hpp"
-#include "Strawberry/Core/Math/Geometry/Line.hpp"
+#include "Strawberry/Core/Math/Geometry/LineSegment.hpp"
 #include "Strawberry/Core/Math/Geometry/Sphere.hpp"
 #include <array>
 #include <set>

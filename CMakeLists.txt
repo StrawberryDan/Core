@@ -91,19 +91,22 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/IO/Receiver.hpp
     src/Strawberry/Core/Markers.cpp
     src/Strawberry/Core/Markers.hpp
+    src/Strawberry/Core/Math/Checked.hpp
     src/Strawberry/Core/Math/Clamped.hpp
     src/Strawberry/Core/Math/Geometry/Delauney.hpp
     src/Strawberry/Core/Math/Geometry/Line.hpp
+    src/Strawberry/Core/Math/Geometry/LineSegment.hpp
     src/Strawberry/Core/Math/Geometry/Plane.hpp
     src/Strawberry/Core/Math/Geometry/PointSet.hpp
+    src/Strawberry/Core/Math/Geometry/Ray.hpp
     src/Strawberry/Core/Math/Geometry/Simplex.hpp
     src/Strawberry/Core/Math/Geometry/Sphere.hpp
     src/Strawberry/Core/Math/Geometry/Voronoi.hpp
+    src/Strawberry/Core/Math/Graph.hpp
     src/Strawberry/Core/Math/Math.hpp
     src/Strawberry/Core/Math/Math.inl
     src/Strawberry/Core/Math/Matrix.hpp
     src/Strawberry/Core/Math/Noise.cpp
-    src/Strawberry/Core/Math/Graph.hpp
     src/Strawberry/Core/Math/Noise.hpp
     src/Strawberry/Core/Math/Periodic.hpp
     src/Strawberry/Core/Math/Rational.hpp
@@ -134,13 +137,12 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/UTF.cpp
     src/Strawberry/Core/UTF.hpp
     src/Strawberry/Core/Util/Alloc.hpp
+    src/Strawberry/Core/Util/CanvasItyImplementation.cpp
     src/Strawberry/Core/Util/IDPool.hpp
     src/Strawberry/Core/Util/Image.hpp
     src/Strawberry/Core/Util/Image.inl
     src/Strawberry/Core/Util/Ranges.hpp
-    src/Strawberry/Core/Util/CanvasItyImplementation.cpp
     src/Strawberry/Core/Util/Strings.hpp
-    src/Strawberry/Core/Math/Checked.hpp
   )
 
 

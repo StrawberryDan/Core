@@ -1,3 +1,4 @@
+#include "Strawberry/Core/Math/Geometry/LineSegment.hpp"
 #include "Strawberry/Core/Math/Geometry/PointSet.hpp"
 #include "Strawberry/Core/Math/Geometry/Delauney.hpp"
 #include "Strawberry/Core/Util/Image.hpp"
