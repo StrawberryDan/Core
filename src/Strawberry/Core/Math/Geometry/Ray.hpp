@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Math/Geometry/Line.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
+
 
 namespace Strawberry::Core::Math
 {
