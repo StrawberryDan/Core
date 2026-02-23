@@ -90,7 +90,7 @@ int main()
 	auto voronoi = Voronoi<double>::From(delauney);
 
 	DrawGraph(context, voronoi.Triangulation(), mainColoring);
-	DrawGraph(context, voronoi.Edges(), voronoiColoring);
+	DrawGraph(context, voronoi.Cells(), voronoiColoring);
 
 	context.get_image_data((unsigned char*) image.Data(), image.Width(), image.Height(), image.Width() * decltype(image)::PixelType::Size, 0, 0);
 	image.Save(fmt::format("delauney_output.png"));

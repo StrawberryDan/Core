@@ -10,7 +10,6 @@ namespace Strawberry::Core::Math
 {
 	template <typename T>
 	class Voronoi
-		: public Graph<Vector<T, 2>>
 	{
 	public:
 		/// Returns the voronoi edge graph for this delaunay triangulation.
@@ -21,7 +20,8 @@ namespace Strawberry::Core::Math
 			using Delaunay = std::decay_t<decltype(delauney)>;
 			using Face = Delaunay::Face;
 			using Edge = Delaunay::Edge;
-			Voronoi<T> graph;
+
+			UndirectedGraph<Vector<T, 2>> voronoi;
 
 
 			std::map<Face, unsigned int> faceCenterNodeIDs;
@@ -29,7 +29,7 @@ namespace Strawberry::Core::Math
 
 			for (auto face : delauney.Faces())
 			{
-				faceCenterNodeIDs.emplace(face, graph.AddNode(delauney.GetFaceCenter(face)));
+				faceCenterNodeIDs.emplace(face, voronoi.AddNode(delauney.GetFaceCenter(face)));
 			}
 
 			for (auto face : delauney.Faces())
@@ -38,16 +38,27 @@ namespace Strawberry::Core::Math
 
 				for (auto n : neighbours)
 				{
-					graph.AddEdge(Edge(faceCenterNodeIDs[face], faceCenterNodeIDs[n]));
+					voronoi.AddEdge(Edge(faceCenterNodeIDs[face], faceCenterNodeIDs[n]));
 				}
 			}
 
 
-			return graph;
-
+			return Voronoi(delauney.PruneSupportingVertices(), std::move(voronoi));
 		}
 
 
-		Voronoi() = default;
+		const auto& Triangulation() const noexcept { return mTriangulation; }
+		const auto& Cells() const noexcept { return mVoronoi; }
+
+
+	private:
+		Voronoi(UndirectedGraph<Vector<T, 2>> triangulation, UndirectedGraph<Vector<T, 2>> voronoi) noexcept
+			: mTriangulation(std::move(triangulation))
+			, mVoronoi(std::move(voronoi)) {}
+
+
+	private:
+		UndirectedGraph<Vector<T, 2>> mTriangulation;
+		UndirectedGraph<Vector<T, 2>> mVoronoi;
 	};
 }
