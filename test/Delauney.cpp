@@ -1,6 +1,6 @@
-#include "Strawberry/Core/Math/Geometry/LineSegment.hpp"
+
 #include "Strawberry/Core/Math/Geometry/PointSet.hpp"
-#include "Strawberry/Core/Math/Geometry/Delauney.hpp"
+#include "Strawberry/Core/Math/Geometry/Voronoi.hpp"
 #include "Strawberry/Core/Util/Image.hpp"
 #include "canvas_ity.hpp"
 #include <random>
@@ -84,7 +84,7 @@ int main()
 	}
 
 	DrawGraph(context, delauney, mainColoring);
-	DrawGraph(context, delauney.ToVoronoi(), voronoiColoring);
+	DrawGraph(context, Voronoi<double>::From(delauney), voronoiColoring);
 
 	context.get_image_data((unsigned char*) image.Data(), image.Width(), image.Height(), image.Width() * decltype(image)::PixelType::Size, 0, 0);
 	image.Save(fmt::format("delauney_output.png"));
