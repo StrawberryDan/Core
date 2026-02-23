@@ -9,25 +9,29 @@
 using namespace Strawberry::Core;
 using namespace Math;
 
+static Vector<double, 2> MIN{0.0, 0.0};
+static Vector<double, 2> MAX{10000.0, 10000.0};
+
 struct GraphColoring
 {
-	float edgeWidth = 1.0f;
-	float nodeRadius = 4.0f;
+	float edgeWidth = 2.0f;
+	float nodeRadius = 8.0f;
 	float mEdgeColor[4];
 	float mNodeColor[4];
 };
 
 static PointSet<double, 2> GeneratePointSet()
 {
-	static size_t POINT_COUNT = 64;
+	static size_t POINT_COUNT = 1024;
 	PointSet<double, 2> points;
 
 	std::random_device rng;
-	std::uniform_real_distribution<double> dist(0.0 + 1.0, 10000.0 - 1.0);
+	std::uniform_real_distribution<double> distX(MIN[0] + 1.0, MAX[0] - 1.0);
+	std::uniform_real_distribution<double> distY(MIN[1] + 1.0, MAX[1] - 1.0);
 
 	for (int i = 0; i < POINT_COUNT; i++)
 	{
-		Vector<double, 2> v(dist(rng), dist(rng));
+		Vector<double, 2> v(distX(rng), distY(rng));
 		points.Add(v.AsType<int>().AsType<double>());
 	}
 	return points;
@@ -70,7 +74,7 @@ int main()
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
-	Delauney delauney(Vector{0., 0.}, Vector{10000., 10000.});
+	Delauney delauney(MIN, MAX);
 	auto min = delauney.GetMin();
 	auto max = delauney.GetMax();
 	auto span = max - min;
@@ -83,8 +87,10 @@ int main()
 		delauney.AddNode(point);
 	}
 
-	DrawGraph(context, delauney, mainColoring);
-	DrawGraph(context, Voronoi<double>::From(delauney), voronoiColoring);
+	auto voronoi = Voronoi<double>::From(delauney);
+
+	DrawGraph(context, voronoi.Triangulation(), mainColoring);
+	DrawGraph(context, voronoi.Edges(), voronoiColoring);
 
 	context.get_image_data((unsigned char*) image.Data(), image.Width(), image.Height(), image.Width() * decltype(image)::PixelType::Size, 0, 0);
 	image.Save(fmt::format("delauney_output.png"));
