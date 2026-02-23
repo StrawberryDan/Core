@@ -19,11 +19,11 @@ struct GraphColoring
 
 static PointSet<double, 2> GeneratePointSet()
 {
-	static size_t POINT_COUNT = 512;
+	static size_t POINT_COUNT = 64;
 	PointSet<double, 2> points;
 
 	std::random_device rng;
-	std::uniform_real_distribution<double> dist(0.0, 10000.0);
+	std::uniform_real_distribution<double> dist(0.0 + 1.0, 10000.0 - 1.0);
 
 	for (int i = 0; i < POINT_COUNT; i++)
 	{
@@ -32,6 +32,34 @@ static PointSet<double, 2> GeneratePointSet()
 	}
 	return points;
 }
+
+
+	static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColoring coloring)
+	{
+		for (auto edge : graph.Edges())
+		{
+			canvas.set_line_width(coloring.edgeWidth);
+			Vector<double, 2> posA = graph.GetValue(edge.nodes[0]);
+			Vector<double, 2> posB = graph.GetValue(edge.nodes[1]);
+			canvas.set_color(canvas_ity::brush_type::stroke_style, coloring.mEdgeColor[0], coloring.mEdgeColor[1], coloring.mEdgeColor[2], coloring.mEdgeColor[3]);
+			canvas.begin_path();
+			canvas.move_to(posA[0], posA[1]);
+			canvas.line_to(posB[0], posB[1]);
+			canvas.stroke();
+		}
+
+
+		for (auto node : graph.Nodes())
+		{
+			auto pos = graph.GetValue(node);
+			canvas.set_line_width(8.0);
+			canvas.set_color(canvas_ity::brush_type::fill_style, coloring.mNodeColor[0], coloring.mNodeColor[1], coloring.mNodeColor[2], coloring.mNodeColor[3]);
+			canvas.begin_path();
+			canvas.arc(pos[0], pos[1], coloring.nodeRadius, 0, 360);
+			canvas.fill();
+		}
+	}
+
 
 
 
@@ -50,43 +78,13 @@ int main()
 	canvas_ity::canvas context(span[0], span[1]);
 	Image<PixelRGBA> image(span.template AsType<unsigned int>());
 
-
-	auto drawGraph = [&](canvas_ity::canvas& canvas, const auto& graph, GraphColoring coloring, int i) {
-		for (auto edge : graph.Edges())
-		{
-			context.set_line_width(coloring.edgeWidth);
-			Vector<double, 2> posA = graph.GetValue(edge.nodes[0]) - min;
-			Vector<double, 2> posB = graph.GetValue(edge.nodes[1]) - min;
-			context.set_color(canvas_ity::brush_type::stroke_style, coloring.mEdgeColor[0], coloring.mEdgeColor[1], coloring.mEdgeColor[2], coloring.mEdgeColor[3]);
-			context.begin_path();
-			context.move_to(posA[0], posA[1]);
-			context.line_to(posB[0], posB[1]);
-			context.stroke();
-		}
-
-
-		for (auto node : graph.Nodes())
-		{
-			auto pos = graph.GetValue(node) - min;
-			context.set_line_width(8.0);
-			context.set_color(canvas_ity::brush_type::fill_style, coloring.mNodeColor[0], coloring.mNodeColor[1], coloring.mNodeColor[2], coloring.mNodeColor[3]);
-			context.begin_path();
-			context.arc(pos[0], pos[1], coloring.nodeRadius, 0, 360);
-			context.fill();
-
-			context.fill_text(std::to_string(node).c_str(), pos[0], pos[1]);
-		}
-
-	};
-
-
 	for (auto point : pointSet.Points())
 	{
 		delauney.AddNode(point);
 	}
 
-	drawGraph(context, delauney, mainColoring, 0);
-	drawGraph(context, delauney.ToVoronoi(), voronoiColoring, 1);
+	DrawGraph(context, delauney, mainColoring);
+	DrawGraph(context, delauney.ToVoronoi(), voronoiColoring);
 
 	context.get_image_data((unsigned char*) image.Data(), image.Width(), image.Height(), image.Width() * decltype(image)::PixelType::Size, 0, 0);
 	image.Save(fmt::format("delauney_output.png"));
