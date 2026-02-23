@@ -231,7 +231,11 @@ namespace Strawberry::Core::Math
 		void AddFace(Face face)
 		{
 			auto triangle = FaceToTriangle(face);
-			bool anyPointContains = false;
+			if (!triangle.GetCircumsphere().HasValue())
+			{
+				return;
+			}
+
 			for (auto n : this->Nodes())
 			{
 				if (face.ContainsNode(n))
@@ -240,15 +244,11 @@ namespace Strawberry::Core::Math
 				auto v = this->GetValue(n);
 				if (triangle.Contains(v))
 				{
-					anyPointContains = true;
-					break;
+					return;
 				}
 			}
 
-			if (!anyPointContains)
-			{
-				mFaces.insert(face);
-			}
+			mFaces.insert(face);
 		}
 
 		/// Returns whether the point v is within the bounds of this graph.
