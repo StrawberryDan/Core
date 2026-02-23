@@ -3,7 +3,7 @@
 
 #include "Strawberry/Core/Math/Geometry/Simplex.hpp"
 #include "Strawberry/Core/Math/Geometry/Sphere.hpp"
-#include "Strawberry/Core/Math/Graph.hpp"
+#include "Strawberry/Core/Math/PlanarGraph.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 #include <algorithm>
 #include <map>
@@ -12,7 +12,7 @@
 namespace Strawberry::Core::Math
 {
 	template <typename T>
-	class Delauney : public UndirectedGraph<Vector<T, 2>>
+	class Delauney : public PlanarGraph<UndirectedGraph<Vector<T, 2>>>
 	{
 	public:
 		using Graph = UndirectedGraph<Vector<T, 2>>;
@@ -229,7 +229,7 @@ namespace Strawberry::Core::Math
 			auto& min = GetMin();
 			auto& max = GetMax();
 
-			return v[0] >= min[0] && v[1] >= min[1] && v[0] <= max[0] && v[1] <= max[1];
+			return v[0] > min[0] && v[1] > min[1] && v[0] < max[0] && v[1] < max[1];
 		}
 		/// Return the set of faces that conflict with the node given.
 		/// Faces conflict with a node if their circumcircle contains that node.

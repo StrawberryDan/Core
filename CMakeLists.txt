@@ -109,6 +109,7 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Math/Noise.cpp
     src/Strawberry/Core/Math/Noise.hpp
     src/Strawberry/Core/Math/Periodic.hpp
+    src/Strawberry/Core/Math/PlanarGraph.hpp
     src/Strawberry/Core/Math/Rational.hpp
     src/Strawberry/Core/Math/Transformations.hpp
     src/Strawberry/Core/Math/Units.hpp
