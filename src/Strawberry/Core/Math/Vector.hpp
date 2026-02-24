@@ -238,6 +238,13 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// returns the atan2(x, y) of this Vector
+		auto ATan2() const noexcept requires (D == 2)
+		{
+			return std::atan2(mValue[0], mValue[1]);
+		}
+
+
 		/// Fold the vectors with the given operation
 		template <typename F>
 		constexpr auto Fold(F&& function) const noexcept
