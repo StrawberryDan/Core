@@ -151,16 +151,16 @@ namespace Strawberry::Core::Math
 		///
 		/// Since, without the bounding vertices, this graph cannot support further addition to the graph,
 		/// it is demoted to a normal graph.
-		Graph PruneSupportingVertices() const
+		PrunedDelauney<Vector<T, 2>> Pruned() const
 		{
-			Delauney copy = *this;
+			PrunedDelauney<Vector<T, 2>> copy(*this);
 
 			copy.RemoveNode(0);
 			copy.RemoveNode(1);
 			copy.RemoveNode(2);
 			copy.RemoveNode(3);
 
-			return std::move(static_cast<Graph>(copy));
+			return copy;
 		}
 
 
@@ -326,5 +326,25 @@ namespace Strawberry::Core::Math
 
 	private:
 		std::set<Face> mFaces;
+	};
+
+
+	template <typename T>
+	class PrunedDelauney<Vector<T, 2>>
+		: public Delauney<Vector<T, 2>>
+	{
+	public:
+		template<typename>
+		friend class Voronoi;
+
+		template <typename>
+		friend class Delauney;
+
+	private:
+		PrunedDelauney(Delauney<Vector<T, 2>> base)
+			: Delauney<Vector<T, 2>>(std::move(base)) {}
+
+
+		using Delauney<Vector<T, 2>>::AddNode;
 	};
 }
