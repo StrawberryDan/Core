@@ -13,21 +13,23 @@ namespace Strawberry::Core::Math
 	class Voronoi
 	{
 	public:
+		using Delauney = Delauney<T>;
+		using Face = Delauney::Face;
+		using Edge = Delauney::Edge;
+
+
 		struct Cell
 		{
 			std::vector<unsigned int> nodes;
+			std::set<Edge> edges;
 		};
 
 
 		/// Returns the voronoi edge graph for this delaunay triangulation.
 		///
 		/// This works because delauney triangulations and voronoi diagrams are duals of eachother.
-		static Voronoi From(const Delauney<T>& delauney) noexcept
+		static Voronoi From(const Delauney& delauney) noexcept
 		{
-			using Delaunay = std::decay_t<decltype(delauney)>;
-			using Face = Delaunay::Face;
-			using Edge = Delaunay::Edge;
-
 			UndirectedGraph<Vector<T, 2>> voronoi;
 
 			std::map<Face, unsigned int> faceCenterNodeIDs;
@@ -53,18 +55,20 @@ namespace Strawberry::Core::Math
 
 			for (auto node : delauney.Nodes())
 			{
-				auto containingFaces = delauney.Faces()
-					| std::views::filter([&] (Face face) { return face.ContainsNode(node); })
+				auto connectedFaces = delauney.Faces()
+					| std::views::filter([&] (Face face) { return face.ContainsNode(node); });
+				auto edgeNodes = connectedFaces
 					| std::views::transform([&] (Face face) { return faceCenterNodeIDs.at(face); })
 					| std::ranges::to<std::vector>();
+				auto edges =
+					connectedFaces
+					| std::views::transform([] (Face face) { return face.Edges(); })
+					| std::views::join
+					| std::views::filter([node] (Edge e) { return !e.ContainsNode(node); })
+					| std::ranges::to<std::set>();
 
 
-				std::ranges::sort(containingFaces, std::less{}, [&] (auto face)
-				{
-					return (voronoi.GetValue(face) - delauney.GetValue(node)).ATan2();
-				});
-
-				cellMap[node] = Cell { .nodes = containingFaces };
+				cellMap[node] = Cell { .nodes = edgeNodes, .edges = edges };
 			}
 
 
@@ -75,6 +79,47 @@ namespace Strawberry::Core::Math
 		const auto& Triangulation() const noexcept { return mTriangulation; }
 		const auto& Edges() const noexcept { return mVoronoi; }
 		const auto& Cells() const noexcept { return mCellMap; }
+
+
+		Vector<T, 2> GetCellCentroid(const Cell& cell) const noexcept
+		{
+			auto cellVertices = cell.nodes
+				| std::views::transform([this] (unsigned int i) { this->Edges().GetValue(i); })
+				| std::ranges::to<std::vector>();
+			return std::ranges::fold_left(cellVertices, {0, 0}, std::plus{}) * (1.0 / (T) cellVertices.size());
+		}
+
+
+		bool CellContains(const Cell& cell, const Vector<T, 2>& point) const noexcept
+		{
+			auto ls = GetCellAsLineSegments(cell);
+
+			for (const auto& l : ls)
+			{
+				T dot = (point - l.A()).Dot(l.Direction().Perpendicular());
+				if (dot < 0.0)
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+
+		std::set<LineSegment<T, 2>> GetCellAsLineSegments(const Cell& cell) const
+		{
+			auto centroid = GetCellCentroid(cell);
+			for (auto edge : cell.edges)
+			{
+				LineSegment<T, 2> l(GetValue(edge.nodes[0]), GetValue(edge.nodes[1]));
+				if ((centroid - l.A()).Dot(l.Direction()) < 0.0)
+				{
+					l.Swap();
+				}
+			}
+		}
+
 
 
 	private:

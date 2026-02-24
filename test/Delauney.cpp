@@ -10,19 +10,19 @@ using namespace Strawberry::Core;
 using namespace Math;
 
 static Vector<double, 2> MIN{0.0, 0.0};
-static Vector<double, 2> MAX{10000.0, 10000.0};
+static Vector<double, 2> MAX{1000.0, 1000.0};
 
 struct GraphColoring
 {
 	float edgeWidth = 2.0f;
-	float nodeRadius = 8.0f;
+	float nodeRadius = 4.0f;
 	float mEdgeColor[4];
 	float mNodeColor[4];
 };
 
 static PointSet<double, 2> GeneratePointSet()
 {
-	static size_t POINT_COUNT = 1024;
+	static size_t POINT_COUNT = 32;
 	PointSet<double, 2> points;
 
 	std::random_device rng;

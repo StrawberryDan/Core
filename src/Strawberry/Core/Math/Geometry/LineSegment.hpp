@@ -53,6 +53,12 @@ namespace Strawberry::Core::Math
 		}
 
 
+		void Swap()
+		{
+			std::swap(this->A(), this->B());
+		}
+
+
 		std::string ToString() const noexcept
 		{
 			return fmt::format("LineSegment({} --> {})", this->A().ToString(), this->B().ToString());

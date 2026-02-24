@@ -48,11 +48,11 @@ namespace Strawberry::Core::Math
 
 			bool ContainsEdge(Edge e) const noexcept
 			{
-				return GetEdges().contains(e);
+				return Edges().contains(e);
 			}
 
 
-			std::set<Edge> GetEdges() const noexcept
+			std::set<Edge> Edges() const noexcept
 			{
 				return {
 					Edge(mNodes[0], mNodes[1]),
@@ -267,7 +267,7 @@ namespace Strawberry::Core::Math
 
 			for (Face face : faces)
 			{
-				for (Edge edge : face.GetEdges())
+				for (Edge edge : face.Edges())
 				{
 					mVotes[edge]++;
 				}
@@ -302,7 +302,7 @@ namespace Strawberry::Core::Math
 		{
 			std::set<Face> adjacentFaces;
 
-			for (auto edge : face.GetEdges())
+			for (auto edge : face.Edges())
 			{
 				for (auto otherFace : mFaces)
 				{
