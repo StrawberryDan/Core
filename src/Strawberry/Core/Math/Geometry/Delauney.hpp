@@ -145,6 +145,23 @@ namespace Strawberry::Core::Math
 		const Vector<T, 2>& GetMin() const noexcept { return this->GetValue(0); }
 		/// Return the maximum point of this graph.
 		const Vector<T, 2>& GetMax() const noexcept { return this->GetValue(3); }
+		/// Return the middle point of this graph's bounding box/
+		decltype(auto) GetCenter(this const auto& self) noexcept { return (self.GetMin() + self.GetMax()) * 0.5; }
+
+		/// Return this graphs bounding box as 4 anti-clockwise Lines.
+		std::array<Line<T, 2>, 4> GetBoundingBox(this const auto& self) noexcept
+		{
+			const Vector<T, 2> min = self.GetMin();
+			const Vector<T, 2> max = self.GetMax();
+			const Vector<T, 2> xmax = Vector{max[0], min[1]};
+			const Vector<T, 2> ymax = Vector{min[0], max[1]};
+			return {
+				Line<T, 2>{ min, xmax },
+				Line<T, 2>{ xmax, max },
+				Line<T, 2>{ max, ymax },
+				Line<T, 2>{ ymax, min }
+			};
+		}
 
 
 		/// Returns this triangulation with the supporting vertices removed.
