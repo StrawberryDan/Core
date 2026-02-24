@@ -134,28 +134,6 @@ namespace Strawberry::Core::Math
 		}
 
 
-		void RemoveNode(unsigned int node)
-		{
-			Graph::RemoveNode(node);
-			auto edgesToRemove = this->Edges()
-				| std::views::filter([node] (Edge e) { return e.ContainsNode(node); })
-				| std::ranges::to<std::set>();
-			auto facesToRemove = this->Faces()
-				| std::views::filter([node] (Face f) { return f.ContainsNode(node); })
-				| std::ranges::to<std::set>();
-
-			for (auto edge : edgesToRemove)
-			{
-				Graph::RemoveEdge(edge);
-			}
-
-			for (auto face : facesToRemove)
-			{
-				mFaces.erase(face);
-			}
-		}
-
-
 		/// Const accessor to the set of all faces in the graph.
 		const auto& Faces() const noexcept
 		{
@@ -187,6 +165,28 @@ namespace Strawberry::Core::Math
 
 
 	private:
+		void RemoveNode(unsigned int node)
+		{
+			Graph::RemoveNode(node);
+			auto edgesToRemove = this->Edges()
+				| std::views::filter([node] (Edge e) { return e.ContainsNode(node); })
+				| std::ranges::to<std::set>();
+			auto facesToRemove = this->Faces()
+				| std::views::filter([node] (Face f) { return f.ContainsNode(node); })
+				| std::ranges::to<std::set>();
+
+			for (auto edge : edgesToRemove)
+			{
+				Graph::RemoveEdge(edge);
+			}
+
+			for (auto face : facesToRemove)
+			{
+				mFaces.erase(face);
+			}
+		}
+
+
 		/// Adds an edge to this graph, and forms any faces resulting from the addition.
 		void AddEdge(Edge edge)
 		{
