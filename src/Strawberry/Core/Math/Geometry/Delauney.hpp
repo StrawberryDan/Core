@@ -163,6 +163,27 @@ namespace Strawberry::Core::Math
 			return copy;
 		}
 
+		/// Returns the set of the outer edges of this triangulation.
+		std::set<Edge> GetOuterEdges() const noexcept
+		{
+			std::map<Edge, unsigned int> votes;
+
+			for (auto face : Faces())
+			{
+				for (auto edge : face.Edges())
+				{
+					votes[edge]++;
+				}
+			}
+
+			auto outerEdges = votes
+				| std::views::filter([] (const auto& x) { return x.second == 1; })
+				| std::views::keys
+				| std::ranges::to<std::set>();
+
+			return outerEdges;
+		}
+
 
 	private:
 		void RemoveNode(unsigned int node)
