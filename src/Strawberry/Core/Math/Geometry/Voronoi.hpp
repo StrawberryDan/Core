@@ -10,10 +10,14 @@
 namespace Strawberry::Core::Math
 {
 	template <typename T>
-	class Voronoi
+	class Voronoi;
+
+
+	template <typename T>
+	class Voronoi<Vector<T, 2>>
 	{
 	public:
-		using Delauney = Delauney<T>;
+		using Delauney = Delauney<Vector<T, 2>>;
 		using Face = Delauney::Face;
 		using Edge = Delauney::Edge;
 
@@ -123,7 +127,7 @@ namespace Strawberry::Core::Math
 
 
 	private:
-		Voronoi(UndirectedGraph<Vector<T, 2>> triangulation,
+		Voronoi(Delauney triangulation,
 				UndirectedGraph<Vector<T, 2>> voronoi,
 				std::map<unsigned int, Cell> cellMap) noexcept
 			: mTriangulation(std::move(triangulation))
@@ -141,7 +145,7 @@ namespace Strawberry::Core::Math
 
 
 	private:
-		UndirectedGraph<Vector<T, 2>> mTriangulation;
+		Delauney mTriangulation;
 		UndirectedGraph<Vector<T, 2>> mVoronoi;
 		/// A map of indices of nodes in the triangulation mapped to lists
 		/// of cell indices in the voronoi mapping which form the cell conainting

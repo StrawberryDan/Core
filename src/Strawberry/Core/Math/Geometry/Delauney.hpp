@@ -12,13 +12,20 @@
 namespace Strawberry::Core::Math
 {
 	template <typename T>
-	class Delauney : public UndirectedGraph<Vector<T, 2>>
+	class Delauney;
+
+	template <typename T>
+	class PrunedDelauney;
+
+
+	template <typename T>
+	class Delauney<Vector<T, 2>> : public UndirectedGraph<Vector<T, 2>>
 	{
 	public:
 		using Graph = UndirectedGraph<Vector<T, 2>>;
-		using typename UndirectedGraph<Vector<T, 2>>::Edge;
+		using Edge = Graph::Edge;
 
-		template <typename T2>
+		template <typename>
 		friend class Voronoi;
 
 
@@ -157,9 +164,9 @@ namespace Strawberry::Core::Math
 
 
 		/// Return the minumum point of this graph.
-		const Vector<T, 2> GetMin() const noexcept { return this->GetValue(0); }
+		const Vector<T, 2>& GetMin() const noexcept { return this->GetValue(0); }
 		/// Return the maximum point of this graph.
-		const Vector<T, 2> GetMax() const noexcept { return this->GetValue(3); }
+		const Vector<T, 2>& GetMax() const noexcept { return this->GetValue(3); }
 
 
 		/// Returns this triangulation with the supporting vertices removed.

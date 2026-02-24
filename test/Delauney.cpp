@@ -74,7 +74,7 @@ int main()
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
-	Delauney delauney(MIN, MAX);
+	Delauney<Vector<double, 2>> delauney(MIN, MAX);
 	auto min = delauney.GetMin();
 	auto max = delauney.GetMax();
 	auto span = max - min;
@@ -87,7 +87,7 @@ int main()
 		delauney.AddNode(point);
 	}
 
-	auto voronoi = Voronoi<double>::From(delauney);
+	auto voronoi = Voronoi<Vector<double, 2>>::From(delauney);
 
 	DrawGraph(context, voronoi.Triangulation(), mainColoring);
 	DrawGraph(context, voronoi.Edges(), voronoiColoring);
