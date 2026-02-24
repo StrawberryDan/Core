@@ -4,6 +4,7 @@
 #include "Strawberry/Core/Math/Geometry/Delauney.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Math/Graph.hpp"
+#include <algorithm>
 
 
 namespace Strawberry::Core::Math
@@ -72,7 +73,8 @@ namespace Strawberry::Core::Math
 
 
 		const auto& Triangulation() const noexcept { return mTriangulation; }
-		const auto& Cells() const noexcept { return mVoronoi; }
+		const auto& Edges() const noexcept { return mVoronoi; }
+		const auto& Cells() const noexcept { return mCellMap; }
 
 
 	private:
@@ -89,7 +91,7 @@ namespace Strawberry::Core::Math
 
 		bool IsPlanar() const noexcept
 		{
-			return Cells().Nodes().size() - Cells().Edges().size() + mCellMap.size() == 1;
+			return Edges().Nodes().size() - Edges().Edges().size() + mCellMap.size() == 1;
 		}
 
 
