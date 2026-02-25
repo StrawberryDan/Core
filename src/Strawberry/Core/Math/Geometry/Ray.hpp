@@ -12,8 +12,26 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		Ray() = default;
+
 		Ray(const Vector<T, D>& origin, const Vector<T, D>& direction)
-			: mOrigin(origin), mDirection(direction.Normalised()) {}
+			: mOrigin(origin)
+		{
+			SetDirection(direction);
+		}
+
+		/// Create a Ray starting at line.A(), and going in the same direction.
+		explicit Ray(const Line<T, D>& line)
+			: mOrigin(line.A())
+		{
+			SetDirection(line.Direction());
+		}
+
+		/// Construct a Ray starting at point A of the line segment, and going in its direction.
+		explicit Ray(const LineSegment<T, D>& lineSegment)
+			: mOrigin(lineSegment.A())
+		{
+			SetDirection(lineSegment.Direction());
+		}
 
 
 		Vector<T, D>& Origin() { return mOrigin; }
@@ -24,6 +42,7 @@ namespace Strawberry::Core::Math
 		const Vector<T, D>& Direction() const { return mDirection; }
 
 
+		/// Transforms this Ray into a Line that is parallel.
 		Line<T, D> IntoLine() const
 		{
 			return Line(mOrigin, mOrigin + mDirection);
