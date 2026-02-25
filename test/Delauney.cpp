@@ -1,6 +1,6 @@
 
 #include "Strawberry/Core/Math/Geometry/PointSet.hpp"
-#include "Strawberry/Core/Math/Geometry/Voronoi.hpp"
+#include "Strawberry/Core/Math/Graph/Voronoi.hpp"
 #include "Strawberry/Core/Util/Image.hpp"
 #include "canvas_ity.hpp"
 #include <random>

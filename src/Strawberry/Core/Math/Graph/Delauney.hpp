@@ -3,7 +3,7 @@
 #include "Strawberry/Core/Math/Geometry/Line.hpp"
 #include "Strawberry/Core/Math/Geometry/Simplex.hpp"
 #include "Strawberry/Core/Math/Geometry/Sphere.hpp"
-#include "Strawberry/Core/Math/Graph.hpp"
+#include "Strawberry/Core/Math/Graph/Graph.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 // Standard library
 #include <algorithm>

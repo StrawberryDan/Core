@@ -1,9 +1,9 @@
 #pragma once
-
-
-#include "Strawberry/Core/Math/Geometry/Delauney.hpp"
+// Strawberry Core
+#include "Strawberry/Core/Math/Graph/Delauney.hpp"
+#include "Strawberry/Core/Math/Graph/Graph.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
-#include "Strawberry/Core/Math/Graph.hpp"
+// Standard Library
 #include <algorithm>
 
 

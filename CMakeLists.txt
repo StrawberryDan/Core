@@ -93,7 +93,6 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Markers.hpp
     src/Strawberry/Core/Math/Checked.hpp
     src/Strawberry/Core/Math/Clamped.hpp
-    src/Strawberry/Core/Math/Geometry/Delauney.hpp
     src/Strawberry/Core/Math/Geometry/Line.hpp
     src/Strawberry/Core/Math/Geometry/LineSegment.hpp
     src/Strawberry/Core/Math/Geometry/Plane.hpp
@@ -101,13 +100,14 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Math/Geometry/Ray.hpp
     src/Strawberry/Core/Math/Geometry/Simplex.hpp
     src/Strawberry/Core/Math/Geometry/Sphere.hpp
-    src/Strawberry/Core/Math/Geometry/Voronoi.hpp
-    src/Strawberry/Core/Math/Graph.hpp
+    src/Strawberry/Core/Math/Graph/Delauney.hpp
+    src/Strawberry/Core/Math/Graph/Graph.hpp
+    src/Strawberry/Core/Math/Graph/Voronoi.hpp
     src/Strawberry/Core/Math/Math.hpp
     src/Strawberry/Core/Math/Math.inl
     src/Strawberry/Core/Math/Matrix.hpp
-    src/Strawberry/Core/Math/Noise.cpp
-    src/Strawberry/Core/Math/Noise.hpp
+    src/Strawberry/Core/Math/Noise/Noise.cpp
+    src/Strawberry/Core/Math/Noise/Noise.hpp
     src/Strawberry/Core/Math/Periodic.hpp
     src/Strawberry/Core/Math/Rational.hpp
     src/Strawberry/Core/Math/Transformations.hpp
@@ -200,5 +200,3 @@ if (NOT TARGET StrawberryCore)
   set(STRAWBERRY_CORE_TYPE_FORMATTERS ${CMAKE_CURRENT_SOURCE_DIR}/share/TypeRenderers.py)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/share/.lldbinit.template ${CMAKE_CURRENT_SOURCE_DIR}/.lldbinit)
 endif ()
-
-

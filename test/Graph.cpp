@@ -1,4 +1,5 @@
-#include "Strawberry/Core/Math/Graph.hpp"
+// Strawberry Core
+#include "Strawberry/Core/Math/Graph/Graph.hpp"
 #include "Strawberry/Core/Assert.hpp"
 
 
