@@ -105,7 +105,7 @@ namespace Strawberry::Core::Math
 
 			auto conflictingFaces = GetConflictingFaces(newNode);
 
-			auto sharedEdges = GetSharedEdges(conflictingFaces);
+			auto sharedEdges = GetCommonEdges(conflictingFaces);
 
 			for (auto conflictingFace : conflictingFaces)
 			{
@@ -308,7 +308,7 @@ namespace Strawberry::Core::Math
 
 		/// Returns the set of edges that are shared by more than one
 		/// of the set of faces given.
-		std::set<Edge> GetSharedEdges(const std::set<Face>& faces) const
+		std::set<Edge> GetCommonEdges(const std::set<Face>& faces) const
 		{
 			std::map<Edge, unsigned int> mVotes;
 
