@@ -1,4 +1,4 @@
-#include "Strawberry/Core/Math/Noise/Noise.hpp"
+#include "Strawberry/Core/Math/Noise/Linear.hpp"
 
 
 int main()

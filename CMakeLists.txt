@@ -106,8 +106,13 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Math/Math.hpp
     src/Strawberry/Core/Math/Math.inl
     src/Strawberry/Core/Math/Matrix.hpp
-    src/Strawberry/Core/Math/Noise/Noise.cpp
-    src/Strawberry/Core/Math/Noise/Noise.hpp
+    src/Strawberry/Core/Math/Noise/Adapters.hpp
+    src/Strawberry/Core/Math/Noise/Linear.cpp
+    src/Strawberry/Core/Math/Noise/Linear.hpp
+    src/Strawberry/Core/Math/Noise/Perlin.cpp
+    src/Strawberry/Core/Math/Noise/Perlin.hpp
+    src/Strawberry/Core/Math/Noise/SmoothLinear.cpp
+    src/Strawberry/Core/Math/Noise/SmoothLinear.hpp
     src/Strawberry/Core/Math/Periodic.hpp
     src/Strawberry/Core/Math/Rational.hpp
     src/Strawberry/Core/Math/Transformations.hpp
