@@ -143,6 +143,23 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Returns this triangulation with the supporting vertices removed.
+		///
+		/// Since, without the bounding vertices, this graph cannot support further addition to the graph,
+		/// it is demoted to a normal graph.
+		PrunedDelauney<Vector<T, 2>> Pruned() const
+		{
+			PrunedDelauney<Vector<T, 2>> copy(GetMin(), GetMax(), *this);
+
+			copy.RemoveNode(0);
+			copy.RemoveNode(1);
+			copy.RemoveNode(2);
+			copy.RemoveNode(3);
+
+			return copy;
+		}
+
+
 		/// Return the minumum point of this graph.
 		const Vector<T, 2>& GetMin() const noexcept { return this->GetValue(0); }
 
@@ -174,23 +191,6 @@ namespace Strawberry::Core::Math
 			auto& max = GetMax();
 
 			return v[0] >= min[0] && v[1] >= min[1] && v[0] <= max[0] && v[1] <= max[1];
-		}
-
-
-		/// Returns this triangulation with the supporting vertices removed.
-		///
-		/// Since, without the bounding vertices, this graph cannot support further addition to the graph,
-		/// it is demoted to a normal graph.
-		PrunedDelauney<Vector<T, 2>> Pruned() const
-		{
-			PrunedDelauney<Vector<T, 2>> copy(*this);
-
-			copy.RemoveNode(0);
-			copy.RemoveNode(1);
-			copy.RemoveNode(2);
-			copy.RemoveNode(3);
-
-			return copy;
 		}
 
 
