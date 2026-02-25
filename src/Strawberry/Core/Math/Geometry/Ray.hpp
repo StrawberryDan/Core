@@ -138,7 +138,7 @@ namespace Strawberry::Core::Math
 
 		std::string ToString() const noexcept
 		{
-			return fmt::format("Ray(from {} direction  {})", Origin().ToString(), Direction().ToString());
+			return fmt::format("Ray(from {} direction {})", Origin().ToString(), Direction().ToString());
 		}
 
 
