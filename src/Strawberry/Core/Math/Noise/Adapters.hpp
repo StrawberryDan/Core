@@ -94,7 +94,9 @@ namespace Strawberry::Core::Math::Noise::Adapter
 
 		float Amplitude() const noexcept
 		{
-			return std::ranges::fold_left(mSignals | std::views::transform([] (auto&& x) { return x.Amplitude(); }), 0.0f, std::plus());
+			return std::ranges::fold_left(
+				mSignals
+				| std::views::transform([] (auto&& x) { return x.Amplitude(); }), 0.0f, std::plus());
 		}
 
 
