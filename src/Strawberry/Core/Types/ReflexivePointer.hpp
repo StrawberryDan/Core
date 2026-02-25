@@ -108,7 +108,7 @@ namespace Strawberry::Core
 			: ReflexivePointer() {}
 
 
-		template <std::derived_from<EnableReflexivePointer> Base>
+		template <typename Base> requires (std::derived_from<std::decay_t<Base>, EnableReflexivePointer>)
 		explicit ReflexivePointer(Base&& base) noexcept
 			: ReflexivePointer(std::forward<Base>(base).GetReflexivePointer()) {}
 
@@ -245,7 +245,7 @@ namespace Strawberry::Core
 
 		operator ReflexivePointer<const T>() const
 		{
-			return ReflexivePointer(std::static_pointer_cast<const T>(mPtr));
+			return ReflexivePointer<const T>(std::static_pointer_cast<const T>(mPtr));
 		}
 
 
