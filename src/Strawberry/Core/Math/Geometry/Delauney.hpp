@@ -216,6 +216,46 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Return the set of faces that share an edge with this face.
+		std::set<Face> GetAdjacentFaces(Face face) const
+		{
+			std::set<Face> adjacentFaces;
+
+			for (auto edge : face.Edges())
+			{
+				for (auto otherFace : mFaces)
+				{
+					if (otherFace != face && otherFace.ContainsEdge(edge))
+					{
+						adjacentFaces.insert(otherFace);
+					}
+				}
+			}
+
+			return adjacentFaces;
+		}
+
+
+		/// Get the corresponding triangle of the face.
+		Triangle<T, 2> FaceToTriangle(Face face) const
+		{
+			return Triangle<T, 2>{
+				this->GetValue(face.Node(0)),
+				this->GetValue(face.Node(1)),
+				this->GetValue(face.Node(2))
+			};
+		}
+
+
+		/// Get the center of the cicumcirle of the triangle represented by this face.
+		Vector<T, 2> GetFaceCenter(Face face) const
+		{
+			auto circumsphere = FaceToTriangle(face).GetCircumsphere();
+			Assert(circumsphere.HasValue(), "Attempted to get the center of a degenerate face in Delaunay!");
+			return circumsphere->Center();
+		}
+
+
 	private:
 		void RemoveNode(unsigned int node)
 		{
@@ -301,16 +341,6 @@ namespace Strawberry::Core::Math
 			return conflicingFaces;
 		}
 
-		/// Get the corresponding triangle of the face.
-		Triangle<T, 2> FaceToTriangle(Face face) const
-		{
-			return Triangle<T, 2>{
-				this->GetValue(face.Node(0)),
-				this->GetValue(face.Node(1)),
-				this->GetValue(face.Node(2))
-			};
-		}
-
 		/// Returns the set of edges that are shared by more than one
 		/// of the set of faces given.
 		std::set<Edge> GetCommonEdges(const std::set<Face>& faces) const
@@ -338,34 +368,6 @@ namespace Strawberry::Core::Math
 		bool IsPlanar() const noexcept
 		{
 			return this->Nodes().size() - this->Edges().size() + this->Faces().size() == 1;
-		}
-
-
-		/// Get the center of the cicumcirle of the triangle represented by this face.
-		Vector<T, 2> GetFaceCenter(Face face) const
-		{
-			auto circumsphere = FaceToTriangle(face).GetCircumsphere();
-			Assert(circumsphere.HasValue(), "Attempted to get the center of a degenerate face in Delaunay!");
-			return circumsphere->Center();
-		}
-
-		/// Return the set of faces that share an edge with this face.
-		std::set<Face> GetAdjacentFaces(Face face) const
-		{
-			std::set<Face> adjacentFaces;
-
-			for (auto edge : face.Edges())
-			{
-				for (auto otherFace : mFaces)
-				{
-					if (otherFace != face && otherFace.ContainsEdge(edge))
-					{
-						adjacentFaces.insert(otherFace);
-					}
-				}
-			}
-
-			return adjacentFaces;
 		}
 
 
