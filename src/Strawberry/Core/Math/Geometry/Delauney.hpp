@@ -145,8 +145,10 @@ namespace Strawberry::Core::Math
 
 		/// Return the minumum point of this graph.
 		const Vector<T, 2>& GetMin() const noexcept { return this->GetValue(0); }
+
 		/// Return the maximum point of this graph.
 		const Vector<T, 2>& GetMax() const noexcept { return this->GetValue(3); }
+
 		/// Return the middle point of this graph's bounding box/
 		decltype(auto) GetCenter(this const auto& self) noexcept { return (self.GetMin() + self.GetMax()) * 0.5; }
 
@@ -165,6 +167,15 @@ namespace Strawberry::Core::Math
 			};
 		}
 
+		/// Returns whether the point v is within the bounds of this graph.
+		bool InBounds(const Vector<T, 2>& v) const
+		{
+			auto& min = GetMin();
+			auto& max = GetMax();
+
+			return v[0] >= min[0] && v[1] >= min[1] && v[0] <= max[0] && v[1] <= max[1];
+		}
+
 
 		/// Returns this triangulation with the supporting vertices removed.
 		///
@@ -181,6 +192,7 @@ namespace Strawberry::Core::Math
 
 			return copy;
 		}
+
 
 		/// Returns the set of the outer edges of this triangulation.
 		std::set<Edge> GetOuterEdges() const noexcept
@@ -270,14 +282,7 @@ namespace Strawberry::Core::Math
 			mFaces.insert(face);
 		}
 
-		/// Returns whether the point v is within the bounds of this graph.
-		bool InBounds(const Vector<T, 2>& v) const
-		{
-			auto& min = GetMin();
-			auto& max = GetMax();
 
-			return v[0] >= min[0] && v[1] >= min[1] && v[0] <= max[0] && v[1] <= max[1];
-		}
 		/// Return the set of faces that conflict with the node given.
 		/// Faces conflict with a node if their circumcircle contains that node.
 		std::set<Face> GetConflictingFaces(unsigned int node) const
