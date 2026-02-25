@@ -376,6 +376,7 @@ namespace Strawberry::Core::Math
 	};
 
 
+	/// Class repesenting a Delauney triangulation which has had it's support vertices removes.
 	template <typename T>
 	class PrunedDelauney<Vector<T, 2>>
 		: public Delauney<Vector<T, 2>>
@@ -387,11 +388,31 @@ namespace Strawberry::Core::Math
 		template <typename>
 		friend class Delauney;
 
+
+		/// Returns the minimum extent of this graph.
+		const Vector<T, 2>& GetMin() const noexcept { return mMin; }
+		/// Returns the maximum extent of this graph.
+		const Vector<T, 2>& GetMax() const noexcept { return mMax; }
+
+
 	private:
-		PrunedDelauney(Delauney<Vector<T, 2>> base)
-			: Delauney<Vector<T, 2>>(std::move(base)) {}
+		/// PruneDelauney constructor.
+		///
+		/// Takes the min and max points of the original delauney graph, and then the delauney graph itself.
+		PrunedDelauney(Vector<T, 2> min, Vector<T, 2> max, Delauney<Vector<T, 2>> base)
+			: Delauney<Vector<T, 2>>(std::move(base))
+			, mMin(min)
+			, mMax(max) {}
 
 
+		// Make AddNode private here since, without supporting vertices,
+		// new nodes cannot be added.
 		using Delauney<Vector<T, 2>>::AddNode;
+
+
+	private:
+		/// Explicitly store bounds since they are no longer included as vertices.
+		Vector<T, 2> mMin;
+		Vector<T, 2> mMax;
 	};
 }
