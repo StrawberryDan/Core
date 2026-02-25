@@ -38,31 +38,31 @@ static PointSet<double, 2> GeneratePointSet()
 }
 
 
-	static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColoring coloring)
+static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColoring coloring)
+{
+	for (auto edge : graph.Edges())
 	{
-		for (auto edge : graph.Edges())
-		{
-			canvas.set_line_width(coloring.edgeWidth);
-			Vector<double, 2> posA = graph.GetValue(edge.nodes[0]);
-			Vector<double, 2> posB = graph.GetValue(edge.nodes[1]);
-			canvas.set_color(canvas_ity::brush_type::stroke_style, coloring.mEdgeColor[0], coloring.mEdgeColor[1], coloring.mEdgeColor[2], coloring.mEdgeColor[3]);
-			canvas.begin_path();
-			canvas.move_to(posA[0], posA[1]);
-			canvas.line_to(posB[0], posB[1]);
-			canvas.stroke();
-		}
-
-
-		for (auto node : graph.Nodes())
-		{
-			auto pos = graph.GetValue(node);
-			canvas.set_line_width(8.0);
-			canvas.set_color(canvas_ity::brush_type::fill_style, coloring.mNodeColor[0], coloring.mNodeColor[1], coloring.mNodeColor[2], coloring.mNodeColor[3]);
-			canvas.begin_path();
-			canvas.arc(pos[0], pos[1], coloring.nodeRadius, 0, 360);
-			canvas.fill();
-		}
+		canvas.set_line_width(coloring.edgeWidth);
+		Vector<double, 2> posA = graph.GetValue(edge.nodes[0]);
+		Vector<double, 2> posB = graph.GetValue(edge.nodes[1]);
+		canvas.set_color(canvas_ity::brush_type::stroke_style, coloring.mEdgeColor[0], coloring.mEdgeColor[1], coloring.mEdgeColor[2], coloring.mEdgeColor[3]);
+		canvas.begin_path();
+		canvas.move_to(posA[0], posA[1]);
+		canvas.line_to(posB[0], posB[1]);
+		canvas.stroke();
 	}
+
+
+	for (auto node : graph.Nodes())
+	{
+		auto pos = graph.GetValue(node);
+		canvas.set_line_width(8.0);
+		canvas.set_color(canvas_ity::brush_type::fill_style, coloring.mNodeColor[0], coloring.mNodeColor[1], coloring.mNodeColor[2], coloring.mNodeColor[3]);
+		canvas.begin_path();
+		canvas.arc(pos[0], pos[1], coloring.nodeRadius, 0, 360);
+		canvas.fill();
+	}
+}
 
 
 
