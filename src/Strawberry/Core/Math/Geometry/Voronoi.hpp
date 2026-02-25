@@ -18,6 +18,7 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		using Delauney = Delauney<Vector<T, 2>>;
+		using PrunedDelauney = PrunedDelauney<Vector<T, 2>>;
 		using Face = Delauney::Face;
 		using Edge = Delauney::Edge;
 
