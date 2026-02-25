@@ -96,6 +96,8 @@ namespace Strawberry::Core
 	template<typename T>
 	class ReflexivePointer
 	{
+		template <typename>
+		friend class ReflexivePointer;
 		friend class EnableReflexivePointer;
 
 
@@ -245,7 +247,7 @@ namespace Strawberry::Core
 
 		operator ReflexivePointer<const T>() const
 		{
-			return ReflexivePointer<const T>(std::static_pointer_cast<const T>(mPtr));
+			return ReflexivePointer<const T>(mPtr);
 		}
 
 
