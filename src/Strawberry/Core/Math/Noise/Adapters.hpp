@@ -83,14 +83,8 @@ namespace Strawberry::Core::Math::Noise::Adapter
 	class Layer
 	{
 	public:
-		template <typename F> requires std::same_as<std::decay_t<std::invoke_result_t<F, unsigned int>>, Base>
-		Layer(const unsigned int layerCount, F&& generator)
-		{
-			for (unsigned int i = 0; i < layerCount; i++)
-			{
-				mSignals.emplace_back(generator(i));
-			}
-		}
+		Layer() = default;
+
 
 		float Amplitude() const noexcept
 		{
@@ -100,10 +94,17 @@ namespace Strawberry::Core::Math::Noise::Adapter
 		}
 
 
+		void AddLayer(float scale, Base base)
+		{
+			mSignals.emplace_back(scale, std::move(base));
+		}
+
+
 		auto begin(this auto& self)
 		{
 			return self.mSignals.begin();
 		}
+
 
 		auto end(this auto& self)
 		{
@@ -122,8 +123,10 @@ namespace Strawberry::Core::Math::Noise::Adapter
 
 			return value;
 		}
+
+
 	private:
-		std::vector<Base> mSignals;
+		std::vector<Scale<Base>> mSignals;
 	};
 
 
