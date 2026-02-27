@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "Strawberry/Core/Types/Variant.hpp"
 #include "Strawberry/Core/Math/Matrix.hpp"
 #include <random>
 
@@ -79,7 +80,7 @@ namespace Strawberry::Core::Math::Noise::Adapter
 	};
 
 
-	template <typename Base>
+	template <typename... BASE_LIST>
 	class Layer
 	{
 	public:
@@ -90,13 +91,17 @@ namespace Strawberry::Core::Math::Noise::Adapter
 		{
 			return std::ranges::fold_left(
 				mSignals
-				| std::views::transform([] (auto&& x) { return x.Amplitude(); }), 0.0f, std::plus());
+				| std::views::transform([] (auto&& x)
+				{
+					return x.Visit([] (auto&& x) { return x.Amplitude(); });
+				}), 0.0f, std::plus());
 		}
 
 
-		void AddLayer(float scale, Base base)
+		template <typename BASE>
+		void AddLayer(BASE&& base) requires (std::same_as<BASE, BASE_LIST> || ...)
 		{
-			mSignals.emplace_back(scale, std::move(base));
+			mSignals.emplace_back(std::forward<BASE>(base));
 		}
 
 
@@ -118,7 +123,7 @@ namespace Strawberry::Core::Math::Noise::Adapter
 
 			for (auto&& signal : mSignals)
 			{
-				value += signal(position);
+				value += signal.Visit([&] (auto x) { return x(position); });
 			}
 
 			return value;
@@ -126,7 +131,7 @@ namespace Strawberry::Core::Math::Noise::Adapter
 
 
 	private:
-		std::vector<Scale<Base>> mSignals;
+		std::vector<Variant<BASE_LIST...>> mSignals;
 	};
 
 
