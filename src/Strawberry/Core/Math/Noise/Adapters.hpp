@@ -167,32 +167,4 @@ namespace Strawberry::Core::Math::Noise::Adapter
 		std::function<Vec2f(Vec2f)>    mFunctor;
 		Base mBase;
 	};
-
-
-	template <typename BaseA, typename BaseB>
-	class Sum
-	{
-	public:
-		Sum(BaseA&& a, BaseB&& b)
-			: mA(std::move(a))
-			, mB(std::move(b))
-		{}
-
-
-		float Amplitude() const noexcept
-		{
-			return mA.Amplitude() + mB.Amplitude();
-		}
-
-
-		float operator()(Vec2f position) const
-		{
-			return mA(position) + mB(position);
-		}
-
-
-	private:
-		BaseA mA;
-		BaseB mB;
-	};
 }
