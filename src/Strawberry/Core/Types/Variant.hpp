@@ -100,13 +100,13 @@ namespace Strawberry::Core
 
 	// Helper struct calculating whether a type is part of a variant.
 	template<typename T, typename... Ts>
-	struct IsInVariant
+	struct VariantCanHold
 			: std::false_type {};
 
 
 	// Specialization of IsInVariant for when a type is inside a variant.
 	template<typename T, typename... Ts> requires (std::same_as<std::decay_t<T>, Ts> || ...)
-	struct IsInVariant<T, Variant<Ts...>>
+	struct VariantCanHold<T, Variant<Ts...>>
 			: std::true_type {};
 
 
@@ -122,12 +122,16 @@ namespace Strawberry::Core
 		using Union = typename VariantUnion<Variant, Additional...>::Type;
 
 
+		template <typename T>
+		static constexpr bool CanHoldType() noexcept { return VariantCanHold<T, Variant>::value; }
+
+
 		Variant()
 			: mTypeIndex(std::numeric_limits<size_t>::max())
 		{}
 
 
-		template<typename Arg> requires IsInVariant<std::decay_t<Arg>, Variant>::value
+		template<typename Arg> requires VariantCanHold<std::decay_t<Arg>, Variant>::value
 		Variant(Arg&& arg)
 			: mTypeIndex(VariantTypeIndex<Arg, Ts...>::Value)
 		{
