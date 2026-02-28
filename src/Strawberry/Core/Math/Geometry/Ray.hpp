@@ -2,6 +2,7 @@
 
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Math/Geometry/Line.hpp"
+#include "Strawberry/Core/Math/Geometry/LineSegment.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 
 
@@ -82,10 +83,10 @@ namespace Strawberry::Core::Math
 		{
 			// Solve using Cramer's rule
 			auto& p1 = this->Origin();
-			auto& p2 = other.other.A();
+			auto& p2 = other.A();
 			auto   c = p2 - p1;
 			auto& v1 = this->Direction();
-			auto& v2 = other.Direction();
+			auto  v2 = other.Direction();
 
 			double determinant = v1[0] * v2[1] - v2[0] - v1[1];
 			if (determinant == 0.0)
