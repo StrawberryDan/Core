@@ -192,6 +192,7 @@ if (NOT TARGET StrawberryCore)
     test/PeriodicNumbers.cpp
     test/Plane.cpp
     test/ProducerConsumer.cpp
+    test/Ray.cpp
     test/Simplex.cpp
     test/Sphere.cpp
     test/TypeSets.cpp
