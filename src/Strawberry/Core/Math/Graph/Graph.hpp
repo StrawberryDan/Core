@@ -74,6 +74,10 @@ namespace Strawberry::Core::Math
 			auto operator<=>(const Edge& other) const = default;
 
 
+			unsigned int A() const noexcept { return nodes[0]; }
+			unsigned int B() const noexcept { return nodes[1]; }
+
+
 			std::array<unsigned int, 2> nodes;
 		};
 
