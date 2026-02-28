@@ -1,5 +1,6 @@
 #pragma once
 // Strawberry Core
+#include "Strawberry/Core/Math/Geometry/Ray.hpp"
 #include "Strawberry/Core/Math/Graph/Delauney.hpp"
 #include "Strawberry/Core/Math/Graph/Graph.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
@@ -52,11 +53,16 @@ namespace Strawberry::Core::Math
 			/// point.
 			std::map<unsigned int, Cell> cellMap;
 
+			/// For each face in the delaunay, take it's center and add it to the voronoi graph.
+			/// Keep track of the association between that face and this new node.
 			for (auto face : delauney.Faces())
 			{
-				faceToNodeMap.emplace(face, voronoi.AddNode(delauney.GetFaceCenter(face)));
+				unsigned int newNode = voronoi.AddNode(delauney.GetFaceCenter(face));
+				faceToNodeMap.emplace(face, newNode);
 			}
 
+			/// Join up the voronoi nodes corresponding to faces that are connected in the
+			/// delauney.
 			for (auto face : delauney.Faces())
 			{
 				auto neighbours = delauney.GetAdjacentFaces(face);
@@ -67,22 +73,100 @@ namespace Strawberry::Core::Math
 				}
 			}
 
+			/// Record the details of each voronoi cell for each delaunay vertex.
 			for (auto node : delauney.Nodes())
 			{
+				/// Get all the faces that contain this node.
 				auto connectedFaces = delauney.Faces()
 					| std::views::filter([&] (Face face) { return face.ContainsNode(node); });
+				/// Get the nodes that are part of this cell's boundary.
 				auto edgeNodes = connectedFaces
 					| std::views::transform([&] (Face face) { return faceToNodeMap.at(face); })
 					| std::ranges::to<std::vector>();
+				/// Get the edges involved in this cell by taking all the edges of the connected faces,
+				/// and removing all of the edges to/from the current node.
 				auto edges =
 					connectedFaces
 					| std::views::transform([] (Face face) { return face.Edges(); })
 					| std::views::join
 					| std::views::filter([node] (Edge e) { return !e.ContainsNode(node); })
 					| std::ranges::to<std::set>();
-
-
+				/// Store this information.
 				cellMap[node] = Cell { .nodes = edgeNodes, .edges = edges };
+			}
+
+
+			/// Create the edges bisecting the outer edges of the delauney graph.
+			/// We need these edges to partition 2D space completely.
+			for (auto outerEdge : delauney.GetOuterEdges())
+			{
+				/// Find the face which contains this outer edge.
+				auto outerFace = std::ranges::find_if(
+					delauney.Faces(),
+					[outerEdge] (auto f) { return f.ContainsEdge(outerEdge); });
+				AssertNEQ(outerFace, delauney.Faces().end(), "Failed to find face for outer edge in Voronoi::From");
+
+				/// Find the voronoi node for this face.
+				auto voronoiNode = faceToNodeMap.at(*outerFace);
+				/// Get the position of this node.
+				auto voronoiNodeLocation = voronoi.GetValue(voronoiNode);
+
+				// Get this edge as a line segment.
+				LineSegment<T, 2> outerEdgeLine(
+					delauney.GetValue(outerEdge.A()),
+					delauney.GetValue(outerEdge.B()));
+
+				/// Get the perpendicular direction for this edge.
+				Vector<T, 2> perpendicular = outerEdgeLine.Direction().Perpendicular();
+				/// Invert the perpendicular so that it extends away from the center of the graph.
+				Vector<T, 2> center = delauney.GetCenter();
+				if (perpendicular.Dot(center - outerEdgeLine.A()) > 0.0)
+				{
+					perpendicular = perpendicular * -1;
+				}
+
+				/// Create a ray from the voronoiNode following the perpendicular.
+				Ray<T, 2> perpendicularRay(
+					voronoiNodeLocation,
+					perpendicular
+				);
+
+				/// Find where this ray intersects with any of the graphs bounding planes.
+				Core::Optional<Vector<T, 2>> perpendicularEndpoint;
+				for (auto line : delauney.GetBoundingBox())
+				{
+					auto intersection = perpendicularRay.Intersection(line);
+					if (intersection)
+					{
+						// Overwrite endpoint if either there is no endpoint yet, or we've found a closer one.
+						if (!perpendicularEndpoint)
+						{
+							perpendicularEndpoint = intersection.Value();
+						}
+						else
+						{
+							float oldDist = (perpendicularEndpoint.Value() - perpendicularRay.Origin()).SquareMagnitude();
+							float newDist = (intersection.Value() - perpendicularRay.Origin()).SquareMagnitude();
+							if (newDist < oldDist)
+							{
+								perpendicularEndpoint = intersection.Value();
+							}
+						}
+					}
+				}
+
+				// If we found no intersection (unlikely),
+				// then just extend the ray by the unit length.
+				// This is because the length of the ray doesn't really matter
+				// for the sake of checking if a point is in a cell.
+				if (!perpendicularEndpoint) [[unlikely]]
+				{
+					perpendicularEndpoint = perpendicularRay.Origin() + perpendicularRay.Direction();
+				}
+
+				/// Add the new node to the graph, and add the edge.
+				unsigned int nodeIndex = voronoi.AddNode(perpendicularEndpoint.Unwrap());
+				voronoi.AddEdge(Edge(voronoiNode, nodeIndex));
 			}
 
 
