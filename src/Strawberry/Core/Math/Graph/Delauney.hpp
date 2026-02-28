@@ -149,13 +149,14 @@ namespace Strawberry::Core::Math
 		/// it is demoted to a normal graph.
 		PrunedDelauney<Vector<T, 2>> Pruned() const
 		{
+			// Create pruned graph.
 			PrunedDelauney<Vector<T, 2>> copy(GetMin(), GetMax(), *this);
-
+			// Remove the supporting nodes.
 			copy.RemoveNode(0);
 			copy.RemoveNode(1);
 			copy.RemoveNode(2);
 			copy.RemoveNode(3);
-
+			// Return pruned.
 			return copy;
 		}
 
