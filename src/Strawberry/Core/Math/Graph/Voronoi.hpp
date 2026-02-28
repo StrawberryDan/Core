@@ -44,7 +44,9 @@ namespace Strawberry::Core::Math
 		{
 			UndirectedGraph<Vector<T, 2>> voronoi;
 
-			std::map<Face, unsigned int> faceCenterNodeIDs;
+			/// Mapping of the Delaunay graphs faces to the corresponding node
+			/// in the voronoi diagram.
+			std::map<Face, unsigned int> faceToNodeMap;
 			/// Mapping of triangulation node  handles to the list
 			/// of edge graph node handles that make up the cell surrounding this
 			/// point.
@@ -52,7 +54,7 @@ namespace Strawberry::Core::Math
 
 			for (auto face : delauney.Faces())
 			{
-				faceCenterNodeIDs.emplace(face, voronoi.AddNode(delauney.GetFaceCenter(face)));
+				faceToNodeMap.emplace(face, voronoi.AddNode(delauney.GetFaceCenter(face)));
 			}
 
 			for (auto face : delauney.Faces())
@@ -61,7 +63,7 @@ namespace Strawberry::Core::Math
 
 				for (auto n : neighbours)
 				{
-					voronoi.AddEdge(Edge(faceCenterNodeIDs[face], faceCenterNodeIDs[n]));
+					voronoi.AddEdge(Edge(faceToNodeMap[face], faceToNodeMap[n]));
 				}
 			}
 
@@ -70,7 +72,7 @@ namespace Strawberry::Core::Math
 				auto connectedFaces = delauney.Faces()
 					| std::views::filter([&] (Face face) { return face.ContainsNode(node); });
 				auto edgeNodes = connectedFaces
-					| std::views::transform([&] (Face face) { return faceCenterNodeIDs.at(face); })
+					| std::views::transform([&] (Face face) { return faceToNodeMap.at(face); })
 					| std::ranges::to<std::vector>();
 				auto edges =
 					connectedFaces
