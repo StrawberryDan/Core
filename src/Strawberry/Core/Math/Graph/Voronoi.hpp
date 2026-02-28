@@ -30,10 +30,17 @@ namespace Strawberry::Core::Math
 		};
 
 
+		/// Prunes the given graph before generating a voronoi from it.
+		static Voronoi From(const Delauney& delauney) noexcept
+		{
+			return From(delauney.Pruned());
+		}
+
+
 		/// Returns the voronoi edge graph for this delaunay triangulation.
 		///
 		/// This works because delauney triangulations and voronoi diagrams are duals of eachother.
-		static Voronoi From(const Delauney& delauney) noexcept
+		static Voronoi From(const PrunedDelauney& delauney) noexcept
 		{
 			UndirectedGraph<Vector<T, 2>> voronoi;
 
