@@ -70,15 +70,4 @@ namespace fmt
 			return fmt::format_to(ctx.out(), "Line({} -> {})", l.A(), l.B());
 		}
 	};
-
-	template <typename T, unsigned D>
-	struct formatter<Strawberry::Core::Math::LineSegment<T, D>> : formatter<std::string>
-	{
-		using formatter<std::string>::parse;
-
-		auto format(const Strawberry::Core::Math::LineSegment<T, D>& l, format_context& ctx) const -> format_context::iterator
-		{
-			return fmt::format_to(ctx.out(), "LineSegment({} -> {})", l.A(), l.B());
-		}
-	};
 }
