@@ -8,14 +8,6 @@
 namespace Strawberry::Core::Math
 {
 	template <typename T, unsigned int D>
-	class Line;
-	template <typename T, unsigned int D>
-	class LineSegment;
-
-
-
-
-	template <typename T, unsigned int D>
 	class Line
 	{
 	public:
@@ -30,11 +22,6 @@ namespace Strawberry::Core::Math
 		const Vector<T, D>& B() const { return mPoints[1]; }
 
 		Vector<T, D> Direction() const noexcept { return B() - A(); }
-
-		LineSegment<T, D> ToLineSegment() const noexcept
-		{
-			return LineSegment(A(), B());
-		}
 
 
 		Optional<Vector<T, D>> Intersection(const Line& other) const noexcept requires (D == 2)
