@@ -91,7 +91,7 @@ int main()
 	canvas_ity::canvas context(span[0], span[1]);
 	Image<PixelRGBA> image(span.template AsType<unsigned int>());
 
-	for (auto point : pointSet.Points())
+	for (auto point : pointSet)
 	{
 		delauney.AddNode(point);
 	}

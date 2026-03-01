@@ -3,6 +3,7 @@
 
 #include "Strawberry/Core/Math/Vector.hpp"
 #include <algorithm>
+#include <set>
 
 
 namespace Strawberry::Core::Math
@@ -18,7 +19,8 @@ namespace Strawberry::Core::Math
 		Vector<T, D>& Get(unsigned int i) { return mPoints[i]; }
 
 
-		const auto& Points() const noexcept { return mPoints; }
+		auto begin() const noexcept { return mPoints.cbegin(); }
+		auto end() const noexcept { return mPoints.cend(); }
 
 
 		unsigned int Size() const { return mPoints.size(); }
@@ -26,7 +28,7 @@ namespace Strawberry::Core::Math
 
 		void Add(const Vector<T, D>& point)
 		{
-			mPoints.push_back(point);
+			mPoints.insert(point);
 		}
 
 
@@ -59,6 +61,6 @@ namespace Strawberry::Core::Math
 
 
 	private:
-		std::vector<Vector<T, D>> mPoints;
+		std::set<Vector<T, D>> mPoints;
 	};
 }
