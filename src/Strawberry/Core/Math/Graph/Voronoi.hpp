@@ -165,8 +165,8 @@ namespace Strawberry::Core::Math
 				}
 
 				/// Add the new node to the graph, and add the edge.
-				unsigned int nodeIndex = voronoi.AddNode(perpendicularEndpoint.Unwrap());
-				voronoi.AddEdge(Edge(voronoiNode, nodeIndex));
+				unsigned int perpendicularEndpointIndex = voronoi.AddNode(perpendicularEndpoint.Unwrap());
+				voronoi.AddEdge(Edge(voronoiNode, perpendicularEndpointIndex));
 			}
 
 
