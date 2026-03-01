@@ -48,9 +48,7 @@ namespace Strawberry::Core::Math
 			/// Mapping of the Delaunay graphs faces to the corresponding node
 			/// in the voronoi diagram.
 			std::map<Face, unsigned int> faceToNodeMap;
-			/// Mapping of triangulation node  handles to the list
-			/// of edge graph node handles that make up the cell surrounding this
-			/// point.
+			/// Mapping of triangulation node handles to corresponding cell info.
 			std::map<unsigned int, Cell> cellMap;
 
 			/// For each face in the delaunay, take it's center and add it to the voronoi graph.
