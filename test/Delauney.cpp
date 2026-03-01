@@ -61,7 +61,7 @@ static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColori
 
 	if (config.drawNodes)
 	{
-		for (auto node : graph.Nodes())
+		for (auto node : graph.NodeIndices())
 		{
 			auto pos = graph.GetValue(node);
 			canvas.set_line_width(8.0);

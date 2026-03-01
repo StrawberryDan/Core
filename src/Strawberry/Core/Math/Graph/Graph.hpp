@@ -96,13 +96,27 @@ namespace Strawberry::Core::Math
 
 		auto Nodes() const noexcept
 		{
-			return mNodes | std::views::transform([] (auto&& x) { return x.first; });
+			return std::ranges::views::all(mNodes);
+		}
+
+
+		auto NodeIndices() const noexcept
+		{
+			return Nodes() | std::views::keys;
 		}
 
 
 		auto Values() const noexcept
 		{
-			return mNodes | std::views::transform([] (auto&& x) { return x.second; });
+			return mNodes | std::views::values;
+		}
+
+
+		bool ContainsValue(const Payload& value) const noexcept
+		{
+			return std::ranges::find_if(
+				mNodes,
+				[value] (auto x) { return x.second == value; }) != mNodes.end();
 		}
 
 

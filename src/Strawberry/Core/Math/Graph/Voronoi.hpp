@@ -74,7 +74,7 @@ namespace Strawberry::Core::Math
 			}
 
 			/// Record the details of each voronoi cell for each delaunay vertex.
-			for (auto node : delauney.Nodes())
+			for (auto node : delauney.NodeIndices())
 			{
 				/// Get all the faces that contain this node.
 				auto connectedFaces = delauney.Faces()

@@ -308,7 +308,7 @@ namespace Strawberry::Core::Math
 				return;
 			}
 
-			for (auto n : this->Nodes())
+			for (auto n : this->NodeIndices())
 			{
 				if (face.ContainsNode(n))
 					continue;
