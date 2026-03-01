@@ -35,7 +35,7 @@ static PointSet<double, 2> GeneratePointSet()
 	for (int i = 0; i < POINT_COUNT; i++)
 	{
 		Vector<double, 2> v(distX(rng), distY(rng));
-		points.Add(v.AsType<int>().AsType<double>());
+		points.Add(v);
 	}
 	return points;
 }
