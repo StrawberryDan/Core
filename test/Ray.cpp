@@ -18,7 +18,7 @@ int main()
 
 	AssertEQ(r1.Intersection(r3), Vector{0.5, 0.5});
 	Assert(!r1.Intersection(r2).HasValue());
-	AssertEQ(r1.Intersection(ls1), Vector{10., 10.});
+	AssertEQ(ls1.Intersection(r1), Vector{10., 10.});
 	AssertEQ(r2.Intersection(l1), Vector{-10., 9.});
 
 	return 0;

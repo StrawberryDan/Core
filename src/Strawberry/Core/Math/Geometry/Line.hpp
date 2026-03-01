@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "Strawberry/Core/Math/Geometry/Intersection.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 
@@ -8,7 +9,7 @@
 namespace Strawberry::Core::Math
 {
 	template <typename T, unsigned int D>
-	class Line
+	class Line : public Intersectable
 	{
 	public:
 		Line() = default;
@@ -24,26 +25,6 @@ namespace Strawberry::Core::Math
 		Vector<T, D> Direction() const noexcept { return B() - A(); }
 
 
-		Optional<Vector<T, D>> Intersection(const Line& other) const noexcept requires (D == 2)
-		{
-			// Solve equation system using Cramer's rule.
-			auto& p1 = A();
-			auto& p2 = other.A();
-			auto   c = p2 - p1;
-			auto  v1 = Direction();
-			auto  v2 = other.Direction();
-
-			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-			if (determinant == 0.0)
-			{
-				return NullOpt;
-			}
-
-			auto t1Num = c[0] * v2[1] - v2[0] * c[1];
-			auto t1 = t1Num / determinant;
-			return p1 + t1 * v1;
-		}
-
 		auto operator<=>(const Line& line) const = default;
 
 
@@ -55,7 +36,36 @@ namespace Strawberry::Core::Math
 
 	private:
 		std::array<Vector<T, D>, 2> mPoints;
-	};}
+	};
+
+
+	template <typename T>
+	struct IntersectionTest<Line<T, 2>, Line<T, 2>>
+	{
+		using Result = Core::Optional<Vector<T, 2>>;
+
+
+		Result operator()(const Line<T, 2>& a, const Line<T, 2>& b) const noexcept
+		{
+			// Solve equation system using Cramer's rule.
+			auto& p1 = a.A();
+			auto& p2 = b.A();
+			auto   c = p2 - p1;
+			auto  v1 = a.Direction();
+			auto  v2 = b.Direction();
+
+			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
+			if (determinant == 0.0)
+			{
+				return NullOpt;
+			}
+
+			auto t1Num = c[0] * v2[1] - v2[0] * c[1];
+			auto t1 = t1Num / determinant;
+			return p1 + t1 * v1;
+		}
+	};
+}
 
 
 namespace fmt

@@ -4,12 +4,13 @@
 #include "Strawberry/Core/Math/Geometry/Line.hpp"
 #include "Strawberry/Core/Math/Geometry/LineSegment.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
+#include "Strawberry/Core/Math/Geometry/Intersection.hpp"
 
 
 namespace Strawberry::Core::Math
 {
 	template <typename T, unsigned D>
-	class Ray
+	class Ray : public Intersectable
 	{
 	public:
 		Ray() = default;
@@ -50,14 +51,32 @@ namespace Strawberry::Core::Math
 		}
 
 
-		Optional<Vector<T, D>> Intersection(const Line<T, D>& other) const noexcept
+		std::string ToString() const noexcept
+		{
+			return fmt::format("Ray(from {} direction {})", Origin().ToString(), Direction().ToString());
+		}
+
+
+	private:
+		Vector<T, D> mOrigin;
+		Vector<T, D> mDirection;
+	};
+
+
+	template <typename T>
+	struct IntersectionTest<Ray<T, 2>, Line<T, 2>>
+	{
+		using Result = Core::Optional<Vector<T, 2>>;
+
+
+		Result operator()(const Ray<T, 2>& a, const Line<T, 2>& b) const noexcept
 		{
 			// Solve using Cramer's rule
-			auto& p1 = this->Origin();
-			auto& p2 = other.A();
+			auto& p1 = a.Origin();
+			auto& p2 = b.A();
 			auto   c = p2 - p1;
-			auto& v1 = this->Direction();
-			auto  v2 = other.Direction();
+			auto& v1 = a.Direction();
+			auto  v2 = b.Direction();
 
 			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
 			if (determinant == 0.0)
@@ -77,16 +96,23 @@ namespace Strawberry::Core::Math
 
 			return p1 + t1 * v1;
 		}
+	};
 
 
-		Optional<Vector<T, D>> Intersection(const LineSegment<T, D>& other) const noexcept
+	template <typename T>
+	struct IntersectionTest<Ray<T, 2>, LineSegment<T, 2>>
+	{
+		using Result = Core::Optional<Vector<T, 2>>;
+
+
+		Result operator()(const Ray<T, 2>& a, const LineSegment<T, 2>& b) const noexcept
 		{
 			// Solve using Cramer's rule
-			auto& p1 = this->Origin();
-			auto& p2 = other.A();
+			auto& p1 = a.Origin();
+			auto& p2 = b.A();
 			auto   c = p2 - p1;
-			auto& v1 = this->Direction();
-			auto  v2 = other.Direction();
+			auto& v1 = a.Direction();
+			auto  v2 = b.Direction();
 
 			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
 			if (determinant == 0.0)
@@ -106,16 +132,22 @@ namespace Strawberry::Core::Math
 
 			return p1 + t1 * v1;
 		}
+	};
 
 
-		Optional<Vector<T, D>> Intersection(const Ray& other) const noexcept
+	template <typename T>
+	struct IntersectionTest<Ray<T, 2>, Ray<T, 2>>
+	{
+		using Result = Core::Optional<Vector<T, 2>>;
+
+		Result operator()(const Ray<T, 2>& a, const Ray<T, 2>& b) const noexcept
 		{
 			// Solve using Cramer's rule
-			auto& p1 = this->Origin();
-			auto& p2 = other.Origin();
+			auto& p1 = a.Origin();
+			auto& p2 = b.Origin();
 			auto   c = p2 - p1;
-			auto& v1 = this->Direction();
-			auto& v2 = other.Direction();
+			auto& v1 = a.Direction();
+			auto& v2 = b.Direction();
 
 			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
 			if (determinant == 0.0)
@@ -135,17 +167,5 @@ namespace Strawberry::Core::Math
 
 			return p1 + t1 * v1;
 		}
-
-
-		std::string ToString() const noexcept
-		{
-			return fmt::format("Ray(from {} direction {})", Origin().ToString(), Direction().ToString());
-		}
-
-
-	private:
-		Vector<T, D> mOrigin;
-		Vector<T, D> mDirection;
 	};
-
 }
