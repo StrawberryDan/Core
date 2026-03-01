@@ -164,9 +164,14 @@ namespace Strawberry::Core::Math
 
 				/// Add the new node to the graph, and add the edge.
 				unsigned int perpendicularEndpointIndex = voronoi.AddNode(perpendicularEndpoint.Unwrap());
-				voronoi.AddEdge(Edge(voronoiNode, perpendicularEndpointIndex));
-			}
+				auto newEdge = Edge(voronoiNode, perpendicularEndpointIndex);
+				voronoi.AddEdge(newEdge);
 
+				cellMap.at(outerEdge.A()).nodes.push_back(perpendicularEndpointIndex);
+				cellMap.at(outerEdge.B()).nodes.push_back(perpendicularEndpointIndex);
+				cellMap.at(outerEdge.A()).edges.push_back(newEdge);
+				cellMap.at(outerEdge.B()).edges.push_back(newEdge);
+			}
 
 			return Voronoi(delauney, std::move(voronoi), std::move(cellMap));
 		}
