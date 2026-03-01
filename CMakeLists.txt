@@ -15,8 +15,14 @@ endif ()
 
 
 if (NOT TARGET StrawberryCore)
+  option(STRAWBERRY_CORE_ENABLE_ASSERTIONS "" OFF)
   option(STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE "" OFF)
   option(STRAWBERRY_CORE_ENABLE_LOGGING_TIMESTAMPS "" OFF)
+
+
+  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(STRAWBERRY_CORE_ENABLE_ASSERTIONS ON)
+  endif()
 
 
   FetchContent_Declare(FMT
@@ -151,13 +157,16 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Util/Strings.hpp
   )
 
+  if (${STRAWBERRY_CORE_ENABLE_ASSERTIONS})
+    target_compile_definitions(StrawberryCore PUBLIC "STRAWBERRY_CORE_ENABLE_ASSERTIONS=1")
+  endif()
 
   if (${STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE})
-    target_compile_definitions(StrawberryCore PUBLIC "STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE=${STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE}")
+    target_compile_definitions(StrawberryCore PUBLIC "STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE=1")
   endif ()
 
   if (${STRAWBERRY_CORE_ENABLE_LOGGING_TIMESTAMPS})
-    target_compile_definitions(StrawberryCore PUBLIC "STRAWBERRY_CORE_ENABLE_LOGGING_TIMESTAMPS=${STRAWBERRY_CORE_ENABLE_LOGGING_TIMESTAMPS}")
+    target_compile_definitions(StrawberryCore PUBLIC "STRAWBERRY_CORE_ENABLE_LOGGING_TIMESTAMPS=1")
   endif ()
 
   target_include_directories(StrawberryCore

@@ -19,7 +19,7 @@ namespace Strawberry::Core
 {
 	constexpr void Assert([[maybe_unused]] bool value, std::string message = "")
 	{
-#if STRAWBERRY_DEBUG
+#if STRAWBERRY_CORE_ENABLE_ASSERTIONS
 		if (!value)
 		{
 #ifdef STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE
@@ -50,6 +50,7 @@ namespace Strawberry::Core
 	template<typename A, typename B>
 	constexpr void AssertEQ([[maybe_unused]] A a, [[maybe_unused]] B b, std::string message = "")
 	{
+#if STRAWBERRY_CORE_ENABLE_ASSERTIONS
 		if constexpr (fmt::is_formattable<A>::value && fmt::is_formattable<B>::value)
 		{
 			if (message.empty())
@@ -58,12 +59,14 @@ namespace Strawberry::Core
 				Assert(a == b, message);
 		}
 		else Assert(a == b, message);
+#endif
 	}
 
 
 	template<typename A, typename B>
 	constexpr void AssertNEQ([[maybe_unused]] A a, [[maybe_unused]] B b, std::string message = "")
 	{
+#if STRAWBERRY_CORE_ENABLE_ASSERTIONS
 		if constexpr (fmt::is_formattable<A>::value && fmt::is_formattable<B>::value)
 		{
 			if (message.empty())
@@ -72,11 +75,14 @@ namespace Strawberry::Core
 				Assert(a != b, message);
 		}
 		else Assert(a != b, message);
+#endif
 	}
 
 
 	constexpr void AssertImplication(bool a, bool b, std::string message = "")
 	{
+#if STRAWBERRY_CORE_ENABLE_ASSERTIONS
 		Assert(!a || b, message);
+#endif
 	}
 } // namespace Strawberry::Core
