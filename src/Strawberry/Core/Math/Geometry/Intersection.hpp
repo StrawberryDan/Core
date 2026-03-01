@@ -40,9 +40,11 @@ namespace Strawberry::Core::Math
 	class Intersectable
 	{
 	public:
+		/// Make default comparable so that derriving classes are also orderable.
 		auto operator<=>(const Intersectable& other) const noexcept = default;
 
 
+		/// Intersection method.
 		auto Intersection(this const auto& self, const auto& other) noexcept
 		{
 			using TestType = IntersectionTest<
