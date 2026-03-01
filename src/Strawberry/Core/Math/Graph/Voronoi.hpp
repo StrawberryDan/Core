@@ -184,10 +184,12 @@ namespace Strawberry::Core::Math
 
 		Vector<T, 2> GetCellCentroid(const Cell& cell) const noexcept
 		{
-			auto cellVertices = cell.nodes
-				| std::views::transform([this] (unsigned int i) { this->Edges().GetValue(i); })
-				| std::ranges::to<std::vector>();
-			return std::ranges::fold_left(cellVertices, {0, 0}, std::plus{}) * (1.0 / (T) cellVertices.size());
+			Vector<T, 2> centroid;
+			for (auto& n : cell.nodes)
+			{
+				centroid += Edges().GetValue(n);
+			}
+			return centroid * (1.0 / cell.nodes.size());
 		}
 
 
