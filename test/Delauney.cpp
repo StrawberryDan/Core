@@ -11,19 +11,21 @@ using namespace Math;
 
 static Vector<double, 2> MIN{0.0, 0.0};
 static Vector<double, 2> MAX{1000.0, 1000.0};
-static double            PADDING = 100.0;
+static double            PADDING = 20.0;
 
 struct GraphColoring
 {
-	float edgeWidth = 2.0f;
-	float nodeRadius = 4.0f;
+	bool drawNodes = true;
+	bool drawEdges = true;
+	float edgeWidth = 1.0f;
+	float nodeRadius = 2.0f;
 	float mEdgeColor[4];
 	float mNodeColor[4];
 };
 
 static PointSet<double, 2> GeneratePointSet()
 {
-	static size_t POINT_COUNT = 128;
+	static size_t POINT_COUNT = 1024;
 	PointSet<double, 2> points;
 
 	std::random_device rng;
@@ -39,29 +41,35 @@ static PointSet<double, 2> GeneratePointSet()
 }
 
 
-static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColoring coloring)
+static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColoring config)
 {
-	for (auto edge : graph.Edges())
+	if (config.drawEdges)
 	{
-		canvas.set_line_width(coloring.edgeWidth);
-		Vector<double, 2> posA = graph.GetValue(edge.nodes[0]);
-		Vector<double, 2> posB = graph.GetValue(edge.nodes[1]);
-		canvas.set_color(canvas_ity::brush_type::stroke_style, coloring.mEdgeColor[0], coloring.mEdgeColor[1], coloring.mEdgeColor[2], coloring.mEdgeColor[3]);
-		canvas.begin_path();
-		canvas.move_to(posA[0], posA[1]);
-		canvas.line_to(posB[0], posB[1]);
-		canvas.stroke();
+		for (auto edge : graph.Edges())
+		{
+			canvas.set_line_width(config.edgeWidth);
+			Vector<double, 2> posA = graph.GetValue(edge.nodes[0]);
+			Vector<double, 2> posB = graph.GetValue(edge.nodes[1]);
+			canvas.set_color(canvas_ity::brush_type::stroke_style, config.mEdgeColor[0], config.mEdgeColor[1], config.mEdgeColor[2], config.mEdgeColor[3]);
+			canvas.begin_path();
+			canvas.move_to(posA[0], posA[1]);
+			canvas.line_to(posB[0], posB[1]);
+			canvas.stroke();
+		}
 	}
 
 
-	for (auto node : graph.Nodes())
+	if (config.drawNodes)
 	{
-		auto pos = graph.GetValue(node);
-		canvas.set_line_width(8.0);
-		canvas.set_color(canvas_ity::brush_type::fill_style, coloring.mNodeColor[0], coloring.mNodeColor[1], coloring.mNodeColor[2], coloring.mNodeColor[3]);
-		canvas.begin_path();
-		canvas.arc(pos[0], pos[1], coloring.nodeRadius, 0, 360);
-		canvas.fill();
+		for (auto node : graph.Nodes())
+		{
+			auto pos = graph.GetValue(node);
+			canvas.set_line_width(8.0);
+			canvas.set_color(canvas_ity::brush_type::fill_style, config.mNodeColor[0], config.mNodeColor[1], config.mNodeColor[2], config.mNodeColor[3]);
+			canvas.begin_path();
+			canvas.arc(pos[0], pos[1], config.nodeRadius, 0, 360);
+			canvas.fill();
+		}
 	}
 }
 
@@ -70,8 +78,8 @@ static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColori
 
 int main()
 {
-	GraphColoring mainColoring { .mEdgeColor{1.0f, 1.0f, 1.0f, 1.0f}, .mNodeColor{1.0f, 0.0f, 0.0f, 1.0f} };
-	GraphColoring voronoiColoring { .mEdgeColor{0.0f, 1.0f, 1.0f, 1.0f}, .mNodeColor{0.0f, 1.0f, 0.0f, 1.0f} };
+	GraphColoring mainColoring { .mEdgeColor{1.0f, 1.0f, 1.0f, 0.2f}, .mNodeColor{1.0f, 0.0f, 0.0f, 0.2f} };
+	GraphColoring voronoiColoring { .drawNodes = false, .mEdgeColor{0.0f, 1.0f, 1.0f, 1.0f}, .mNodeColor{0.0f, 1.0f, 0.0f, 1.0f} };
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
