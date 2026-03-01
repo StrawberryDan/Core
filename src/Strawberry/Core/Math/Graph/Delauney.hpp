@@ -100,6 +100,11 @@ namespace Strawberry::Core::Math
 		void AddNode(const Vector<T, 2>& value)
 		{
 			Core::Assert(InBounds(value), "Attempted to call Delaunay::AddNode() with out of bounds point!");
+			if (this->ContainsValue(value)) [[unlikely]]
+			{
+				Core::Logging::Warning("Attempted to call Delaunay::AddNode() with a duplicate value.");
+				return;
+			}
 
 			auto newNode = Graph::AddNode(value);
 
@@ -125,6 +130,7 @@ namespace Strawberry::Core::Math
 					newEdges.insert(Edge(newNode, node));
 				}
 			}
+
 			for (auto edge : newEdges)
 			{
 				this->AddEdge(edge);
@@ -132,7 +138,8 @@ namespace Strawberry::Core::Math
 
 			Core::Assert(
 				IsPlanar(),
-				"Delaunay graph is not planar after call to Delaunay::AddNode!");
+				fmt::format("Delaunay graph is not planar after call to Delaunay::AddNode!"
+							"Node was {} : {}", newNode, value.ToString()));
 		}
 
 
@@ -305,6 +312,9 @@ namespace Strawberry::Core::Math
 			auto triangle = FaceToTriangle(face);
 			if (!triangle.GetCircumsphere().HasValue())
 			{
+				Logging::Warning(
+					"Face ({}, {}, {}) produced degenerate triangle in Delaunay::AddFace!",
+					face.Node(0), face.Node(1), face.Node(2));
 				return;
 			}
 
