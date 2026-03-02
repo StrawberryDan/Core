@@ -18,9 +18,17 @@ namespace Strawberry::Core::Math
 			return Plane(normal, dotProduct);
 		}
 
+		/// Returns the plane defined by a point and a normal vector.
+		static Plane FromNormalAndPoint(const Vector<T, D>& normal, const Vector<T, D>& point)
+		{
+			normal = normal.Normalised();
+			return Plane(normal, normal.Dot(point));
+		}
+
 
 		Plane(const Vector<T, D>& normal, T dotProduct)
-			: mNormal(normal.Normalised()) , mDotProduct(dotProduct) {}
+			: mNormal(normal.Normalised())
+			, mDotProduct(dotProduct) {}
 
 
 		T SignedDistance(const Vector<T, D>& point) const requires (std::floating_point<T>)
