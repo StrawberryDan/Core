@@ -25,13 +25,7 @@ namespace Strawberry::Core::Math
 
 		T SignedDistance(const Vector<T, D>& point) const requires (std::floating_point<T>)
 		{
-			return mNormal.Dot(point);
-		}
-
-
-		void SetNormal(const Vector<T, D>& normal)
-		{
-			mNormal = normal.Normalised();
+			return mNormal.Dot(point) - mDotProduct;
 		}
 
 
