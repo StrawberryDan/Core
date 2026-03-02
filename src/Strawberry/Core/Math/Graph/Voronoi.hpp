@@ -103,10 +103,12 @@ namespace Strawberry::Core::Math
 					| std::views::transform([] (Edge e) { return LineSegment<T, 2>(); })
 					| std::ranges::to<std::vector>();
 				/// Sort boundary into ccw order.
-				std::ranges::sort(boundary, std::less(),
-								  [centroid](LineSegment<T, 2> l) { return std::min(
-										  (l.A() - centroid).ATan2(), (l.B() - centroid).ATan2()
-									  ); });
+				std::ranges::sort(
+					boundary, std::less(),
+					[centroid] (LineSegment<T, 2> l)
+					{
+						return (l.Midpoint() - centroid).ATan2();
+					});
 				/// Orient each part of the boundary to be CCW.
 				for (auto& l : boundary)
 				{
