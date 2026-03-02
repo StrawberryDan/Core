@@ -26,8 +26,10 @@ namespace Strawberry::Core::Math
 
 		struct Cell
 		{
-			std::vector<unsigned int> nodes;
-			std::set<Edge> edges;
+			Vector<T, 2>                   centroid;
+			std::set<unsigned int>         nodes;
+			std::set<Edge>                 edges;
+			std::vector<LineSegment<T, 2>> boundary;
 		};
 
 
@@ -80,7 +82,14 @@ namespace Strawberry::Core::Math
 				/// Get the nodes that are part of this cell's boundary.
 				auto edgeNodes = connectedFaces
 					| std::views::transform([&] (Face face) { return faceToNodeMap.at(face); })
-					| std::ranges::to<std::vector>();
+					| std::ranges::to<std::set>();
+				/// Calculate the centroid of the cell.
+				Vector<T, 2> centroid;
+				for (auto n : edgeNodes)
+				{
+					centroid += voronoi.GetValue(n);
+				}
+				centroid = (1.0 / edgeNodes.size()) * centroid;
 				/// Get the edges involved in this cell by taking all the edges of the connected faces,
 				/// and removing all of the edges to/from the current node.
 				auto edges =
@@ -89,8 +98,33 @@ namespace Strawberry::Core::Math
 					| std::views::join
 					| std::views::filter([node] (Edge e) { return !e.ContainsNode(node); })
 					| std::ranges::to<std::set>();
+				/// Map edges onto linesegments.
+				auto boundary = edges
+					| std::views::transform([] (Edge e) { return LineSegment<T, 2>(); })
+					| std::ranges::to<std::vector>();
+				/// Sort boundary into ccw order.
+				std::ranges::sort(boundary, std::less(),
+								  [centroid](LineSegment<T, 2> l) { return std::min(
+										  (l.A() - centroid).ATan2(), (l.B() - centroid).ATan2()
+									  ); });
+				/// Orient each part of the boundary to be CCW.
+				for (auto& l : boundary)
+				{
+					auto toCentroid = centroid - l.Midpoint();
+					auto perp = l.Direction().Perpendicular();
+					if (toCentroid.Dot(perp) < 0.0)
+					{
+						l.Swap();
+					}
+				}
+
 				/// Store this information.
-				cellMap[node] = Cell { .nodes = edgeNodes, .edges = edges };
+				cellMap[node] = Cell {
+					.centroid = centroid,
+					.nodes = std::move(edgeNodes),
+					.edges = std::move(edges),
+					.boundary = std::move(boundary)
+				};
 			}
 
 
@@ -167,10 +201,10 @@ namespace Strawberry::Core::Math
 				auto newEdge = Edge(voronoiNode, perpendicularEndpointIndex);
 				voronoi.AddEdge(newEdge);
 
-				cellMap.at(outerEdge.A()).nodes.push_back(perpendicularEndpointIndex);
-				cellMap.at(outerEdge.B()).nodes.push_back(perpendicularEndpointIndex);
-				cellMap.at(outerEdge.A()).edges.push_back(newEdge);
-				cellMap.at(outerEdge.B()).edges.push_back(newEdge);
+				cellMap.at(outerEdge.A()).nodes.insert(perpendicularEndpointIndex);
+				cellMap.at(outerEdge.B()).nodes.insert(perpendicularEndpointIndex);
+				cellMap.at(outerEdge.A()).edges.insert(newEdge);
+				cellMap.at(outerEdge.B()).edges.insert(newEdge);
 			}
 
 			return Voronoi(delauney, std::move(voronoi), std::move(cellMap));
@@ -180,17 +214,6 @@ namespace Strawberry::Core::Math
 		const auto& Triangulation() const noexcept { return mTriangulation; }
 		const auto& Edges() const noexcept { return mVoronoi; }
 		const auto& Cells() const noexcept { return mCellMap; }
-
-
-		Vector<T, 2> GetCellCentroid(const Cell& cell) const noexcept
-		{
-			Vector<T, 2> centroid;
-			for (auto& n : cell.nodes)
-			{
-				centroid += Edges().GetValue(n);
-			}
-			return centroid * (1.0 / cell.nodes.size());
-		}
 
 
 		bool CellContains(const Cell& cell, const Vector<T, 2>& point) const noexcept
