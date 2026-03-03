@@ -128,6 +128,7 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Removes the node with the given index, as well as all it's connected edges.
 		void RemoveNode(unsigned int index)
 		{
 			mNodes.erase(index);
