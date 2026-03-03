@@ -1,5 +1,6 @@
 #pragma once
 // Strawberry Core
+#include "Strawberry/Core/Math/Geometry/Plane.hpp"
 #include "Strawberry/Core/Math/Geometry/Ray.hpp"
 #include "Strawberry/Core/Math/Graph/Delauney.hpp"
 #include "Strawberry/Core/Math/Graph/Graph.hpp"
@@ -26,10 +27,14 @@ namespace Strawberry::Core::Math
 
 		struct Cell
 		{
-			Vector<T, 2>                   centroid;
-			std::set<unsigned int>         nodes;
-			std::set<Edge>                 edges;
-			std::vector<LineSegment<T, 2>> boundary;
+			/// Centroid of the face.
+			Vector<T, 2>             centroid;
+			/// The set of node indices of this cell.
+			std::set<unsigned int>   nodes;
+			/// The set of edges comprising this cell.
+			std::set<Edge>           edges;
+			/// The set of planes defining this cell.
+			std::vector<Plane<T, 2>> boundary;
 		};
 
 
@@ -119,13 +124,20 @@ namespace Strawberry::Core::Math
 						l.Swap();
 					}
 				}
+				/// Transform the boundary edges into planes.
+				auto boundaryPlanes = boundary
+					| std::views::transform([] (const LineSegment<T, 2>& l)
+					{
+						return Plane<T, 2>::FromNormalAndPoint(l.Direction().Perpendicular(), l.A());
+					})
+					| std::ranges::to<std::vector>();
 
 				/// Store this information.
 				cellMap[node] = Cell {
 					.centroid = centroid,
 					.nodes = std::move(edgeNodes),
 					.edges = std::move(edges),
-					.boundary = std::move(boundary)
+					.boundary = std::move(boundaryPlanes)
 				};
 			}
 
