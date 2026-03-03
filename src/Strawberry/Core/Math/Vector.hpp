@@ -502,6 +502,18 @@ namespace Strawberry::Core::Math
 		{
 			return std::acos(Dot(b) / (std::sqrt(SquareMagnitude() * b.SquareMagnitude())));
 		}
+
+
+		/// Return the angle between two vectors in the CCW direction.
+		Radians AngleBetweenCCW(const Vector& b) const noexcept
+		{
+			Radians smallestAngle = AngleBetween(b);
+			if (Perpendicular().Dot(b) >= T{0.0})
+			{
+				smallestAngle = smallestAngle + M_PI;
+			}
+
+			return smallestAngle;
 		}
 
 
