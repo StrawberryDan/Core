@@ -466,6 +466,16 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Returns the dot product of b with this vector's perpendicular.
+		/// This function is often known as Orient2D.
+		/// The result of this function is positive if the point b lies to the
+		/// left of vector a.
+		constexpr T DotPerp(const Vector& b) const noexcept requires (D == 2)
+		{
+			return Perpendicular().Dot(b);
+		}
+
+
 		/// Define Cross Product
 		constexpr Vector Cross(const Vector& b) const noexcept requires (D == 3)
 		{
