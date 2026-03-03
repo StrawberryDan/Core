@@ -657,7 +657,7 @@ namespace Strawberry::Core
 	}
 
 
-	template <typename T, typename R>
+	template <typename T, typename R> requires (!IsOptional<R>)
 	bool operator==(const Optional<T>& t, const R& r)
 	{
 		if (t.HasValue())
@@ -669,12 +669,12 @@ namespace Strawberry::Core
 	}
 
 
-	template <typename T, typename R>
+	template <typename T, typename R> requires (!IsOptional<R>)
 	bool operator==(const R& r, const Optional<T>& t)
 	{
 		if (t.HasValue())
 		{
-			return r == t;
+			return r == t.Value();
 		}
 
 		return false;
@@ -693,7 +693,7 @@ namespace Strawberry::Core
 	}
 
 
-	template <typename T, typename R>
+	template <typename T, typename R> requires (!IsOptional<R>)
 	bool operator!=(const Optional<T>& t, const R& r)
 	{
 		if (t.HasValue())
@@ -705,12 +705,12 @@ namespace Strawberry::Core
 	}
 
 
-	template <typename T, typename R>
+	template <typename T, typename R> requires (!IsOptional<R>)
 	bool operator!=(const R& r, const Optional<T>& t)
 	{
 		if (t.HasValue())
 		{
-			return r != t;
+			return r != t.Value();
 		}
 
 		return true;
