@@ -19,7 +19,7 @@ namespace Strawberry::Core::Math
 		}
 
 		/// Returns the plane defined by a point and a normal vector.
-		static Plane FromNormalAndPoint(const Vector<T, D>& normal, const Vector<T, D>& point)
+		static Plane FromNormalAndPoint(Vector<T, D> normal, const Vector<T, D>& point)
 		{
 			normal = normal.Normalised();
 			return Plane(normal, normal.Dot(point));
