@@ -500,7 +500,8 @@ namespace Strawberry::Core::Math
 		/// Calculate the angle between this and another vector in radians.
 		Radians AngleBetween(const Vector& b) const noexcept
 		{
-			return std::acos(Dot(b) / std::sqrt(SquareMagnitude() * b.SquareMagnitude()));
+			return std::acos(Dot(b) / (std::sqrt(SquareMagnitude() * b.SquareMagnitude())));
+		}
 		}
 
 
