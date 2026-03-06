@@ -1,6 +1,6 @@
 
 #include "Strawberry/Core/Math/Geometry/PointSet.hpp"
-#include "Strawberry/Core/Math/Graph/Voronoi.hpp"
+#include "Strawberry/Core/Math/Graph/Delauney.hpp"
 #include "Strawberry/Core/Util/Image.hpp"
 #include "canvas_ity.hpp"
 #include <random>
@@ -17,15 +17,15 @@ struct GraphColoring
 {
 	bool drawNodes = true;
 	bool drawEdges = true;
-	float edgeWidth = 1.0f;
-	float nodeRadius = 2.0f;
+	float edgeWidth = 2.0f;
+	float nodeRadius = 4.0f;
 	float mEdgeColor[4];
 	float mNodeColor[4];
 };
 
 static PointSet<double, 2> GeneratePointSet()
 {
-	static size_t POINT_COUNT = 1024;
+	static size_t POINT_COUNT = 128;
 	PointSet<double, 2> points;
 
 	std::random_device rng;
@@ -35,6 +35,7 @@ static PointSet<double, 2> GeneratePointSet()
 	for (int i = 0; i < POINT_COUNT; i++)
 	{
 		Vector<double, 2> v(distX(rng), distY(rng));
+		v = v.AsType<int>().AsType<double>();
 		points.Add(v);
 	}
 	return points;
@@ -83,26 +84,22 @@ int main()
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
-	Delauney<Vector<double, 2>> delauney(MIN, MAX);
-	auto min = delauney.GetMin();
-	auto max = delauney.GetMax();
-	auto span = max - min;
+	auto builder = Delaunay<Vector<double, 2>>::Builder(MIN, MAX);
+	for (const auto& point : pointSet)
+	{
+		builder.AddNode(point);
+	}
+
+	auto delaunay = builder.Build();
+	auto span = MAX - MIN;
 
 	canvas_ity::canvas context(span[0], span[1]);
 	Image<PixelRGBA> image(span.template AsType<unsigned int>());
 
-	for (auto point : pointSet)
-	{
-		delauney.AddNode(point);
-	}
-
-	auto voronoi = Voronoi<Vector<double, 2>>::From(delauney);
-
-	DrawGraph(context, voronoi.Triangulation(), mainColoring);
-	DrawGraph(context, voronoi.Edges(), voronoiColoring);
+	DrawGraph(context, delaunay, mainColoring);
 
 	context.get_image_data((unsigned char*) image.Data(), image.Width(), image.Height(), image.Width() * decltype(image)::PixelType::Size, 0, 0);
-	image.Save(fmt::format("delauney_output.png"));
+	image.Save(fmt::format("delaunay_output.png"));
 
 
 	return 0;

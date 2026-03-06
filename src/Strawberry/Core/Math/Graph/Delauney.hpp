@@ -14,34 +14,64 @@
 namespace Strawberry::Core::Math
 {
 	template <typename T>
-	class Delauney;
-
-	template <typename T>
-	class PrunedDelauney;
+	class Delaunay;
 
 
 	template <typename T>
-	class Delauney<Vector<T, 2>> : public UndirectedGraph<Vector<T, 2>>
+	class Delaunay<Vector<T, 2>>
+		: public UndirectedGraph<Vector<T, 2>>
 	{
 	public:
 		using Graph = UndirectedGraph<Vector<T, 2>>;
 		using Edge = Graph::Edge;
 
-		template <typename>
-		friend class Voronoi;
+
+		/// Struct for the triangular faces represented in this graph.
+		struct Face;
 
 
-		/// Struct for faces represented in this graph.
-		struct Face
+		class Builder;
+		friend class Builder;
+
+
+		const auto& Faces() const { return mFaces; }
+
+		Triangle<T, 2> GetFaceAsTriangle(const Face& face) const noexcept
+		{
+			return Triangle<T, 2>{
+				GetValue(face.A()),
+				GetValue(face.B()),
+				GetValue(face.C())
+			};
+		}
+
+		Vector<T, 2> GetFaceCircumcenter(const Face& face) const noexcept
+		{
+			return GetFaceAsTriangle(face).GetCircumsphere().Center();
+		}
+
+	private:
+		Delaunay(UndirectedGraph<Vector<T, 2>> graph, std::set<Face> faces)
+			: UndirectedGraph<Vector<T, 2>>(std::move(graph))
+			, mFaces(std::move(faces))
+		{}
+
+
+		std::set<Face> mFaces;
+	};
+
+
+	template <typename T>
+	struct Delaunay<Vector<T, 2>>::Face
 		{
 		public:
 			Face(unsigned int a, unsigned int b, unsigned int c) noexcept
 				: mNodes{a, b, c}
 			{
 				std::sort(mNodes.begin(), mNodes.end());
-				AssertNEQ(a, b, "Attempt to create a degenerate triangle!");
-				AssertNEQ(a, c, "Attempt to create a degenerate triangle!");
-				AssertNEQ(b, c, "Attempt to create a degenerate triangle!");
+				AssertNEQ(a, b, "Attempt to create a degenerate face!");
+				AssertNEQ(a, c, "Attempt to create a degenerate face!");
+				AssertNEQ(b, c, "Attempt to create a degenerate face!");
 			}
 
 
@@ -79,351 +109,268 @@ namespace Strawberry::Core::Math
 		};
 
 
-		/// Constructs a basic Delaunay triangulation with rectangular bounds.
-		Delauney(const Vector<T, 2>& min, const Vector<T, 2>& max) noexcept
-		{
-			this->Graph::AddNode(Vector{min[0], min[1]});
-			this->Graph::AddNode(Vector{max[0], min[1]});
-			this->Graph::AddNode(Vector{min[0], max[1]});
-			this->Graph::AddNode(Vector{max[0], max[1]});
 
-			this->AddEdge(Edge(0, 1));
-			this->AddEdge(Edge(0, 2));
-			this->AddEdge(Edge(1, 2));
-			this->AddEdge(Edge(1, 3));
-			this->AddEdge(Edge(2, 3));
-			AssertEQ(this->mFaces.size(), 2);
+	template <typename T>
+	class Delaunay<Vector<T, 2>>::Builder
+	{
+	public:
+		Builder(const Vector<T, 2>& min, const Vector<T, 2>& max)
+		{
+			// Other two orthogonal extreme points.
+			Vector<T, 2> xMax(max[0], min[1]);
+			Vector<T, 2> yMax(min[0], max[1]);
+			// Create the supporting nodes.
+			mGraph.AddNode(min);
+			mGraph.AddNode(xMax);
+			mGraph.AddNode(yMax);
+			mGraph.AddNode(max);
+			// Create the edges between supporting nodes.
+			mGraph.AddEdge({0, 1});
+			mGraph.AddEdge({0, 2});
+			mGraph.AddEdge({0, 3});
+			mGraph.AddEdge({1, 3});
+			mGraph.AddEdge({2, 3});
+			// Create the faces between supporting nodes.
+			mFaces.emplace(Face{0, 2, 3});
+			mFaces.emplace(Face{0, 1, 3});
 		}
 
 
-		/// Adds a node to this graph and connects it to the triangulation.
 		void AddNode(const Vector<T, 2>& value)
 		{
-			Core::Assert(InBounds(value), "Attempted to call Delaunay::AddNode() with out of bounds point!");
-			if (this->ContainsValue(value)) [[unlikely]]
+			Assert(NodeInBounds(value),
+				   "Attempted to add an out-of-bounds node to Delaunay graph.");
+			Assert(!mGraph.ContainsValue(value),
+				   "Attempted to add duplicate node to Delaunay graph.");
+
+			std::set conflictingFaces = GetConflictingFaces(value);
+			Logging::Info("Found {} conflicing faces", conflictingFaces.size());
+			std::set innerEdges       = GetInnerEdges(conflictingFaces);
+			Logging::Info("Found {} inner edges", innerEdges.size());
+			std::set outerNodes       = GetOuterNodes(conflictingFaces);
+			Logging::Info("Found {} outer nodes", outerNodes.size());
+
+			unsigned int newNodeHandle = mGraph.AddNode(value);
+
+			for (Face face : conflictingFaces)
 			{
-				Core::Logging::Warning("Attempted to call Delaunay::AddNode() with a duplicate value.");
-				return;
+				mFaces.erase(face);
 			}
 
-			auto newNode = Graph::AddNode(value);
-
-			auto conflictingFaces = GetConflictingFaces(newNode);
-
-			auto sharedEdges = GetCommonEdges(conflictingFaces);
-
-			for (auto conflictingFace : conflictingFaces)
+			for (Edge innerEdge : innerEdges)
 			{
-				mFaces.erase(conflictingFace);
+				mGraph.RemoveEdge(innerEdge);
 			}
 
-			for (auto sharedEdge : sharedEdges)
+			for (unsigned int outerNode : outerNodes)
 			{
-				this->RemoveEdge(sharedEdge);
+				Edge newEdge(outerNode, newNodeHandle);
+				mGraph.AddEdge(newEdge);
+				DiscoverFaces(newEdge);
 			}
-
-			std::set<Edge> newEdges;
-			for (auto conflictingFace : conflictingFaces)
-			{
-				for (auto node : conflictingFace.Nodes())
-				{
-					newEdges.insert(Edge(newNode, node));
-				}
-			}
-
-			for (auto edge : newEdges)
-			{
-				this->AddEdge(edge);
-			}
-
-			Core::Assert(
-				IsPlanar(),
-				fmt::format("Delaunay graph is not planar after call to Delaunay::AddNode!"
-							"Node was {} : {}", newNode, value.ToString()));
 		}
 
 
-		/// Const accessor to the set of all faces in the graph.
-		const auto& Faces() const noexcept
+		Delaunay<Vector<T, 2>> Build() const noexcept
 		{
-			return mFaces;
-		}
-
-
-		/// Returns this triangulation with the supporting vertices removed.
-		///
-		/// Since, without the bounding vertices, this graph cannot support further addition to the graph,
-		/// it is demoted to a normal graph.
-		PrunedDelauney<Vector<T, 2>> Pruned() const
-		{
-			// Create pruned graph.
-			PrunedDelauney<Vector<T, 2>> copy(GetMin(), GetMax(), *this);
-			// Remove the supporting nodes.
+			auto copy = mGraph;
 			copy.RemoveNode(0);
 			copy.RemoveNode(1);
 			copy.RemoveNode(2);
 			copy.RemoveNode(3);
-			// Return pruned.
-			return copy;
+			return {copy, mFaces};
 		}
 
 
-		/// Return the minumum point of this graph.
-		const Vector<T, 2>& GetMin() const noexcept { return this->GetValue(0); }
-
-		/// Return the maximum point of this graph.
-		const Vector<T, 2>& GetMax() const noexcept { return this->GetValue(3); }
-
-		/// Return the middle point of this graph's bounding box/
-		decltype(auto) GetCenter(this const auto& self) noexcept { return (self.GetMin() + self.GetMax()) * 0.5; }
-
-		/// Return this graphs bounding box as 4 anti-clockwise Lines.
-		std::array<Line<T, 2>, 4> GetBoundingBox(this const auto& self) noexcept
+	private:
+		bool NodeInBounds(const Vector<T, 2>& value)
 		{
-			const Vector<T, 2> min = self.GetMin();
-			const Vector<T, 2> max = self.GetMax();
-			const Vector<T, 2> xmax = Vector{max[0], min[1]};
-			const Vector<T, 2> ymax = Vector{min[0], max[1]};
-			return {
-				Line<T, 2>{ min, xmax },
-				Line<T, 2>{ xmax, max },
-				Line<T, 2>{ max, ymax },
-				Line<T, 2>{ ymax, min }
-			};
-		}
+			Vector<T, 2> min = mGraph.GetValue(0);
+			Vector<T, 2> max = mGraph.GetValue(3);
 
-		/// Returns whether the point v is within the bounds of this graph.
-		bool InBounds(const Vector<T, 2>& v) const
-		{
-			auto& min = GetMin();
-			auto& max = GetMax();
-
-			return v[0] >= min[0] && v[1] >= min[1] && v[0] <= max[0] && v[1] <= max[1];
+			const bool xBounds = min[0] < value[0] && value[0] < max[0];
+			const bool yBounds = min[1] < value[1] && value[1] < max[1];
+			return xBounds && yBounds;
 		}
 
 
-		/// Returns the set of the outer edges of this triangulation.
-		std::set<Edge> GetOuterEdges() const noexcept
+		Triangle<T, 2> FaceAsTriangle(const Delaunay<Vector<T, 2>>::Face& face) const
 		{
-			std::map<Edge, unsigned int> votes;
+			return Triangle<T, 2>(
+				mGraph.GetValue(face.Node(0)),
+				mGraph.GetValue(face.Node(1)),
+				mGraph.GetValue(face.Node(2))
+			);
+		}
 
-			for (auto face : Faces())
+
+		Sphere<T, 2> FaceAsCircumcircle(const Delaunay<Vector<T, 2>>::Face& face) const
+		{
+			return FaceAsTriangle(face).GetCircumsphere().Unwrap();
+		}
+
+
+		std::set<Delaunay<Vector<T, 2>>::Face> GetConflictingFaces(const Vector<T, 2>& value) const
+		{
+			std::set<Face> conflictingFaces;
+			for (const auto& face : mFaces)
 			{
-				for (auto edge : face.Edges())
+				if (FaceAsCircumcircle(face).Contains(value))
 				{
-					votes[edge]++;
+					conflictingFaces.emplace(face);
+				}
+			}
+			return conflictingFaces;
+		}
+
+
+		std::set<unsigned int> GetOuterNodes(const std::set<Delaunay<Vector<T, 2>>::Face>& faces) const
+		{
+			// Count how often each edge occurs in these faces.
+			std::map<Edge, unsigned int> edgeOccurences;
+			for (const auto& face : faces)
+			{
+				for (const auto& edge : face.Edges())
+				{
+					edgeOccurences[edge] += 1;
 				}
 			}
 
-			auto outerEdges = votes
-				| std::views::filter([] (const auto& x) { return x.second == 1; })
-				| std::views::keys
-				| std::ranges::to<std::set>();
+			// Filter for the edges that occur twice, meaning that they are inner edges.
+			std::set<Delaunay<Vector<T, 2>>::Edge> outerEdges;
+			for (const auto& [edge, count] : edgeOccurences)
+			{
+				Core::Assert(count == 1 || count == 2);
+				if (count == 1)
+				{
+					outerEdges.emplace(edge);
+				}
+			}
 
-			return outerEdges;
+			std::set<unsigned int> outerNodes;
+			for (const auto& edge : outerEdges)
+			{
+				outerNodes.emplace(edge.A());
+				outerNodes.emplace(edge.B());
+			}
+
+			return outerNodes;
 		}
 
 
-		/// Return the set of faces that share an edge with this face.
-		std::set<Face> GetAdjacentFaces(Face face) const
+		std::set<Delaunay<Vector<T, 2>>::Edge> GetInnerEdges(const std::set<Delaunay<Vector<T, 2>>::Face>& faces) const
 		{
-			std::set<Face> adjacentFaces;
-
-			for (auto edge : face.Edges())
+			// Count how often each edge occurs in these faces.
+			std::map<Delaunay<Vector<T, 2>>::Edge, unsigned int> edgeOccurences;
+			for (const auto& face : faces)
 			{
-				for (auto otherFace : mFaces)
+				for (const auto& edge : face.Edges())
 				{
-					if (otherFace != face && otherFace.ContainsEdge(edge))
+					edgeOccurences[edge] += 1;
+				}
+			}
+
+			// Filter for the edges that occur twice, meaning that they are inner edges.
+			std::set<Delaunay<Vector<T, 2>>::Edge> innerEdges;
+			for (const auto& [edge, count] : edgeOccurences)
+			{
+				Core::Assert(count == 1 || count == 2);
+				if (count == 2)
+				{
+					innerEdges.emplace(edge);
+				}
+			}
+
+			return innerEdges;
+		}
+
+
+		double GetFaceArea(Face face) const noexcept
+		{
+			auto a = mGraph.GetValue(face.Node(0));
+			auto b = mGraph.GetValue(face.Node(1));
+			auto c = mGraph.GetValue(face.Node(2));
+
+			auto v1 = b - a;
+			auto v2 = c - a;
+
+			return 0.5 * std::abs(v1[0] * v2[1] - v1[1] * v2[0]);
+		}
+
+
+		void DiscoverFaces(Edge edge)
+		{
+			std::set<unsigned int> neighboursA = mGraph.GetNeighbourIndices(edge.A());
+			std::set<unsigned int> neighboursB = mGraph.GetNeighbourIndices(edge.B());
+
+			std::set<unsigned int> commonNeighbours;
+			std::ranges::set_intersection(
+				neighboursA, neighboursB,
+				std::inserter(commonNeighbours, commonNeighbours.begin())
+			);
+
+			Vector<T, 2> edgeVector = mGraph.GetValue(edge.B()) - mGraph.GetValue(edge.A());
+
+
+			auto faceAreaComparison = [this] (const Face& a, const Face& b)
+			{
+				return GetFaceArea(a) < GetFaceArea(b);
+			};
+
+			// Sort the common nodes into the corresponding faces,
+			// divided between those to the left, and to the right of the new edge.
+			std::vector<Face> tentativeFaces[2];
+			for (auto n : commonNeighbours)
+			{
+				Face face(n, edge.A(), edge.B());
+				Vector toNode = mGraph.GetValue(n) - mGraph.GetValue(edge.A());
+				if (edgeVector.DotPerp(toNode) > 0.0f)
+				{
+					tentativeFaces[0].push_back(face);
+				}
+				else
+				{
+					tentativeFaces[1].push_back(face);
+				}
+			}
+
+
+			std::array<Optional<Face>, 2> faces {
+				tentativeFaces[0].empty() ? Optional<Face>(NullOpt) : *std::ranges::min_element(tentativeFaces[0], faceAreaComparison),
+				tentativeFaces[1].empty() ? Optional<Face>(NullOpt) : *std::ranges::min_element(tentativeFaces[1], faceAreaComparison)
+			};
+
+			for (auto& face : faces)
+			{
+				if (face.HasValue())
+				{
+					Triangle tri = FaceAsTriangle(face.Value());
+					bool containsAnyPoint = false;
+					for (auto [node, point] : mGraph.Nodes())
 					{
-						adjacentFaces.insert(otherFace);
+						if (face.Value().ContainsNode(node))
+						{
+							continue;
+						}
+
+						if (tri.Contains(point))
+						{
+							containsAnyPoint = true;
+							break;
+						}
+					}
+
+					if (!containsAnyPoint)
+					{
+						Logging::Info("Discovered face");
+						mFaces.emplace(face.Value());
 					}
 				}
 			}
-
-			return adjacentFaces;
 		}
-
-
-		/// Get the corresponding triangle of the face.
-		Triangle<T, 2> FaceToTriangle(Face face) const
-		{
-			return Triangle<T, 2>{
-				this->GetValue(face.Node(0)),
-				this->GetValue(face.Node(1)),
-				this->GetValue(face.Node(2))
-			};
-		}
-
-
-		/// Get the center of the cicumcirle of the triangle represented by this face.
-		Vector<T, 2> GetFaceCenter(Face face) const
-		{
-			auto circumsphere = FaceToTriangle(face).GetCircumsphere();
-			Assert(circumsphere.HasValue(), "Attempted to get the center of a degenerate face in Delaunay!");
-			return circumsphere->Center();
-		}
-
 
 	private:
-		void RemoveNode(unsigned int node)
-		{
-			Graph::RemoveNode(node);
-			auto edgesToRemove = this->Edges()
-				| std::views::filter([node] (Edge e) { return e.ContainsNode(node); })
-				| std::ranges::to<std::set>();
-			auto facesToRemove = this->Faces()
-				| std::views::filter([node] (Face f) { return f.ContainsNode(node); })
-				| std::ranges::to<std::set>();
-
-			for (auto edge : edgesToRemove)
-			{
-				Graph::RemoveEdge(edge);
-			}
-
-			for (auto face : facesToRemove)
-			{
-				mFaces.erase(face);
-			}
-		}
-
-
-		/// Adds an edge to this graph, and forms any faces resulting from the addition.
-		void AddEdge(Edge edge)
-		{
-			this->Graph::AddEdge(edge);
-			std::set<unsigned int> mutualNeighbours;
-			std::ranges::set_intersection(this->GetNeighbourIndices(edge.nodes[0]),
-										  this->GetNeighbourIndices(edge.nodes[1]),
-										  std::inserter(mutualNeighbours, mutualNeighbours.begin()));
-
-			for (auto neighbour : mutualNeighbours)
-			{
-				AddFace(Face(edge.nodes[0], edge.nodes[1], neighbour));
-			}
-		}
-
-		/// Use Remove Edge here and make it private to hide it.
-		using Graph::RemoveEdge;
-
-		/// Adds a face to this graph.
-		/// Excludes faces which contain other nodes.
-		void AddFace(Face face)
-		{
-			auto triangle = FaceToTriangle(face);
-			if (!triangle.GetCircumsphere().HasValue())
-			{
-				Logging::Warning(
-					"Face ({}, {}, {}) produced degenerate triangle in Delaunay::AddFace!",
-					face.Node(0), face.Node(1), face.Node(2));
-				return;
-			}
-
-			for (auto n : this->NodeIndices())
-			{
-				if (face.ContainsNode(n))
-					continue;
-
-				auto v = this->GetValue(n);
-				if (triangle.Contains(v))
-				{
-					return;
-				}
-			}
-
-			mFaces.insert(face);
-		}
-
-
-		/// Return the set of faces that conflict with the node given.
-		/// Faces conflict with a node if their circumcircle contains that node.
-		std::set<Face> GetConflictingFaces(unsigned int node) const
-		{
-			std::set<Face> conflicingFaces;
-			Vector<T, 2> v = this->GetValue(node);
-			for (auto face : mFaces)
-			{
-				Triangle<double, 2> triangle = FaceToTriangle(face);
-				Optional<Sphere<double, 2>> circumcircle = triangle.GetCircumsphere();
-				if (circumcircle && circumcircle->Contains(v))
-				{
-					conflicingFaces.emplace(face);
-				}
-			}
-			return conflicingFaces;
-		}
-
-		/// Returns the set of edges that are shared by more than one
-		/// of the set of faces given.
-		std::set<Edge> GetCommonEdges(const std::set<Face>& faces) const
-		{
-			std::map<Edge, unsigned int> mVotes;
-
-			for (Face face : faces)
-			{
-				for (Edge edge : face.Edges())
-				{
-					mVotes[edge]++;
-				}
-			}
-
-			return mVotes
-				| std::views::filter([] (auto x) { return x.second >= 2; })
-				| std::views::transform([] (auto x) { return x.first; })
-				| std::ranges::to<std::set>();
-		}
-
-		// If this graph is planar, then the following identity will be true.
-		// Based on Euler's V - E + F = 2 indentity.
-		// That identity includes the mega-face outside the graph. Since we don't include
-		// that, we check equality to 1 and not 2.
-		bool IsPlanar() const noexcept
-		{
-			return this->Nodes().size() - this->Edges().size() + this->Faces().size() == 1;
-		}
-
-
-	private:
-		std::set<Face> mFaces;
-	};
-
-
-	/// Class repesenting a Delauney triangulation which has had it's support vertices removes.
-	template <typename T>
-	class PrunedDelauney<Vector<T, 2>>
-		: public Delauney<Vector<T, 2>>
-	{
-	public:
-		template<typename>
-		friend class Voronoi;
-
-		template <typename>
-		friend class Delauney;
-
-
-		/// Returns the minimum extent of this graph.
-		const Vector<T, 2>& GetMin() const noexcept { return mMin; }
-		/// Returns the maximum extent of this graph.
-		const Vector<T, 2>& GetMax() const noexcept { return mMax; }
-
-
-	private:
-		/// PruneDelauney constructor.
-		///
-		/// Takes the min and max points of the original delauney graph, and then the delauney graph itself.
-		PrunedDelauney(Vector<T, 2> min, Vector<T, 2> max, Delauney<Vector<T, 2>> base)
-			: Delauney<Vector<T, 2>>(std::move(base))
-			, mMin(min)
-			, mMax(max) {}
-
-
-		// Make AddNode private here since, without supporting vertices,
-		// new nodes cannot be added.
-		using Delauney<Vector<T, 2>>::AddNode;
-
-
-	private:
-		/// Explicitly store bounds since they are no longer included as vertices.
-		Vector<T, 2> mMin;
-		Vector<T, 2> mMax;
+		UndirectedGraph<Vector<T, 2>>          mGraph;
+		std::set<Delaunay<Vector<T, 2>>::Face> mFaces;
 	};
 }
