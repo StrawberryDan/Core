@@ -11,18 +11,20 @@
 
 namespace Strawberry::Core::Math
 {
+	/// Base template.
 	template <typename T>
 	class Voronoi;
 
 
+	/// Template specialisation for vectors.
 	template <typename T>
 	class Voronoi<Vector<T, 2>>
 	{
 	public:
-		using Delauney = Delauney<Vector<T, 2>>;
-		using PrunedDelauney = PrunedDelauney<Vector<T, 2>>;
-		using Face = Delauney::Face;
-		using Edge = Delauney::Edge;
+		/// Alias types.
+		using Delaunay = Delaunay<Vector<T, 2>>;
+		using Face = Delaunay::Face;
+		using Edge = Delaunay::Edge;
 
 
 		struct Cell
@@ -38,17 +40,10 @@ namespace Strawberry::Core::Math
 		};
 
 
-		/// Prunes the given graph before generating a voronoi from it.
-		static Voronoi From(const Delauney& delauney) noexcept
-		{
-			return From(delauney.Pruned());
-		}
-
-
 		/// Returns the voronoi edge graph for this delaunay triangulation.
 		///
 		/// This works because delauney triangulations and voronoi diagrams are duals of eachother.
-		static Voronoi From(const PrunedDelauney& delauney) noexcept
+		static Voronoi From(const Delaunay& delauney) noexcept
 		{
 			UndirectedGraph<Vector<T, 2>> voronoi;
 
@@ -62,7 +57,7 @@ namespace Strawberry::Core::Math
 			/// Keep track of the association between that face and this new node.
 			for (auto face : delauney.Faces())
 			{
-				unsigned int newNode = voronoi.AddNode(delauney.GetFaceCenter(face));
+				unsigned int newNode = voronoi.AddNode(delauney.GetFaceCircumcenter(face));
 				faceToNodeMap.emplace(face, newNode);
 			}
 
@@ -263,7 +258,7 @@ namespace Strawberry::Core::Math
 
 
 	private:
-		Voronoi(Delauney triangulation,
+		Voronoi(Delaunay triangulation,
 				UndirectedGraph<Vector<T, 2>> voronoi,
 				std::map<unsigned int, Cell> cellMap) noexcept
 			: mTriangulation(std::move(triangulation))
@@ -281,7 +276,7 @@ namespace Strawberry::Core::Math
 
 
 	private:
-		Delauney mTriangulation;
+		Delaunay mTriangulation;
 		UndirectedGraph<Vector<T, 2>> mVoronoi;
 		/// A map of indices of nodes in the triangulation mapped to lists
 		/// of cell indices in the voronoi mapping which form the cell conainting
