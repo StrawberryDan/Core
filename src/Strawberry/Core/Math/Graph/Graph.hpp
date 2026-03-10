@@ -34,10 +34,13 @@ namespace Strawberry::Core::Math
 	};
 
 
-	template <typename Payload, GraphConfig Config = GraphTypeUndirected>
+	template <typename _Value, GraphConfig Config = GraphTypeUndirected>
 	class Graph
 	{
 	public:
+		using Value = _Value;
+
+
 		struct Edge
 		{
 			Edge(unsigned int a, unsigned int b) : nodes{ a, b }
@@ -82,13 +85,13 @@ namespace Strawberry::Core::Math
 		};
 
 
-		Payload& GetValue(unsigned int nodeIndex)
+		_Value& GetValue(unsigned int nodeIndex)
 		{
 			return mNodes.at(nodeIndex);
 		}
 
 
-		const Payload& GetValue(unsigned int nodeIndex) const
+		const _Value& GetValue(unsigned int nodeIndex) const
 		{
 			return mNodes.at(nodeIndex);
 		}
@@ -112,7 +115,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		bool ContainsValue(const Payload& value) const noexcept
+		bool ContainsValue(const _Value& value) const noexcept
 		{
 			return std::ranges::find_if(
 				mNodes,
@@ -120,7 +123,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		template <typename T> requires (std::same_as<Payload, std::decay_t<T>>)
+		template <typename T> requires (std::same_as<_Value, std::decay_t<T>>)
 		unsigned AddNode(T&& node)
 		{
 			mNodes.insert({mNextID++, std::forward<T>(node)});
@@ -175,10 +178,10 @@ namespace Strawberry::Core::Math
 		}
 
 
-		std::set<std::pair<unsigned int, Payload&>> GetNeighbours(unsigned int node)
+		std::set<std::pair<unsigned int, _Value&>> GetNeighbours(unsigned int node)
 		{
 			return GetNeighbourIndices(node)
-				| std::views::transform([this] (auto x) { return std::make_pair<unsigned int, Payload&>(x, GetValue(x)); })
+				| std::views::transform([this] (auto x) { return std::make_pair<unsigned int, _Value&>(x, GetValue(x)); })
 				| std::ranges::to<std::set>();
 		}
 
@@ -227,7 +230,7 @@ namespace Strawberry::Core::Math
 		/// Incrementing counter for generating node IDs
 		unsigned int mNextID = 0;
 		/// The map of nodes, associates node ids to values.
-		std::map<unsigned int, Payload> mNodes;
+		std::map<unsigned int, _Value> mNodes;
 		/// The set of edges in this graph.
 		std::set<Edge> mEdges;
 	};
