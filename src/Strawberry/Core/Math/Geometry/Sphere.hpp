@@ -28,6 +28,9 @@ namespace Strawberry::Core::Math
 		}
 
 
+		auto operator<=>(const Sphere& other) const noexcept = default;
+
+
 	private:
 		Vector<T, D> mCenter;
 		T            mRadius;
