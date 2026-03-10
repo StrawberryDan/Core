@@ -209,6 +209,7 @@ if (NOT TARGET StrawberryCore)
     test/UTF.cpp
     test/Variants.cpp
     test/Vectors.cpp
+    test/Voronoi.cpp
   )
 
 
