@@ -13,13 +13,15 @@
 
 namespace Strawberry::Core::Math
 {
+	/// Base Template.
 	template <typename T>
 	class Delaunay;
 
 
+	/// Graph representing a delaunay triangulation of a set of points.
 	template <typename T>
 	class Delaunay<Vector<T, 2>>
-		: public UndirectedGraph<Vector<T, 2>>
+		: private UndirectedGraph<Vector<T, 2>>
 	{
 	public:
 		using Graph = UndirectedGraph<Vector<T, 2>>;
@@ -30,14 +32,30 @@ namespace Strawberry::Core::Math
 		struct Face;
 
 
+		/// Builder type and friend declaration.
 		class Builder;
 		friend class Builder;
 
 
+		const Graph::Value& GetValue(unsigned int nodeID) const noexcept
+		{
+			return Graph::GetValue(nodeID);
+		}
+
+
+		using Graph::NodeIndices;
+		using Graph::Edges;
+
+
+		/// Const accessor to the set of faces.
 		const auto& Faces() const { return mFaces; }
 
+		/// Returns the selected face as a Triangle with the values as vertices..
 		Triangle<T, 2> GetFaceAsTriangle(const Face& face) const noexcept
 		{
+			Assert(mFaces.contains(face),
+				   "Delaunay::GetFaceAsTriangle called with face not "
+				   "already in the triangulation!");
 			return Triangle<T, 2>{
 				GetValue(face.A()),
 				GetValue(face.B()),
@@ -45,75 +63,88 @@ namespace Strawberry::Core::Math
 			};
 		}
 
+		/// Shorthand for getting the circumcircle center for the result of GetFaceASTriangle().
 		Vector<T, 2> GetFaceCircumcenter(const Face& face) const noexcept
 		{
 			return GetFaceAsTriangle(face).GetCircumsphere().Center();
 		}
 
+
 	private:
-		Delaunay(UndirectedGraph<Vector<T, 2>> graph, std::set<Face> faces)
-			: UndirectedGraph<Vector<T, 2>>(std::move(graph))
-			, mFaces(std::move(faces))
-		{}
+		/// Private constructor for use by Builder().
+		Delaunay() = default;
 
 
+		/// The set of triangular faces contained in this graph.
 		std::set<Face> mFaces;
 	};
 
 
+	/// Class Defining a Triangular face on the graph of a Delaunay Triangulation.
 	template <typename T>
 	struct Delaunay<Vector<T, 2>>::Face
+	{
+	public:
+		/// Construct a fae from the given set of node indices.
+		Face(unsigned int a, unsigned int b, unsigned int c) noexcept
+			: mNodes{a, b, c}
 		{
-		public:
-			Face(unsigned int a, unsigned int b, unsigned int c) noexcept
-				: mNodes{a, b, c}
-			{
-				std::sort(mNodes.begin(), mNodes.end());
-				AssertNEQ(a, b, "Attempt to create a degenerate face!");
-				AssertNEQ(a, c, "Attempt to create a degenerate face!");
-				AssertNEQ(b, c, "Attempt to create a degenerate face!");
-			}
+			/// Nodes are stored in sorted order for normalisation.
+			std::sort(mNodes.begin(), mNodes.end());
+			AssertNEQ(a, b, "Attempt to create a degenerate face!");
+			AssertNEQ(a, c, "Attempt to create a degenerate face!");
+			AssertNEQ(b, c, "Attempt to create a degenerate face!");
+		}
 
 
-			const auto& Node(unsigned int i) const noexcept { return mNodes[i]; }
-			const auto& Nodes() const noexcept { return mNodes; }
+		/// Node Index Getter.
+		const auto& Node(unsigned int i) const noexcept { return mNodes[i]; }
+		/// Const access to Node Array.
+		const auto& Nodes() const noexcept { return mNodes; }
 
 
-			bool ContainsNode(unsigned int n) const noexcept
-			{
-				return std::ranges::contains(mNodes, n);
-			}
+		/// Check if this node is a part of this face.
+		bool ContainsNode(unsigned int n) const noexcept
+		{
+			return std::ranges::contains(mNodes, n);
+		}
 
 
-			bool ContainsEdge(Edge e) const noexcept
-			{
-				return Edges().contains(e);
-			}
+		/// Check if this face includes the given edge.
+		bool ContainsEdge(Edge e) const noexcept
+		{
+			return Edges().contains(e);
+		}
 
 
-			std::set<Edge> Edges() const noexcept
-			{
-				return {
-					Edge(mNodes[0], mNodes[1]),
-					Edge(mNodes[1], mNodes[2]),
-					Edge(mNodes[2], mNodes[0])
-				};
-			}
+		/// Returns the set of edges in this face.
+		std::set<Edge> Edges() const noexcept
+		{
+			return {
+				Edge(mNodes[0], mNodes[1]),
+				Edge(mNodes[1], mNodes[2]),
+				Edge(mNodes[2], mNodes[0])
+			};
+		}
 
 
-			auto operator<=>(const Face&) const = default;
+		/// Default comparision for use in sorted data structures.
+		auto operator<=>(const Face&) const = default;
 
 
-		private:
-			std::array<unsigned int, 3> mNodes;
-		};
+	private:
+		/// The set of 3 nodes in this face.
+		std::array<unsigned int, 3> mNodes;
+	};
 
 
 
+	/// Class for creating Delaunay Triangulations.
 	template <typename T>
 	class Delaunay<Vector<T, 2>>::Builder
 	{
 	public:
+		/// Create a builder with the given AABB extent.
 		Builder(const Vector<T, 2>& min, const Vector<T, 2>& max)
 		{
 			// Other two orthogonal extreme points.
@@ -131,46 +162,61 @@ namespace Strawberry::Core::Math
 			mGraph.AddEdge({1, 3});
 			mGraph.AddEdge({2, 3});
 			// Create the faces between supporting nodes.
-			mFaces.emplace(Face{0, 2, 3});
-			mFaces.emplace(Face{0, 1, 3});
+			mGraph.mFaces.emplace(Face{0, 2, 3});
+			mGraph.mFaces.emplace(Face{0, 1, 3});
 		}
 
 
+		/// Adds a node to this triangulaiton.
 		void AddNode(const Vector<T, 2>& value)
 		{
+			ZoneScoped;
+
 			Assert(NodeInBounds(value),
 				   "Attempted to add an out-of-bounds node to Delaunay graph.");
 			Assert(!mGraph.ContainsValue(value),
 				   "Attempted to add duplicate node to Delaunay graph.");
 
+			/// Get the set of faces that conflic with the value being added.
 			std::set conflictingFaces = GetConflictingFaces(value);
-			Logging::Info("Found {} conflicing faces", conflictingFaces.size());
+			/// Get the set of edges that are shared by 2 of these conflicting faces.
 			std::set innerEdges       = GetInnerEdges(conflictingFaces);
-			Logging::Info("Found {} inner edges", innerEdges.size());
+			/// The set of edges nodes defining the face of the created by
+			/// the deletion of the inner edges.
+			/// I.e. the hole torn in the graph.
 			std::set outerNodes       = GetOuterNodes(conflictingFaces);
-			Logging::Info("Found {} outer nodes", outerNodes.size());
 
+			/// Add the new node to the graph.
 			unsigned int newNodeHandle = mGraph.AddNode(value);
 
+			/// Erase the conflicting faces.
 			for (Face face : conflictingFaces)
 			{
-				mFaces.erase(face);
+				mGraph.mFaces.erase(face);
+				mFaceCache.erase(face);
+				mCircumsphereCache.erase(face);
 			}
 
+			/// Erase the innerEdges fo the conflicting faces.
 			for (Edge innerEdge : innerEdges)
 			{
 				mGraph.RemoveEdge(innerEdge);
 			}
 
+			/// Join the new node into the hole by joining it to
+			/// the outer points.
 			for (unsigned int outerNode : outerNodes)
 			{
+				/// Add edge to the graph.
 				Edge newEdge(outerNode, newNodeHandle);
 				mGraph.AddEdge(newEdge);
+				/// Look for new triangular faces.
 				DiscoverFaces(newEdge);
 			}
 		}
 
 
+		/// Return the graph with the supporting nodes removed.
 		Delaunay<Vector<T, 2>> Build() const noexcept
 		{
 			auto copy = mGraph;
@@ -178,11 +224,12 @@ namespace Strawberry::Core::Math
 			copy.RemoveNode(1);
 			copy.RemoveNode(2);
 			copy.RemoveNode(3);
-			return {copy, mFaces};
+			return copy;
 		}
 
 
 	private:
+		/// Returns if a node is contained by the AABB box bounding this graph.
 		bool NodeInBounds(const Vector<T, 2>& value)
 		{
 			Vector<T, 2> min = mGraph.GetValue(0);
@@ -194,28 +241,15 @@ namespace Strawberry::Core::Math
 		}
 
 
-		Triangle<T, 2> FaceAsTriangle(const Delaunay<Vector<T, 2>>::Face& face) const
-		{
-			return Triangle<T, 2>(
-				mGraph.GetValue(face.Node(0)),
-				mGraph.GetValue(face.Node(1)),
-				mGraph.GetValue(face.Node(2))
-			);
-		}
-
-
-		Sphere<T, 2> FaceAsCircumcircle(const Delaunay<Vector<T, 2>>::Face& face) const
-		{
-			return FaceAsTriangle(face).GetCircumsphere().Unwrap();
-		}
-
-
+		/// Returns the set of faces that conflict with the point being added 'value'.
+		///
+		/// Edges are defined to be conflicinging if their circumspheres
 		std::set<Delaunay<Vector<T, 2>>::Face> GetConflictingFaces(const Vector<T, 2>& value) const
 		{
 			std::set<Face> conflictingFaces;
-			for (const auto& face : mFaces)
+			for (const auto& face : mGraph.mFaces)
 			{
-				if (FaceAsCircumcircle(face).Contains(value))
+				if (GetCircumcircle(face).Contains(value))
 				{
 					conflictingFaces.emplace(face);
 				}
@@ -224,7 +258,8 @@ namespace Strawberry::Core::Math
 		}
 
 
-		std::set<unsigned int> GetOuterNodes(const std::set<Delaunay<Vector<T, 2>>::Face>& faces) const
+		/// Returns the set of nodes that outline the set of conflicing faces.
+		std::set<unsigned int> GetOuterNodes(const std::set<Face>& faces) const
 		{
 			// Count how often each edge occurs in these faces.
 			std::map<Edge, unsigned int> edgeOccurences;
@@ -258,6 +293,7 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Returns the set of edges that are shared amongst the input faces.
 		std::set<Delaunay<Vector<T, 2>>::Edge> GetInnerEdges(const std::set<Delaunay<Vector<T, 2>>::Face>& faces) const
 		{
 			// Count how often each edge occurs in these faces.
@@ -285,6 +321,40 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Gets the given face in the form of a triangle.
+		Triangle<T, 2> GetFaceAsTriangle(Face face) const noexcept
+		{
+			auto iter = mFaceCache.find(face);
+			if (iter == mFaceCache.end())
+			{
+				Triangle<T, 2> triangle({
+					mGraph.GetValue(face.Node(0)),
+					mGraph.GetValue(face.Node(1)),
+					mGraph.GetValue(face.Node(2))
+					});
+
+				iter = mFaceCache.emplace(face, triangle).first;
+			}
+
+			return iter->second;
+		}
+
+
+		/// Gets the given face's circumcircle.
+		Sphere<T, 2> GetCircumcircle(Face face) const noexcept
+		{
+			auto iter = mCircumsphereCache.find(face);
+			if (iter == mCircumsphereCache.end())
+			{
+				auto sphere = GetFaceAsTriangle(face).GetCircumsphere().Unwrap();
+				iter = mCircumsphereCache.emplace(face, sphere).first;
+			}
+
+			return iter->second;
+		}
+
+
+		/// Returns the area of the face.
 		double GetFaceArea(Face face) const noexcept
 		{
 			auto a = mGraph.GetValue(face.Node(0));
@@ -298,6 +368,7 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Looks for a new face on either side of this edge.
 		void DiscoverFaces(Edge edge)
 		{
 			std::set<unsigned int> neighboursA = mGraph.GetNeighbourIndices(edge.A());
@@ -344,7 +415,7 @@ namespace Strawberry::Core::Math
 			{
 				if (face.HasValue())
 				{
-					Triangle tri = FaceAsTriangle(face.Value());
+					Triangle tri = GetFaceAsTriangle(face.Value());
 					bool containsAnyPoint = false;
 					for (auto [node, point] : mGraph.Nodes())
 					{
@@ -362,15 +433,16 @@ namespace Strawberry::Core::Math
 
 					if (!containsAnyPoint)
 					{
-						Logging::Info("Discovered face");
-						mFaces.emplace(face.Value());
+						mGraph.mFaces.emplace(face.Value());
 					}
 				}
 			}
 		}
 
+
 	private:
-		UndirectedGraph<Vector<T, 2>>          mGraph;
-		std::set<Delaunay<Vector<T, 2>>::Face> mFaces;
+		Delaunay<Vector<T, 2>>                 mGraph;
+		mutable std::map<Face, Triangle<T, 2>> mFaceCache;
+		mutable std::map<Face, Sphere<T, 2>>   mCircumsphereCache;
 	};
 }
