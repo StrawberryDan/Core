@@ -15,9 +15,9 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		Simplex() = default;
-		template <typename... Args>
-		Simplex(Args&&... args)
-			: mPoints{std::forward<Args>(args)...}
+
+		Simplex(std::array<Vector<T, Dimension>, Order> points)
+			: mPoints{std::move(points)}
 		{
 			if constexpr (Dimension == 2 && Order == 3)
 			{
@@ -141,4 +141,3 @@ namespace fmt
 		}
 	};
 }
-
