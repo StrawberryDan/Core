@@ -79,8 +79,7 @@ static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColori
 
 int main()
 {
-	GraphColoring mainColoring { .mEdgeColor{1.0f, 1.0f, 1.0f, 0.2f}, .mNodeColor{1.0f, 0.0f, 0.0f, 0.2f} };
-	GraphColoring voronoiColoring { .drawNodes = false, .mEdgeColor{0.0f, 1.0f, 1.0f, 1.0f}, .mNodeColor{0.0f, 1.0f, 0.0f, 1.0f} };
+	GraphColoring mainColoring { .mEdgeColor{1.0f, 1.0f, 1.0f, 1.0f}, .mNodeColor{1.0f, 0.0f, 0.0f, 1.0f} };
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
