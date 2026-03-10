@@ -95,7 +95,7 @@ int main()
 	canvas_ity::canvas context(span[0], span[1]);
 	Image<PixelRGBA> image(span.template AsType<unsigned int>());
 
-	DrawGraph(context, delaunay, mainColoring);
+	DrawGraph(context, delaunay.GetGraph(), mainColoring);
 
 	context.get_image_data((unsigned char*) image.Data(), image.Width(), image.Height(), image.Width() * decltype(image)::PixelType::Size, 0, 0);
 	image.Save(fmt::format("delaunay_output.png"));

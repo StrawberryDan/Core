@@ -1,5 +1,6 @@
 
 #include "Strawberry/Core/Math/Geometry/PointSet.hpp"
+#include "Strawberry/Core/Math/Graph/Voronoi.hpp"
 #include "Strawberry/Core/Math/Graph/Delauney.hpp"
 #include "Strawberry/Core/Util/Image.hpp"
 #include "canvas_ity.hpp"
@@ -17,15 +18,15 @@ struct GraphColoring
 {
 	bool drawNodes = true;
 	bool drawEdges = true;
-	float edgeWidth = 2.0f;
-	float nodeRadius = 4.0f;
+	float edgeWidth = 1.0f;
+	float nodeRadius = 1.0f;
 	float mEdgeColor[4];
 	float mNodeColor[4];
 };
 
 static PointSet<double, 2> GeneratePointSet()
 {
-	static size_t POINT_COUNT = 128;
+	static size_t POINT_COUNT = 1024;
 	PointSet<double, 2> points;
 
 	std::random_device rng;
@@ -35,7 +36,7 @@ static PointSet<double, 2> GeneratePointSet()
 	for (int i = 0; i < POINT_COUNT; i++)
 	{
 		Vector<double, 2> v(distX(rng), distY(rng));
-		v = v.AsType<int>().AsType<double>();
+		// v = v.AsType<int>().AsType<double>();
 		points.Add(v);
 	}
 	return points;
@@ -80,7 +81,7 @@ static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColori
 int main()
 {
 	GraphColoring mainColoring { .mEdgeColor{1.0f, 1.0f, 1.0f, 0.2f}, .mNodeColor{1.0f, 0.0f, 0.0f, 0.2f} };
-	GraphColoring voronoiColoring { .drawNodes = false, .mEdgeColor{0.0f, 1.0f, 1.0f, 1.0f}, .mNodeColor{0.0f, 1.0f, 0.0f, 1.0f} };
+	GraphColoring voronoiColoring { .mEdgeColor{0.0f, 1.0f, 1.0f, 1.0f}, .mNodeColor{0.0f, 1.0f, 0.0f, 1.0f} };
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
@@ -91,15 +92,17 @@ int main()
 	}
 
 	auto delaunay = builder.Build();
+	auto voronoi = Voronoi<Vector<double, 2>>::From(delaunay);
 	auto span = MAX - MIN;
 
 	canvas_ity::canvas context(span[0], span[1]);
 	Image<PixelRGBA> image(span.template AsType<unsigned int>());
 
-	DrawGraph(context, delaunay, mainColoring);
+	DrawGraph(context, delaunay.GetGraph(), mainColoring);
+	DrawGraph(context, voronoi.GetGraph(), voronoiColoring);
 
 	context.get_image_data((unsigned char*) image.Data(), image.Width(), image.Height(), image.Width() * decltype(image)::PixelType::Size, 0, 0);
-	image.Save(fmt::format("delaunay_output.png"));
+	image.Save(fmt::format("voronoi_output.png"));
 
 
 	return 0;
