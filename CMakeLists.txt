@@ -110,6 +110,7 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Math/Graph/Delauney.hpp
     src/Strawberry/Core/Math/Graph/Graph.hpp
     src/Strawberry/Core/Math/Graph/Voronoi.hpp
+    src/Strawberry/Core/Math/Graph/Walker.hpp
     src/Strawberry/Core/Math/Math.hpp
     src/Strawberry/Core/Math/Math.inl
     src/Strawberry/Core/Math/Matrix.hpp
