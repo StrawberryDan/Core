@@ -34,11 +34,12 @@ namespace Strawberry::Core::Math
 	};
 
 
-	template <typename _Value, GraphConfig Config = GraphTypeUndirected>
+	template <typename _Value, GraphConfig _Config = GraphTypeUndirected>
 	class Graph
 	{
 	public:
 		using Value = _Value;
+		using Config = _Config;
 
 
 		struct Edge
