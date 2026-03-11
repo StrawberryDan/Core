@@ -25,6 +25,7 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		using Graph = UndirectedGraph<Vector<T, 2>>;
+		using Value = Graph::Value;
 		using Edge = Graph::Edge;
 
 
@@ -471,69 +472,28 @@ namespace Strawberry::Core::Math
 		/// Looks for a new face on either side of this edge.
 		void DiscoverFaces(Edge edge)
 		{
-			std::set<unsigned int> neighboursA = mGraph.mGraph.GetNeighbourIndices(edge.A());
-			std::set<unsigned int> neighboursB = mGraph.mGraph.GetNeighbourIndices(edge.B());
-
-			std::set<unsigned int> commonNeighbours;
-			std::ranges::set_intersection(
-				neighboursA, neighboursB,
-				std::inserter(commonNeighbours, commonNeighbours.begin())
-			);
-
-			Vector<T, 2> edgeVector = mGraph.GetValue(edge.B()) - mGraph.GetValue(edge.A());
-
-
-			auto faceAreaComparison = [this] (const Face& a, const Face& b)
-			{
-				return GetFaceArea(a) < GetFaceArea(b);
-			};
-
-			// Sort the common nodes into the corresponding faces,
-			// divided between those to the left, and to the right of the new edge.
-			std::vector<Face> tentativeFaces[2];
-			for (auto n : commonNeighbours)
-			{
-				Face face(n, edge.A(), edge.B());
-				Vector toNode = mGraph.GetValue(n) - mGraph.GetValue(edge.A());
-				if (edgeVector.DotPerp(toNode) > 0.0f)
+			VectorGraphWalker<decltype(mGraph.mGraph)> walkers[2]
 				{
-					tentativeFaces[0].push_back(face);
-				}
-				else
-				{
-					tentativeFaces[1].push_back(face);
-				}
-			}
+					{mGraph.mGraph, edge.A()},
+					{mGraph.mGraph, edge.B()}
+				};
+
+			walkers[0].WalkTo(edge.B());
+			walkers[1].WalkTo(edge.A());
 
 
-			std::array<Optional<Face>, 2> faces {
-				tentativeFaces[0].empty() ? Optional<Face>(NullOpt) : *std::ranges::min_element(tentativeFaces[0], faceAreaComparison),
-				tentativeFaces[1].empty() ? Optional<Face>(NullOpt) : *std::ranges::min_element(tentativeFaces[1], faceAreaComparison)
-			};
-
-			for (auto& face : faces)
+			for (auto& walker : walkers)
 			{
-				if (face.HasValue())
+				while (walker.TryWalkCCW() && walker.PathLength() <= 4)
 				{
-					Triangle tri = GetFaceAsTriangle(face.Value());
-					bool containsAnyPoint = false;
-					for (auto [node, point] : mGraph.mGraph.Nodes())
+					if (walker.CurrentNode() == walker.GetPreviousNode(walker.PathLength() - 1))
 					{
-						if (face.Value().ContainsNode(node))
-						{
-							continue;
-						}
-
-						if (tri.Contains(point))
-						{
-							containsAnyPoint = true;
-							break;
-						}
-					}
-
-					if (!containsAnyPoint)
-					{
-						mGraph.mFaces.emplace(face.Value());
+						Assert(walker.PathLength() == 4);
+						Face face(
+							walker.GetPreviousNode(0),
+							walker.GetPreviousNode(1),
+							walker.GetPreviousNode(2));
+						mGraph.mFaces.emplace(face);
 					}
 				}
 			}
