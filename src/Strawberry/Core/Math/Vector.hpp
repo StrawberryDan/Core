@@ -520,7 +520,7 @@ namespace Strawberry::Core::Math
 			Radians smallestAngle = AngleBetween(b);
 			if (Perpendicular().Dot(b) >= T{0.0})
 			{
-				smallestAngle = smallestAngle + M_PI;
+				return 2.0 * M_PI - smallestAngle;
 			}
 
 			return smallestAngle;
