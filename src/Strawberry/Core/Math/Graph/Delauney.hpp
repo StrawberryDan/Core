@@ -485,16 +485,21 @@ namespace Strawberry::Core::Math
 
 			for (auto& walker : walkers)
 			{
-				while (walker.TryWalkCCW() && walker.PathLength() <= 4)
+				while (walker.TryWalkCCW())
 				{
-					if (walker.CurrentNode() == walker.GetPreviousNode(walker.PathLength() - 1))
+					Assert(walker.PathLength() <= 4);
+					if (walker.PathLength() == 4)
 					{
-						Assert(walker.PathLength() == 4);
-						Face face(
-							walker.GetPreviousNode(0),
-							walker.GetPreviousNode(1),
-							walker.GetPreviousNode(2));
-						mGraph.mFaces.emplace(face);
+						if (walker.CurrentNode() == walker.GetPreviousNode(walker.PathLength() - 1))
+						{
+							Assert(walker.PathLength() == 4);
+							Face face(
+								walker.GetPreviousNode(0),
+								walker.GetPreviousNode(1),
+								walker.GetPreviousNode(2));
+							mGraph.mFaces.emplace(face);
+						}
+						break;
 					}
 				}
 			}
