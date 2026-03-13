@@ -38,15 +38,8 @@ namespace Strawberry::Core::Math
 		class Builder;
 		friend class Builder;
 
-
-		const Graph::Value& GetValue(unsigned int nodeID) const noexcept
-		{
-			return mGraph.GetValue(nodeID);
-		}
-
-
+		/// Accessor for the edge of the voronoi cell boundaries.
 		const auto& GetGraph() const noexcept { return mGraph; }
-
 
 		/// Const accessor to the set of faces.
 		const auto& Faces() const { return mFaces; }
@@ -58,9 +51,9 @@ namespace Strawberry::Core::Math
 				   "Delaunay::GetFaceAsTriangle called with face not "
 				   "already in the triangulation!");
 			return Triangle<T, 2>{{
-					GetValue(face.Node(0)),
-					GetValue(face.Node(1)),
-					GetValue(face.Node(2))
+					GetGraph().GetValue(face.Node(0)),
+					GetGraph().GetValue(face.Node(1)),
+					GetGraph().GetValue(face.Node(2))
 				}};
 		}
 
@@ -70,7 +63,7 @@ namespace Strawberry::Core::Math
 			return GetFaceAsTriangle(face).GetCircumsphere().Unwrap().Center();
 		}
 
-
+		/// Returns the faces that are adjacent to the given face.
 		std::set<Face> GetAdjacentFaces(const Face& face) const noexcept
 		{
 			return mFaces
@@ -80,45 +73,9 @@ namespace Strawberry::Core::Math
 				| std::ranges::to<std::set>();
 		}
 
-
-		std::set<Edge> GetOuterEdges() const noexcept
-		{
-			std::map<Edge, unsigned int> votes;
-
-			for (auto face : mFaces)
-			{
-				for (auto edge : face.Edges())
-				{
-					votes[edge]++;
-				}
-			}
-
-			return votes
-				| std::views::filter([] (const auto& x) { return x.second == 1; })
-				| std::views::keys
-				| std::ranges::to<std::set>();
-		}
-
-
-		Vector<T, 2> GetCenter() const noexcept
-		{
-			return 0.5 * (mMin + mMax);
-		}
-
-
-		std::set<LineSegment<T, 2>> GetBoundingBox() const noexcept
-		{
-			auto xmax = Vector{mMax[0], mMin[1]};
-			auto ymax = Vector{mMin[0], mMax[1]};
-			return {
-				LineSegment<T, 2>(mMin, xmax),
-				LineSegment<T, 2>(xmax, mMax),
-				LineSegment<T, 2>(mMax, ymax),
-				LineSegment<T, 2>(ymax, mMin)
-			};
-		}
-
-
+		/// Return the dual graph of this delaunay triangulation.
+		///
+		/// This is also the graph of the voronoi diagram of the points in this triangulation.
 		Graph GetDual() const noexcept
 		{
 			Graph dual;
@@ -195,6 +152,7 @@ namespace Strawberry::Core::Math
 		}
 
 
+		// Returns whether this face has another edge in common with this other face.
 		bool SharesEdgeWith(Face other) const noexcept
 		{
 			std::set<unsigned int> u;
@@ -235,26 +193,26 @@ namespace Strawberry::Core::Math
 		Builder(const Vector<T, 2>& min, const Vector<T, 2>& max)
 		{
 			// Store min and max;
-			mGraph.mMin = min;
-			mGraph.mMax = max;
+			mResult.mMin = min;
+			mResult.mMax = max;
 
 			// Other two orthogonal extreme points.
 			Vector<T, 2> xMax(max[0], min[1]);
 			Vector<T, 2> yMax(min[0], max[1]);
 			// Create the supporting nodes.
-			mGraph.mGraph.AddNode(min);
-			mGraph.mGraph.AddNode(xMax);
-			mGraph.mGraph.AddNode(yMax);
-			mGraph.mGraph.AddNode(max);
+			mResult.mGraph.AddNode(min);
+			mResult.mGraph.AddNode(xMax);
+			mResult.mGraph.AddNode(yMax);
+			mResult.mGraph.AddNode(max);
 			// Create the edges between supporting nodes.
-			mGraph.mGraph.AddEdge({0, 1});
-			mGraph.mGraph.AddEdge({0, 2});
-			mGraph.mGraph.AddEdge({0, 3});
-			mGraph.mGraph.AddEdge({1, 3});
-			mGraph.mGraph.AddEdge({2, 3});
+			mResult.mGraph.AddEdge({0, 1});
+			mResult.mGraph.AddEdge({0, 2});
+			mResult.mGraph.AddEdge({0, 3});
+			mResult.mGraph.AddEdge({1, 3});
+			mResult.mGraph.AddEdge({2, 3});
 			// Create the faces between supporting nodes.
-			mGraph.mFaces.emplace(Face{0, 2, 3});
-			mGraph.mFaces.emplace(Face{0, 1, 3});
+			mResult.mFaces.emplace(Face{0, 2, 3});
+			mResult.mFaces.emplace(Face{0, 1, 3});
 		}
 
 
@@ -265,7 +223,7 @@ namespace Strawberry::Core::Math
 
 			Assert(NodeInBounds(value),
 				   "Attempted to add an out-of-bounds node to Delaunay graph.");
-			Assert(!mGraph.mGraph.ContainsValue(value),
+			Assert(!mResult.mGraph.ContainsValue(value),
 				   "Attempted to add duplicate node to Delaunay graph.");
 
 			/// Get the set of faces that conflic with the value being added.
@@ -278,12 +236,12 @@ namespace Strawberry::Core::Math
 			std::set outerNodes       = GetOuterNodes(conflictingFaces);
 
 			/// Add the new node to the graph.
-			unsigned int newNodeHandle = mGraph.mGraph.AddNode(value);
+			unsigned int newNodeHandle = mResult.mGraph.AddNode(value);
 
 			/// Erase the conflicting faces.
 			for (Face face : conflictingFaces)
 			{
-				mGraph.mFaces.erase(face);
+				mResult.mFaces.erase(face);
 				mFaceCache.erase(face);
 				mCircumsphereCache.erase(face);
 			}
@@ -291,7 +249,7 @@ namespace Strawberry::Core::Math
 			/// Erase the innerEdges fo the conflicting faces.
 			for (Edge innerEdge : innerEdges)
 			{
-				mGraph.mGraph.RemoveEdge(innerEdge);
+				mResult.mGraph.RemoveEdge(innerEdge);
 			}
 
 			/// Join the new node into the hole by joining it to
@@ -300,7 +258,7 @@ namespace Strawberry::Core::Math
 			{
 				/// Add edge to the graph.
 				Edge newEdge(outerNode, newNodeHandle);
-				mGraph.mGraph.AddEdge(newEdge);
+				mResult.mGraph.AddEdge(newEdge);
 				/// Look for new triangular faces.
 				DiscoverFaces(newEdge);
 			}
@@ -310,14 +268,17 @@ namespace Strawberry::Core::Math
 		/// Return the graph with the supporting nodes removed.
 		Delaunay<Vector<T, 2>> Build(bool pruneSupportVertices = false) const noexcept
 		{
-			auto copy = mGraph;
+			// Copy the result.
+			auto copy = mResult;
+			// If we're pruning supporting vertices, we remove all nodes
+			// from the supporting rectangle and all faces using those nodes.
 			if (pruneSupportVertices)
 			{
 				copy.mGraph.RemoveNode(0);
 				copy.mGraph.RemoveNode(1);
 				copy.mGraph.RemoveNode(2);
 				copy.mGraph.RemoveNode(3);
-				copy.mFaces = mGraph.mFaces
+				copy.mFaces = mResult.mFaces
 					| std::views::filter([] (Face face) {
 						return !(face.ContainsNode(0) ||
 								 face.ContainsNode(1) ||
@@ -326,6 +287,7 @@ namespace Strawberry::Core::Math
 					})
 					| std::ranges::to<std::set>();
 			}
+			// Return the copy.
 			return copy;
 		}
 
@@ -334,8 +296,8 @@ namespace Strawberry::Core::Math
 		/// Returns if a node is contained by the AABB box bounding this graph.
 		bool NodeInBounds(const Vector<T, 2>& value)
 		{
-			Vector<T, 2> min = mGraph.GetValue(0);
-			Vector<T, 2> max = mGraph.GetValue(3);
+			Vector<T, 2> min = mResult.GetGraph().GetValue(0);
+			Vector<T, 2> max = mResult.GetGraph().GetValue(3);
 
 			const bool xBounds = min[0] < value[0] && value[0] < max[0];
 			const bool yBounds = min[1] < value[1] && value[1] < max[1];
@@ -349,7 +311,7 @@ namespace Strawberry::Core::Math
 		std::set<Delaunay<Vector<T, 2>>::Face> GetConflictingFaces(const Vector<T, 2>& value) const
 		{
 			std::set<Face> conflictingFaces;
-			for (const auto& face : mGraph.mFaces)
+			for (const auto& face : mResult.mFaces)
 			{
 				if (GetCircumcircle(face).Contains(value))
 				{
@@ -430,9 +392,9 @@ namespace Strawberry::Core::Math
 			if (iter == mFaceCache.end())
 			{
 				Triangle<T, 2> triangle({
-						mGraph.GetValue(face.Node(0)),
-						mGraph.GetValue(face.Node(1)),
-						mGraph.GetValue(face.Node(2))
+						mResult.GetGraph().GetValue(face.Node(0)),
+						mResult.GetGraph().GetValue(face.Node(1)),
+						mResult.GetGraph().GetValue(face.Node(2))
 					});
 
 				iter = mFaceCache.emplace(face, triangle).first;
@@ -459,9 +421,9 @@ namespace Strawberry::Core::Math
 		/// Returns the area of the face.
 		double GetFaceArea(Face face) const noexcept
 		{
-			auto a = mGraph.GetValue(face.Node(0));
-			auto b = mGraph.GetValue(face.Node(1));
-			auto c = mGraph.GetValue(face.Node(2));
+			auto a = mResult.GetGraph().GetValue(face.Node(0));
+			auto b = mResult.GetGraph().GetValue(face.Node(1));
+			auto c = mResult.GetGraph().GetValue(face.Node(2));
 
 			auto v1 = b - a;
 			auto v2 = c - a;
@@ -473,32 +435,40 @@ namespace Strawberry::Core::Math
 		/// Looks for a new face on either side of this edge.
 		void DiscoverFaces(Edge edge)
 		{
-			VectorGraphWalker<decltype(mGraph.mGraph)> walkers[2]
-				{
-					{mGraph.mGraph, edge.A()},
-					{mGraph.mGraph, edge.B()}
-				};
+			// Create two walkers on each side of the edge.
+			VectorGraphWalker<decltype(mResult.mGraph)> walkers[2] {
+				{mResult.mGraph, edge.A()},
+				{mResult.mGraph, edge.B()}
+			};
 
+			// Have the walkers swap places so that they
+			// end up going in opposite directions.
 			walkers[0].WalkTo(edge.B());
 			walkers[1].WalkTo(edge.A());
 
-
+			// Do for each walker
 			for (auto& walker : walkers)
 			{
+				// Keep trying to walk counter clockwise until we can't.
 				while (walker.TryWalkCCW())
 				{
+					// We never let the path exceed 4 nodes.
 					Assert(walker.PathLength() <= 4);
+					// If the path is at the length to encapsulate a triangle.
 					if (walker.PathLength() == 4)
 					{
+						// If our first and current node are the same, we've walked a triangle.
 						if (walker.CurrentNode() == walker.GetPreviousNode(walker.PathLength() - 1))
 						{
-							Assert(walker.PathLength() == 4);
+							/// Create the new face.
 							Face face(
 								walker.GetPreviousNode(0),
 								walker.GetPreviousNode(1),
 								walker.GetPreviousNode(2));
-							mGraph.mFaces.emplace(face);
+							/// Put the face in our set.
+							mResult.mFaces.emplace(face);
 						}
+						// No need to keep going now.
 						break;
 					}
 				}
@@ -507,8 +477,11 @@ namespace Strawberry::Core::Math
 
 
 	private:
-		Delaunay<Vector<T, 2>>                 mGraph;
-		mutable std::map<Face, Triangle<T, 2>> mFaceCache;
+		/// The delaunay graph we are creating.
+		Delaunay<Vector<T, 2>>                 mResult;
+		/// A cache of the triangle representation of faces from our delaunay.
+		mutable std::map<Face, Triangle<T, 2>> mTriangleCache;
+		/// A cache of the circumpheres of the faces from our delaunay.
 		mutable std::map<Face, Sphere<T, 2>>   mCircumsphereCache;
 	};
 }
