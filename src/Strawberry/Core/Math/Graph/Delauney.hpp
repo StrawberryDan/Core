@@ -242,7 +242,7 @@ namespace Strawberry::Core::Math
 			for (Face face : conflictingFaces)
 			{
 				mResult.mFaces.erase(face);
-				mFaceCache.erase(face);
+				mTriangleCache.erase(face);
 				mCircumsphereCache.erase(face);
 			}
 
@@ -388,8 +388,8 @@ namespace Strawberry::Core::Math
 		/// Gets the given face in the form of a triangle.
 		Triangle<T, 2> GetFaceAsTriangle(Face face) const noexcept
 		{
-			auto iter = mFaceCache.find(face);
-			if (iter == mFaceCache.end())
+			auto iter = mTriangleCache.find(face);
+			if (iter == mTriangleCache.end())
 			{
 				Triangle<T, 2> triangle({
 						mResult.GetGraph().GetValue(face.Node(0)),
@@ -397,7 +397,7 @@ namespace Strawberry::Core::Math
 						mResult.GetGraph().GetValue(face.Node(2))
 					});
 
-				iter = mFaceCache.emplace(face, triangle).first;
+				iter = mTriangleCache.emplace(face, triangle).first;
 			}
 
 			return iter->second;

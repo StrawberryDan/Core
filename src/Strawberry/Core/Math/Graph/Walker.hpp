@@ -209,7 +209,7 @@ namespace Strawberry::Core::Math
 			/// Skip the most CCW node until we find one that is not the node we came from.
 			while (sortedNeighbours.size() > 0)
 			{
-				if (sortedNeighbours[sortedNeighbours.size() - 1].first != this->GetPreviousNode)
+				if (sortedNeighbours[sortedNeighbours.size() - 1].first != this->GetPreviousNode())
 				{
 					this->WalkTo(sortedNeighbours[sortedNeighbours.size() - 1].first);
 					return true;

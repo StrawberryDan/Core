@@ -24,21 +24,28 @@ if (NOT TARGET StrawberryCore)
     set(STRAWBERRY_CORE_ENABLE_ASSERTIONS ON)
   endif()
 
+  get_strawberry_external_build_dep_dir(BUILD_DEP_DIR)
 
   FetchContent_Declare(FMT
     EXCLUDE_FROM_ALL
+    UPDATE_DISCONNECTED TRUE
+    SOURCE_DIR "${BUILD_DEP_DIR}/FMT/11.1.4"
     GIT_REPOSITORY "https://github.com/fmtlib/fmt.git"
     GIT_TAG "11.1.4")
   FetchContent_MakeAvailable(FMT)
 
   FetchContent_Declare(JSON
     EXCLUDE_FROM_ALL
+    UPDATE_DISCONNECTED TRUE
+    SOURCE_DIR "${BUILD_DEP_DIR}/JSON/v3.11.3"
     GIT_REPOSITORY "https://github.com/nlohmann/json.git"
     GIT_TAG "v3.11.3")
   FetchContent_MakeAvailable(JSON)
 
   FetchContent_Declare(STB
     EXCLUDE_FROM_ALL
+    UPDATE_DISCONNECTED TRUE
+    SOURCE_DIR "${BUILD_DEP_DIR}/stb"
     GIT_REPOSITORY "https://github.com/nothings/stb.git"
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
@@ -53,6 +60,8 @@ if (NOT TARGET StrawberryCore)
   option(TRACY_ON_DEMAND "" ${TRACY_ENABLE})
   FetchContent_Declare(
     tracy
+    SOURCE_DIR "${BUILD_DEP_DIR}/tracy/v0.11.1"
+    UPDATE_DISCONNECTED TRUE
     GIT_REPOSITORY "https://github.com/wolfpld/tracy.git"
     GIT_TAG "v0.11.1"
     GIT_SHALLOW TRUE
@@ -64,6 +73,9 @@ if (NOT TARGET StrawberryCore)
 
   FetchContent_Declare(
     canvas_ity
+    EXCLUDE_FROM_ALL
+    UPDATE_DISCONNECTED TRUE
+    SOURCE_DIR "${BUILD_DEP_DIR}/canvas_ity/main"
     GIT_REPOSITORY "https://github.com/a-e-k/canvas_ity.git"
     GIT_TAG "main"
   )
