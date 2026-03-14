@@ -7,6 +7,7 @@
 #include "Strawberry/Core/Math/Vector.hpp"
 // Standard Library
 #include <algorithm>
+#include <tuple>
 
 
 namespace Strawberry::Core::Math
@@ -35,10 +36,12 @@ namespace Strawberry::Core::Math
 
 		static Voronoi<Vector<T, 2>> From(const Delaunay& delaunay) noexcept
 		{
+			const auto [voronoiEdges, faceNodeMapping] = delaunay.GetDual();
+
+
+
 			Voronoi voronoi;
-
-			voronoi.mGraph = delaunay.GetDual();
-
+			voronoi.mGraph = voronoiEdges;
 			return voronoi;
 		}
 

@@ -76,7 +76,7 @@ namespace Strawberry::Core::Math
 		/// Return the dual graph of this delaunay triangulation.
 		///
 		/// This is also the graph of the voronoi diagram of the points in this triangulation.
-		Graph GetDual() const noexcept
+		std::pair<Graph, std::map<Face, unsigned int>> GetDual() const noexcept
 		{
 			Graph dual;
 
@@ -97,7 +97,7 @@ namespace Strawberry::Core::Math
 				}
 			}
 
-			return dual;
+			return {dual, faceNodeMapping};
 		}
 
 
