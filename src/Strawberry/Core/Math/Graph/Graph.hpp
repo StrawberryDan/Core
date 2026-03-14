@@ -56,6 +56,7 @@ namespace Strawberry::Core::Math
 			}
 
 
+			/// String formatter
 			std::string ToString() const
 			{
 				if constexpr (Config::Directed::value)
@@ -69,9 +70,17 @@ namespace Strawberry::Core::Math
 			}
 
 
+			/// Returns whether this edge contains the given node.
 			bool ContainsNode(unsigned int node) const
 			{
 				return nodes[0] == node || nodes[1] == node;
+			}
+
+
+			/// Reverses the order of the nodes in this edge.
+			void Reverse() requires (Config::Directed::value)
+			{
+				std::swap(nodes[0], nodes[1]);
 			}
 
 
@@ -80,6 +89,7 @@ namespace Strawberry::Core::Math
 
 			unsigned int A() const noexcept { return nodes[0]; }
 			unsigned int B() const noexcept { return nodes[1]; }
+			std::array<unsigned int, 2> Nodes() const { return {A(), B()}; }
 
 
 			std::array<unsigned int, 2> nodes;
