@@ -4,6 +4,7 @@
 #include "Strawberry/Core/Math/Graph/Delauney.hpp"
 #include "Strawberry/Core/Util/Image.hpp"
 #include "canvas_ity.hpp"
+#include <numbers>
 #include <random>
 
 
@@ -11,22 +12,23 @@ using namespace Strawberry::Core;
 using namespace Math;
 
 static Vector<double, 2> MIN{0.0, 0.0};
-static Vector<double, 2> MAX{1000.0, 1000.0};
+static Vector<double, 2> MAX{2000.0, 2000.0};
 static double            PADDING = 20.0;
 
 struct GraphColoring
 {
 	bool drawNodes = true;
 	bool drawEdges = true;
-	float edgeWidth = 1.0f;
-	float nodeRadius = 1.0f;
+	bool dashEdges = false;
+	float edgeWidth = 2.0f;
+	float nodeRadius = 2.0f;
 	float mEdgeColor[4];
 	float mNodeColor[4];
 };
 
 static PointSet<double, 2> GeneratePointSet()
 {
-	static size_t POINT_COUNT = 1024;
+	static size_t POINT_COUNT = 256;
 	PointSet<double, 2> points;
 
 	std::random_device rng;
@@ -49,6 +51,16 @@ static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColori
 	{
 		for (auto edge : graph.Edges())
 		{
+			if (config.dashEdges)
+			{
+				constexpr float DASH_BASE = 5.0f;
+				float lineDash[] = {DASH_BASE, std::numbers::phi_v<float> * DASH_BASE};
+				canvas.set_line_dash(lineDash, std::extent_v<decltype(lineDash)>);
+			}
+			else
+			{
+				canvas.set_line_dash(nullptr, 0);
+			}
 			canvas.set_line_width(config.edgeWidth);
 			Vector<double, 2> posA = graph.GetValue(edge.nodes[0]);
 			Vector<double, 2> posB = graph.GetValue(edge.nodes[1]);
@@ -76,12 +88,51 @@ static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColori
 }
 
 
+static void DrawCellCenters(canvas_ity::canvas& canvas, Voronoi<Vector<double, 2>>& graph)
+{
+	for (auto cell : graph.Cells())
+	{
+		auto center = graph.GetCellMeanVertex(cell);
+		canvas.set_color(canvas_ity::fill_style, 0.2, 0.5, 0.8, 1.0);
+		canvas.begin_path();
+		canvas.arc(center[0], center[1], 2.0, 0, 360);
+		canvas.fill();
+
+		for (auto edge : cell.edges | std::views::keys)
+		{
+			auto a = graph.GetGraph().GetValue(edge.A());
+			auto b = graph.GetGraph().GetValue(edge.B());
+
+			a = a + (center - a).WithLength(10.0);
+			b = b + (center - b).WithLength(10.0);
+
+			auto mid = (a + b) * 0.5;
+			auto perp = (b - a).Perpendicular();
+			auto towardsCenter = mid + perp.WithLength(10.0);
+
+			canvas.set_line_dash(nullptr, 0);
+			canvas.set_line_width(2.0);
+			canvas.set_color(canvas_ity::stroke_style, 0.5, 0.3, 0.8, 1.0);
+			canvas.begin_path();
+			canvas.move_to(a[0], a[1]);
+			canvas.line_to(b[0], b[1]);
+			canvas.stroke();
+			canvas.begin_path();
+			canvas.set_line_width(4.0);
+			canvas.move_to(mid[0], mid[1]);
+			canvas.line_to(towardsCenter[0], towardsCenter[1]);
+			canvas.stroke();
+		}
+	}
+}
+
+
 
 
 int main()
 {
-	GraphColoring mainColoring { .mEdgeColor{1.0f, 1.0f, 1.0f, 0.2f}, .mNodeColor{1.0f, 0.0f, 0.0f, 0.2f} };
-	GraphColoring voronoiColoring { .mEdgeColor{0.0f, 1.0f, 1.0f, 1.0f}, .mNodeColor{0.0f, 1.0f, 0.0f, 1.0f} };
+	GraphColoring mainColoring { .dashEdges = true, .edgeWidth = 1.5f, .mEdgeColor{0.7f, 0.7f, 0.7f, 1.0f}, .mNodeColor{0.7f, 0.0f, 0.0f, 1.0f} };
+	GraphColoring voronoiColoring { .drawNodes = false, .mEdgeColor{0.0f, 0.8f, 0.8f, 1.0f}, .mNodeColor{0.0f, 1.0f, 0.0f, 1.0f} };
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
@@ -100,6 +151,7 @@ int main()
 
 	DrawGraph(context, delaunay.GetGraph(), mainColoring);
 	DrawGraph(context, voronoi.GetGraph(), voronoiColoring);
+	DrawCellCenters(context, voronoi);
 
 	context.get_image_data((unsigned char*) image.Data(), image.Width(), image.Height(), image.Width() * decltype(image)::PixelType::Size, 0, 0);
 	image.Save(fmt::format("voronoi_output.png"));
