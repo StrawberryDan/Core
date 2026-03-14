@@ -28,7 +28,7 @@ namespace Strawberry::Core::Math
 		/// Getter for the value at the current node.
 		decltype(auto) GetValue(this auto& self) noexcept
 		{
-			return self->mGraph->GetValue(self->CurrentNode());
+			return self.mGraph->GetValue(self.CurrentNode());
 		}
 
 
@@ -101,7 +101,7 @@ namespace Strawberry::Core::Math
 		/// Construcotr from base.
 		PathGraphWalker(Base&& base)
 			: Base(std::move(base))
-			, mHistory(this->GetCurrentNode())
+			, mHistory(this->CurrentNode())
 		{}
 
 		/// Returns the set of possible next nodes, excluding the node previously visited.
@@ -225,13 +225,28 @@ namespace Strawberry::Core::Math
 			     - self.mGraph->GetValue(self.mNode);
 		}
 
+		/// Returns the neighbours of this current node in CCW order.
+		std::vector<unsigned int> GetNeighboursCCW(this const auto& self) noexcept
+		{
+			/// Possible next steps.
+			auto outgoingNeighbours = self.NextNodes() | std::ranges::to<std::vector>();
+
+			/// Sort the neighbours according to their
+			std::ranges::sort(
+				outgoingNeighbours, std::less{},
+				[self] (auto x) { return self.GetOutgoingVector(x).ATan2(); });
+
+			/// Return result.
+			return outgoingNeighbours;
+		}
+
 		/// Get the possible next steps of this walker, sorted in order of ascending
 		/// CCW angle between the outgoing vector for that neighbour, and the incoming vector
 		/// from the previous node.
 		///
 		/// @returns A vector of pairs of node indices, and the CCW between them and the
 		///          incoming vector.
-		std::vector<std::pair<unsigned int, Radians>> GetNeighboursCCW(this const auto& self) noexcept
+		std::vector<std::pair<unsigned int, Radians>> GetNeighboursCCWFromIncoming(this const auto& self) noexcept
 		{
 			/// Possible next steps.
 			auto outgoingNeighbours = self.NextNodes();
@@ -264,7 +279,7 @@ namespace Strawberry::Core::Math
 				   "Cannot Try to walk CCW without having a path history size >= 2 to set initial direction.");
 
 			/// Get neighbours in CCW order
-			std::vector sortedNeighbours = self.GetNeighboursCCW();
+			std::vector sortedNeighbours = self.GetNeighboursCCWFromIncoming();
 			/// Hunt for next node whilst there are sorted neighbours
 			/// Skip the most CCW node until we find one that is not the node we came from.
 			while (sortedNeighbours.size() > 0)
