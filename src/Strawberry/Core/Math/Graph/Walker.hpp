@@ -5,6 +5,7 @@
 #include "Strawberry/Core/Types/Optional.hpp"
 // Standard Library
 #include <algorithm>
+#include <concepts>
 
 
 namespace Strawberry::Core::Math
@@ -12,50 +13,56 @@ namespace Strawberry::Core::Math
 	/// Base graph walker type.
 	/// Can walk along any arbitrary graph type.
 	template <typename Base>
-	class GraphWalker
+	class BasicGraphWalker
 	{
 	public:
 		using Graph = Base;
 
 		/// Constructor initialising the walker to a node in a graph.
-		GraphWalker(Graph& graph, unsigned int node)
+		BasicGraphWalker(Graph& graph, unsigned int node)
 			: mGraph(&graph)
 			, mNode(node)
 		{}
 
 
 		/// Getter for the value at the current node.
-		decltype(auto) GetValue(this auto* self) noexcept
+		decltype(auto) GetValue(this auto& self) noexcept
 		{
 			return self->mGraph->GetValue(self->CurrentNode());
 		}
 
 
 		/// Returns the index of the current node this walker is sat on.
-		unsigned int CurrentNode() const noexcept { return mNode; }
+		unsigned int CurrentNode(this const auto& self) noexcept { return self.mNode; }
 
 
 		/// Returns the set of possible next steps the walker can take from its current location.
-		std::set<unsigned int> PossibleSteps() const noexcept
+		std::set<unsigned int> NextNodes(this const auto& self) noexcept
 		{
 			if constexpr (Graph::Config::Directed::value)
 			{
-				return mGraph->GetOutgoingNeighbourIndices(this->mNode);
+				return self.mGraph->GetOutgoingNeighbourIndices(self.CurrentNode());
 			}
 			else
 			{
-				return mGraph->GetNeighbourIndices(this->mNode);
+				return self.mGraph->GetNeighbourIndices(self.CurrentNode());
 			}
+		}
+
+		/// Returns whether a walker can walk to the given node in one step.
+		bool CanWalkTo(this const auto& self, unsigned int node) noexcept
+		{
+			return self.NextNodes().contains(node);
 		}
 
 
 		/// Moves this walker to the node specified.
 		///
 		/// @param node Target node. Must be in the list of possible steps.
-		void WalkTo(unsigned int node) noexcept
+		void WalkTo(this auto& self, unsigned int node) noexcept
 		{
-			Assert(PossibleSteps().contains(node), "Attempt to walk to unavailable node in Graph::Walker::WalkTo!");
-			mNode = node;
+			Assert(self.CanWalkTo(node), "Attempt to walk to unavailable node in Graph::Walker::WalkTo!");
+			self.mNode = node;
 		}
 
 
@@ -67,48 +74,72 @@ namespace Strawberry::Core::Math
 	};
 
 
+	template <typename Walker>
+	concept GraphWalkerType = requires (Walker walker)
+	{
+		typename Walker::Graph;
+		std::derived_from<Walker, BasicGraphWalker<typename Walker::Graph>>;
+	};
+
+
 	/// Graph walker which remembers it's path.
-	template <typename Base>
+	template <GraphWalkerType Base>
 	class PathGraphWalker
-		: public GraphWalker<Base>
+		: public Base
 	{
 	public:
 		/// Alias to Graph type
-		using Graph = GraphWalker<Base>::Graph;
+		using Graph = Base::Graph;
 
 		/// Constructor overload.
 		/// Initialised mHistory
 		PathGraphWalker(Graph& graph, unsigned int node)
-			: GraphWalker<Graph>(graph, node)
+			: Base(graph, node)
 			, mHistory{node}
 		{}
 
+		/// Construcotr from base.
+		PathGraphWalker(Base&& base)
+			: Base(std::move(base))
+			, mHistory(this->GetCurrentNode())
+		{}
+
+		/// Returns the set of possible next nodes, excluding the node previously visited.
+		std::set<unsigned int> ForwardNodes(this const auto& self) noexcept
+		{
+			auto possibleSteps = self.NextNodes();
+			if (self.PathLength() > 1) [[likely]]
+			{
+				possibleSteps.erase(self.GetPreviousNode());
+			}
+			return possibleSteps;
+		}
 
 		/// Overloads WalkTo to record the steps walked into the history list.
-		void WalkTo(unsigned int node) noexcept
+		void WalkTo(this auto& self, unsigned int node) noexcept
 		{
-			GraphWalker<Graph>::WalkTo(node);
-			mHistory.emplace_back(node);
+			self.Base::WalkTo(node);
+			self.mHistory.emplace_back(node);
 		}
 
 
 		/// Returns the number of nodes this walker has visited.
-		size_t PathLength() const noexcept
+		size_t PathLength(this const auto& self) noexcept
 		{
-			return mHistory.size();
+			return self.mHistory.size();
 		}
 
 
 		/// Rewinds the node walker back index steps in it's history
 		/// If index == 0, then this function does nothing.
-		void GoBack(unsigned int index = 1) noexcept
+		void GoBack(this const auto& self, unsigned int index = 1) noexcept
 		{
-			Assert(mHistory.size() > index + 1);
+			Assert(self.PathLength() > index + 1);
 			for (int i = 0; i < index; i++)
 			{
-				mHistory.pop_back();
+				self.mHistory.pop_back();
 			}
-			this->mNode = mHistory.back();
+			self.mNode = self.mHistory.back();
 		}
 
 
@@ -116,6 +147,13 @@ namespace Strawberry::Core::Math
 		bool HasVisitedCurrentNode() const noexcept
 		{
 			return std::ranges::count(this->mHistory, this->mNode) > 1;
+		}
+
+
+		/// Returns whether this path begins and ends on the same node.
+		bool IsLoop() const noexcept
+		{
+			return PathLength() > 1 && mHistory.front() == mHistory.back();
 		}
 
 
@@ -131,40 +169,60 @@ namespace Strawberry::Core::Math
 		}
 
 
+		bool TryWalkForwards(this auto& self)
+		{
+			auto forwardNodes = self.ForwardNodes();
+			if (forwardNodes.empty())
+			{
+				return false;
+			}
+
+			self.WalkTo(*forwardNodes.begin());
+			return true;
+		}
+
+
 	protected:
 		/// Double ended queue of nodes this walker has visited.
 		std::deque<unsigned int> mHistory;
 	};
 
+	template <GraphWalkerType Base>
+	PathGraphWalker(Base) -> PathGraphWalker<Base>;
+
 
 	/// Walker for graphs that use Vector<*, *> as a payload.
 	///
 	/// Provides special functions for navigating graphs in a space.
-	template <typename Base>
+	template <GraphWalkerType Base>
 	class VectorGraphWalker
-		: public PathGraphWalker<Base>
+		: public Base
 	{
 	public:
 		/// Type alias for base graph.
-		using Graph = PathGraphWalker<Base>::Graph;
+		using Graph = Base::Graph;
 		/// Expose base constructor.
-		using PathGraphWalker<Base>::PathGraphWalker;
+		using Base::Base;
+
+		VectorGraphWalker(Base&& base)
+			: Base(std::move(base))
+		{}
 
 		/// Returns the vector pointing from the previous node to the current node.
-		Graph::Value GetIncomingVector() const noexcept
+		Graph::Value GetIncomingVector(this const auto& self) noexcept
 		{
-			Assert(this->PathLength() > 1,
+			Assert(self.PathLength() > 1,
 				   "Call to VectorGraphWalker::GetIncomingDirection with path history length <= 1.");
-			return this->mGraph->GetValue(this->mNode)
-			     - this->mGraph->GetValue(this->GetPreviousNode());
+			return self.mGraph->GetValue(self.mNode)
+			     - self.mGraph->GetValue(self.GetPreviousNode());
 		}
 
 		/// Returns the vector pointing from the current node to the specified outgoing node.
-		Graph::Value GetOutgoingVector(unsigned int outgoingNode) const noexcept
+		Graph::Value GetOutgoingVector(this const auto& self, unsigned int outgoingNode) noexcept
 		{
-			Assert(this->PossibleSteps().contains(outgoingNode));
-			return this->mGraph->GetValue(outgoingNode)
-			     - this->mGraph->GetValue(this->mNode);
+			Assert(self.NextNodes().contains(outgoingNode));
+			return self.mGraph->GetValue(outgoingNode)
+			     - self.mGraph->GetValue(self.mNode);
 		}
 
 		/// Get the possible next steps of this walker, sorted in order of ascending
@@ -173,19 +231,19 @@ namespace Strawberry::Core::Math
 		///
 		/// @returns A vector of pairs of node indices, and the CCW between them and the
 		///          incoming vector.
-		std::vector<std::pair<unsigned int, Radians>> GetNeighboursCCW() const noexcept
+		std::vector<std::pair<unsigned int, Radians>> GetNeighboursCCW(this const auto& self) noexcept
 		{
 			/// Possible next steps.
-			auto outgoingNeighbours = this->PossibleSteps();
+			auto outgoingNeighbours = self.NextNodes();
 			/// Invert the incoming vector so it points away from the current node,
 			/// which mean s that the CCW difference is calculated correctly.
-			auto incomingVector = -1.0 * this->GetIncomingVector();
+			auto incomingVector = -1.0 * self.GetIncomingVector();
 
 			/// Get the outgoingNeighbours as a pair of the neighbour and it's CCW angle.
 			auto pairs = outgoingNeighbours
-				| std::views::transform([&,this] (unsigned int x) -> std::pair<unsigned int, Radians>
+				| std::views::transform([&, self] (unsigned int x) -> std::pair<unsigned int, Radians>
 				{
-					return {x, incomingVector.AngleBetweenCCW(this->GetOutgoingVector(x))};
+					return {x, incomingVector.AngleBetweenCCW(self.GetOutgoingVector(x))};
 				})
 				| std::ranges::to<std::vector>();
 
@@ -197,21 +255,23 @@ namespace Strawberry::Core::Math
 		}
 
 
-		/// Attempts to walk
-		bool TryWalkCCW() noexcept
+		/// Attempts to walk to any node which is not the one it just came from.
+		///
+		/// @returns Whether the walker was able to take a step.
+		bool TryWalkCCW(this auto& self) noexcept
 		{
-			Assert(this->PathLength() > 1,
+			Assert(self.PathLength() > 1,
 				   "Cannot Try to walk CCW without having a path history size >= 2 to set initial direction.");
 
 			/// Get neighbours in CCW order
-			std::vector sortedNeighbours = this->GetNeighboursCCW();
+			std::vector sortedNeighbours = self.GetNeighboursCCW();
 			/// Hunt for next node whilst there are sorted neighbours
 			/// Skip the most CCW node until we find one that is not the node we came from.
 			while (sortedNeighbours.size() > 0)
 			{
-				if (sortedNeighbours[sortedNeighbours.size() - 1].first != this->GetPreviousNode())
+				if (sortedNeighbours[sortedNeighbours.size() - 1].first != self.GetPreviousNode())
 				{
-					this->WalkTo(sortedNeighbours[sortedNeighbours.size() - 1].first);
+					self.WalkTo(sortedNeighbours[sortedNeighbours.size() - 1].first);
 					return true;
 				}
 
@@ -221,4 +281,47 @@ namespace Strawberry::Core::Math
 			return false;
 		}
 	};
+
+	template <GraphWalkerType Base>
+	VectorGraphWalker(Base) -> VectorGraphWalker<Base>;
+
+
+	/// Class representing a walker that can only travel within the set of boundNodes.
+	template <GraphWalkerType Base>
+	class BoundGraphWalker
+		: public Base
+	{
+	public:
+		BoundGraphWalker(Base&& base, std::set<unsigned int> boundNodes)
+			: Base(std::move(base))
+			, mBoundNodes(std::move(boundNodes))
+		{}
+
+		BoundGraphWalker(Base::Graph& graph, unsigned int node, std::set<unsigned int> boundNodes)
+			: Base(graph, node)
+			, mBoundNodes(std::move(boundNodes))
+		{}
+
+		/// Returns whether this walker is bound to this node.
+		bool BoundToNode(unsigned int node) const noexcept
+		{
+			return mBoundNodes.contains(node);
+		}
+
+		/// NextNodes implementation only includes bound nodes in result.
+		std::set<unsigned int> NextNodes(this const auto self) noexcept
+		{
+			return Base::NextNodes()
+				| std::views::filter([&] (unsigned int n) { return self.BoundToNode(n); })
+				| std::ranges::to<std::set>();
+		}
+
+
+	private:
+		std::set<unsigned int> mBoundNodes;
+	};
+
+
+	template <GraphWalkerType Base>
+	BoundGraphWalker(Base) -> BoundGraphWalker<Base>;
 }
