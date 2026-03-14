@@ -4,9 +4,11 @@
 #include "Strawberry/Core/Math/Geometry/Ray.hpp"
 #include "Strawberry/Core/Math/Graph/Delauney.hpp"
 #include "Strawberry/Core/Math/Graph/Graph.hpp"
+#include "Strawberry/Core/Math/Graph/Walker.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 // Standard Library
 #include <algorithm>
+#include <ranges>
 #include <tuple>
 
 
@@ -24,37 +26,177 @@ namespace Strawberry::Core::Math
 	public:
 		/// Alias types.
 		using Delaunay = Delaunay<Vector<T, 2>>;
-		using Face = Delaunay::Face;
-		using Edge = Delaunay::Edge;
+
+		using DirectedEdge = DirectedGraph<Vector<T, 2>>::Edge;
+		using Edge = UndirectedGraph<Vector<T, 2>>::Edge;
 
 
+		/// Structure representing a cell in a voronoi diagram.
 		struct Cell
 		{
+			std::map<DirectedEdge, unsigned int> edges;
 
+
+			/// Gets the set of nodes in counter clockwise order.
+			auto Nodes() const
+			{
+				/// Get the ordered set of all nodes.
+				auto edgeNodes = edges
+					| std::views::keys
+					| std::views::transform([] (DirectedEdge edge) { return edge.Nodes(); })
+					| std::views::join
+					| std::ranges::to<std::vector>();
+
+				/// Remove duplicates from the list whilst preserving the order
+				/// of first appearence
+				for (int i = 0; i < edges.size(); i++)
+				{
+					auto v = edgeNodes[i];
+					for (int j = edgeNodes.size() - 1; j > i; j--)
+					{
+						if (edgeNodes[i] == edgeNodes[j])
+						{
+							edgeNodes.erase(edgeNodes.begin() + j);
+						}
+					}
+				}
+
+				return edgeNodes;
+			}
+
+
+			/// Default comparisons for use in ordered structures.
+			auto operator<=>(const Cell& other) const = default;
 		};
 
-
+		/// Creates the coresponding voronoi diagram for a delaunay triangulation.
 		static Voronoi<Vector<T, 2>> From(const Delaunay& delaunay) noexcept
 		{
 			const auto [voronoiEdges, faceNodeMapping] = delaunay.GetDual();
 
-
-
-			Voronoi voronoi;
+			Voronoi voronoi(delaunay);
 			voronoi.mGraph = voronoiEdges;
-			voronoi.mTriangulation = delaunay.GetGraph();
+			voronoi.mTriangleToNodeMapping = faceNodeMapping;
+			voronoi.GenerateCellMap();
 			return voronoi;
 		}
 
-
+		/// Returns the graph containing the boundaries of the voronoi.
 		const auto& GetGraph() const noexcept { return mGraph; }
+
+		/// Returns a range over the cells in thie diagram.
+		auto Cells() const { return mCellMap | std::views::values; }
+
+		/// Gets the set of vertices for this Cell in CCW order.
+		std::vector<Vector<T, 2>> CellVertices(Cell cell) const noexcept
+		{
+			return cell.Nodes()
+				| std::views::transform([this] (unsigned int x) { return mGraph.GetValue(x); })
+				| std::ranges::to<std::vector>();
+		}
+
+		/// Returns the mean vertex position of the vertices in this cell.
+		Vector<T, 2> GetCellMeanVertex(Cell cell) const noexcept
+		{
+			Vector<T, 2> center;
+			auto values = CellVertices(cell);
+			for (auto v : values)
+			{
+				center = center + v;
+			}
+
+			return center * (1.0 / values.size());
+		}
+
+		/// Returns whether the given point is contained by the given cell.
+		bool CellContainsPoint(const Cell& cell, Vector<T, 2> point) const
+		{
+			for (auto edge : cell.edges | std::views::keys)
+			{
+				LineSegment<T, 2> asLine(
+					mGraph.GetValue(edge.A()),
+					mGraph.GetValue(edge.B())
+				);
+
+				if (asLine.Direction().DotPerp(point - asLine.A()) < 0.0)
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
 
 
 	private:
-		Voronoi() = default;
+		Voronoi(const Delaunay& delaunay)
+			: mTriangulation(delaunay)
+		{}
+
+		void GenerateCellMap()
+		{
+			Assert(mCellMap.empty(), "Second call to GenerateCellMap in Voronoi when mCellMap already populated");
+			/// Add the cell for each node
+			for (const auto node : mTriangulation.GetGraph().NodeIndices())
+			{
+				mCellMap.emplace(node, CalculateNodeVoronoiCell(node));
+			}
+		}
+
+		/// Calculates the voronoi cell at the given index.
+		Cell CalculateNodeVoronoiCell(unsigned int triangulationNode) const noexcept
+		{
+			Vector<T, 2> triangulationNodeValue = mTriangulation.GetGraph().GetValue(triangulationNode);
+
+			/// Table of edges mapped to the neighbour with which it shares that edge.
+			std::map<DirectedEdge, unsigned int> edges;
+			/// Get this cell's neighbours in CCW order.
+			auto neighbours = VectorGraphWalker(PathGraphWalker(BasicGraphWalker(mTriangulation.GetGraph(), triangulationNode)))
+				.GetNeighboursCCW();
+
+			/// For each neighbour, find the shared edge.
+			for (auto neighbour : neighbours)
+			{
+				Vector<T, 2> neighbourValue = mTriangulation.GetGraph().GetValue(neighbour);
+
+				typename Delaunay::Edge edge (triangulationNode, neighbour);
+				auto faces = mTriangulation.Faces()
+					| std::views::filter([edge] (const Delaunay::Face& face) { return face.ContainsEdge(edge); })
+					| std::ranges::to<std::vector>();
+				Assert(faces.size() >= 1 && faces.size() <= 2);
+				if (faces.size() == 1)
+				{
+					continue;
+				}
+
+				/// Get voronoi vertices.
+				DirectedEdge voronoiEdge { mTriangleToNodeMapping.at(faces[0]), mTriangleToNodeMapping.at(faces[1]) };
+				Vector<T, 2> voronoiEdgeStart = mTriangulation.GetFaceCircumcenter(faces[0]);
+				Vector<T, 2> voronoiEdgeEnd = mTriangulation.GetFaceCircumcenter(faces[1]);
+				// Make sure edges are all CCW.
+				if ( (neighbourValue - triangulationNodeValue).DotPerp(voronoiEdgeStart - triangulationNodeValue) >
+					 (neighbourValue - triangulationNodeValue).DotPerp(voronoiEdgeEnd   - triangulationNodeValue))
+				{
+					voronoiEdge.Reverse();
+				}
+
+				// Store
+				edges.emplace(voronoiEdge, neighbour);
+			}
+
+
+			Cell cell;
+			cell.edges = edges;
+
+			Assert(CellContainsPoint(cell, GetCellMeanVertex(cell)));
+			return cell;
+		}
+
 
 		UndirectedGraph<Vector<T, 2>> mGraph;
+		Delaunay                      mTriangulation;
 
-		UndirectedGraph<Vector<T, 2>> mTriangulation;
+		std::map<typename Delaunay::Face, unsigned int> mTriangleToNodeMapping;
+		std::map<unsigned int, Cell>                    mCellMap;
 	};
 }
