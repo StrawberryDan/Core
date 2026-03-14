@@ -435,10 +435,12 @@ namespace Strawberry::Core::Math
 		/// Looks for a new face on either side of this edge.
 		void DiscoverFaces(Edge edge)
 		{
+			// Type for vector path walkers.
+			using WalkerType = VectorGraphWalker<PathGraphWalker<BasicGraphWalker<Graph>>>;
 			// Create two walkers on each side of the edge.
-			VectorGraphWalker<decltype(mResult.mGraph)> walkers[2] {
-				{mResult.mGraph, edge.A()},
-				{mResult.mGraph, edge.B()}
+			WalkerType walkers[2] {
+				WalkerType(mResult.mGraph, edge.A()),
+				WalkerType(mResult.mGraph, edge.B())
 			};
 
 			// Have the walkers swap places so that they
