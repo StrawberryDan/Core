@@ -42,6 +42,7 @@ namespace Strawberry::Core::Math
 
 			Voronoi voronoi;
 			voronoi.mGraph = voronoiEdges;
+			voronoi.mTriangulation = delaunay.GetGraph();
 			return voronoi;
 		}
 
@@ -52,7 +53,8 @@ namespace Strawberry::Core::Math
 	private:
 		Voronoi() = default;
 
-
 		UndirectedGraph<Vector<T, 2>> mGraph;
+
+		UndirectedGraph<Vector<T, 2>> mTriangulation;
 	};
 }
