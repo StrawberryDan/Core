@@ -5,6 +5,7 @@
 #include "fmt/ranges.h"
 #include <algorithm>
 #include <array>
+#include <concepts>
 #include <deque>
 #include <iterator>
 #include <map>
@@ -251,4 +252,14 @@ namespace Strawberry::Core::Math
 	using UndirectedGraph = Graph<T, GraphTypeUndirected>;
 	template <typename T>
 	using DirectedGraph = Graph<T, GraphTypeDirected>;
+
+
+	template <typename Base>
+	concept GraphType = requires(Base base)
+	{
+		typename Base::Value;
+		typename Base::Config;
+		GraphConfig<typename Base::Config>;
+		std::derived_from<Base, Graph<typename Base::Value, typename Base::Config>>;
+	};
 }
