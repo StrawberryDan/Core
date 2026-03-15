@@ -103,15 +103,15 @@ static void DrawCellCenters(canvas_ity::canvas& canvas, Voronoi<Vector<double, 2
 			auto a = graph.GetGraph().GetValue(edge.A());
 			auto b = graph.GetGraph().GetValue(edge.B());
 
-			a = a + (center - a).WithLength(10.0);
-			b = b + (center - b).WithLength(10.0);
+			a = a + (center - a).WithLength(8.0);
+			b = b + (center - b).WithLength(8.0);
 
 			auto mid = (a + b) * 0.5;
 			auto perp = (b - a).Perpendicular();
-			auto towardsCenter = mid + perp.WithLength(10.0);
+			auto towardsCenter = mid + perp.WithLength(4.0);
 
 			canvas.set_line_dash(nullptr, 0);
-			canvas.set_line_width(2.0);
+			canvas.set_line_width(1.0);
 			canvas.set_color(canvas_ity::stroke_style, 0.5, 0.3, 0.8, 1.0);
 			canvas.begin_path();
 			canvas.move_to(a[0], a[1]);
@@ -131,7 +131,7 @@ static void DrawCellCenters(canvas_ity::canvas& canvas, Voronoi<Vector<double, 2
 
 int main()
 {
-	GraphColoring mainColoring { .dashEdges = true, .edgeWidth = 1.5f, .mEdgeColor{0.7f, 0.7f, 0.7f, 1.0f}, .mNodeColor{0.7f, 0.0f, 0.0f, 1.0f} };
+	GraphColoring mainColoring { .drawEdges = false, .dashEdges = true, .edgeWidth = 1.5f, .mEdgeColor{0.7f, 0.7f, 0.7f, 1.0f}, .mNodeColor{0.7f, 0.0f, 0.0f, 1.0f} };
 	GraphColoring voronoiColoring { .drawNodes = false, .mEdgeColor{0.0f, 0.8f, 0.8f, 1.0f}, .mNodeColor{0.0f, 1.0f, 0.0f, 1.0f} };
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
