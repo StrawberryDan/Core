@@ -121,6 +121,7 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Math/Geometry/Sphere.hpp
     src/Strawberry/Core/Math/Graph/Delauney.hpp
     src/Strawberry/Core/Math/Graph/Graph.hpp
+    src/Strawberry/Core/Math/Graph/Tree.hpp
     src/Strawberry/Core/Math/Graph/Voronoi.hpp
     src/Strawberry/Core/Math/Graph/Walker.hpp
     src/Strawberry/Core/Math/Math.hpp
@@ -218,6 +219,7 @@ if (NOT TARGET StrawberryCore)
     test/Ray.cpp
     test/Simplex.cpp
     test/Sphere.cpp
+    test/Tree.cpp
     test/TypeSets.cpp
     test/UTF.cpp
     test/Variants.cpp
