@@ -10,6 +10,9 @@ A core utility library for most C++ projects. Supports compilation with GCC, App
 * Linear, Smooth-linear and Perlin Noise functions
 * Rational, Periodic, and Clamped/Saturating Number types
 * Linear Algebra primitives (Vectors & Matrices)
+* Graph structure implementations, including trees, nary trees.
+* Implementation of Delaunay triangulations using the Bowyer-Watson Algorithm.
+* Implementation of Voronoi diagrams derived from Delaunay Triangulations.
 * Synchronisation primitives (e.g. ProducerConsumerQueue, Mutex Wrappers)
 * Thread Pools and Worker Threads
 * Improved implementation of Variant types allowing derivation of Variant types based on set operations of thoses types (i.e. defining variant types as a union of two other variant types.)
