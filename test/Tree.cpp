@@ -22,5 +22,12 @@ int main()
 	Assert(binaryTree.GetValue(binaryTree.GetChildren(0)[0]) == 1);
 	Assert(binaryTree.GetValue(binaryTree.GetChildren(0)[1]) == 2);
 
+	Math::SortedTree<Math::BinaryTree<int>> sorted(0);
+	sorted.AddNode(0, 2);
+	sorted.AddNode(0, 1);
+
+	Assert(sorted.GetValue(sorted.GetChildren(0)[0]) == 1);
+	Assert(sorted.GetValue(sorted.GetChildren(0)[1]) == 2);
+
 	return 0;
 }

@@ -209,6 +209,7 @@ if (NOT TARGET StrawberryCore)
     test/Delauney.cpp
     test/DynamicByteBuffer.cpp
     test/Graph.cpp
+    test/GraphWalker.cpp
     test/Line.cpp
     test/Matrices.cpp
     test/Noise.cpp

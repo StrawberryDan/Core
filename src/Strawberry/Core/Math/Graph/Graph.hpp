@@ -31,7 +31,8 @@ namespace Strawberry::Core::Math
 	template <typename T>
 	concept GraphConfig = requires(T t)
 	{
-		std::same_as<bool, decltype(T::Directed::value)>;
+		typename T::Directed;
+		{ T::Directed::value } -> std::convertible_to<bool>;
 	};
 
 
@@ -41,11 +42,12 @@ namespace Strawberry::Core::Math
 	public:
 		using Value = _Value;
 		using Config = _Config;
+		using NodeID = unsigned int;
 
 
 		struct Edge
 		{
-			Edge(unsigned int a, unsigned int b) : nodes{ a, b }
+			Edge(NodeID a, NodeID b) : nodes{ a, b }
 			{
 				// Puts edges in normalised order for undirected graphs
 				if constexpr (!Config::Directed::value)
@@ -72,7 +74,7 @@ namespace Strawberry::Core::Math
 
 
 			/// Returns whether this edge contains the given node.
-			bool ContainsNode(unsigned int node) const
+			bool ContainsNode(NodeID node) const noexcept
 			{
 				return nodes[0] == node || nodes[1] == node;
 			}
@@ -88,22 +90,22 @@ namespace Strawberry::Core::Math
 			auto operator<=>(const Edge& other) const = default;
 
 
-			unsigned int A() const noexcept { return nodes[0]; }
-			unsigned int B() const noexcept { return nodes[1]; }
-			std::array<unsigned int, 2> Nodes() const { return {A(), B()}; }
+			NodeID A() const noexcept { return nodes[0]; }
+			NodeID B() const noexcept { return nodes[1]; }
+			std::array<NodeID, 2> Nodes() const { return nodes; }
 
 
-			std::array<unsigned int, 2> nodes;
+			std::array<NodeID, 2> nodes;
 		};
 
 
-		_Value& GetValue(unsigned int nodeIndex)
+		_Value& GetValue(NodeID nodeIndex)
 		{
 			return mNodes.at(nodeIndex);
 		}
 
 
-		const _Value& GetValue(unsigned int nodeIndex) const
+		const _Value& GetValue(NodeID nodeIndex) const
 		{
 			return mNodes.at(nodeIndex);
 		}
@@ -117,7 +119,7 @@ namespace Strawberry::Core::Math
 
 		auto NodeIndices() const noexcept
 		{
-			return Nodes() | std::views::keys;
+			return mNodes | std::views::keys;
 		}
 
 
@@ -131,12 +133,12 @@ namespace Strawberry::Core::Math
 		{
 			return std::ranges::find_if(
 				mNodes,
-				[value] (auto x) { return x.second == value; }) != mNodes.end();
+				[value] (const auto& x) { return x.second == value; }) != mNodes.end();
 		}
 
 
 		template <typename T> requires (std::same_as<_Value, std::decay_t<T>>)
-		unsigned AddNode(T&& node)
+		NodeID AddNode(T&& node)
 		{
 			mNodes.insert({mNextID++, std::forward<T>(node)});
 			return mNextID - 1;
@@ -144,11 +146,9 @@ namespace Strawberry::Core::Math
 
 
 		/// Removes the node with the given index, as well as all it's connected edges.
-		void RemoveNode(unsigned int index)
+		void RemoveNode(NodeID index)
 		{
-			mNodes.erase(index);
-
-			auto affectedEdges =  mEdges
+			auto affectedEdges =  Edges()
 				| std::views::filter([index] (Edge e) { return e.ContainsNode(index); })
 				| std::ranges::to<std::vector>();
 
@@ -157,94 +157,91 @@ namespace Strawberry::Core::Math
 			{
 				RemoveEdge(edge);
 			}
+
+			mNodes.erase(index);
 		}
 
 
 		void AddEdge(Edge e)
 		{
-			mEdges.insert(e);
+			Assert(mNodes.contains(e.A()));
+			Assert(mNodes.contains(e.B()));
+			mEdges[e.A()].emplace(e.B());
+			if (!Config::Directed::value)
+			{
+				mEdges[e.B()].emplace(e.A());
+			}
 		}
 
 
 		void RemoveEdge(Edge e)
 		{
-			mEdges.erase(e);
+			mEdges[e.A()].erase(e.B());
+			if (!Config::Directed::value)
+			{
+				mEdges[e.B()].erase(e.A());
+			}
 		}
 
 
-		const std::set<Edge>& Edges() const
+		std::set<Edge> Edges() const noexcept
 		{
-			return mEdges;
+			return mEdges
+				| std::views::transform( [] (auto&& x)
+				{
+					return x.second | std::views::transform([x] (const auto x2) { return Edge(x.first, x2); });
+				})
+				| std::views::join
+				| std::ranges::to<std::set>();
 		}
 
 
-		bool IsConnected(unsigned nodeAIndex, unsigned nodeBIndex) const
+		bool IsConnected(NodeID nodeAIndex, NodeID nodeBIndex) const
 		{
-			return mEdges.contains({nodeAIndex, nodeBIndex});
+			Edge edge(nodeAIndex, nodeBIndex);
+			return mEdges[edge.A()].contains(edge.B());
 		}
 
 
 		bool IsConnected(Edge edge) const
 		{
-			return IsConnected(edge.nodes[0], edge.nodes[1]);
+			return mEdges[edge.A()].contains(edge.B());
 		}
 
 
-		std::set<std::pair<unsigned int, _Value&>> GetNeighbours(unsigned int node)
+		std::set<NodeID> GetNeighbours(NodeID node) const
 		{
-			return GetNeighbourIndices(node)
-				| std::views::transform([this] (auto x) { return std::make_pair<unsigned int, _Value&>(x, GetValue(x)); })
-				| std::ranges::to<std::set>();
-		}
-
-
-		std::set<unsigned int> GetNeighbourIndices(unsigned int node) const requires (!Config::Directed::value)
-		{
-			std::set<unsigned int> neighbours;
-
-			for (const auto& edge : mEdges)
-			{
-				if (edge.nodes[0] == node) neighbours.insert(edge.nodes[1]);
-				if (edge.nodes[1] == node) neighbours.insert(edge.nodes[0]);
-			}
-
+			std::set<NodeID> neighbours = mEdges[node];
 			return neighbours;
 		}
 
 
-		std::set<unsigned int> GetIncomingNeighbourIndices(unsigned int node) const requires (Config::Directed::value)
+		std::set<NodeID> GetIncomingNeighbours(NodeID node) const requires (Config::Directed::value)
 		{
-			std::set<unsigned int> incomingNeighbours;
+			std::set<NodeID> incomingNeighbours;
 
 			incomingNeighbours = mEdges
-				| std::views::filter([node] (Edge e) { return e.nodes[1] == node; })
-				| std::views::transform([] (Edge e) { return e.nodes[0]; })
+				| std::views::filter([node] (const Edge& e) { return e.nodes[1] == node; })
+				| std::views::transform([] (const Edge& e) { return e.nodes[0]; })
 				| std::ranges::to<std::set>();
 
 			return incomingNeighbours;
 		}
 
 
-		std::set<unsigned int> GetOutgoingNeighbourIndices(unsigned int node) const requires (Config::Directed::value)
+		std::set<NodeID> GetOutgoingNeighbours(NodeID node) const requires (Config::Directed::value)
 		{
-			std::set<unsigned int> outgoingNeighbours;
-
-			outgoingNeighbours = mEdges
-				| std::views::filter([node] (Edge e) { return e.nodes[0] == node; })
-				| std::views::transform([] (Edge e) { return e.nodes[1]; })
-				| std::ranges::to<std::set>();
-
-			return outgoingNeighbours;
+			return mEdges[node];
 		}
 
 
 	private:
 		/// Incrementing counter for generating node IDs
-		unsigned int mNextID = 0;
+		NodeID mNextID = 0;
 		/// The map of nodes, associates node ids to values.
-		std::map<unsigned int, _Value> mNodes;
+		std::map<NodeID, _Value> mNodes;
 		/// The set of edges in this graph.
-		std::set<Edge> mEdges;
+		mutable std::map<NodeID, std::set<NodeID>> mEdges;
 	};
 
 
@@ -260,6 +257,7 @@ namespace Strawberry::Core::Math
 		typename Base::Value;
 		typename Base::Config;
 		GraphConfig<typename Base::Config>;
-		std::derived_from<Base, Graph<typename Base::Value, typename Base::Config>>;
+		std::derived_from<Base, Graph<typename Base::Value, typename Base::Config>>
+			|| std::same_as<Base, Graph<typename Base::Value, typename Base::Config>>;
 	};
 }

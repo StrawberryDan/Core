@@ -26,9 +26,9 @@ int main()
 	Assert(graphA.IsConnected(0, 2));
 	Assert(graphA.IsConnected(2, 0));
 
-	AssertEQ(graphA.GetNeighbourIndices(0), std::set<unsigned int>{1, 2});
-	AssertEQ(graphA.GetNeighbourIndices(1), std::set<unsigned int>{0, 2});
-	AssertEQ(graphA.GetNeighbourIndices(2), std::set<unsigned int>{0, 1});
+	AssertEQ(graphA.GetNeighbours(0), std::set<unsigned int>{1, 2});
+	AssertEQ(graphA.GetNeighbours(1), std::set<unsigned int>{0, 2});
+	AssertEQ(graphA.GetNeighbours(2), std::set<unsigned int>{0, 1});
 
 	graphA.AddNode(3);
 	graphA.AddEdge({1, 3});
@@ -57,9 +57,9 @@ int main()
 	Assert(!graphB.IsConnected(0, 2));
 	Assert(graphB.IsConnected(2, 0));
 
-	AssertEQ(graphB.GetOutgoingNeighbourIndices(0), std::set<unsigned int>{1});
-	AssertEQ(graphB.GetOutgoingNeighbourIndices(1), std::set<unsigned int>{2});
-	AssertEQ(graphB.GetOutgoingNeighbourIndices(2), std::set<unsigned int>{0});
+	AssertEQ(graphB.GetOutgoingNeighbours(0), std::set<unsigned int>{1});
+	AssertEQ(graphB.GetOutgoingNeighbours(1), std::set<unsigned int>{2});
+	AssertEQ(graphB.GetOutgoingNeighbours(2), std::set<unsigned int>{0});
 
 
 	return 0;

@@ -6,6 +6,7 @@
 #include <array>
 #include <bitset>
 #include <concepts>
+#include <functional>
 
 
 namespace Strawberry::Core::Math
@@ -16,36 +17,37 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		using Graph = DirectedGraph<T>;
+		using NodeID = Graph::NodeID;
 
 		Tree(T rootValue)
 		{
 			mRoot = AddNode(std::move(rootValue));
 		}
 
-		unsigned int Root() const
+		NodeID Root() const
 		{
 			return mRoot;
 		}
 
-		unsigned int AddNode(unsigned int parent, T value)
+		NodeID AddNode(NodeID parent, T value)
 		{
-			unsigned int node = AddNode(std::move(value));
+			NodeID node = AddNode(std::move(value));
 			AddEdge({parent, node});
 			return node;
 		}
 
-		void RemoveNode(unsigned int node)
+		void RemoveNode(NodeID node)
 		{
-			for (unsigned int child : GetChildren(node))
+			for (NodeID child : GetChildren(node))
 			{
 				RemoveNode(child);
 			}
 			DirectedGraph<T>::RemoveNode(node);
 		}
 
-		std::set<unsigned int> GetChildren(unsigned int parent) const
+		std::set<NodeID> GetChildren(NodeID parent) const
 		{
-			return DirectedGraph<T>::GetOutgoingNeighbourIndices(parent);
+			return DirectedGraph<T>::GetOutgoingNeighbours(parent);
 		}
 
 
@@ -54,7 +56,7 @@ namespace Strawberry::Core::Math
 		using DirectedGraph<T>::AddEdge;
 		using DirectedGraph<T>::RemoveEdge;
 
-		unsigned int mRoot;
+		NodeID mRoot;
 	};
 
 
@@ -75,28 +77,29 @@ namespace Strawberry::Core::Math
 		: public Base
 	{
 	public:
+		using NodeID = Base::NodeID;
 		using Value = Base::Value;
 
 
 		using Base::Base;
 
 
-		unsigned int AddNode(unsigned int parent, Value value)
+		NodeID AddNode(NodeID parent, Value value)
 		{
-			unsigned int child = Base::AddNode(parent, std::move(value));
+			NodeID child = Base::AddNode(parent, std::move(value));
 			mParentChildMap[parent].emplace_back(child);
 			return child;
 		}
 
-		unsigned int InsertNode(unsigned int parent, unsigned int index, Value value)
+		NodeID InsertNode(NodeID parent, NodeID index, Value value)
 		{
-			unsigned int child = Base::AddNode(parent, std::move(value));
+			NodeID child = Base::AddNode(parent, std::move(value));
 			mParentChildMap[parent].insert(mParentChildMap.begin() + index, child);
 		}
 
-		void RemoveNode(unsigned int node)
+		void RemoveNode(NodeID node)
 		{
-			for (unsigned int child : this->GetChildren(node))
+			for (NodeID child : this->GetChildren(node))
 			{
 				RemoveNode(child);
 			}
@@ -104,18 +107,31 @@ namespace Strawberry::Core::Math
 			mParentChildMap.erase(node);
 			for (auto& [parent, children] : mParentChildMap)
 			{
-				std::erase_if(children, [node] (unsigned int child) { return child == node; });
+				std::erase_if(children, [node] (NodeID child) { return child == node; });
 			}
 		}
 
-		std::vector<unsigned int> GetChildren(unsigned int parent) const
+		Optional<NodeID> GetChildIndex(NodeID parent, NodeID child) const
+		{
+			const auto& children = mParentChildMap[parent];
+			for (int i = 0; i < children.size(); i++)
+			{
+				if (children[i] == child) [[unlikely]]
+				{
+					return i;
+				}
+			}
+			return NullOpt;
+		}
+
+		std::vector<NodeID> GetChildren(NodeID parent) const
 		{
 			return mParentChildMap[parent];
 		}
 
 
-	private:
-		mutable std::map<unsigned int, std::vector<unsigned int>> mParentChildMap;
+	protected:
+		mutable std::map<NodeID, std::vector<NodeID>> mParentChildMap;
 	};
 
 
@@ -132,12 +148,13 @@ namespace Strawberry::Core::Math
 		: public Base
 	{
 	public:
+		using NodeID = Base::NodeID;
 		static constexpr auto ChildCount = _ChildCount;
 
 		using Base::Base;
 
 
-		unsigned int AddNode(unsigned int parent, Base::Value value)
+		NodeID AddNode(NodeID parent, Base::Value value)
 		{
 			Assert(std::ranges::size(this->GetChildren(parent)) < ChildCount,
 				   "Attempt to overfill node in SizedTree!");
@@ -161,11 +178,12 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		using SizedTree<Base, I>::SizedTree;
+		using NodeID = SizedTree<Base, I>::NodeID;
 
 
-		unsigned int AddNode(unsigned int parent, Base::Value value)
+		NodeID AddNode(NodeID parent, Base::Value value)
 		{
-			unsigned int node = SizedTree<Base, I>::AddNode(parent, std::move(value));
+			NodeID node = SizedTree<Base, I>::AddNode(parent, std::move(value));
 			auto& childArray = mParentChildMap[parent];
 			Assert(!childArray.Full());
 			childArray.AddChild(node);
@@ -173,9 +191,9 @@ namespace Strawberry::Core::Math
 		}
 
 
-		unsigned int InsertNode(unsigned int parent, unsigned int index, Base::Value value)
+		NodeID InsertNode(NodeID parent, NodeID index, Base::Value value)
 		{
-			unsigned int node = SizedTree<Base, I>::AddNode(parent, std::move(value));
+			NodeID node = SizedTree<Base, I>::AddNode(parent, std::move(value));
 			auto& childArray = mParentChildMap[parent];
 			Assert(!childArray.Full());
 			childArray.InsertNode(index, node);
@@ -183,7 +201,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		void RemoveNode(unsigned int node)
+		void RemoveNode(NodeID node)
 		{
 			for (auto child : GetChildren(node))
 			{
@@ -198,22 +216,28 @@ namespace Strawberry::Core::Math
 		}
 
 
-		std::vector<unsigned int> GetChildren(unsigned int parent) const
+		Optional<NodeID> GetChildIndex(NodeID parent, NodeID child) const
+		{
+			return mParentChildMap[parent].GetChildIndex(child);
+		}
+
+
+		std::vector<NodeID> GetChildren(NodeID parent) const
 		{
 			return mParentChildMap[parent].GetChildren();
 		}
 
 
-	private:
+	protected:
 		struct ChildArray
 		{
 			std::bitset<I> mFlags = 0;
-			std::array<unsigned int, I> mValues { 0 };
+			std::array<NodeID, I> mValues { 0 };
 
 
-			void AddChild(unsigned int node)
+			void AddChild(NodeID node)
 			{
-				unsigned int firstIndex = 0;
+				NodeID firstIndex = 0;
 				while (firstIndex < I - 1 && mFlags[firstIndex]) firstIndex++;
 				Assert(firstIndex < I);
 				mFlags.set(firstIndex);
@@ -221,11 +245,14 @@ namespace Strawberry::Core::Math
 			}
 
 
-			void InsertNode(unsigned int index, unsigned int node)
+			void InsertNode(NodeID index, NodeID node)
 			{
 				if (mFlags[index])
 				{
-					for (int i = I - 1; i > index; i--)
+					NodeID nextZero = index;
+					while (nextZero < I && mFlags[nextZero]) nextZero++;
+
+					for (int i = nextZero; i > index; i--)
 					{
 						mFlags[i] = mFlags[i - 1];
 						mFlags.reset(i - 1);
@@ -239,7 +266,7 @@ namespace Strawberry::Core::Math
 			}
 
 
-			void RemoveChild(unsigned int node)
+			void RemoveChild(NodeID node)
 			{
 				for (int i = 0; i < I; i++)
 				{
@@ -253,9 +280,22 @@ namespace Strawberry::Core::Math
 			}
 
 
-			std::vector<unsigned int> GetChildren() const
+			Optional<NodeID> GetChildIndex(NodeID child) const
 			{
-				std::vector<unsigned int> children;
+				for (int i = 0; i < I; i++)
+				{
+					if (mFlags[i] && mValues[i] == child) [[unlikely]]
+					{
+						return i;
+					}
+				}
+				return NullOpt;
+			}
+
+
+			std::vector<NodeID> GetChildren() const
+			{
+				std::vector<NodeID> children;
 				for (int i = 0; i < I; i++)
 				{
 					if (mFlags[i])
@@ -273,7 +313,7 @@ namespace Strawberry::Core::Math
 			}
 		};
 
-		mutable std::map<unsigned int, ChildArray> mParentChildMap;
+		mutable std::map<NodeID, ChildArray> mParentChildMap;
 	};
 
 
@@ -285,12 +325,57 @@ namespace Strawberry::Core::Math
 	using BinaryTree = NAryTree<T, 2>;
 
 
+	template <typename Base, typename Comparison = std::less<typename Base::Value>>
+	class SortedTree;
+
+
+	/// Class representing a tree in which the order of children depends on
+	/// their ordering with respect to the function Comparison.
+	template <OrderedTreeGraphType Base, typename Comparison>
+	class SortedTree<Base, Comparison>
+		: public Base
+	{
+	public:
+		using NodeID = Base::NodeID;
+
+
+		/// Inserts the node into the tree into the properly ordered position.
+		NodeID AddNode(NodeID parent, Base::Value value)
+		{
+			const auto& children = this->GetChildren(parent);
+			int position = 0;
+			Comparison comparison;
+
+			while (position < children.size() && comparison(
+					   this->GetValue(children[position]),
+					   value))
+			{
+				position++;
+			}
+
+			return this->InsertNode(
+				parent,
+				children.empty() ? 0 : this->GetChildIndex(parent, children[position]).Unwrap(),
+				std::move(value));
+		}
+
+	protected:
+		/// Hide insert node as it would allow the breaking of ordering.
+		using Base::InsertNode;
+	};
+
+
+	/// Class representing a graph walker over a tree.
+	/// Keeps a stack of it's path from the root.
 	template <GraphWalkerType Base>
 	class TreeWalker
 		: public Base
 	{
 	public:
-		TreeWalker(const Base::Graph& tree, unsigned int node)
+		using NodeID = Base::NodeID;
+
+
+		TreeWalker(const Base::Graph& tree, NodeID node)
 			: Base(tree, tree.Root())
 		{
 			mPathStack.emplace_back(node);
@@ -303,19 +388,14 @@ namespace Strawberry::Core::Math
 			mPathStack.emplace_back(tree.Root());
 		}
 
-
 		void WalkUp()
 		{
 			Assert(mPathStack.size() > 1);
 			mPathStack.pop_back();
-			this->mNode = mPathStack.back();
+			Base::Jump(mPathStack.back());
 		}
 
-
-
-
-
-		void WalkTo(unsigned int node)
+		void WalkTo(NodeID node)
 		{
 			mPathStack.emplace_back(node);
 			Base::WalkTo(node);
@@ -323,6 +403,6 @@ namespace Strawberry::Core::Math
 
 
 	private:
-		std::deque<unsigned int> mPathStack;
+		std::deque<NodeID> mPathStack;
 	};
 }

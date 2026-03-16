@@ -45,7 +45,7 @@ namespace Strawberry::Core::Math
 			}
 			else
 			{
-				return self.mGraph->GetNeighbourIndices(self.CurrentNode());
+				return self.mGraph->GetNeighbours(self.CurrentNode());
 			}
 		}
 
@@ -53,6 +53,14 @@ namespace Strawberry::Core::Math
 		bool CanWalkTo(this const auto& self, unsigned int node) noexcept
 		{
 			return self.NextNodes().contains(node);
+		}
+
+
+		/// Jumps this walker to another node without any requirement
+		/// of there being a connection.
+		void Jump(this auto& self, unsigned int node) noexcept
+		{
+			self.mNode = node;
 		}
 
 
@@ -115,6 +123,23 @@ namespace Strawberry::Core::Math
 			return possibleSteps;
 		}
 
+		/// Jumps to the givne node, and tries to change mHistory to include the last occurence of node in path.
+		void Jump(unsigned int node) noexcept
+		{
+			Base::Jump(node);
+			auto it = std::find(mHistory.rbegin(), mHistory.rend(), node);
+			if (it == mHistory.rend())
+			{
+				mHistory.clear();
+				mHistory.emplace_back(node);
+			}
+			else
+			{
+				mHistory.erase(it.base(), mHistory.end());
+			}
+			Assert(mHistory.back() == node);
+		}
+
 		/// Overloads WalkTo to record the steps walked into the history list.
 		void WalkTo(this auto& self, unsigned int node) noexcept
 		{
@@ -139,7 +164,7 @@ namespace Strawberry::Core::Math
 			{
 				self.mHistory.pop_back();
 			}
-			self.mNode = self.mHistory.back();
+			self.Jump(self.mHistory.back());
 		}
 
 
