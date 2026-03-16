@@ -65,6 +65,13 @@ namespace Strawberry::Core::Math
 			}
 
 
+			/// Returns the IDs for the neighbouring cells.
+			std::set<unsigned int> Neighbours() const noexcept
+			{
+				return edges | std::views::values | std::ranges::to<std::set>();
+			};
+
+
 			/// Default comparisons for use in ordered structures.
 			auto operator<=>(const Cell& other) const = default;
 		};
@@ -83,6 +90,12 @@ namespace Strawberry::Core::Math
 
 		/// Returns the graph containing the boundaries of the voronoi.
 		const auto& GetGraph() const noexcept { return mGraph; }
+
+		/// Returns the cell for a given point.
+		const Cell& GetCell(unsigned int triangulationPointID)
+		{
+			return mCellMap.at(triangulationPointID);
+		}
 
 		/// Returns a range over the cells in thie diagram.
 		auto Cells() const { return mCellMap | std::views::values; }
