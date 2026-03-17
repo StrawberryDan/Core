@@ -115,6 +115,53 @@ namespace Strawberry::Core::Math
 			return {dual, faceNodeMapping};
 		}
 
+		/// Looks for the faces on either side of this edge.
+		std::set<Face> FindFacesWithEdge(Edge edge) const
+		{
+			// Type for vector path walkers.
+			using WalkerType = VectorGraphWalker<PathGraphWalker<BasicGraphWalker<Graph>>>;
+			// Create two walkers on each side of the edge.
+			WalkerType walkers[2] {
+				WalkerType(mGraph, edge.A()),
+				WalkerType(mGraph, edge.B())
+			};
+
+			// Have the walkers swap places so that they
+			// end up going in opposite directions.
+			walkers[0].WalkTo(edge.B());
+			walkers[1].WalkTo(edge.A());
+
+			std::set<Face> faces;
+			// Do for each walker
+			for (auto& walker : walkers)
+			{
+				// Keep trying to walk counter clockwise until we can't.
+				while (walker.TryWalkCCW())
+				{
+					// We never let the path exceed 4 nodes.
+					Assert(walker.PathLength() <= 4);
+					// If the path is at the length to encapsulate a triangle.
+					if (walker.PathLength() == 4)
+					{
+						// If our first and current node are the same, we've walked a triangle.
+						if (walker.CurrentNode() == walker.GetPreviousNode(walker.PathLength() - 1))
+						{
+							/// Create the new face.
+							Face face(
+								walker.GetPreviousNode(0),
+								walker.GetPreviousNode(1),
+								walker.GetPreviousNode(2));
+							/// Put the face in our set.
+							faces.emplace(face);
+						}
+						// No need to keep going now.
+						break;
+					}
+				}
+			}
+			return faces;
+		}
+
 
 	private:
 		/// Private constructor for use by Builder().
@@ -277,7 +324,8 @@ namespace Strawberry::Core::Math
 				Edge newEdge(outerNode, newNodeHandle);
 				mResult.mGraph.AddEdge(newEdge);
 				/// Look for new triangular faces.
-				DiscoverFaces(newEdge);
+				auto faces = mResult.FindFacesWithEdge(newEdge);
+				mResult.mFaces.insert_range(faces);
 			}
 		}
 
@@ -443,52 +491,6 @@ namespace Strawberry::Core::Math
 			auto v2 = c - a;
 
 			return 0.5 * std::abs(v1[0] * v2[1] - v1[1] * v2[0]);
-		}
-
-
-		/// Looks for a new face on either side of this edge.
-		void DiscoverFaces(Edge edge)
-		{
-			// Type for vector path walkers.
-			using WalkerType = VectorGraphWalker<PathGraphWalker<BasicGraphWalker<Graph>>>;
-			// Create two walkers on each side of the edge.
-			WalkerType walkers[2] {
-				WalkerType(mResult.mGraph, edge.A()),
-				WalkerType(mResult.mGraph, edge.B())
-			};
-
-			// Have the walkers swap places so that they
-			// end up going in opposite directions.
-			walkers[0].WalkTo(edge.B());
-			walkers[1].WalkTo(edge.A());
-
-			// Do for each walker
-			for (auto& walker : walkers)
-			{
-				// Keep trying to walk counter clockwise until we can't.
-				while (walker.TryWalkCCW())
-				{
-					// We never let the path exceed 4 nodes.
-					Assert(walker.PathLength() <= 4);
-					// If the path is at the length to encapsulate a triangle.
-					if (walker.PathLength() == 4)
-					{
-						// If our first and current node are the same, we've walked a triangle.
-						if (walker.CurrentNode() == walker.GetPreviousNode(walker.PathLength() - 1))
-						{
-							/// Create the new face.
-							Face face(
-								walker.GetPreviousNode(0),
-								walker.GetPreviousNode(1),
-								walker.GetPreviousNode(2));
-							/// Put the face in our set.
-							mResult.mFaces.emplace(face);
-						}
-						// No need to keep going now.
-						break;
-					}
-				}
-			}
 		}
 
 
