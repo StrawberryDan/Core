@@ -76,6 +76,12 @@ namespace Strawberry::Core::Math
 			auto operator<=>(const Cell& other) const = default;
 		};
 
+		/// Constructs Voronoi from a set of points.
+		static Voronoi<Vector<T, 2>> From(const PointSet<T, 2>& points) noexcept
+		{
+			return From(Delaunay::From(points));
+		}
+
 		/// Creates the coresponding voronoi diagram for a delaunay triangulation.
 		static Voronoi<Vector<T, 2>> From(const Delaunay& delaunay) noexcept
 		{
