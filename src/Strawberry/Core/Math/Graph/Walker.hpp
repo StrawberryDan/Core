@@ -19,7 +19,7 @@ namespace Strawberry::Core::Math
 		using Graph = Base;
 
 		/// Constructor initialising the walker to a node in a graph.
-		BasicGraphWalker(Graph& graph, unsigned int node)
+		BasicGraphWalker(const Graph& graph, unsigned int node)
 			: mGraph(&graph)
 			, mNode(node)
 		{}
@@ -76,7 +76,7 @@ namespace Strawberry::Core::Math
 
 	protected:
 		/// Pointer to the graph we're walking.
-		Graph*       mGraph;
+		const Graph* mGraph;
 		/// Current node.
 		unsigned int mNode;
 	};
@@ -101,7 +101,7 @@ namespace Strawberry::Core::Math
 
 		/// Constructor overload.
 		/// Initialised mHistory
-		PathGraphWalker(Graph& graph, unsigned int node)
+		PathGraphWalker(const Graph& graph, unsigned int node)
 			: Base(graph, node)
 			, mHistory{node}
 		{}
