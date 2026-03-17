@@ -98,13 +98,16 @@ namespace Strawberry::Core::Math
 		const auto& GetGraph() const noexcept { return mGraph; }
 
 		/// Returns the cell for a given point.
-		const Cell& GetCell(unsigned int triangulationPointID)
+		const Cell& GetCell(CellID triangulationPointID)
 		{
 			return mCellMap.at(triangulationPointID);
 		}
 
+
+		auto CellIDs() const { return mCellMap | std::views::keys | std::ranges::to<std::set>(); }
+
 		/// Returns a range over the cells in thie diagram.
-		auto Cells() const { return mCellMap | std::views::values; }
+		auto Cells() const { return mCellMap | std::views::values | std::ranges::to<std::set>(); }
 
 		/// Gets the set of vertices for this Cell in CCW order.
 		std::vector<Vector<T, 2>> CellVertices(Cell cell) const noexcept
@@ -146,6 +149,26 @@ namespace Strawberry::Core::Math
 			return true;
 		}
 
+		/// Finds the cell that contains given point.
+		std::pair<typename Delaunay::NodeID, Cell> GetContainingCell(const Vector<T, 2>& point)
+		{
+			typename Delaunay::NodeID currentNode = mCellMap.begin()->first;
+			Cell currentCell = GetCell(currentNode);
+
+			while (!CellContainsPoint(currentCell, point))
+			{
+				auto neighbouringCells = currentCell.Neighbours();
+				currentNode = *std::ranges::min_element(neighbouringCells, std::less{},
+												[this, point] (Delaunay::NodeID node)
+												{
+													return (mTriangulation.GetGraph().GetValue(node) - point).SquareMagnitude();
+												});
+				currentCell = GetCell(currentNode);
+			}
+
+			return {currentNode, currentCell};
+		}
+
 
 	private:
 		Voronoi(const Delaunay& delaunay)
@@ -160,10 +183,17 @@ namespace Strawberry::Core::Math
 			{
 				mCellMap.emplace(node, CalculateNodeVoronoiCell(node));
 			}
+#if STRAWBERRY_DEBUG
+			for (const auto node : mTriangulation.GetGraph().NodeIndices())
+			{
+				auto cell = GetCell(node);
+				Assert(GetContainingCell(GetCellMeanVertex(cell)).first == node);
+			}
+#endif
 		}
 
 		/// Calculates the voronoi cell at the given index.
-		Cell CalculateNodeVoronoiCell(unsigned int triangulationNode) const noexcept
+		Cell CalculateNodeVoronoiCell(Delaunay::NodeID triangulationNode) const noexcept
 		{
 			Vector<T, 2> triangulationNodeValue = mTriangulation.GetGraph().GetValue(triangulationNode);
 
