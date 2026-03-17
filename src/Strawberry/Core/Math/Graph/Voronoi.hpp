@@ -26,7 +26,7 @@ namespace Strawberry::Core::Math
 	public:
 		/// Alias types.
 		using Delaunay = Delaunay<Vector<T, 2>>;
-
+		using CellID = Delaunay::NodeID;
 		using DirectedEdge = DirectedGraph<Vector<T, 2>>::Edge;
 		using Edge = UndirectedGraph<Vector<T, 2>>::Edge;
 
