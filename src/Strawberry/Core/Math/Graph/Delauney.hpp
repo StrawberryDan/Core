@@ -2,6 +2,7 @@
 // Strawberry Core
 #include "Strawberry/Core/Math/Geometry/Line.hpp"
 #include "Strawberry/Core/Math/Geometry/LineSegment.hpp"
+#include "Strawberry/Core/Math/Geometry/PointSet.hpp"
 #include "Strawberry/Core/Math/Geometry/Simplex.hpp"
 #include "Strawberry/Core/Math/Geometry/Sphere.hpp"
 #include "Strawberry/Core/Math/Graph/Graph.hpp"
@@ -28,6 +29,7 @@ namespace Strawberry::Core::Math
 		using Graph = UndirectedGraph<Vector<T, 2>>;
 		using Value = Graph::Value;
 		using Edge = Graph::Edge;
+		using NodeID = Graph::NodeID;
 
 
 		/// Struct for the triangular faces represented in this graph.
@@ -37,6 +39,19 @@ namespace Strawberry::Core::Math
 		/// Builder type and friend declaration.
 		class Builder;
 		friend class Builder;
+
+
+		/// Constructs a delaunay triangulation from a set of points.
+		static Delaunay From(const PointSet<T, 2>& points, Vector<T, 2> padding)
+		{
+			Builder builder(points.MinExtreme() - padding
+							, points.MaxExtreme() + padding);
+			for (const auto& point : points)
+			{
+				builder.AddNode(point);
+			}
+			return builder.Build();
+		}
 
 		/// Accessor for the edge of the voronoi cell boundaries.
 		const auto& GetGraph() const noexcept { return mGraph; }
@@ -191,6 +206,8 @@ namespace Strawberry::Core::Math
 	public:
 		/// Create a builder with the given AABB extent.
 		Builder(const Vector<T, 2>& min, const Vector<T, 2>& max)
+			: mMin(min)
+			, mMax(max)
 		{
 			// Store min and max;
 			mResult.mMin = min;
@@ -296,11 +313,8 @@ namespace Strawberry::Core::Math
 		/// Returns if a node is contained by the AABB box bounding this graph.
 		bool NodeInBounds(const Vector<T, 2>& value)
 		{
-			Vector<T, 2> min = mResult.GetGraph().GetValue(0);
-			Vector<T, 2> max = mResult.GetGraph().GetValue(3);
-
-			const bool xBounds = min[0] < value[0] && value[0] < max[0];
-			const bool yBounds = min[1] < value[1] && value[1] < max[1];
+			const bool xBounds = mMin[0] < value[0] && value[0] < mMax[0];
+			const bool yBounds = mMin[1] < value[1] && value[1] < mMax[1];
 			return xBounds && yBounds;
 		}
 
@@ -479,6 +493,7 @@ namespace Strawberry::Core::Math
 
 
 	private:
+		Vector<T, 2> mMin; Vector<T, 2> mMax;
 		/// The delaunay graph we are creating.
 		Delaunay<Vector<T, 2>>                 mResult;
 		/// A cache of the triangle representation of faces from our delaunay.
