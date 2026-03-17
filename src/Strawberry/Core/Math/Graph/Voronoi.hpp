@@ -209,9 +209,7 @@ namespace Strawberry::Core::Math
 				Vector<T, 2> neighbourValue = mTriangulation.GetGraph().GetValue(neighbour);
 
 				typename Delaunay::Edge edge (triangulationNode, neighbour);
-				auto faces = mTriangulation.Faces()
-					| std::views::filter([edge] (const Delaunay::Face& face) { return face.ContainsEdge(edge); })
-					| std::ranges::to<std::vector>();
+				auto faces = mTriangulation.FindFacesWithEdge(edge) | std::ranges::to<std::vector>();
 				Assert(faces.size() >= 1 && faces.size() <= 2);
 				if (faces.size() == 1)
 				{
