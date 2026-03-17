@@ -3,9 +3,9 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
-// STB
+#include "Strawberry/Core/Thread/ThreadPool.hpp"
 #include <Strawberry/Core/IO/Logging.hpp>
-
+// STB
 #include "stb_image.h"
 #include "stb_image_write.h"
 
@@ -32,7 +32,7 @@ namespace Strawberry::Core
 
 		template <typename... Args> requires (sizeof...(Args) == D && (std::convertible_to<Args, T> && ...))
 		Pixel(Args&&... args)
-			: channels{std::forward<Args>(args)...}
+			: channels{static_cast<Type>(std::forward<Args>(args))...}
 		{
 		}
 
@@ -53,6 +53,12 @@ namespace Strawberry::Core
 	using PixelF32Greyscale = Pixel<float, 1>;
 	using PixelF32RGB       = Pixel<float, 3>;
 	using PixelF32RGBA      = Pixel<float, 4>;
+
+
+	struct ImageShadingContext
+	{
+		Math::Vector<unsigned int, 2> position;
+	};
 
 
 	template <typename Pixel>
@@ -86,8 +92,44 @@ namespace Strawberry::Core
 		void Write(Math::Vec2u x, PixelType pixel) noexcept;
 
 
+		template <typename ShadingFunction>
+		void Shade(ShadingFunction shader)
+		{
+			for (int x = 0; x < Width(); x++)
+			{
+				for (int y = 0; y < Height(); y++)
+				{
+					ImageShadingContext context
+						{
+							.position { x, y }
+						};
+					Write(x, y, std::invoke(shader, context));
+				}
+			}
+		}
+
+
+		template <typename ShadingFunction>
+		void Shade(ThreadPool& threadPool, ShadingFunction shader)
+		{
+			auto tasks = threadPool.QueueTasks(Size(), [&] (const auto& p) {
+				ImageShadingContext context {
+					.position = p,
+				};
+
+				Write(p[0], p[1], std::invoke(shader, context));
+			}).Unwrap();
+
+			for (auto& task : tasks)
+			{
+				task.second.wait();
+			}
+		}
+
+
 		uint32_t Width() const noexcept;
 		uint32_t Height() const noexcept;
+		constexpr uint32_t PixelSize() const noexcept { return Pixel::Size; }
 		Math::Vec2u Size() const noexcept;
 
 
