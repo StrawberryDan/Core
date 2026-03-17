@@ -3,6 +3,7 @@
 
 #include "Strawberry/Core/Math/Vector.hpp"
 #include <algorithm>
+#include <random>
 #include <set>
 
 
@@ -12,6 +13,30 @@ namespace Strawberry::Core::Math
 	class PointSet
 	{
 	public:
+		static PointSet UniformDistribution(unsigned int count, Vector<T, D> min, Vector<T, D> max)
+		{
+			std::default_random_engine rng;
+			rng.seed(std::random_device{}());
+
+			std::array<std::uniform_real_distribution<T>, D> distibutions;
+			for (int d  = 0; d < D; d++)
+			{
+				distibutions[d] = std::uniform_real_distribution<T>(min[d], max[d]);
+			}
+
+			PointSet points;
+			for (int i = 0; i < count; i++)
+			{
+				Vector<T, D> v;
+				for (int d = 0; d < D; d++)
+				{
+					v[d] = distibutions[d](rng);
+				}
+				points.Add(v);
+			}
+			return points;
+		}
+
 		PointSet() = default;
 
 
