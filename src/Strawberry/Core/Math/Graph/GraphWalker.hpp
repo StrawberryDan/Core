@@ -39,7 +39,7 @@ namespace Strawberry::Core::Math
 		/// Returns the set of possible next steps the walker can take from its current location.
 		std::set<unsigned int> NextNodes(this const auto& self) noexcept
 		{
-			if constexpr (Graph::Config::Directed::value)
+			if constexpr (Graph::Config::Directed)
 			{
 				return self.mGraph->GetOutgoingNeighbourIndices(self.CurrentNode());
 			}

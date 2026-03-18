@@ -4,7 +4,7 @@
 #include "Strawberry/Core/Math/Geometry/Ray.hpp"
 #include "Strawberry/Core/Math/Graph/Delauney.hpp"
 #include "Strawberry/Core/Math/Graph/Graph.hpp"
-#include "Strawberry/Core/Math/Graph/Walker.hpp"
+#include "Strawberry/Core/Math/Graph/GraphWalker.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 // Standard Library
 #include <algorithm>
