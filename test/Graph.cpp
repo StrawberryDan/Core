@@ -61,6 +61,11 @@ int main()
 	AssertEQ(graphB.GetOutgoingNeighbours(1), std::set<unsigned int>{2});
 	AssertEQ(graphB.GetOutgoingNeighbours(2), std::set<unsigned int>{0});
 
+	WeightedGraph<DirectedGraph<int>> weightedGraph;
+	weightedGraph.AddNode(0);
+	weightedGraph.AddNode(1);
+	weightedGraph.AddEdge({0, 1, 5});
+	AssertEQ(weightedGraph.GetEdge(0, 1).Weight(), 5);
 
 	return 0;
 }

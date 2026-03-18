@@ -7,7 +7,6 @@
 #include <array>
 #include <concepts>
 #include <deque>
-#include <iterator>
 #include <map>
 #include <type_traits>
 #include <vector>
@@ -19,84 +18,141 @@ namespace Strawberry::Core::Math
 {
 	struct GraphTypeUndirected
 	{
-		using Directed = std::false_type;
+		using NodeID = unsigned int;
+		static constexpr bool Weighted = false;
+		static constexpr bool Directed = false;
 	};
 
 	struct GraphTypeDirected
 	{
-		using Directed = std::true_type;
+		using NodeID = unsigned int;
+		static constexpr bool Weighted = false;
+		static constexpr bool Directed = true;
 	};
 
 
-	template <typename T>
-	concept GraphConfig = requires(T t)
+	template <typename Config>
+	concept GraphConfig = requires(Config)
 	{
-		typename T::Directed;
-		{ T::Directed::value } -> std::convertible_to<bool>;
+		typename Config::NodeID;
+		std::integral<typename Config::NodeID>;
+		{ Config::Weighted } -> std::convertible_to<bool>;
+		{ Config::Directed } -> std::convertible_to<bool>;
+	} && (Config::Weighted == false || requires { typename Config::WeightType; });
+
+
+	template <GraphConfig Config>
+	struct Edge;
+
+	template <GraphConfig Config>
+	struct EdgeCommon
+	{
+		EdgeCommon(Config::NodeID a, Config::NodeID b) : nodes{ a, b }
+		{
+			// Puts edges in normalised order for undirected graphs
+			if constexpr (!Config::Directed)
+			{
+				if (nodes[0] > nodes[1]) std::swap(nodes[0], nodes[1]);
+			}
+
+			AssertNEQ(a, b);
+		}
+
+
+		/// String formatter
+		std::string ToString() const
+		{
+			if constexpr (Config::Directed::value)
+			{
+				return fmt::format("{} -> {}", nodes[0], nodes[1]);
+			}
+			else
+			{
+				return fmt::format("{} <-> {}", nodes[0], nodes[1]);
+			}
+		}
+
+
+		/// Returns whether this edge contains the given node.
+		bool ContainsNode(Config::NodeID node) const noexcept
+		{
+			return nodes[0] == node || nodes[1] == node;
+		}
+
+
+		/// Reverses the order of the nodes in this edge.
+		void Reverse() requires (Config::Directed)
+		{
+			std::swap(nodes[0], nodes[1]);
+		}
+
+
+		auto operator<=>(const EdgeCommon& other) const = default;
+
+
+		Config::NodeID A() const noexcept { return nodes[0]; }
+		Config::NodeID B() const noexcept { return nodes[1]; }
+		std::array<typename Config::NodeID, 2> Nodes() const { return nodes; }
+
+
+		std::array<typename Config::NodeID, 2> nodes;
 	};
 
 
-	template <typename _Value, GraphConfig _Config = GraphTypeUndirected>
+	template <GraphConfig Config> requires (!Config::Weighted)
+	struct Edge<Config>
+		: EdgeCommon<Config>
+	{
+		using EdgeCommon<Config>::EdgeCommon;
+	};
+
+
+	template <GraphConfig Config> requires (Config::Weighted)
+	struct Edge<Config>
+		: EdgeCommon<Config>
+	{
+	public:
+		Edge(Config::NodeID a, Config::NodeID b, Config::WeightType weight = 0)
+			: EdgeCommon<Config>(a, b)
+			, mWeight(weight)
+		{}
+
+		const auto& Weight() const { return mWeight; }
+
+		void SetWeight(typename Config::WeightType weight) { mWeight = weight; }
+
+	private:
+		Config::WeightType mWeight;
+	};
+
+
+	template <GraphConfig Config>
+	struct GraphEdgeStorage;
+
+
+	template <GraphConfig Config> requires (!Config::Weighted)
+	struct GraphEdgeStorage<Config>
+	{
+		mutable std::map<typename Config::NodeID, std::set<typename Config::NodeID>> mEdges;
+	};
+
+
+	template <GraphConfig Config> requires (Config::Weighted)
+	struct GraphEdgeStorage<Config>
+	{
+		mutable std::map<typename Config::NodeID, std::set<typename Config::NodeID>> mEdges;
+		std::map<EdgeCommon<Config>, typename Config::WeightType> mWeights;
+	};
+
+
+	template <typename _Value, GraphConfig _Config>
 	class Graph
 	{
 	public:
 		using Value = _Value;
 		using Config = _Config;
 		using NodeID = unsigned int;
-
-
-		struct Edge
-		{
-			Edge(NodeID a, NodeID b) : nodes{ a, b }
-			{
-				// Puts edges in normalised order for undirected graphs
-				if constexpr (!Config::Directed::value)
-				{
-					if (nodes[0] > nodes[1]) std::swap(nodes[0], nodes[1]);
-				}
-
-				AssertNEQ(a, b);
-			}
-
-
-			/// String formatter
-			std::string ToString() const
-			{
-				if constexpr (Config::Directed::value)
-				{
-					return fmt::format("{} -> {}", nodes[0], nodes[1]);
-				}
-				else
-				{
-					return fmt::format("{} <-> {}", nodes[0], nodes[1]);
-				}
-			}
-
-
-			/// Returns whether this edge contains the given node.
-			bool ContainsNode(NodeID node) const noexcept
-			{
-				return nodes[0] == node || nodes[1] == node;
-			}
-
-
-			/// Reverses the order of the nodes in this edge.
-			void Reverse() requires (Config::Directed::value)
-			{
-				std::swap(nodes[0], nodes[1]);
-			}
-
-
-			auto operator<=>(const Edge& other) const = default;
-
-
-			NodeID A() const noexcept { return nodes[0]; }
-			NodeID B() const noexcept { return nodes[1]; }
-			std::array<NodeID, 2> Nodes() const { return nodes; }
-
-
-			std::array<NodeID, 2> nodes;
-		};
+		using Edge = Edge<Config>;
 
 
 		_Value& GetValue(NodeID nodeIndex)
@@ -149,7 +205,7 @@ namespace Strawberry::Core::Math
 		void RemoveNode(NodeID index)
 		{
 			auto affectedEdges =  Edges()
-				| std::views::filter([index] (Edge e) { return e.ContainsNode(index); })
+				| std::views::filter([index] (const Edge& e) { return e.ContainsNode(index); })
 				| std::ranges::to<std::vector>();
 
 
@@ -162,34 +218,56 @@ namespace Strawberry::Core::Math
 		}
 
 
-		void AddEdge(Edge e)
+		void AddEdge(const Edge& e)
 		{
 			Assert(mNodes.contains(e.A()));
 			Assert(mNodes.contains(e.B()));
-			mEdges[e.A()].emplace(e.B());
-			if (!Config::Directed::value)
+			mEdgeStorage.mEdges[e.A()].emplace(e.B());
+			if constexpr (!Config::Directed)
 			{
-				mEdges[e.B()].emplace(e.A());
+				mEdgeStorage.mEdges[e.B()].emplace(e.A());
+				if constexpr (Config::Weighted)
+				{
+					mEdgeStorage.mWeights[{e.B(), e.A()}] = e.Weight();
+				}
+			}
+			if constexpr (Config::Weighted)
+			{
+				mEdgeStorage.mWeights[e] = e.Weight();
 			}
 		}
 
 
-		void RemoveEdge(Edge e)
+		void RemoveEdge(const Edge& e)
 		{
-			mEdges[e.A()].erase(e.B());
-			if (!Config::Directed::value)
+			mEdgeStorage.mEdges[e.A()].erase(e.B());
+			if (!Config::Directed)
 			{
-				mEdges[e.B()].erase(e.A());
+				mEdgeStorage.mEdges[e.B()].erase(e.A());
 			}
+		}
+
+
+		Edge GetEdge(Config::NodeID a, Config::NodeID b) const
+		{
+			EdgeCommon<Config> edge(a, b);
+			Edge result(edge.A(), edge.B());
+
+			if constexpr (Config::Weighted)
+			{
+				result.SetWeight(mEdgeStorage.mWeights.at(edge));
+			}
+
+			return result;
 		}
 
 
 		std::set<Edge> Edges() const noexcept
 		{
-			return mEdges
-				| std::views::transform( [] (auto&& x)
+			return mEdgeStorage.mEdges
+				| std::views::transform( [this] (auto&& x)
 				{
-					return x.second | std::views::transform([x] (const auto x2) { return Edge(x.first, x2); });
+					return x.second | std::views::transform([this, x] (const auto x2) { return GetEdge(x.first, x2); });
 				})
 				| std::views::join
 				| std::ranges::to<std::set>();
@@ -199,28 +277,28 @@ namespace Strawberry::Core::Math
 		bool IsConnected(NodeID nodeAIndex, NodeID nodeBIndex) const
 		{
 			Edge edge(nodeAIndex, nodeBIndex);
-			return mEdges[edge.A()].contains(edge.B());
+			return mEdgeStorage.mEdges[edge.A()].contains(edge.B());
 		}
 
 
-		bool IsConnected(Edge edge) const
+		bool IsConnected(const Edge& edge) const
 		{
-			return mEdges[edge.A()].contains(edge.B());
+			return mEdgeStorage.mEdges[edge.A()].contains(edge.B());
 		}
 
 
 		std::set<NodeID> GetNeighbours(NodeID node) const
 		{
-			std::set<NodeID> neighbours = mEdges[node];
+			std::set<NodeID> neighbours = mEdgeStorage.mEdges[node];
 			return neighbours;
 		}
 
 
-		std::set<NodeID> GetIncomingNeighbours(NodeID node) const requires (Config::Directed::value)
+		std::set<NodeID> GetIncomingNeighbours(NodeID node) const requires (Config::Directed)
 		{
 			std::set<NodeID> incomingNeighbours;
 
-			incomingNeighbours = mEdges
+			incomingNeighbours = mEdgeStorage.mEdges
 				| std::views::filter([node] (const Edge& e) { return e.nodes[1] == node; })
 				| std::views::transform([] (const Edge& e) { return e.nodes[0]; })
 				| std::ranges::to<std::set>();
@@ -229,9 +307,9 @@ namespace Strawberry::Core::Math
 		}
 
 
-		std::set<NodeID> GetOutgoingNeighbours(NodeID node) const requires (Config::Directed::value)
+		std::set<NodeID> GetOutgoingNeighbours(NodeID node) const requires (Config::Directed)
 		{
-			return mEdges[node];
+			return mEdgeStorage.mEdges[node];
 		}
 
 
@@ -241,7 +319,7 @@ namespace Strawberry::Core::Math
 		/// The map of nodes, associates node ids to values.
 		std::map<NodeID, _Value> mNodes;
 		/// The set of edges in this graph.
-		mutable std::map<NodeID, std::set<NodeID>> mEdges;
+		GraphEdgeStorage<Config> mEdgeStorage;
 	};
 
 
@@ -251,13 +329,16 @@ namespace Strawberry::Core::Math
 	using DirectedGraph = Graph<T, GraphTypeDirected>;
 
 
-	template <typename Base>
-	concept GraphType = requires(Base base)
+	template <GraphConfig Config>
+	struct WeightedGraphConfig
 	{
-		typename Base::Value;
-		typename Base::Config;
-		GraphConfig<typename Base::Config>;
-		std::derived_from<Base, Graph<typename Base::Value, typename Base::Config>>
-			|| std::same_as<Base, Graph<typename Base::Value, typename Base::Config>>;
+		using NodeID = Config::NodeID;
+		static constexpr bool Weighted = true;
+		using WeightType = unsigned int;
+		static constexpr bool Directed = Config::Directed;
 	};
+
+
+	template <typename _Graph>
+	using WeightedGraph = Graph<typename _Graph::Value, WeightedGraphConfig<typename _Graph::Config>>;
 }
