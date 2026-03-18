@@ -1,408 +1,340 @@
 #pragma once
 
-
-#include "Strawberry/Core/Math/Graph/Graph.hpp"
-#include "Strawberry/Core/Math/Graph/Walker.hpp"
-#include <array>
+#include "Strawberry/Core/Markers.hpp"
 #include <bitset>
 #include <concepts>
-#include <functional>
+#include <map>
+#include <vector>
+#include <algorithm>
+#include <set>
 
+#include "Strawberry/Core/Types/Optional.hpp"
 
 namespace Strawberry::Core::Math
 {
-	template <typename T>
-	class Tree
-		: public DirectedGraph<T>
+	enum class VisitMode
+	{
+		Before, Middle, After,
+	};
+
+
+	template <typename Config>
+	concept TreeConfigType = requires ()
+	{
+		typename Config::NodeID;
+		{ Config::ChildCount } -> std::convertible_to<unsigned int>;
+		{ Config::Ordered } -> std::convertible_to<bool>;
+		{ Config::Sorted } -> std::convertible_to<bool>;
+	}
+	&& (Config::Sorted == false || (Config::Ordered == true && requires { typename Config::SortingFunction; }));
+
+
+	template <typename T, TreeConfigType Config>
+	class Tree;
+
+
+	template <typename Value, TreeConfigType Config>
+	struct TreeStorage;
+
+
+	template <typename Value, TreeConfigType Config> requires (Config::ChildCount == 0)
+	struct TreeStorage<Value, Config>
+	{
+		std::map<typename Config::NodeID, Value>                                mValues;
+		std::map<typename Config::NodeID, std::vector<typename Config::NodeID>> childrenMap;
+	};
+
+
+	template <typename Value, TreeConfigType Config> requires (Config::ChildCount > 0)
+	struct TreeStorage<Value, Config>
+	{
+		struct ChildArray;
+
+		std::map<typename Config::NodeID, Value>      mValues;
+		std::map<typename Config::NodeID, ChildArray> childrenMap;
+	};
+
+
+	template <typename Value, TreeConfigType Config> requires (Config::ChildCount > 0)
+	struct TreeStorage<Value, Config>::ChildArray
 	{
 	public:
-		using Graph = DirectedGraph<T>;
-		using NodeID = Graph::NodeID;
-
-		Tree(T rootValue)
+		void AddNode(Config::NodeID node) requires (!Config::Sorted)
 		{
-			mRoot = AddNode(std::move(rootValue));
+			Assert(ChildCount() < Config::ChildCount);
+			for (int i = 0; i < Config::ChildCount; i++)
+			{
+				if (!mFlags[i])
+				{
+					mFlags.set(i);
+					mValues[i] = node;
+					return;
+				}
+			}
+			Unreachable();
 		}
 
-		NodeID Root() const
+		void AddNode(Config::NodeID node, const std::map<typename Config::NodeID, Value>& values) requires (Config::Sorted)
+		{
+			auto pos = std::ranges::lower_bound(
+				mValues.begin(), std::next(mValues.begin(), ChildCount()),
+				values.at(node),
+				typename Config::SortingFunction{},
+				[&] (const auto& x) { return values.at(x); });
+			Insert(std::distance(mValues.begin(), pos), node);
+		}
+
+		void Insert(unsigned int index, Config::NodeID node)
+		{
+			Assert(ChildCount() < Config::ChildCount);
+			do
+			{
+				std::swap(mValues[index], node);
+			} while (index < Config::ChildCount && mFlags[index++]);
+			mFlags.set(index - 1);
+		}
+
+		unsigned int ChildCount() const
+		{
+			unsigned int count = 0;
+			for (int i = 0; i < Config::ChildCount; i++)
+			{
+				if (mFlags[i]) count++;
+			}
+			return count;
+		}
+
+		Config::NodeID operator[](unsigned int i) const
+		{
+			Assert(mFlags[i]);
+			return mValues[i];
+		}
+
+
+	private:
+		std::bitset<Config::ChildCount> mFlags = { 0 };
+		std::array<typename Config::NodeID, Config::ChildCount> mValues = { 0 };
+	};
+
+
+	template <typename _Value, TreeConfigType _Config>
+	class Tree
+	{
+	public:
+		using Value = _Value;
+		using Config = _Config;
+
+		Tree(Value root)
+		{
+			mRoot = 0;
+			mStorage.mValues.emplace(0, std::move(root));
+		}
+
+
+		Config::NodeID Root() const
 		{
 			return mRoot;
 		}
 
-		NodeID AddNode(NodeID parent, T value)
+
+		const Value& GetValue(Config::NodeID node) const
 		{
-			NodeID node = AddNode(std::move(value));
-			AddEdge({parent, node});
-			return node;
+			return mStorage.mValues.at(node);
 		}
 
-		void RemoveNode(NodeID node)
+
+		Config::NodeID AddNode(Config::NodeID parent, Value value)
 		{
-			for (NodeID child : GetChildren(node))
+			typename Config::NodeID id = mStorage.mValues.rbegin()->first + 1;
+			mStorage.mValues.emplace(id, std::move(value));
+			if constexpr (Config::ChildCount == 0)
 			{
-				RemoveNode(child);
-			}
-			DirectedGraph<T>::RemoveNode(node);
-		}
-
-		std::set<NodeID> GetChildren(NodeID parent) const
-		{
-			return DirectedGraph<T>::GetOutgoingNeighbours(parent);
-		}
-
-
-	private:
-		using DirectedGraph<T>::AddNode;
-		using DirectedGraph<T>::AddEdge;
-		using DirectedGraph<T>::RemoveEdge;
-
-		NodeID mRoot;
-	};
-
-
-	template <typename Base>
-	concept TreeGraphType = requires (Base base)
-	{
-		GraphType<Base>;
-		std::derived_from<Base, Tree<typename Base::Value>>;
-	};
-
-
-	template <typename Base>
-	class OrderedTree;
-
-
-	template <TreeGraphType Base>
-	class OrderedTree<Base>
-		: public Base
-	{
-	public:
-		using NodeID = Base::NodeID;
-		using Value = Base::Value;
-
-
-		using Base::Base;
-
-
-		NodeID AddNode(NodeID parent, Value value)
-		{
-			NodeID child = Base::AddNode(parent, std::move(value));
-			mParentChildMap[parent].emplace_back(child);
-			return child;
-		}
-
-		NodeID InsertNode(NodeID parent, NodeID index, Value value)
-		{
-			NodeID child = Base::AddNode(parent, std::move(value));
-			mParentChildMap[parent].insert(mParentChildMap.begin() + index, child);
-		}
-
-		void RemoveNode(NodeID node)
-		{
-			for (NodeID child : this->GetChildren(node))
-			{
-				RemoveNode(child);
-			}
-			Base::RemoveNode(node);
-			mParentChildMap.erase(node);
-			for (auto& [parent, children] : mParentChildMap)
-			{
-				std::erase_if(children, [node] (NodeID child) { return child == node; });
-			}
-		}
-
-		Optional<NodeID> GetChildIndex(NodeID parent, NodeID child) const
-		{
-			const auto& children = mParentChildMap[parent];
-			for (int i = 0; i < children.size(); i++)
-			{
-				if (children[i] == child) [[unlikely]]
+				if constexpr (Config::Sorted)
 				{
-					return i;
+					auto pos = std::ranges::lower_bound(
+						mStorage.childrenMap[parent],
+						value,
+						Config::SortingFunction,
+						[this] (const auto& x) { return GetValue(x); });
+					mStorage.childrenMap[parent].insert(pos, id);
+				}
+				else
+				{
+					mStorage.childrenMap[parent].emplace_back(id);
 				}
 			}
-			return NullOpt;
-		}
-
-		std::vector<NodeID> GetChildren(NodeID parent) const
-		{
-			return mParentChildMap[parent];
-		}
-
-
-	protected:
-		mutable std::map<NodeID, std::vector<NodeID>> mParentChildMap;
-	};
-
-
-	template <typename Base>
-	concept OrderedTreeGraphType = requires (Base base)
-	{
-		TreeGraphType<Base>;
-		std::derived_from<Base, OrderedTree<typename Base::Value>>;
-	};
-
-
-	template <TreeGraphType Base, unsigned int _ChildCount>
-	class SizedTree
-		: public Base
-	{
-	public:
-		using NodeID = Base::NodeID;
-		static constexpr auto ChildCount = _ChildCount;
-
-		using Base::Base;
-
-
-		NodeID AddNode(NodeID parent, Base::Value value)
-		{
-			Assert(std::ranges::size(this->GetChildren(parent)) < ChildCount,
-				   "Attempt to overfill node in SizedTree!");
-			return Base::AddNode(parent, value);
-		}
-	};
-
-
-	template <typename Base>
-	concept SizedTreeGraphType = requires (Base base)
-	{
-		TreeGraphType<Base>;
-		{ Base::ChildCount } -> std::same_as<unsigned int>;
-		std::derived_from<Base, SizedTree<typename Base::Graph, Base::ChildCount>>;
-	};
-
-
-	template <TreeGraphType Base, unsigned int I>
-	class OrderedTree<SizedTree<Base, I>>
-		: public SizedTree<Base, I>
-	{
-	public:
-		using SizedTree<Base, I>::SizedTree;
-		using NodeID = SizedTree<Base, I>::NodeID;
-
-
-		NodeID AddNode(NodeID parent, Base::Value value)
-		{
-			NodeID node = SizedTree<Base, I>::AddNode(parent, std::move(value));
-			auto& childArray = mParentChildMap[parent];
-			Assert(!childArray.Full());
-			childArray.AddChild(node);
-			return node;
-		}
-
-
-		NodeID InsertNode(NodeID parent, NodeID index, Base::Value value)
-		{
-			NodeID node = SizedTree<Base, I>::AddNode(parent, std::move(value));
-			auto& childArray = mParentChildMap[parent];
-			Assert(!childArray.Full());
-			childArray.InsertNode(index, node);
-			return node;
-		}
-
-
-		void RemoveNode(NodeID node)
-		{
-			for (auto child : GetChildren(node))
+			else
 			{
-				RemoveNode(child);
-			}
-			SizedTree<Base, I>::RemoveNode(node);
-			mParentChildMap.erase(node);
-			for (auto& [parent, children] : mParentChildMap)
-			{
-				children.RemoveNode(node);
-			}
-		}
-
-
-		Optional<NodeID> GetChildIndex(NodeID parent, NodeID child) const
-		{
-			return mParentChildMap[parent].GetChildIndex(child);
-		}
-
-
-		std::vector<NodeID> GetChildren(NodeID parent) const
-		{
-			return mParentChildMap[parent].GetChildren();
-		}
-
-
-	protected:
-		struct ChildArray
-		{
-			std::bitset<I> mFlags = 0;
-			std::array<NodeID, I> mValues { 0 };
-
-
-			void AddChild(NodeID node)
-			{
-				NodeID firstIndex = 0;
-				while (firstIndex < I - 1 && mFlags[firstIndex]) firstIndex++;
-				Assert(firstIndex < I);
-				mFlags.set(firstIndex);
-				mValues[firstIndex] = node;
-			}
-
-
-			void InsertNode(NodeID index, NodeID node)
-			{
-				if (mFlags[index])
+				if constexpr (Config::Sorted)
 				{
-					NodeID nextZero = index;
-					while (nextZero < I && mFlags[nextZero]) nextZero++;
-
-					for (int i = nextZero; i > index; i--)
-					{
-						mFlags[i] = mFlags[i - 1];
-						mFlags.reset(i - 1);
-						mValues[i] = std::exchange(mValues[i - 1], 0);
-					}
+					mStorage.childrenMap[parent].AddNode(id, mStorage.mValues);
 				}
-
-				Assert(!mFlags[index]);
-				mFlags.set(index);
-				mValues[index] = node;
-			}
-
-
-			void RemoveChild(NodeID node)
-			{
-				for (int i = 0; i < I; i++)
+				else
 				{
-					bool match = mFlags[i] && mValues[i] == node;
-					if (match)
-					{
-						mFlags.reset(i);
-						mValues[i] = 0;
-					}
+					mStorage.childrenMap[parent].AddNode(id);
 				}
 			}
+			return id;
+		}
 
 
-			Optional<NodeID> GetChildIndex(NodeID child) const
+		Config::NodeID InsertNode(Config::NodeID parent, unsigned int index, Value value) requires (Config::Ordered)
+		{
+			typename Config::NodeID id = mStorage.mValues.rbegin()->first + 1;
+			mStorage.mValues.emplace(id, std::move(value));
+			if constexpr (Config::ChildCount == 0)
 			{
-				for (int i = 0; i < I; i++)
-				{
-					if (mFlags[i] && mValues[i] == child) [[unlikely]]
-					{
-						return i;
-					}
-				}
-				return NullOpt;
+				mStorage.childrenMap[parent].insert(index, id);
+			}
+			else
+			{
+				mStorage.childrenMap[parent].Insert(index, id);
+			}
+			return id;
+		}
+
+		const auto& GetChildren(Config::NodeID parent) const
+		{
+			return mStorage.childrenMap[parent];
+		}
+
+		auto GetChildCount(Config::NodeID parent) const
+		{
+			if constexpr (Config::ChildCount == 0)
+			{
+				return mStorage.childrenMap.at(parent).size();
+			}
+			else
+			{
+				return mStorage.childrenMap.at(parent).ChildCount();
+			}
+		}
+
+
+		struct VisitContext
+		{
+			VisitContext(const Tree& tree)
+			{
+				mPath = { tree.Root() };
 			}
 
-
-			std::vector<NodeID> GetChildren() const
+			Config::NodeID CurrentNode() const
 			{
-				std::vector<NodeID> children;
-				for (int i = 0; i < I; i++)
-				{
-					if (mFlags[i])
-					{
-						children.emplace_back(mValues[i]);
-					}
-				}
-				return children;
+				return mPath.back();
 			}
 
-
-			bool Full() const
+			void GoUp()
 			{
-				return mFlags.all();
+				mPath.pop_back();
 			}
+
+			std::vector<typename Config::NodeID> mPath;
+			std::set<typename Config::NodeID> visitedNodes;
 		};
 
-		mutable std::map<NodeID, ChildArray> mParentChildMap;
-	};
 
-
-	template <typename T, unsigned int N>
-	using NAryTree = OrderedTree<SizedTree<Tree<T>, N>>;
-
-
-	template <typename T>
-	using BinaryTree = NAryTree<T, 2>;
-
-
-	template <typename Base, typename Comparison = std::less<typename Base::Value>>
-	class SortedTree;
-
-
-	/// Class representing a tree in which the order of children depends on
-	/// their ordering with respect to the function Comparison.
-	template <OrderedTreeGraphType Base, typename Comparison>
-	class SortedTree<Base, Comparison>
-		: public Base
-	{
-	public:
-		using NodeID = Base::NodeID;
-
-
-		/// Inserts the node into the tree into the properly ordered position.
-		NodeID AddNode(NodeID parent, Base::Value value)
+		template <VisitMode Mode = VisitMode::Before> requires (Config::Ordered)
+		void Visit(this auto& self, auto&& fn)
 		{
-			const auto& children = this->GetChildren(parent);
-			int position = 0;
-			Comparison comparison;
+			self.template Visit<Mode>(std::forward<decltype(fn)>(fn), VisitContext(self));
+		}
 
-			while (position < children.size() && comparison(
-					   this->GetValue(children[position]),
-					   value))
+		template <VisitMode Mode> requires (Config::Ordered)
+		void Visit(this auto& self, auto&& fn, VisitContext visitContext)
+		{
+			AssertImplication(Mode == VisitMode::Middle, Config::ChildCount == 2);
+			while (visitContext.mPath.size() > 0)
 			{
-				position++;
+				if (Mode == VisitMode::Before && !visitContext.visitedNodes.contains(visitContext.CurrentNode()))
+				{
+					std::invoke(std::forward<decltype(fn)>(fn), self.mStorage.mValues.at(visitContext.CurrentNode()));
+					visitContext.visitedNodes.emplace(visitContext.CurrentNode());
+				}
+
+				Optional<typename Config::NodeID> next;
+				unsigned int childIndex = 0;
+				auto children = self.GetChildren(visitContext.CurrentNode());
+				const auto ChildCount = self.GetChildCount(visitContext.CurrentNode());
+				for (childIndex = 0; childIndex < ChildCount; childIndex++)
+				{
+					if (!visitContext.visitedNodes.contains(children[childIndex]))
+					{
+						next = children[childIndex];
+						break;
+					}
+				}
+
+				if (next)
+				{
+					if (Mode == VisitMode::Middle && childIndex == 1 && !visitContext.visitedNodes.contains(visitContext.CurrentNode()))
+					{
+						std::invoke(std::forward<decltype(fn)>(fn), self.mStorage.mValues.at(visitContext.CurrentNode()));
+						visitContext.visitedNodes.emplace(visitContext.CurrentNode());
+					}
+
+					visitContext.mPath.emplace_back(next.Value());
+				}
+				else
+				{
+					if ((Mode == VisitMode::Middle || Mode == VisitMode::After) && !visitContext.visitedNodes.contains(visitContext.CurrentNode()))
+					{
+						std::invoke(std::forward<decltype(fn)>(fn), self.mStorage.mValues.at(visitContext.CurrentNode()));
+						visitContext.visitedNodes.emplace(visitContext.CurrentNode());
+					}
+
+					visitContext.GoUp();
+				}
 			}
-
-			return this->InsertNode(
-				parent,
-				children.empty() ? 0 : this->GetChildIndex(parent, children[position]).Unwrap(),
-				std::move(value));
 		}
-
-	protected:
-		/// Hide insert node as it would allow the breaking of ordering.
-		using Base::InsertNode;
-	};
-
-
-	/// Class representing a graph walker over a tree.
-	/// Keeps a stack of it's path from the root.
-	template <GraphWalkerType Base>
-	class TreeWalker
-		: public Base
-	{
-	public:
-		using NodeID = Base::NodeID;
-
-
-		TreeWalker(const Base::Graph& tree, NodeID node)
-			: Base(tree, tree.Root())
-		{
-			mPathStack.emplace_back(node);
-		}
-
-
-		TreeWalker(const Base& tree)
-			: Base(tree, tree.Root())
-		{
-			mPathStack.emplace_back(tree.Root());
-		}
-
-		void WalkUp()
-		{
-			Assert(mPathStack.size() > 1);
-			mPathStack.pop_back();
-			Base::Jump(mPathStack.back());
-		}
-
-		void WalkTo(NodeID node)
-		{
-			mPathStack.emplace_back(node);
-			Base::WalkTo(node);
-		}
-
 
 	private:
-		std::deque<NodeID> mPathStack;
+		Config::NodeID mRoot;
+		mutable TreeStorage<Value, Config> mStorage;
 	};
+
+
+	template <typename NodeIDType = unsigned int>
+	struct TreeConfigOrderedTree
+	{
+		using NodeID = NodeIDType;
+		static constexpr unsigned int ChildCount = 0;
+		static constexpr bool Ordered = true;
+		static constexpr bool Sorted = false;
+	};
+
+
+	template <unsigned int I, typename NodeIDType = unsigned int>
+	struct TreeConfigNAryTree
+	{
+		using NodeID = NodeIDType;
+		static constexpr unsigned int ChildCount = I;
+		static constexpr bool Ordered = true;
+		static constexpr bool Sorted = false;
+	};
+
+
+	template <typename Value, typename NodeIDType = unsigned int>
+	using OrderedTree = Tree<Value, TreeConfigOrderedTree<NodeIDType>>;
+
+
+	template <typename Value, unsigned int ChildCount, typename NodeIDType = unsigned int>
+	using NAryTree = Tree<Value, TreeConfigNAryTree<ChildCount, NodeIDType>>;
+
+
+	template <typename Value, typename NodeIDType = unsigned int>
+	using BinaryTree = NAryTree<Value, 2, NodeIDType>;
+
+
+	template <TreeConfigType Base, typename SORTING_FUNCTION>
+	struct MakeSortedTreeConfig
+	{
+		using NodeID = Base::NodeID;
+		static constexpr unsigned int ChildCount = Base::ChildCount;
+		static constexpr bool Ordered = true;
+		static constexpr bool Sorted = true;
+		using SortingFunction = SORTING_FUNCTION;
+	};
+
+	template <typename _Tree, typename SORTING_FUNCTION = std::less<typename _Tree::Value>>
+	using SortedTree = Tree<typename _Tree::Value, MakeSortedTreeConfig<typename _Tree::Config, SORTING_FUNCTION>>;
 }
