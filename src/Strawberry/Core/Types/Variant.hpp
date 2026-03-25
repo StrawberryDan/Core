@@ -251,7 +251,7 @@ namespace Strawberry::Core
 		{
 			using Arg = std::tuple_element<0, std::tuple<Ts...>>::type;
 
-			if constexpr (std::same_as<const Variant&, decltype(self)>)
+			if constexpr (std::is_const_v<std::remove_reference_t<decltype(self)>> && std::is_lvalue_reference_v<decltype(self)>)
 			{
 				using Ret = std::invoke_result_t<F, const Arg&>;
 
