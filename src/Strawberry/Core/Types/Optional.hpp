@@ -124,12 +124,27 @@ namespace Strawberry::Core
 		//======================================================================================================================
 		//  Monadic Operations
 		//----------------------------------------------------------------------------------------------------------------------
-		template <std::invocable<T&&> F>
+		template <typename F>
 		Optional<std::invoke_result_t<F, T&&>> Map(this auto&& self, F&& functor)
 		{
-			return self.HasValue()
-					   ? Optional<std::invoke_result_t<F, T&&>>(std::forward<F>(functor)(self.Unwrap()))
-					   : NullOpt;
+			if constexpr (std::is_const_v<std::remove_reference_t<decltype(self)>> || std::is_lvalue_reference_v<decltype(self)>)
+			{
+				return std::forward<decltype(self)>(self).HasValue()
+					   ? Optional<std::invoke_result_t<F, const T&>>(
+					   		std::invoke(
+					   			std::forward<F>(functor),
+					   			std::forward<decltype(self)>(self).Value()))
+					   : Optional<std::invoke_result_t<F, T&&>>(NullOpt);
+			}
+			else
+			{
+				return std::forward<decltype(self)>(self).HasValue()
+					   ? Optional<std::invoke_result_t<F, T&&>>(
+							   std::invoke(
+								   std::forward<F>(functor),
+								   std::forward<decltype(self)>(self).Unwrap()))
+					   : Optional<std::invoke_result_t<F, T&&>>(NullOpt);
+			}
 		}
 
 
