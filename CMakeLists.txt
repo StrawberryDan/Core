@@ -148,6 +148,7 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Types/ReflexivePointer.hpp
     src/Strawberry/Core/Types/Result.hpp
     src/Strawberry/Core/Types/TypeSet.hpp
+    src/Strawberry/Core/Types/ValOrPtr.hpp
     src/Strawberry/Core/Types/Variant.hpp
     src/Strawberry/Core/UTF.cpp
     src/Strawberry/Core/UTF.hpp
