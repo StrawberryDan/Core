@@ -30,7 +30,7 @@ namespace Strawberry::Core::Math
 	class TreeWalker
 	{
 	public:
-		using Tree= _Tree;
+		using Tree = _Tree;
 
 
 		TreeWalker(const Tree& tree)
