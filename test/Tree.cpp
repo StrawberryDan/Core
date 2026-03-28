@@ -32,15 +32,15 @@ int main()
 
 	std::vector<int> order;
 	sorted.Visit<Math::VisitMode::Before>(
-		[&] (int x) { order.emplace_back(x); });
+		[&] (const auto& visitContext) { order.emplace_back(visitContext.Value()); });
 	AssertEQ(order, std::vector<int>{0, 1, 2, 3, 4, 5, 6});
 	order.clear();
 
-	sorted.Visit<Math::VisitMode::Middle>([&] (int x) { order.emplace_back(x); });
+	sorted.Visit<Math::VisitMode::Middle>([&] (const auto& visitContext) { order.emplace_back(visitContext.Value()); });
 	AssertEQ(order, std::vector<int>{2, 1, 3, 0, 5, 4, 6});
 	order.clear();
 
-	sorted.Visit<Math::VisitMode::After>([&] (int x) { order.emplace_back(x); });
+	sorted.Visit<Math::VisitMode::After>([&] (const auto& visitContext) { order.emplace_back(visitContext.Value()); });
 	AssertEQ(order, std::vector<int>{2, 3, 1, 5, 6, 4, 0});
 	order.clear();
 

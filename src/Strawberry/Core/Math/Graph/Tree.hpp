@@ -215,21 +215,36 @@ namespace Strawberry::Core::Math
 		{
 			VisitContext(const Tree& tree)
 			{
-				mPath = { tree.Root() };
+				this->tree = &tree;
+				this->path = { tree.Root() };
 			}
 
 			Config::NodeID CurrentNode() const
 			{
-				return mPath.back();
+				return path.back();
+			}
+
+			const auto& Value() const
+			{
+				return tree->GetValue(this->CurrentNode());
+			}
+
+			Optional<typename Config::NodeID> GetParent() const noexcept
+			{
+				if (path.size() >= 2) [[likely]]
+					return path[path.size() - 2];
+				else
+					return NullOpt;
 			}
 
 			void GoUp()
 			{
-				mPath.pop_back();
+				path.pop_back();
 			}
 
-			std::vector<typename Config::NodeID> mPath;
-			std::set<typename Config::NodeID> visitedNodes;
+			const Tree*                          tree;
+			std::vector<typename Config::NodeID> path;
+			std::set<typename Config::NodeID>    visitedNodes;
 		};
 
 
@@ -240,15 +255,19 @@ namespace Strawberry::Core::Math
 		}
 
 		template <VisitMode Mode> requires (Config::Ordered)
-		void Visit(this auto& self, auto&& fn, VisitContext visitContext)
+		void Visit(this auto& self, auto&& fn, VisitContext visitContext) requires (std::invocable<decltype(fn), const VisitContext&>)
 		{
+			const auto INVOKE = [&] {
+				std::invoke(std::forward<decltype(fn)>(fn), static_cast<const VisitContext&>(visitContext));
+				visitContext.visitedNodes.emplace(visitContext.CurrentNode());
+			};
+
 			AssertImplication(Mode == VisitMode::Middle, Config::ChildCount == 2);
-			while (visitContext.mPath.size() > 0)
+			while (visitContext.path.size() > 0)
 			{
 				if (Mode == VisitMode::Before && !visitContext.visitedNodes.contains(visitContext.CurrentNode()))
 				{
-					std::invoke(std::forward<decltype(fn)>(fn), self.mStorage.mValues.at(visitContext.CurrentNode()));
-					visitContext.visitedNodes.emplace(visitContext.CurrentNode());
+					INVOKE();
 				}
 
 				Optional<typename Config::NodeID> next;
@@ -268,18 +287,16 @@ namespace Strawberry::Core::Math
 				{
 					if (Mode == VisitMode::Middle && childIndex == 1 && !visitContext.visitedNodes.contains(visitContext.CurrentNode()))
 					{
-						std::invoke(std::forward<decltype(fn)>(fn), self.mStorage.mValues.at(visitContext.CurrentNode()));
-						visitContext.visitedNodes.emplace(visitContext.CurrentNode());
+						INVOKE();
 					}
 
-					visitContext.mPath.emplace_back(next.Value());
+					visitContext.path.emplace_back(next.Value());
 				}
 				else
 				{
 					if ((Mode == VisitMode::Middle || Mode == VisitMode::After) && !visitContext.visitedNodes.contains(visitContext.CurrentNode()))
 					{
-						std::invoke(std::forward<decltype(fn)>(fn), self.mStorage.mValues.at(visitContext.CurrentNode()));
-						visitContext.visitedNodes.emplace(visitContext.CurrentNode());
+						INVOKE();
 					}
 
 					visitContext.GoUp();
