@@ -24,11 +24,11 @@ int main()
 
 	Math::SortedTree<Math::BinaryTree<int>> sorted(0);
 	sorted.AddNode(0, 1);
-	sorted.AddNode(1, 3);
 	sorted.AddNode(1, 2);
+	sorted.AddNode(1, 3);
 	sorted.AddNode(0, 4);
-	sorted.AddNode(4, 6);
 	sorted.AddNode(4, 5);
+	sorted.AddNode(4, 6);
 
 	std::vector<int> order;
 	sorted.Visit<Math::VisitMode::Before>(
@@ -43,6 +43,11 @@ int main()
 	sorted.Visit<Math::VisitMode::After>([&] (const auto& visitContext) { order.emplace_back(visitContext.Value()); });
 	AssertEQ(order, std::vector<int>{2, 3, 1, 5, 6, 4, 0});
 	order.clear();
+
+	AssertEQ(sorted.FindParent(1), 0);
+	auto parentMap = sorted.GenerateParentMap();
+	AssertEQ(parentMap[6], 4);
+	AssertEQ(parentMap[4], 0);
 
 	return 0;
 }

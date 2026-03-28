@@ -94,6 +94,18 @@ namespace Strawberry::Core::Math
 			mFlags.set(index - 1);
 		}
 
+		bool Contains(Config::NodeID node) const
+		{
+			for (int i = 0; i < Config::ChildCount; i++)
+			{
+				if (mFlags[i] && mValues[i] == node)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
 		unsigned int ChildCount() const
 		{
 			unsigned int count = 0;
@@ -208,6 +220,44 @@ namespace Strawberry::Core::Math
 			{
 				return mStorage.childrenMap.at(parent).ChildCount();
 			}
+		}
+
+
+		Optional<typename Config::NodeID> FindParent(Config::NodeID node) const
+		{
+			for (const auto& [parent, children] : mStorage.childrenMap)
+			{
+				if constexpr (Config::ChildCount == 0)
+				{
+					if (children.contains(node))
+					{
+						return parent;
+					}
+				}
+				else
+				{
+					if (children.Contains(node))
+					{
+						return parent;
+					}
+				}
+
+			}
+
+			return NullOpt;
+		}
+
+
+		std::map<typename Config::NodeID, typename Config::NodeID> GenerateParentMap() const
+		{
+			std::map<typename Config::NodeID, typename Config::NodeID> map;
+			Visit([&] (const VisitContext& visitContext) {
+				if (visitContext.path.size() >= 2)
+				{
+					map.emplace(visitContext.CurrentNode(), visitContext.GetParent().Value());
+				}
+			});
+			return map;
 		}
 
 
