@@ -229,11 +229,11 @@ namespace Strawberry::Core::Math
 		{
 			if constexpr (Config::ChildCount == 0)
 			{
-				return mStorage.childrenMap.at(parent).size();
+				return mStorage.childrenMap[parent].size();
 			}
 			else
 			{
-				return mStorage.childrenMap.at(parent).ChildCount();
+				return mStorage.childrenMap[parent].ChildCount();
 			}
 		}
 
