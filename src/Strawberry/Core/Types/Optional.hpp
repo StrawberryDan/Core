@@ -424,6 +424,17 @@ namespace Strawberry::Core
 			return std::move(mPayload);
 		}
 
+		T Expect([[maybe_unused]] const std::string& message)
+		{
+#ifdef STRAWBERRY_DEBUG
+			if (!HasValue()) [[unlikely]]
+			{
+				Logging::Error("Optional Expect failed: {}", message);
+			}
+#endif
+			return Unwrap();
+		}
+
 	private:
 		bool mHasValue;
 
