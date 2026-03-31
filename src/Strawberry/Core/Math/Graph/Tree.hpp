@@ -106,6 +106,21 @@ namespace Strawberry::Core::Math
 			return false;
 		}
 
+
+		std::vector<typename Config::NodeID> AsVector() const
+		{
+			std::vector<typename Config::NodeID> result;
+			result.reserve(Config::ChildCount);
+			for (int i = 0; i < Config::ChildCount; i++)
+			{
+				if (mFlags[i])
+				{
+					result.emplace_back(mValues[i]);
+				}
+			}
+			return result;
+		}
+
 		unsigned int ChildCount() const
 		{
 			unsigned int count = 0;
