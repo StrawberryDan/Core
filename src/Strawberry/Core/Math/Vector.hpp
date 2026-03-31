@@ -279,6 +279,20 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Applies the binary operator given (f) piecewise to the
+		/// other vector and return the result.
+		template <typename F, typename T2>
+		Vector<std::invoke_result_t<F, T, T2>, D> Piecewise(F&& f, T2 other) const noexcept
+		{
+			Vector<std::invoke_result_t<F, T, T2>, D> result;
+			for (int i = 0; i < D; i++)
+			{
+				result[i] = std::invoke(std::forward<F>(f), (*this)[i], other);
+			}
+			return result;
+		}
+
+
 		/// Returns this vector in reverse
 		constexpr Vector Reversed() const noexcept
 		{
