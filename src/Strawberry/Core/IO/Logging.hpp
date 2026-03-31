@@ -218,7 +218,11 @@ namespace Strawberry::Core
 			// Create string
 			std::string formatted;
 			// Do as much at compile time as possible
-			if consteval
+			if (sizeof...(Args) == 0)
+			{
+				formatted = message;
+			}
+			else if consteval
 			{
 				formatted = fmt::format(message, std::forward<Args>(args)...);
 			}
