@@ -99,6 +99,7 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Markers.hpp
     src/Strawberry/Core/Math/Checked.hpp
     src/Strawberry/Core/Math/Clamped.hpp
+    src/Strawberry/Core/Math/Geometry/AABB.hpp
     src/Strawberry/Core/Math/Geometry/Intersection.hpp
     src/Strawberry/Core/Math/Geometry/Line.hpp
     src/Strawberry/Core/Math/Geometry/LineSegment.hpp
