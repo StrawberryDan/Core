@@ -93,6 +93,13 @@ namespace Strawberry::Core
 	}
 
 
+	template<typename Pixel>
+	IO::DynamicByteBuffer Image<Pixel>::AsBytes() const
+	{
+		return Core::IO::DynamicByteBuffer(mPixels.data(), mPixels.size() * PixelSize());
+	}
+
+
 	template <typename PixelType>
 	void Image<PixelType>::Save(const std::filesystem::path& path, unsigned int quality) const noexcept
 	{	ZoneScoped;

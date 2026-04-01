@@ -137,6 +137,9 @@ namespace Strawberry::Core
 		const PixelType* Data() const noexcept;
 
 
+		IO::DynamicByteBuffer AsBytes() const;
+
+
 		void Save(const std::filesystem::path& path, unsigned int quality = 100) const noexcept;
 
 
