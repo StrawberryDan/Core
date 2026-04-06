@@ -21,17 +21,17 @@ namespace Strawberry::Core::Math
 	}
 
 
-	template<typename T, typename... Ts>
-	Matrix<T, sizeof...(Ts) + 1, sizeof...(Ts) + 1> Translate(Ts... args)
+	template<typename... Ts>
+	decltype(auto) Translate(Ts... args)
 	{
-		return Translate(Core::Math::Vector<T, sizeof...(Ts)>(args...));
+		return Translate(Vector{std::forward<Ts>(args)...});
 	}
 
 
 	template<typename T, size_t D>
-	Matrix<T, D + 1, D + 1> Scale(const Vector<T, D>& scale)
+	Matrix<T, D, D> Scale(const Vector<T, D>& scale)
 	{
-		Matrix<T, D + 1, D + 1> result;
+		Matrix<T, D, D> result;
 		for (int i       = 0; i < D; i++)
 			result[i][i] = scale[i];
 		return result;
@@ -39,9 +39,9 @@ namespace Strawberry::Core::Math
 
 
 	template<typename T, typename... Ts>
-	Matrix<T, sizeof...(Ts) + 1, sizeof...(Ts) + 1> Scale(Ts... args)
+	Matrix<T, sizeof...(Ts), sizeof...(Ts)> Scale(Ts... args)
 	{
-		return Scale(Core::Math::Vector<T, sizeof...(Ts)>(args...));
+		return Scale(Vector{std::forward<Ts>(args)...});
 	}
 
 
@@ -58,46 +58,43 @@ namespace Strawberry::Core::Math
 
 
 	template <typename T>
-	Matrix<T, 4, 4> RotateX(Radians radians)
+	Matrix<T, 3, 3> RotateX(Radians radians)
 	{
 		T cosx = std::cos(radians);
 		T sinx = std::sin(radians);
 
-		return Matrix<T, 4, 4>{
-			1.0f, 0.0f,  0.0f, 0.0f,
-			0.0f, cosx, -sinx, 0.0f,
-			0.0f, sinx,  cosx, 0.0f,
-			0.0f, 0.0f,  0.0f, 1.0f,
+		return Matrix<T, 3, 3>{
+			1.0f, 0.0f,  0.0f,
+			0.0f, cosx, -sinx,
+			0.0f, sinx,  cosx,
 		};
 	}
 
 
 	template <typename T>
-	Matrix<T, 4, 4> RotateY(Radians radians)
+	Matrix<T, 3, 3> RotateY(Radians radians)
 	{
 		T cosx = std::cos(radians);
 		T sinx = std::sin(radians);
 
-		return Matrix<T, 4, 4>{
-			 cosx, 0.0f, sinx, 0.0f,
-			 0.0f, 1.0f, 0.0f, 0.0f,
-			-sinx, 0.0f, cosx, 0.0f,
-			 0.0f, 0.0f, 0.0f, 1.0f,
+		return Matrix<T, 3, 3>{
+			 cosx, 0.0f, sinx,
+			 0.0f, 1.0f, 0.0f,
+			-sinx, 0.0f, cosx,
 		};
 	}
 
 
 	template <typename T>
-	Matrix<T, 4, 4> RotateZ(Radians radians)
+	Matrix<T, 3, 3> RotateZ(Radians radians)
 	{
 		T cosx = std::cos(radians);
 		T sinx = std::sin(radians);
 
-		return Matrix<T, 4, 4>{
-			cosx, -sinx, 0.0f, 0.0f,
-			sinx, cosx, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 1.0f
+		return Matrix<T, 3, 3>{
+			cosx, -sinx, 0.0f,
+			sinx, cosx, 0.0f,
+			0.0f, 0.0f, 1.0f,
 		};
 	}
 }
