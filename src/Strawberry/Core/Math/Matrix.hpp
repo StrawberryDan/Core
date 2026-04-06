@@ -73,6 +73,36 @@ namespace Strawberry::Core::Math
 		}
 
 
+		template <typename T2>
+		Matrix<T2, W, H> AsType() const noexcept
+		{
+			Matrix<T2, W, H> result;
+
+			for (unsigned x = 0; x < W; x++)
+				for (unsigned y = 0; y < H; y++)
+				{
+					result[x][y] = static_cast<T2>((*this)[x][y]);
+				}
+
+			return result;
+		}
+
+
+		template <size_t W2, size_t H2 = W2>
+		Matrix<T, W2, H2> AsSize() const noexcept
+		{
+			Matrix<T, W2, H2> result;
+
+			for (unsigned x = 0; x < std::min(W, W2); x++)
+				for (unsigned y = 0; y < std::min(W, W2); y++)
+				{
+					result[x][y] = (*this)[x][y];
+				}
+
+			return result;
+		}
+
+
 		constexpr T* operator[](size_t col) noexcept
 		{
 			Core::Assert(col < W);
