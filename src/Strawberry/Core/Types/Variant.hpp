@@ -215,10 +215,18 @@ namespace Strawberry::Core
 
 
 		template<typename Arg>
-		const Arg& Ref() const
+		decltype(auto) Ref(this auto&& self)
 		{
-			Core::Assert(IsType<Arg>());
-			return *reinterpret_cast<const Arg*>(mData);
+			Core::Assert(self.template IsType<Arg>());
+
+			if constexpr (std::is_const_v<std::remove_reference_t<decltype(self)>>)
+			{
+				return *reinterpret_cast<const Arg*>(self.mData);
+			}
+			else
+			{
+				return *reinterpret_cast<Arg*>(self.mData);
+			}
 		}
 
 
