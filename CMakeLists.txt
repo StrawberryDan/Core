@@ -54,7 +54,7 @@ if (NOT TARGET StrawberryCore)
   FetchContent_Declare(
     tracy
     GIT_REPOSITORY "https://github.com/wolfpld/tracy.git"
-    GIT_TAG "v0.11.1"
+    GIT_TAG "v0.13.1"
     GIT_SHALLOW TRUE
     GIT_PROGRESS TRUE
   )
@@ -154,6 +154,7 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/UTF.cpp
     src/Strawberry/Core/UTF.hpp
     src/Strawberry/Core/Util/Alloc.hpp
+    src/Strawberry/Core/Util/Allocator.hpp
     src/Strawberry/Core/Util/CanvasItyImplementation.cpp
     src/Strawberry/Core/Util/IDPool.hpp
     src/Strawberry/Core/Util/Image.hpp
