@@ -20,6 +20,7 @@ namespace Strawberry::Core
 
 		static constexpr T NULL_VALUE = Null;
 
+
 		NullValue() = default;
 
 
