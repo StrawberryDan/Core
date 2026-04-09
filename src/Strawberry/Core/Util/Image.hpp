@@ -37,7 +37,7 @@ namespace Strawberry::Core
 		}
 
 
-		auto&& operator[](this auto& self, size_t index)
+		decltype(auto) operator[](this auto&& self, size_t index)
 		{
 			return std::forward<decltype(self)>(self).channels[index];
 		}
