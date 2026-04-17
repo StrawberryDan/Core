@@ -277,6 +277,7 @@ namespace Strawberry::Core::Math
 			// Create the faces between supporting nodes.
 			mResult.mFaces.emplace(Face{0, 2, 3});
 			mResult.mFaces.emplace(Face{0, 1, 3});
+			Validate();
 		}
 
 
@@ -327,6 +328,8 @@ namespace Strawberry::Core::Math
 				auto faces = mResult.FindFacesWithEdge(newEdge);
 				mResult.mFaces.insert_range(faces);
 			}
+
+			Validate();
 		}
 
 
@@ -352,6 +355,9 @@ namespace Strawberry::Core::Math
 					})
 					| std::ranges::to<std::set>();
 			}
+
+			Validate(&copy);
+
 			// Return the copy.
 			return copy;
 		}
@@ -495,6 +501,29 @@ namespace Strawberry::Core::Math
 
 
 	private:
+		void Validate(const Delaunay<Vector<T, 2>>* graph = nullptr) const
+		{
+#ifdef STRAWBERRY_DEBUG
+			if (graph == nullptr) graph = &mResult;
+			std::map<Edge, unsigned int> edgeOccurences;
+			for (auto face : graph->Faces())
+			{
+				for (auto edge : face.Edges())
+				{
+					edgeOccurences[edge] += 1;
+				}
+			}
+
+			for (const auto& [edge, count] : edgeOccurences)
+			{
+				Core::Assert(count > 0);
+				Core::Assert(count < 3);
+			}
+
+			AssertEQ(graph->GetGraph().NodeCount() - graph->GetGraph().EdgeCount() + graph->FaceCount(), 1);
+#endif
+		}
+
 		Vector<T, 2> mMin; Vector<T, 2> mMax;
 		/// The delaunay graph we are creating.
 		Delaunay<Vector<T, 2>>                 mResult;
