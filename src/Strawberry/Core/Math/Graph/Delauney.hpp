@@ -59,6 +59,9 @@ namespace Strawberry::Core::Math
 		/// Const accessor to the set of faces.
 		const auto& Faces() const { return mFaces; }
 
+		/// Gets the number of triangular faces in the graph.
+		[[nodiscard]] unsigned int FaceCount() const { return mFaces.size(); }
+
 		/// Returns the selected face as a Triangle with the values as vertices..
 		Triangle<T, 2> GetFaceAsTriangle(const Face& face) const noexcept
 		{
