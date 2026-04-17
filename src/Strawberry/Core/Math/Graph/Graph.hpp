@@ -133,6 +133,9 @@ namespace Strawberry::Core::Math
 	template <GraphConfig Config> requires (!Config::Weighted)
 	struct GraphEdgeStorage<Config>
 	{
+		unsigned int Count() const { return static_cast<unsigned int>(mEdges.size()); }
+
+
 		mutable std::map<typename Config::NodeID, std::set<typename Config::NodeID>> mEdges;
 	};
 
@@ -140,6 +143,9 @@ namespace Strawberry::Core::Math
 	template <GraphConfig Config> requires (Config::Weighted)
 	struct GraphEdgeStorage<Config>
 	{
+		unsigned int Count() const { return static_cast<unsigned int>(mEdges.size()); }
+
+
 		mutable std::map<typename Config::NodeID, std::set<typename Config::NodeID>> mEdges;
 		std::map<EdgeCommon<Config>, typename Config::WeightType> mWeights;
 	};
@@ -164,6 +170,12 @@ namespace Strawberry::Core::Math
 		const _Value& GetValue(NodeID nodeIndex) const
 		{
 			return mNodes.at(nodeIndex);
+		}
+
+
+		unsigned int NodeCount() const
+		{
+			return mNodes.size();
 		}
 
 
@@ -245,6 +257,17 @@ namespace Strawberry::Core::Math
 			{
 				mEdgeStorage.mEdges[e.B()].erase(e.A());
 			}
+		}
+
+
+		unsigned int EdgeCount() const
+		{
+			std::set<Edge> edgeSet;
+			for (auto edge : Edges())
+			{
+				edgeSet.emplace(edge);
+			}
+			return edgeSet.size();
 		}
 
 
