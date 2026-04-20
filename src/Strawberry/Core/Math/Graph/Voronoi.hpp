@@ -37,7 +37,7 @@ namespace Strawberry::Core::Math
 			std::map<DirectedEdge, unsigned int> edges;
 
 
-			/// Gets the set of nodes in counter clockwise order.
+			/// Gets the set of nodes in counter-clockwise order.
 			auto Nodes() const
 			{
 				/// Get the ordered set of all nodes.
