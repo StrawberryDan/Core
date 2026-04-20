@@ -1,7 +1,6 @@
 #pragma once
 // Strawberry Core
-#include "Strawberry/Core/Math/Geometry/Line.hpp"
-#include "Strawberry/Core/Math/Geometry/LineSegment.hpp"
+#include "Strawberry/Core/Math/Geometry/AABB.hpp"
 #include "Strawberry/Core/Math/Geometry/PointSet.hpp"
 #include "Strawberry/Core/Math/Geometry/Simplex.hpp"
 #include "Strawberry/Core/Math/Geometry/Sphere.hpp"
@@ -52,6 +51,8 @@ namespace Strawberry::Core::Math
 			}
 			return builder.Build();
 		}
+
+		const auto& GetBoundingBox() const noexcept { return mBounds; }
 
 		/// Accessor for the edge of the voronoi cell boundaries.
 		const auto& GetGraph() const noexcept { return mGraph; }
@@ -171,7 +172,8 @@ namespace Strawberry::Core::Math
 		Delaunay() = default;
 
 
-		UndirectedGraph<Vector<T, 2>> mGraph;
+		/// The bounding box of this graph.
+		AABB<T, 2> mBounds;
 		/// The set of triangular faces contained in this graph.
 		std::set<Face> mFaces;
 
@@ -256,12 +258,10 @@ namespace Strawberry::Core::Math
 	public:
 		/// Create a builder with the given AABB extent.
 		Builder(const Vector<T, 2>& min, const Vector<T, 2>& max)
-			: mMin(min)
-			, mMax(max)
+			: mBoundingBox(min, max)
 		{
 			// Store min and max;
-			mResult.mMin = min;
-			mResult.mMax = max;
+			mResult.mBounds = mBoundingBox;
 
 			// Other two orthogonal extreme points.
 			Vector<T, 2> xMax(max[0], min[1]);
@@ -289,7 +289,7 @@ namespace Strawberry::Core::Math
 		{
 			ZoneScoped;
 
-			Assert(NodeInBounds(value),
+			Assert(mBoundingBox.Contains(value),
 				   "Attempted to add an out-of-bounds node to Delaunay graph.");
 			Assert(!mResult.mGraph.ContainsValue(value),
 				   "Attempted to add duplicate node to Delaunay graph.");
@@ -367,15 +367,6 @@ namespace Strawberry::Core::Math
 
 
 	private:
-		/// Returns if a node is contained by the AABB box bounding this graph.
-		bool NodeInBounds(const Vector<T, 2>& value)
-		{
-			const bool xBounds = mMin[0] < value[0] && value[0] < mMax[0];
-			const bool yBounds = mMin[1] < value[1] && value[1] < mMax[1];
-			return xBounds && yBounds;
-		}
-
-
 		/// Returns the set of faces that conflict with the point being added 'value'.
 		///
 		/// Edges are defined to be conflicinging if their circumspheres
@@ -527,7 +518,8 @@ namespace Strawberry::Core::Math
 #endif
 		}
 
-		Vector<T, 2> mMin; Vector<T, 2> mMax;
+		/// Bounds
+		AABB<T, 2> mBoundingBox;
 		/// The delaunay graph we are creating.
 		Delaunay<Vector<T, 2>>                 mResult;
 		/// A cache of the triangle representation of faces from our delaunay.
