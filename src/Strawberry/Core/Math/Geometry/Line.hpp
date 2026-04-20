@@ -55,7 +55,7 @@ namespace Strawberry::Core::Math
 			auto  v2 = b.Direction();
 
 			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-			if (determinant == 0.0)
+			if (std::abs(determinant) <= std::numeric_limits<T>::epsilon())
 			{
 				return NullOpt;
 			}

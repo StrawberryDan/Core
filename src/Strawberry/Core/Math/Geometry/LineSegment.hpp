@@ -37,14 +37,20 @@ namespace Strawberry::Core::Math
 
 
 	template <typename T>
-	struct IntersectionTest<LineSegment<T, 2>, LineSegment<T, 2>>
+	struct IntersectionTest<LineSegment<T, 2>, Line<T, 2>>
 	{
-		using Result = Optional<Vector<T, 2>>;
-
-
-		Result operator()(const LineSegment<T, 2>& a, const LineSegment<T, 2>& b) const noexcept
+		struct Data
 		{
-						// Solve using Cramer's rule
+			Vector<T, 2> position;
+			double segmentDistance;
+		};
+
+		using Result = Optional<Data>;
+
+
+		Result operator()(const LineSegment<T, 2>& a, const Line<T, 2>& b) const noexcept
+		{
+			// Solve using Cramer's rule
 			auto& p1 = a.A();
 			auto& p2 = b.A();
 			auto   c = p2 - p1;
@@ -52,7 +58,49 @@ namespace Strawberry::Core::Math
 			auto  v2 = b.Direction();
 
 			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-			if (determinant == 0.0)
+			if (std::abs(determinant) <= std::numeric_limits<T>::epsilon())
+			{
+				return NullOpt;
+			}
+
+			auto t1Num = c[0] * v2[1] - v2[0] * c[1];
+			auto t1 = t1Num / determinant;
+			auto t2Num = -(v1[0] * c[1] - c[0] * v1[1]);
+			auto t2 = t2Num / determinant;
+
+			if (t1 < 0 || t1 > 1.0)
+			{
+				return NullOpt;
+			}
+
+			return Data { .position = p1 + t1 * v1, .segmentDistance = t1 };
+		}
+	};
+
+
+	template <typename T>
+	struct IntersectionTest<LineSegment<T, 2>, LineSegment<T, 2>>
+	{
+		struct Data
+		{
+			Vector<T, 2> position;
+			double segmentDistance[2];
+		};
+
+		using Result = Optional<Data>;
+
+
+		Result operator()(const LineSegment<T, 2>& a, const LineSegment<T, 2>& b) const noexcept
+		{
+			// Solve using Cramer's rule
+			auto& p1 = a.A();
+			auto& p2 = b.A();
+			auto   c = p2 - p1;
+			auto  v1 = a.Direction();
+			auto  v2 = b.Direction();
+
+			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
+			if (std::abs(determinant) <= std::numeric_limits<T>::epsilon())
 			{
 				return NullOpt;
 			}
@@ -67,7 +115,7 @@ namespace Strawberry::Core::Math
 				return NullOpt;
 			}
 
-			return p1 + t1 * v1;
+			return Data{ .position = p1 + t1 * v1, .segmentDistance { t1, t2 } };
 		}
 	};
 }

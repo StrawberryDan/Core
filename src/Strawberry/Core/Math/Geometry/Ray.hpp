@@ -66,7 +66,13 @@ namespace Strawberry::Core::Math
 	template <typename T>
 	struct IntersectionTest<Ray<T, 2>, Line<T, 2>>
 	{
-		using Result = Core::Optional<Vector<T, 2>>;
+		struct Data
+		{
+			Vector<T, 2> position;
+			double rayDistance;
+		};
+
+		using Result = Optional<Data>;
 
 
 		Result operator()(const Ray<T, 2>& a, const Line<T, 2>& b) const noexcept
@@ -79,7 +85,7 @@ namespace Strawberry::Core::Math
 			auto  v2 = b.Direction();
 
 			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-			if (determinant == 0.0)
+			if (std::abs(determinant) <= std::numeric_limits<T>::epsilon())
 			{
 				return NullOpt;
 			}
@@ -94,7 +100,7 @@ namespace Strawberry::Core::Math
 				return NullOpt;
 			}
 
-			return p1 + t1 * v1;
+			return Data { .position = p1 + t1 * v1, .rayDistance = t1 };
 		}
 	};
 
@@ -102,7 +108,14 @@ namespace Strawberry::Core::Math
 	template <typename T>
 	struct IntersectionTest<Ray<T, 2>, LineSegment<T, 2>>
 	{
-		using Result = Core::Optional<Vector<T, 2>>;
+		struct Data
+		{
+			Vector<T, 2> position;
+			double       rayDistance;
+			double       segmentDistance;
+		};
+
+		using Result = Optional<Data>;
 
 
 		Result operator()(const Ray<T, 2>& a, const LineSegment<T, 2>& b) const noexcept
@@ -115,7 +128,7 @@ namespace Strawberry::Core::Math
 			auto  v2 = b.Direction();
 
 			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-			if (determinant == 0.0)
+			if (std::abs(determinant) <= std::numeric_limits<T>::epsilon())
 			{
 				return NullOpt;
 			}
@@ -130,7 +143,7 @@ namespace Strawberry::Core::Math
 				return NullOpt;
 			}
 
-			return p1 + t1 * v1;
+			return Data { .position = p1 + t1 * v1, .rayDistance = t1, .segmentDistance = t2 };
 		}
 	};
 
@@ -138,7 +151,13 @@ namespace Strawberry::Core::Math
 	template <typename T>
 	struct IntersectionTest<Ray<T, 2>, Ray<T, 2>>
 	{
-		using Result = Core::Optional<Vector<T, 2>>;
+		struct Data
+		{
+			Vector<T, 2> position;
+			double       rayDistance[2];
+		};
+
+		using Result = Optional<Data>;
 
 		Result operator()(const Ray<T, 2>& a, const Ray<T, 2>& b) const noexcept
 		{
@@ -150,7 +169,7 @@ namespace Strawberry::Core::Math
 			auto& v2 = b.Direction();
 
 			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-			if (determinant == 0.0)
+			if (std::abs(determinant) <= std::numeric_limits<T>::epsilon())
 			{
 				return NullOpt;
 			}
@@ -165,7 +184,7 @@ namespace Strawberry::Core::Math
 				return NullOpt;
 			}
 
-			return p1 + t1 * v1;
+			return Data { .position = p1 + t1 * v1, .rayDistance { t1, t2 } };
 		}
 	};
 }
