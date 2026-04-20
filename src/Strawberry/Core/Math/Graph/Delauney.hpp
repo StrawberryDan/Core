@@ -116,7 +116,7 @@ namespace Strawberry::Core::Math
 				}
 			}
 
-			return {dual, faceNodeMapping};
+			return { dual, faceNodeMapping };
 		}
 
 		/// Looks for the faces on either side of this edge.
@@ -163,6 +163,9 @@ namespace Strawberry::Core::Math
 					}
 				}
 			}
+
+			// A valid triangulation edge cannot be shared by more than 2 faces.
+			Assert(faces.size() <= 2);
 			return faces;
 		}
 
@@ -178,9 +181,6 @@ namespace Strawberry::Core::Math
 		UndirectedVectorGraph<Vector<T, 2>> mGraph;
 		/// The set of triangular faces contained in this graph.
 		std::set<Face> mFaces;
-
-		Vector<T, 2> mMin;
-		Vector<T, 2> mMax;
 	};
 
 
@@ -250,7 +250,6 @@ namespace Strawberry::Core::Math
 		/// The set of 3 nodes in this face.
 		std::array<unsigned int, 3> mNodes;
 	};
-
 
 
 	/// Class for creating Delaunay Triangulations.
@@ -339,7 +338,7 @@ namespace Strawberry::Core::Math
 
 
 		/// Return the graph with the supporting nodes removed.
-		Delaunay<Vector<T, 2>> Build(bool pruneSupportVertices = false) const noexcept
+		Delaunay Build(bool pruneSupportVertices = false) const noexcept
 		{
 			// Copy the result.
 			auto copy = mResult;
@@ -497,7 +496,7 @@ namespace Strawberry::Core::Math
 
 
 	private:
-		void Validate(const Delaunay<Vector<T, 2>>* graph = nullptr) const
+		void Validate(const Delaunay* graph = nullptr) const
 		{
 #ifdef STRAWBERRY_DEBUG
 			if (graph == nullptr) graph = &mResult;
