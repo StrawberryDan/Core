@@ -16,10 +16,10 @@ int main()
 
 	Line<double, 2> l1({-10, 0}, {-10, 1});
 
-	AssertEQ(r1.Intersection(r3), Vector{0.5, 0.5});
+	AssertEQ(r1.Intersection(r3)->position, Vector{0.5, 0.5});
 	Assert(!r1.Intersection(r2).HasValue());
-	AssertEQ(ls1.Intersection(r1), Vector{10., 10.});
-	AssertEQ(r2.Intersection(l1), Vector{-10., 9.});
+	AssertEQ(ls1.Intersection(r1)->position, Vector{10., 10.});
+	AssertEQ(r2.Intersection(l1)->position, Vector{-10., 9.});
 
 	return 0;
 }
