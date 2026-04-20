@@ -31,6 +31,16 @@ namespace Strawberry::Core::Math
 			, mDotProduct(dotProduct) {}
 
 
+		/// Returns a point located on the plane.
+		/// This is the point which intersects the line along the normal from the origin.
+		Vector<T, 2> GetPoint() const
+		{
+			auto result = mNormal * mDotProduct;
+			Assert(SignedDistance(result) < std::numeric_limits<T>::epsilon());
+			return result;
+		}
+
+
 		T SignedDistance(const Vector<T, D>& point) const requires (std::floating_point<T>)
 		{
 			return mNormal.Dot(point) - mDotProduct;
