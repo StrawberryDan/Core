@@ -741,4 +741,117 @@ namespace Strawberry::Core
 
 		return true;
 	}
+
+
+	template <typename T, typename R>
+	bool operator<(const Optional<T>& t, const R& r)
+	{
+		if constexpr (IsOptional<R>)
+		{
+			if (t.HasValue() && r.HasValue())
+			{
+				return t.Value() < r.Value();
+			}
+
+			if (t.HasValue())
+			{
+				return false;
+			}
+
+			if (r.HasValue())
+			{
+				return true;
+			}
+
+			return false;
+		}
+		else
+		{
+			return t.HasValue() ? t.Value() < r : true;
+		}
+	}
+
+	template <typename T, typename R>
+	bool operator<=(const Optional<T>& t, const R& r)
+	{
+		if constexpr (IsOptional<R>)
+		{
+			if (t.HasValue() && r.HasValue())
+			{
+				return t.Value() <= r.Value();
+			}
+
+			if (t.HasValue())
+			{
+				return false;
+			}
+
+			if (r.HasValue())
+			{
+				return true;
+			}
+
+			return true;
+		}
+		else
+		{
+			return t.HasValue() ? t.Value <= r : true;
+		}
+	}
+
+	template <typename T, typename R>
+	bool operator>(const Optional<T>& t, const R& r)
+	{
+		if constexpr (IsOptional<R>)
+		{
+			if (t.HasValue() && r.HasValue())
+			{
+				return t.Value() > r.Value();
+			}
+
+			if (t.HasValue())
+			{
+				return true;
+			}
+
+			if (r.HasValue())
+			{
+				return false;
+			}
+
+			return false;
+		}
+		else
+		{
+			return t.HasValue() ? t.Value() > r : true;
+		}
+	}
+
+	template <typename T, typename R>
+	bool operator>=(const Optional<T>& t, const R& r)
+	{
+		if constexpr (IsOptional<R>)
+		{
+			if (t.HasValue() && r.HasValue())
+			{
+				return t.Value() >= r.Value();
+			}
+
+			if (t.HasValue())
+			{
+				return true;
+			}
+
+			if (r.HasValue())
+			{
+				return false;
+			}
+
+			return true;
+		}
+		else
+		{
+			return t.HasValue() ? t.Value <= r : true;
+		}
+	}
 } // namespace Strawberry::Core
