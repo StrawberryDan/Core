@@ -36,11 +36,11 @@ namespace Strawberry::Core::Math
 
 
 	/// Base class for types supporting intersection operations.
-	/// Provides method syntax for intersectiont testing.
+	/// Provides method syntax for intersection testing.
 	class Intersectable
 	{
 	public:
-		/// Make default comparable so that derriving classes are also orderable.
+		/// Make default comparable so that deriving classes are also orderable.
 		auto operator<=>(const Intersectable& other) const noexcept = default;
 
 
