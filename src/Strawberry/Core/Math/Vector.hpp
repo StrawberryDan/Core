@@ -439,6 +439,12 @@ namespace Strawberry::Core::Math
 			return result;
 		}
 
+		/// Return whether this vector has a length of one.
+		bool IsNormal() const noexcept requires (std::floating_point<T>)
+		{
+			return Magnitude() - 1.0 <= std::numeric_limits<T>::epsilon();
+		}
+
 
 		/// Define vector normalisation
 		Vector Normalised() const noexcept requires (std::floating_point<T>)
