@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Strawberry/Core/IO/Logging.hpp"
+#include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "fmt/ranges.h"
 #include <algorithm>
@@ -364,4 +365,26 @@ namespace Strawberry::Core::Math
 
 	template <typename _Graph>
 	using WeightedGraph = Graph<typename _Graph::Value, WeightedGraphConfig<typename _Graph::Config>>;
+
+
+	template <typename T, GraphConfig Config>
+	class VectorGraph;
+
+	template <typename T, unsigned int D, GraphConfig Config>
+	class VectorGraph<Vector<T, D>, Config>
+		: public Graph<Vector<T, D>, Config>
+	{
+	public:
+		using Graph<Vector<T, D>, Config>::Graph;
+
+
+
+	private:
+	};
+
+	template <typename T>
+	using DirectedVectorGraph = VectorGraph<T, GraphTypeDirected>;
+
+	template <typename T>
+	using UndirectedVectorGraph = VectorGraph<T, GraphTypeUndirected>;
 }

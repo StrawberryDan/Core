@@ -25,7 +25,7 @@ namespace Strawberry::Core::Math
 	class Delaunay<Vector<T, 2>>
 	{
 	public:
-		using Graph = UndirectedGraph<Vector<T, 2>>;
+		using Graph = UndirectedVectorGraph<Vector<T, 2>>;
 		using Value = Graph::Value;
 		using Edge = Graph::Edge;
 		using NodeID = Graph::NodeID;
@@ -174,6 +174,8 @@ namespace Strawberry::Core::Math
 
 		/// The bounding box of this graph.
 		AABB<T, 2> mBounds;
+		/// The graph of the delauney triangulation.
+		UndirectedVectorGraph<Vector<T, 2>> mGraph;
 		/// The set of triangular faces contained in this graph.
 		std::set<Face> mFaces;
 
