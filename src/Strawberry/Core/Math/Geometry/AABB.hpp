@@ -71,7 +71,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		/// Returns the edges of the AABB as linesegmens in CCW order.
+		/// Returns the edges of the AABB as line segments in CCW order.
 		std::array<LineSegment<T, D>, 4> AsLineSegments() const noexcept
 		{
 			return {
