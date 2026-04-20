@@ -41,7 +41,7 @@ namespace Strawberry::Core::Math
 
 
 		void SetDirection(const Vector<T, D>& direction) { mDirection = direction.Normalised(); }
-		const Vector<T, D>& Direction() const { return mDirection; }
+		const Vector<T, D>& Direction() const { Assert(mDirection.IsNormal()); return mDirection; }
 
 
 		/// Transforms this Ray into a Line that is parallel.
