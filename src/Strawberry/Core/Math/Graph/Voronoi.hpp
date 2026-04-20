@@ -104,10 +104,11 @@ namespace Strawberry::Core::Math
 		}
 
 
-		auto CellIDs() const { return mCellMap | std::views::keys | std::ranges::to<std::set>(); }
+		/// Returns a range over all the CellIDs.
+		decltype(auto) CellIDs() const { return mCellMap | std::views::keys | std::ranges::to<std::set>(); }
 
-		/// Returns a range over the cells in thie diagram.
-		auto Cells() const { return mCellMap | std::views::values | std::ranges::to<std::set>(); }
+		/// Returns a range over the cells in this diagram.
+		decltype(auto) Cells() const { return mCellMap | std::views::values | std::ranges::to<std::set>(); }
 
 		/// Gets the set of vertices for this Cell in CCW order.
 		std::vector<Vector<T, 2>> CellVertices(Cell cell) const noexcept
