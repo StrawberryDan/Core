@@ -16,14 +16,8 @@ namespace Strawberry::Core::Math
 		template <std::ranges::range Range>
 		static PolygonOutline From(Range&& range) requires (std::convertible_to<std::ranges::range_value_t<Range>, LineSegment<T, 2>>)
 		{
-			return From(static_cast<const std::vector<LineSegment<T, 2>>&>(std::forward<Range>(range) | std::ranges::to<std::vector>()));
-		}
-
-
-		static PolygonOutline From(const std::vector<LineSegment<T, 2>>& outlineLines)
-		{
 			PolygonOutline outline;
-			outline.mOutline = outlineLines;
+			outline.mOutline = std::forward<Range>(range) | std::ranges::to<std::vector>();
 			return outline;
 		}
 
