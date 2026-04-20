@@ -105,6 +105,7 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Math/Geometry/LineSegment.hpp
     src/Strawberry/Core/Math/Geometry/Plane.hpp
     src/Strawberry/Core/Math/Geometry/PointSet.hpp
+    src/Strawberry/Core/Math/Geometry/PolygonOutline.hpp
     src/Strawberry/Core/Math/Geometry/Ray.hpp
     src/Strawberry/Core/Math/Geometry/Simplex.hpp
     src/Strawberry/Core/Math/Geometry/Sphere.hpp

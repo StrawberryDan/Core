@@ -1,0 +1,138 @@
+#pragma once
+#include "Strawberry/Core/Math/Geometry/LineSegment.hpp"
+#include "Strawberry/Core/Math/Geometry/Line.hpp"
+#include "Strawberry/Core/Math/Geometry/Ray.hpp"
+#include <ranges>
+#include <vector>
+
+
+
+namespace Strawberry::Core::Math
+{
+	template <typename T>
+	class PolygonOutline
+	{
+	public:
+		template <std::ranges::range Range>
+		static PolygonOutline From(Range&& range) requires (std::convertible_to<std::ranges::range_value_t<Range>, LineSegment<T, 2>>)
+		{
+			return From(static_cast<const std::vector<LineSegment<T, 2>>&>(std::forward<Range>(range) | std::ranges::to<std::vector>()));
+		}
+
+
+		static PolygonOutline From(const std::vector<LineSegment<T, 2>>& outlineLines)
+		{
+			PolygonOutline outline;
+			outline.mOutline = outlineLines;
+			return outline;
+		}
+
+		const LineSegment<T, 2>& GetLine(unsigned int index) const
+		{
+			return mOutline.at(index);
+		}
+
+
+		decltype(auto) LineCount() const
+		{
+			return mOutline.size();
+		}
+
+
+	private:
+		PolygonOutline() = default;
+
+
+		std::vector<LineSegment<T, 2>> mOutline;
+	};
+
+
+	template <typename T>
+	struct IntersectionTest<PolygonOutline<T>, Line<T, 2>>
+	{
+		struct Data
+			: IntersectionTest<LineSegment<T, 2>, Line<T, 2>>::Result::Inner
+		{
+			using IntersectionTest<LineSegment<T, 2>, Line<T, 2>>::Result::Inner::Inner;
+
+
+			Data(const IntersectionTest<LineSegment<T, 2>, Line<T, 2>>::Result::Inner& inner)
+				: IntersectionTest<LineSegment<T, 2>, Line<T, 2>>::Result::Inner(inner)
+				, edgeIndex(0)
+			{}
+
+
+			unsigned int edgeIndex;
+		};
+
+		using Result = std::vector<Data>;
+
+		constexpr Result operator()(const PolygonOutline<T>& a, const Line<T, 2>& b) const noexcept
+		{
+			Result result;
+			result.reserve(2);
+
+			for (int i = 0; i < a.LineCount(); i++)
+			{
+				const auto& line = a.GetLine(i);
+
+				if (auto intersection = line.Intersection(b))
+				{
+					Data data(intersection.Unwrap());
+					data.edgeIndex = i;
+					result.emplace_back(std::move(data));
+				}
+			}
+
+			return result;
+		}
+	};
+
+
+	template <typename T>
+	struct IntersectionTest<PolygonOutline<T>, Ray<T, 2>>
+	{
+		using Result = std::vector<typename IntersectionTest<LineSegment<T, 2>, Ray<T, 2>>::Result::Inner>;
+
+		constexpr Result operator()(const PolygonOutline<T>& a, const Ray<T, 2>& b) const noexcept
+		{
+			Result result;
+			result.reserve(2);
+
+			for (const auto& line : a.AsLineSegments())
+			{
+				if (auto intersection = line.Intersection(b))
+				{
+					auto pos = std::ranges::lower_bound(result, std::less{}, [] (const auto& x) { return x.rayDistance;});
+					result.emplace(pos, std::move(intersection.Unwrap()));
+				}
+			}
+
+			return result;
+		}
+	};
+
+
+	template <typename T>
+	struct IntersectionTest<PolygonOutline<T>, LineSegment<T, 2>>
+	{
+		using Result = std::vector<typename IntersectionTest<LineSegment<T, 2>, LineSegment<T, 2>>::Result::Inner>;
+
+		constexpr Result operator()(const PolygonOutline<T>& a, const LineSegment<T, 2>& b) const noexcept
+		{
+			Result result;
+			result.reserve(2);
+
+			for (const auto& line : a.AsLineSegments())
+			{
+				if (auto intersection = b.Intersection(line))
+				{
+					auto pos = std::ranges::lower_bound(result, std::less{}, [] (const auto& x) { return x.segmentDistance[0]; });
+					result.emplace(pos, std::move(intersection.Unwrap()));
+				}
+			}
+
+			return result;
+		}
+	};
+}
