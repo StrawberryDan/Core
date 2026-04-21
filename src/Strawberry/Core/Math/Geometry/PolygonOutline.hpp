@@ -11,6 +11,7 @@ namespace Strawberry::Core::Math
 {
 	template <typename T>
 	class PolygonOutline
+		: public Intersectable
 	{
 	public:
 		template <std::ranges::range Range>
