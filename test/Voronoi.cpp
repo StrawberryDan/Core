@@ -11,9 +11,9 @@
 using namespace Strawberry::Core;
 using namespace Math;
 
-static Vector<double, 2> MIN{0.0, 0.0};
-static Vector<double, 2> MAX{2000.0, 2000.0};
-static double            PADDING = 20.0;
+static Vector<double, 2> MIN{50.0, 50.0};
+static Vector<double, 2> MAX{1950.0, 1950.0};
+static double            PADDING = 50.0;
 
 struct GraphColoring
 {
