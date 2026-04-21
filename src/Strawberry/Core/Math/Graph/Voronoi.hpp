@@ -34,7 +34,7 @@ namespace Strawberry::Core::Math
 		/// Structure representing a cell in a voronoi diagram.
 		struct Cell
 		{
-			std::map<DirectedEdge, unsigned int> edges;
+			std::map<DirectedEdge, Optional<unsigned int>> edges;
 
 
 			/// Gets the set of nodes in counter-clockwise order.
@@ -68,7 +68,11 @@ namespace Strawberry::Core::Math
 			/// Returns the IDs for the neighbouring cells.
 			std::set<unsigned int> Neighbours() const noexcept
 			{
-				return edges | std::views::values | std::ranges::to<std::set>();
+				return edges
+					| std::views::values
+					| std::views::filter([] (const auto& x) { return static_cast<bool>(x); })
+					| std::views::transform([] (const auto& x) { return x.Value(); })
+					| std::ranges::to<std::set>();
 			};
 
 
@@ -199,7 +203,7 @@ namespace Strawberry::Core::Math
 			Vector<T, 2> triangulationNodeValue = mTriangulation.GetGraph().GetValue(triangulationNode);
 
 			/// Table of edges mapped to the neighbour with which it shares that edge.
-			std::map<DirectedEdge, unsigned int> edges;
+			std::map<DirectedEdge, Optional<unsigned int>> edges;
 			/// Get this cell's neighbours in CCW order.
 			auto neighbours = VectorGraphWalker(PathGraphWalker(BasicGraphWalker(mTriangulation.GetGraph(), triangulationNode)))
 				.GetNeighboursCCW();
