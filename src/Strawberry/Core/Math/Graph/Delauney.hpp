@@ -87,8 +87,7 @@ namespace Strawberry::Core::Math
 		{
 			return mFaces
 				| std::views::filter([face] (const Face& otherFace) {
-					return face != otherFace && face.SharesEdgeWith(otherFace);
-				})
+					return face != otherFace && face.SharesEdgeWith(otherFace); })
 				| std::ranges::to<std::set>();
 		}
 
