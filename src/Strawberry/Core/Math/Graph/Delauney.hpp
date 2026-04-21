@@ -261,26 +261,20 @@ namespace Strawberry::Core::Math
 		Builder(const Vector<T, 2>& min, const Vector<T, 2>& max)
 			: mBoundingBox(min, max)
 		{
+			auto span = max - min;
+
 			// Store min and max;
 			mResult.mBounds = mBoundingBox;
-
-			// Other two orthogonal extreme points.
-			Vector<T, 2> xMax(max[0], min[1]);
-			Vector<T, 2> yMax(min[0], max[1]);
 			// Create the supporting nodes.
 			mResult.mGraph.AddNode(min);
-			mResult.mGraph.AddNode(xMax);
-			mResult.mGraph.AddNode(yMax);
-			mResult.mGraph.AddNode(max);
+			mResult.mGraph.AddNode(Vector{2 * span[0], min[1]});
+			mResult.mGraph.AddNode(Vector{min[0], 2 * span[1]});
 			// Create the edges between supporting nodes.
 			mResult.mGraph.AddEdge({0, 1});
-			mResult.mGraph.AddEdge({0, 2});
-			mResult.mGraph.AddEdge({0, 3});
-			mResult.mGraph.AddEdge({1, 3});
-			mResult.mGraph.AddEdge({2, 3});
+			mResult.mGraph.AddEdge({1, 2});
+			mResult.mGraph.AddEdge({2, 0});
 			// Create the faces between supporting nodes.
-			mResult.mFaces.emplace(Face{0, 2, 3});
-			mResult.mFaces.emplace(Face{0, 1, 3});
+			mResult.mFaces.emplace(Face{0, 1, 2});
 			Validate();
 		}
 
@@ -339,44 +333,36 @@ namespace Strawberry::Core::Math
 		}
 
 
-		Builder&& Unpruned()
-		{
-			mShouldPrune = false;
-			return std::move(*this);
-		}
-
-
 		/// Return the graph with the supporting nodes removed.
 		Delaunay Build() const noexcept
 		{
-			// Copy the result.
-			auto copy = mResult;
-			// If we're pruning supporting vertices, we remove all nodes
-			// from the supporting rectangle and all faces using those nodes.
-			if (mShouldPrune)
-			{
-				copy.mGraph.RemoveNode(0);
-				copy.mGraph.RemoveNode(1);
-				copy.mGraph.RemoveNode(2);
-				copy.mGraph.RemoveNode(3);
-				copy.mFaces = mResult.mFaces
-					| std::views::filter([] (Face face) {
-						return !(face.ContainsNode(0) ||
-								 face.ContainsNode(1) ||
-								 face.ContainsNode(2) ||
-								 face.ContainsNode(3));
-					})
-					| std::ranges::to<std::set>();
-			}
-
-			Validate(&copy);
-
 			// Return the copy.
-			return copy;
+			return Prune();
 		}
 
 
 	private:
+		Delaunay Prune() const noexcept
+		{
+			// If we're pruning supporting vertices, we remove all nodes
+			// from the supporting rectangle and all faces using those nodes.
+			auto copy = mResult;
+
+			copy.mGraph.RemoveNode(0);
+			copy.mGraph.RemoveNode(1);
+			copy.mGraph.RemoveNode(2);
+			copy.mFaces = mResult.mFaces
+				| std::views::filter([] (Face face) {
+					return !(face.ContainsNode(0) ||
+							 face.ContainsNode(1) ||
+							 face.ContainsNode(2));
+				})
+				| std::ranges::to<std::set>();
+			Validate(&copy);
+			return copy;
+		}
+
+
 		/// Returns the set of faces that conflict with the point being added 'value'.
 		///
 		/// Edges are defined to be conflicinging if their circumspheres
