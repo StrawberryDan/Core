@@ -93,12 +93,12 @@ namespace Strawberry::Core::Math
 			Result result;
 			result.reserve(2);
 
-			for (const auto& line : a.AsLineSegments())
+			for (int i = 0; i < a.LineCount(); i++)
 			{
+				const auto& line = a.GetLine(i);
 				if (auto intersection = line.Intersection(b))
 				{
-					auto pos = std::ranges::lower_bound(result, std::less{}, [] (const auto& x) { return x.rayDistance;});
-					result.emplace(pos, std::move(intersection.Unwrap()));
+					result.emplace_back(std::move(intersection.Unwrap()));
 				}
 			}
 
@@ -117,12 +117,12 @@ namespace Strawberry::Core::Math
 			Result result;
 			result.reserve(2);
 
-			for (const auto& line : a.AsLineSegments())
+			for (int i = 0; i < a.LineCount(); i++)
 			{
-				if (auto intersection = b.Intersection(line))
+				const auto& line = a.GetLine(i);
+				if (auto intersection = line.Intersection(b))
 				{
-					auto pos = std::ranges::lower_bound(result, std::less{}, [] (const auto& x) { return x.segmentDistance[0]; });
-					result.emplace(pos, std::move(intersection.Unwrap()));
+					result.emplace_back(std::move(intersection.Unwrap()));
 				}
 			}
 
