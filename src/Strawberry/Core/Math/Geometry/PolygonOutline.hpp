@@ -21,6 +21,12 @@ namespace Strawberry::Core::Math
 			return outline;
 		}
 
+		Vector<T, 2> GetPoint(unsigned int index) const noexcept
+		{
+			Assert(index < mPoints.size());
+			return mPoints[index];
+		}
+
 		decltype(auto) PointCount() const noexcept
 		{
 			return mPoints.size();
