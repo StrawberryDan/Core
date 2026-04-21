@@ -131,8 +131,8 @@ static void DrawCellCenters(canvas_ity::canvas& canvas, Voronoi<Vector<double, 2
 
 int main()
 {
-	GraphColoring mainColoring { .drawEdges = false, .dashEdges = true, .edgeWidth = 1.5f, .mEdgeColor{0.7f, 0.7f, 0.7f, 1.0f}, .mNodeColor{0.7f, 0.0f, 0.0f, 1.0f} };
-	GraphColoring voronoiColoring { .drawNodes = false, .mEdgeColor{0.0f, 0.8f, 0.8f, 1.0f}, .mNodeColor{0.0f, 1.0f, 0.0f, 1.0f} };
+	GraphColoring mainColoring { .drawEdges = true, .dashEdges = true, .edgeWidth = 1.0f, .mEdgeColor{0.7f, 0.7f, 0.7f, 1.0f}, .mNodeColor{0.7f, 0.0f, 0.0f, 1.0f} };
+	GraphColoring voronoiColoring { .drawNodes = true, .mEdgeColor{0.0f, 0.8f, 0.8f, 1.0f}, .mNodeColor{0.0f, 1.0f, 0.0f, 1.0f} };
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
