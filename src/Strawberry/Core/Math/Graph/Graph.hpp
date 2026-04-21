@@ -186,6 +186,46 @@ namespace Strawberry::Core::Math
 		}
 
 
+		unsigned int InDegree(NodeID node) const requires (Config::Directed)
+		{
+			unsigned int result = 0;
+			for (auto edge : mEdgeStorage.mEdges)
+			{
+				if (edge.first == node) result++;
+			}
+			return result;
+		}
+
+
+		unsigned int OutDegree(NodeID node) const requires (Config::Directed)
+		{
+			unsigned int result = 0;
+			for (auto edge : mEdgeStorage.mEdges)
+			{
+				if (edge.second == node) result++;
+			}
+			return result;
+		}
+
+
+		unsigned int Degree(NodeID node) const
+		{
+			if constexpr (Config::Directed)
+			{
+				return OutDegree();
+			}
+			else
+			{
+				unsigned int result = 0;
+				for (auto edge : mEdgeStorage.mEdges)
+				{
+					if (edge.first == node) result++;
+				}
+				return result;
+			}
+		}
+
+
 		auto NodeIndices() const noexcept
 		{
 			return mNodes | std::views::keys;
