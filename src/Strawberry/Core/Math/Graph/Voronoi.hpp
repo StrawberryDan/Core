@@ -235,6 +235,7 @@ namespace Strawberry::Core::Math
 
 			Cell cell;
 			cell.edges = edges;
+			Assert(cell.edges.size() > 0);
 
 			Assert(CellContainsPoint(cell, GetCellMeanVertex(cell)));
 			return cell;
