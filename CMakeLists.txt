@@ -195,6 +195,7 @@ if (NOT TARGET StrawberryCore)
 
 
   new_strawberry_tests(NAME "StrawberryCore" TESTS
+    test/AABB.cpp
     test/Base64.cpp
     test/ChannelBroadcaster.cpp
     test/Checked.cpp
