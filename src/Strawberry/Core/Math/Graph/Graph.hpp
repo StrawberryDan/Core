@@ -254,6 +254,13 @@ namespace Strawberry::Core::Math
 		}
 
 
+		template <std::convertible_to<Value> T>
+		void UpdateNode(NodeID id, T&& value)
+		{
+			mNodes.at(id) = std::forward<T>(value);
+		}
+
+
 		/// Removes the node with the given index, as well as all it's connected edges.
 		void RemoveNode(NodeID index)
 		{
