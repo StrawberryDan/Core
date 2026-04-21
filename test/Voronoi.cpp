@@ -147,7 +147,7 @@ int main()
 	auto span = MAX - MIN;
 
 	canvas_ity::canvas context(span[0], span[1]);
-	Image<PixelRGBA> image(span.template AsType<unsigned int>());
+	Image<PixelRGBA> image(span.AsType<unsigned int>());
 
 	DrawGraph(context, delaunay.GetGraph(), mainColoring);
 	DrawGraph(context, voronoi.GetGraph(), voronoiColoring);
