@@ -215,25 +215,28 @@ namespace Strawberry::Core::Math
 
 				typename Delaunay::Edge edge (triangulationNode, neighbour);
 				auto faces = mTriangulation.FindFacesWithEdge(edge) | std::ranges::to<std::vector>();
-				Assert(faces.size() >= 1 && faces.size() <= 2);
-				if (faces.size() == 1)
-				{
-					continue;
-				}
+				Assert(faces.size() <= 2);
 
-				/// Get voronoi vertices.
-				DirectedEdge voronoiEdge { mTriangleToNodeMapping.at(faces[0]), mTriangleToNodeMapping.at(faces[1]) };
-				Vector<T, 2> voronoiEdgeStart = mTriangulation.GetFaceCircumcenter(faces[0]);
-				Vector<T, 2> voronoiEdgeEnd = mTriangulation.GetFaceCircumcenter(faces[1]);
-				// Make sure edges are all CCW.
-				if ( (neighbourValue - triangulationNodeValue).DotPerp(voronoiEdgeStart - triangulationNodeValue) >
-					 (neighbourValue - triangulationNodeValue).DotPerp(voronoiEdgeEnd   - triangulationNodeValue))
+				if (faces.size() == 2)
 				{
-					voronoiEdge.Reverse();
-				}
+					/// Get voronoi vertices.
+					DirectedEdge voronoiEdge {
+						mTriangleToNodeMapping.at(faces[0]),
+						mTriangleToNodeMapping.at(faces[1]) };
 
-				// Store
-				edges.emplace(voronoiEdge, neighbour);
+					Vector<T, 2> voronoiEdgeStart = mTriangulation.GetFaceCircumcenter(faces[0]);
+					Vector<T, 2> voronoiEdgeEnd = mTriangulation.GetFaceCircumcenter(faces[1]);
+
+					// Make sure edges are all CCW.
+					if ( (neighbourValue - triangulationNodeValue).DotPerp(voronoiEdgeStart - triangulationNodeValue) >
+						 (neighbourValue - triangulationNodeValue).DotPerp(voronoiEdgeEnd   - triangulationNodeValue))
+					{
+						voronoiEdge.Reverse();
+					}
+
+					// Store
+					edges.emplace(voronoiEdge, neighbour);
+				}
 			}
 
 
