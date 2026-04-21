@@ -232,6 +232,30 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Get the edges on the outside of the triangulation;
+		std::set<Edge> GetOuterEdges() const noexcept
+		{
+			std::set<Edge> outerEdges;
+			for (const auto& edge : mGraph.Edges())
+			{
+				unsigned int containingFaces = 0;
+				for (const auto& face : mFaces)
+				{
+					if (face.ContainsEdge(edge))
+					{
+						containingFaces++;
+					}
+				}
+
+				if (containingFaces == 1)
+				{
+					outerEdges.emplace(edge);
+				}
+			}
+			return outerEdges;
+		}
+
+
 	private:
 		/// Private constructor for use by Builder().
 		Delaunay() = default;
