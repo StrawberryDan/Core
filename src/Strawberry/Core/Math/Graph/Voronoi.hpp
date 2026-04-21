@@ -249,9 +249,8 @@ namespace Strawberry::Core::Math
 		}
 
 
-		UndirectedVectorGraph<Vector<T, 2>> mGraph;
-		Delaunay                      mTriangulation;
-
+		UndirectedVectorGraph<Vector<T, 2>>             mGraph;
+		Delaunay                                        mTriangulation;
 		std::map<typename Delaunay::Face, unsigned int> mTriangleToNodeMapping;
 		std::map<unsigned int, Cell>                    mCellMap;
 	};
