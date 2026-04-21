@@ -182,7 +182,7 @@ namespace Strawberry::Core::Math
 		}
 
 		/// Looks for the faces on either side of this edge.
-		std::set<Face> FindFacesWithEdge(Edge edge) const
+		std::vector<Face> FindFacesWithEdge(Edge edge) const
 		{
 			// Type for vector path walkers.
 			using WalkerType = VectorGraphWalker<PathGraphWalker<BasicGraphWalker<Graph>>>;
@@ -197,7 +197,7 @@ namespace Strawberry::Core::Math
 			walkers[0].WalkTo(edge.B());
 			walkers[1].WalkTo(edge.A());
 
-			std::set<Face> faces;
+			std::vector<Face> faces;
 			// Do for each walker
 			for (auto& walker : walkers)
 			{
@@ -218,7 +218,7 @@ namespace Strawberry::Core::Math
 								walker.GetPreviousNode(1),
 								walker.GetPreviousNode(2));
 							/// Put the face in our set.
-							faces.emplace(face);
+							faces.emplace_back(face);
 						}
 						// No need to keep going now.
 						break;
@@ -230,7 +230,6 @@ namespace Strawberry::Core::Math
 			Assert(faces.size() <= 2);
 			return faces;
 		}
-
 
 		/// Get the edges on the outside of the triangulation;
 		std::set<Edge> GetOuterEdges() const noexcept
