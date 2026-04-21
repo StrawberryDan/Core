@@ -286,7 +286,7 @@ namespace Strawberry::Core::Math
 
 
 		/// Adds a node to this triangulaiton.
-		void AddNode(const Vector<T, 2>& value)
+		Builder&& AddNode(const Vector<T, 2>& value)
 		{
 			ZoneScoped;
 
@@ -334,6 +334,8 @@ namespace Strawberry::Core::Math
 			}
 
 			Validate();
+
+			return std::move(*this);
 		}
 
 
