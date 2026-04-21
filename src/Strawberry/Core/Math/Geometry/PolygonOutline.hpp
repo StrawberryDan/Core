@@ -35,7 +35,7 @@ namespace Strawberry::Core::Math
 		const LineSegment<T, 2> GetLine(unsigned int index) const
 		{
 			Assert(index < mPoints.size());
-			return LineSegment<T, 2>(mPoints.at(index), mPoints.at((index + 1) % mPoints.size()));
+			return LineSegment<T, 2>(mPoints[index], mPoints[(index + 1) % mPoints.size()]);
 		}
 
 
