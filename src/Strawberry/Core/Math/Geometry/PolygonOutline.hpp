@@ -21,6 +21,11 @@ namespace Strawberry::Core::Math
 			return outline;
 		}
 
+		decltype(auto) PointCount() const noexcept
+		{
+			return mPoints.size();
+		}
+
 		const LineSegment<T, 2> GetLine(unsigned int index) const
 		{
 			Assert(index < mPoints.size());
