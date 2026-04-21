@@ -339,14 +339,21 @@ namespace Strawberry::Core::Math
 		}
 
 
+		Builder&& Unpruned()
+		{
+			mShouldPrune = false;
+			return std::move(*this);
+		}
+
+
 		/// Return the graph with the supporting nodes removed.
-		Delaunay Build(bool pruneSupportVertices = false) const noexcept
+		Delaunay Build() const noexcept
 		{
 			// Copy the result.
 			auto copy = mResult;
 			// If we're pruning supporting vertices, we remove all nodes
 			// from the supporting rectangle and all faces using those nodes.
-			if (pruneSupportVertices)
+			if (mShouldPrune)
 			{
 				copy.mGraph.RemoveNode(0);
 				copy.mGraph.RemoveNode(1);
@@ -529,5 +536,7 @@ namespace Strawberry::Core::Math
 		mutable std::map<Face, Triangle<T, 2>> mTriangleCache;
 		/// A cache of the circumpheres of the faces from our delaunay.
 		mutable std::map<Face, Sphere<T, 2>>   mCircumsphereCache;
+		/// Bool for whether the resulting graph should be pruned.
+		bool mShouldPrune = true;
 	};
 }
