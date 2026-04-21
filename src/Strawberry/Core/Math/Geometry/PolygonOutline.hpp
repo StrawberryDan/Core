@@ -14,22 +14,22 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		template <std::ranges::range Range>
-		static PolygonOutline From(Range&& range) requires (std::convertible_to<std::ranges::range_value_t<Range>, LineSegment<T, 2>>)
+		static PolygonOutline From(Range&& range) requires (std::convertible_to<std::ranges::range_value_t<Range>, Vector<T, 2>>)
 		{
 			PolygonOutline outline;
-			outline.mOutline = std::forward<Range>(range) | std::ranges::to<std::vector>();
+			outline.mPoints = std::forward<Range>(range) | std::ranges::to<std::vector>();
 			return outline;
 		}
 
-		const LineSegment<T, 2>& GetLine(unsigned int index) const
+		const LineSegment<T, 2> GetLine(unsigned int index) const
 		{
-			return mOutline.at(index);
+			return LineSegment<T, 2>(mPoints.at(index), mPoints.at((index + 1) % mPoints.size()));
 		}
 
 
 		decltype(auto) LineCount() const
 		{
-			return mOutline.size();
+			return mPoints.size();
 		}
 
 
@@ -37,7 +37,7 @@ namespace Strawberry::Core::Math
 		PolygonOutline() = default;
 
 
-		std::vector<LineSegment<T, 2>> mOutline;
+		std::vector<Vector<T, 2>> mPoints;
 	};
 
 
