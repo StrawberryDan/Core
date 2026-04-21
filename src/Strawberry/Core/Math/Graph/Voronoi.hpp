@@ -228,8 +228,8 @@ namespace Strawberry::Core::Math
 					Vector<T, 2> voronoiEdgeEnd = mTriangulation.GetFaceCircumcenter(faces[1]);
 
 					// Make sure edges are all CCW.
-					if ( (neighbourValue - triangulationNodeValue).DotPerp(voronoiEdgeStart - triangulationNodeValue) >
-						 (neighbourValue - triangulationNodeValue).DotPerp(voronoiEdgeEnd   - triangulationNodeValue))
+					if ((neighbourValue - triangulationNodeValue).DotPerp(voronoiEdgeStart - triangulationNodeValue) >
+						(neighbourValue - triangulationNodeValue).DotPerp(voronoiEdgeEnd   - triangulationNodeValue))
 					{
 						voronoiEdge.Reverse();
 					}
