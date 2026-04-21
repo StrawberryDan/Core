@@ -115,6 +115,69 @@ namespace Strawberry::Core::Math
 				}
 			}
 
+			/// Record edges that overlap the bounds of the delaunay
+			/// and adjust them so that they are clipped by the bounds.
+			std::vector<Edge> edgesToRemove;
+			std::vector<Edge> edgesToAdd;
+			for (auto edge : dual.Edges())
+			{
+				auto a = dual.GetValue(edge.A());
+				auto b = dual.GetValue(edge.B());
+
+				bool containsA = mBounds.Contains(a);
+				bool containsB = mBounds.Contains(b);
+
+				if (containsA && containsB) [[likely]]
+				{
+					continue;
+				}
+
+				if (containsA)
+				{
+					Vector<T, 2> edgeDir = b - a;
+					Ray<T, 2> ray(a, edgeDir);
+					auto intersections = ray.Intersection(mBounds.GetOutline());
+					auto intersection = *std::ranges::min_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
+
+					if (dual.Degree(edge.B()) == 1)
+					{
+						edgesToRemove.emplace_back(edge);
+					}
+
+					auto newNode = dual.AddNode(intersection.position);
+					edgesToAdd.emplace_back(edge.A(), newNode);
+				}
+				else if (containsB)
+				{
+					Vector<T, 2> edgeDir = a - b;
+					Ray<T, 2> ray(b, edgeDir);
+					auto intersections = ray.Intersection(mBounds.GetOutline());
+					auto intersection = *std::ranges::min_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
+
+					if (dual.Degree(edge.A()) == 1)
+					{
+						edgesToRemove.emplace_back(edge);
+					}
+
+					auto newNode = dual.AddNode(intersection.position);
+					edgesToAdd.emplace_back(edge.B(), newNode);
+				}
+				else
+				{
+					edgesToRemove.emplace_back(edge);
+				}
+			}
+
+			for (auto&& edge : edgesToAdd)
+			{
+				dual.AddEdge(edge);
+			}
+
+			for (auto&& edge : edgesToRemove)
+			{
+				dual.RemoveEdge(edge);
+			}
+
 			return { dual, faceNodeMapping };
 		}
 
