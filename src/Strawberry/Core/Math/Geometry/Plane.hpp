@@ -35,6 +35,7 @@ namespace Strawberry::Core::Math
 		/// This is the point which intersects the line along the normal from the origin.
 		Vector<T, 2> GetPoint() const
 		{
+			Assert(mNormal.IsNormal());
 			auto result = mNormal * mDotProduct;
 			Assert(SignedDistance(result) < std::numeric_limits<T>::epsilon());
 			return result;

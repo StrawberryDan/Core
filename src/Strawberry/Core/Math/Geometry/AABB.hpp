@@ -76,10 +76,10 @@ namespace Strawberry::Core::Math
 		PolygonOutline<T> GetOutline() const noexcept
 		{
 			return PolygonOutline<T>::From(std::array{
-				LineSegment<T, D>(mMin, Vector{mMax[0], mMin[1]}),
-				LineSegment<T, D>(Vector(mMax[0], mMin[1]), mMax),
-				LineSegment<T, D>(mMax, Vector(mMin[0], mMax[1])),
-				LineSegment<T, D>(Vector(mMin[0], mMax[1]), mMin)
+				mMin,
+				Vector{mMax[0], mMin[1]},
+				mMax,
+				Vector(mMin[0], mMax[1]),
 			});
 		}
 
