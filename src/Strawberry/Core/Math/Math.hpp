@@ -70,4 +70,19 @@ namespace Strawberry::Core::Math
 		auto ratio = Smoothstep(x);
 		return b * ratio + a * (1.0 - ratio);
 	}
+
+	/// Returns 1 for positive input, -1 for negative and 0 for 0.
+	template <typename T> requires (std::signed_integral<T> || std::floating_point<T>)
+	constexpr int SigNum(const T& v) noexcept
+	{
+		if (v > 0.0)
+		{
+			return 1;
+		}
+		if (std::abs(v) == 0.0)
+		{
+			return 0;
+		}
+		return -1;
+	}
 } // namespace Strawberry::Core::Math
