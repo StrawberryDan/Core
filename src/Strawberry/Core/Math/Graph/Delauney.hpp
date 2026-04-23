@@ -199,15 +199,12 @@ namespace Strawberry::Core::Math
 					auto vMidPoint = 0.5 * (vEdgeA + vEdgeB);
 					auto vEdgeDir = (vEdgeB - vEdgeA).Perpendicular();
 
-					std::array<NodeID, 2> newNodes;
-
-					for (int i = 0; i < 2; i++)
-					{
-						Ray<T, 2> ray(vMidPoint, (i == 0 ? 1. : -1.) * vEdgeDir);
-						auto intersections = ray.Intersection(mBounds.GetOutline());
-						AssertEQ(intersections.size(), 1);
-						newNodes[i] = dual.AddNode(intersections[0].position);
-					}
+					Line<T, 2> line(vMidPoint, vMidPoint + vEdgeDir);
+					auto intersections = line.Intersection(mBounds.GetOutline());
+					AssertEQ(intersections.size(), 2);
+					std::array<NodeID, 2> newNodes{
+						dual.AddNode(intersections[0].position),
+						dual.AddNode(intersections[1].position)};
 
 					dual.AddEdge({newNodes[0], newNodes[1]});
 				}
