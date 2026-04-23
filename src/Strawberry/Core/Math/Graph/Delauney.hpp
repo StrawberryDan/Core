@@ -228,6 +228,13 @@ namespace Strawberry::Core::Math
 
 			// A valid triangulation edge cannot be shared by more than 2 faces.
 			Assert(faces.size() <= 2);
+
+			// It's possible to have the same face twice so we check here.
+			if (faces.size() == 2 && faces[0] == faces[1])
+			{
+				faces.pop_back();
+			}
+
 			return faces;
 		}
 
