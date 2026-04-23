@@ -6,6 +6,7 @@
 #include "Strawberry/Core/Math/Geometry/Sphere.hpp"
 #include "Strawberry/Core/Math/Graph/Graph.hpp"
 #include "Strawberry/Core/Math/Graph/GraphWalker.hpp"
+#include "Strawberry/Core/Math/Math.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 // Standard library
 #include <algorithm>
@@ -176,6 +177,70 @@ namespace Strawberry::Core::Math
 			for (auto&& edge : edgesToRemove)
 			{
 				dual.RemoveEdge(edge);
+			}
+
+			// Take each outer edge A and extend an edge B from
+			// the circumcentre of A to the boundary of the graph,
+			// intersecting the midpoint of edge A.
+			//
+			// If an edge doesn't have a face at all,
+			// then we extend in both directions a ray,
+			// from the centre of the edge to the boundary,
+			// in the two directions perpendicular to the edge.
+			for (const auto edge : GetOuterEdges())
+			{
+				auto vEdgeA = mGraph.GetValue(edge.A());
+				auto vEdgeB = mGraph.GetValue(edge.B());
+
+				auto faces = FindFacesWithEdge(edge);
+
+				if (faces.size() == 0)
+				{
+					auto vMidPoint = 0.5 * (vEdgeA + vEdgeB);
+					auto vEdgeDir = (vEdgeB - vEdgeA).Perpendicular();
+
+					std::array<NodeID, 2> newNodes;
+
+					for (int i = 0; i < 2; i++)
+					{
+						Ray<T, 2> ray(vMidPoint, (i == 0 ? 1. : -1.) * vEdgeDir);
+						auto intersections = ray.Intersection(mBounds.GetOutline());
+						AssertEQ(intersections.size(), 1);
+						newNodes[i] = dual.AddNode(intersections[0].position);
+					}
+
+					dual.AddEdge({newNodes[0], newNodes[1]});
+				}
+				else if (faces.size() == 1)
+				{
+					auto face = faces[0];
+
+					auto midpoint = 0.5 * (vEdgeA + vEdgeB);
+
+					auto centerNode = faceNodeMapping.at(face);
+					auto vFaceCircumcenter = dual.GetValue(centerNode);
+
+					auto vVoronoiEdgeDirection = midpoint - vFaceCircumcenter;
+					auto vAlongEdge = vEdgeB - vEdgeA;
+					auto vMean = GetFaceAsTriangle(face).GetMean();
+					auto vEdgeToMean = vMean - vEdgeA;
+					if (SigNum(vAlongEdge.DotPerp(vEdgeToMean)) == SigNum(vAlongEdge.DotPerp(vVoronoiEdgeDirection)))
+					{
+						vVoronoiEdgeDirection = -1.0 * vVoronoiEdgeDirection;
+					}
+
+					Ray<T, 2> ray(vFaceCircumcenter, vVoronoiEdgeDirection);
+
+					auto intersections = ray.Intersection(mBounds.GetOutline());
+					Assert(intersections.size() <= 1);
+
+					if (intersections.size() == 1)
+					{
+						auto intersection = intersections[0];
+						auto newNode = dual.AddNode(intersection.position);
+						dual.AddEdge({centerNode, newNode});
+					}
+				}
 			}
 
 			return { dual, faceNodeMapping };
