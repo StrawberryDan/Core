@@ -228,11 +228,9 @@ namespace Strawberry::Core::Math
 					Ray<T, 2> ray(vFaceCircumcenter, vVoronoiEdgeDirection);
 
 					auto intersections = ray.Intersection(mBounds.GetOutline());
-					Assert(intersections.size() <= 1);
-
-					if (intersections.size() == 1)
+					if (intersections.size() > 0)
 					{
-						auto intersection = intersections[0];
+						auto intersection = *std::ranges::max_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
 						auto newNode = dual.AddNode(intersection.position);
 						dual.AddEdge({centerNode, newNode});
 					}
