@@ -86,7 +86,7 @@ namespace Strawberry::Core::Math
 			return From(Delaunay::From(points));
 		}
 
-		/// Creates the coresponding voronoi diagram for a delaunay triangulation.
+		/// Creates the corresponding voronoi diagram for a delaunay triangulation.
 		static Voronoi<Vector<T, 2>> From(const Delaunay& delaunay) noexcept
 		{
 			const auto [voronoiEdges, faceNodeMapping] = delaunay.GetDual();
