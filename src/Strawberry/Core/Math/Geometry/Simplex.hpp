@@ -46,10 +46,10 @@ namespace Strawberry::Core::Math
 
 			for (unsigned int i = 0; i < Order; i++)
 			{
-				mean = mean = Point(i);
+				mean = mean + Point(i);
 			}
 
-			return (1.0 / Dimension) * mean;
+			return (1.0 / Order) * mean;
 		}
 
 
