@@ -39,6 +39,20 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Calculates the mean of the vertices of this Simplex.
+		Vector<T, Dimension> GetMean() const noexcept
+		{
+			Vector<T, Dimension> mean;
+
+			for (unsigned int i = 0; i < Order; i++)
+			{
+				mean = mean = Point(i);
+			}
+
+			return (1.0 / Dimension) * mean;
+		}
+
+
 		bool IsCounterClockwise() const requires (Dimension == 2 && Order == 3)
 		{
 			auto a = Point(1) - Point(0);
