@@ -2,6 +2,7 @@
 
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Math/Geometry/Line.hpp"
+#include "Strawberry/Core/Math/Geometry/Plane.hpp"
 #include "Strawberry/Core/Math/Geometry/LineSegment.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/Math/Geometry/Intersection.hpp"
@@ -48,6 +49,12 @@ namespace Strawberry::Core::Math
 		Line<T, D> IntoLine() const
 		{
 			return Line(mOrigin, mOrigin + mDirection);
+		}
+
+
+		Plane<T, D> IntoPlane() const
+		{
+			return Plane<T, D>::FromNormalAndPoint(mDirection, mOrigin);
 		}
 
 
