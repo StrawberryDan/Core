@@ -43,6 +43,8 @@ namespace Strawberry::Core::Math
 		{
 			Vector<T, 2> position;
 			double segmentDistance;
+			LineSegment<T, 2> lineSegment;
+			Line<T, 2> line;
 		};
 
 		using Result = Optional<Data>;
@@ -73,7 +75,13 @@ namespace Strawberry::Core::Math
 				return NullOpt;
 			}
 
-			return Data { .position = p1 + t1 * v1, .segmentDistance = t1 };
+			return Data
+			{
+				.position = p1 + t1 * v1,
+				.segmentDistance = t1,
+				.lineSegment = a,
+				.line = b
+			};
 		}
 	};
 
@@ -85,6 +93,7 @@ namespace Strawberry::Core::Math
 		{
 			Vector<T, 2> position;
 			double segmentDistance[2];
+			LineSegment<T, 2> lines[2];
 		};
 
 		using Result = Optional<Data>;
@@ -115,7 +124,12 @@ namespace Strawberry::Core::Math
 				return NullOpt;
 			}
 
-			return Data{ .position = p1 + t1 * v1, .segmentDistance { t1, t2 } };
+			return Data
+			{
+				.position = p1 + t1 * v1,
+				.segmentDistance { t1, t2 },
+				.lines{ a, b }
+			};
 		}
 	};
 }

@@ -72,9 +72,11 @@ namespace Strawberry::Core::Math
 		}
 
 
-		/// Returns the edges of the AABB as line segments in CCW order.
+		/// Returns the edges of the AABB as line segments in CCW order,
+		/// starting from the bottom left.
 		PolygonOutline<T> GetOutline() const noexcept
 		{
+			Assert(IsNormal());
 			return PolygonOutline<T>::From(std::array{
 				mMin,
 				Vector{mMax[0], mMin[1]},

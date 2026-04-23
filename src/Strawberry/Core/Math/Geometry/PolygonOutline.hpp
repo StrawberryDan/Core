@@ -57,19 +57,15 @@ namespace Strawberry::Core::Math
 	template <typename T>
 	struct IntersectionTest<PolygonOutline<T>, Line<T, 2>>
 	{
-		struct Data
-			: IntersectionTest<LineSegment<T, 2>, Line<T, 2>>::Result::Inner
+		using Base = IntersectionTest<LineSegment<T, 2>, Line<T, 2>>::Result::Inner;
+		struct Data : Base
 		{
-			using IntersectionTest<LineSegment<T, 2>, Line<T, 2>>::Result::Inner::Inner;
-
-
-			Data(const IntersectionTest<LineSegment<T, 2>, Line<T, 2>>::Result::Inner& inner)
-				: IntersectionTest<LineSegment<T, 2>, Line<T, 2>>::Result::Inner(inner)
-				, edgeIndex(0)
+			Data(const Base& base)
+				: Base(base)
 			{}
 
 
-			unsigned int edgeIndex;
+			unsigned int edgeIndex = 0;
 		};
 
 		using Result = std::vector<Data>;
@@ -99,7 +95,17 @@ namespace Strawberry::Core::Math
 	template <typename T>
 	struct IntersectionTest<PolygonOutline<T>, Ray<T, 2>>
 	{
-		using Result = std::vector<typename IntersectionTest<LineSegment<T, 2>, Ray<T, 2>>::Result::Inner>;
+		using Base = IntersectionTest<LineSegment<T, 2>, Ray<T, 2>>::Result::Inner;
+		struct Data : Base
+		{
+			Data(const Base& base)
+				: Base(base)
+			{}
+
+			unsigned int edgeIndex = 0;
+		};
+
+		using Result = std::vector<Data>;
 
 		constexpr Result operator()(const PolygonOutline<T>& a, const Ray<T, 2>& b) const noexcept
 		{
@@ -111,7 +117,9 @@ namespace Strawberry::Core::Math
 				const auto& line = a.GetLine(i);
 				if (auto intersection = line.Intersection(b))
 				{
-					result.emplace_back(std::move(intersection.Unwrap()));
+					Data data(std::move(intersection.Unwrap()));
+					data.edgeIndex = i;
+					result.emplace_back(std::move(data));
 				}
 			}
 
@@ -123,7 +131,18 @@ namespace Strawberry::Core::Math
 	template <typename T>
 	struct IntersectionTest<PolygonOutline<T>, LineSegment<T, 2>>
 	{
-		using Result = std::vector<typename IntersectionTest<LineSegment<T, 2>, LineSegment<T, 2>>::Result::Inner>;
+		using Base = IntersectionTest<LineSegment<T, 2>, LineSegment<T, 2>>::Result::Inner;
+
+		struct Data : Base
+		{
+			Data(const Base& base)
+				: Base(base)
+			{}
+
+			unsigned int edgeIndex = 0;
+		};
+
+		using Result = std::vector<Data>;
 
 		constexpr Result operator()(const PolygonOutline<T>& a, const LineSegment<T, 2>& b) const noexcept
 		{
@@ -135,7 +154,9 @@ namespace Strawberry::Core::Math
 				const auto& line = a.GetLine(i);
 				if (auto intersection = line.Intersection(b))
 				{
-					result.emplace_back(std::move(intersection.Unwrap()));
+					Data data(std::move(intersection.Unwrap()));
+					data.edgeIndex = i;
+					result.emplace_back(std::move(data));
 				}
 			}
 

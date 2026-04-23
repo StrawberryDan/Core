@@ -42,7 +42,14 @@ namespace Strawberry::Core::Math
 	template <typename T>
 	struct IntersectionTest<Line<T, 2>, Line<T, 2>>
 	{
-		using Result = Core::Optional<Vector<T, 2>>;
+		struct Data
+		{
+			Vector<T, 2> position;
+			double lineDistance[2];
+			Line<T, 2> lines[2];
+		};
+
+		using Result = Optional<Data>;
 
 
 		Result operator()(const Line<T, 2>& a, const Line<T, 2>& b) const noexcept
@@ -62,7 +69,15 @@ namespace Strawberry::Core::Math
 
 			auto t1Num = c[0] * v2[1] - v2[0] * c[1];
 			auto t1 = t1Num / determinant;
-			return p1 + t1 * v1;
+			auto t2Num = -(v1[0] * c[1] - c[0] * v1[1]);
+			auto t2 = t2Num / determinant;
+
+			return Data
+			{
+				.position = p1 + t1 * v1,
+				.lineDistance { t1, t2 },
+				.lines { a, b }
+			};
 		}
 	};
 }

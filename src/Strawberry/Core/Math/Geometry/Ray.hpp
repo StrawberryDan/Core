@@ -117,9 +117,11 @@ namespace Strawberry::Core::Math
 	{
 		struct Data
 		{
-			Vector<T, 2> position;
-			double       rayDistance;
-			double       segmentDistance;
+			Vector<T, 2>      position;
+			double            rayDistance;
+			double            segmentDistance;
+			Ray<T, 2>         ray;
+			LineSegment<T, 2> lineSegment;
 		};
 
 		using Result = Optional<Data>;
@@ -150,7 +152,14 @@ namespace Strawberry::Core::Math
 				return NullOpt;
 			}
 
-			return Data { .position = p1 + t1 * v1, .rayDistance = t1, .segmentDistance = t2 };
+			return Data
+			{
+				.position = p1 + t1 * v1,
+				.rayDistance = t1,
+				.segmentDistance = t2,
+				.ray = a,
+				.lineSegment = b
+			};
 		}
 	};
 
@@ -162,6 +171,7 @@ namespace Strawberry::Core::Math
 		{
 			Vector<T, 2> position;
 			double       rayDistance[2];
+			Ray<T, 2>    rays[2];
 		};
 
 		using Result = Optional<Data>;
@@ -191,7 +201,12 @@ namespace Strawberry::Core::Math
 				return NullOpt;
 			}
 
-			return Data { .position = p1 + t1 * v1, .rayDistance { t1, t2 } };
+			return Data
+			{
+				.position = p1 + t1 * v1,
+				.rayDistance { t1, t2 },
+				.rays { a, b }
+			};
 		}
 	};
 }
