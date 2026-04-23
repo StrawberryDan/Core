@@ -100,7 +100,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		Core::Optional<Sphere<T, Dimension>> GetCircumsphere() const requires (Dimension == 2 && Order == 3)
+		Optional<Sphere<T, Dimension>> GetCircumsphere() const requires (Dimension == 2 && Order == 3)
 		{
 			auto perps = GetLineSegments() | std::views::take(2) | std::views::transform([] (LineSegment<T, Dimension> l)
 			{
@@ -111,8 +111,8 @@ namespace Strawberry::Core::Math
 
 			if (center)
 			{
-				auto radius = (Point(0) - *center).Magnitude();
-				return Sphere<T, Dimension>(*center, radius);
+				auto radius = (Point(0) - center->position).Magnitude();
+				return Sphere<T, Dimension>(center->position, radius);
 			}
 
 			return NullOpt;
