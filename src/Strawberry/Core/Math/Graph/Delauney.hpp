@@ -246,7 +246,7 @@ namespace Strawberry::Core::Math
 					}
 				}
 
-				if (containingFaces == 1)
+				if (containingFaces <= 1)
 				{
 					outerEdges.emplace(edge);
 				}
