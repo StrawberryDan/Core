@@ -214,20 +214,19 @@ namespace Strawberry::Core::Math
 				else if (faces.size() == 1)
 				{
 					auto face = faces[0];
-
-					auto midpoint = 0.5 * (vEdgeA + vEdgeB);
+					auto vMean = GetFaceAsTriangle(face).GetMean();
 
 					auto centerNode = faceNodeMapping.at(face);
 					auto vFaceCircumcenter = dual.GetValue(centerNode);
 
-					auto vVoronoiEdgeDirection = midpoint - vFaceCircumcenter;
-					auto vAlongEdge = vEdgeB - vEdgeA;
-					auto vMean = GetFaceAsTriangle(face).GetMean();
-					auto vEdgeToMean = vMean - vEdgeA;
-					if (SigNum(vAlongEdge.DotPerp(vEdgeToMean)) == SigNum(vAlongEdge.DotPerp(vVoronoiEdgeDirection)))
+					// Make sure edges are in CW order, so they all point outwards from the face.
+					if ((vEdgeA - vMean).DotPerp(vEdgeB - vMean) > 0.0)
 					{
-						vVoronoiEdgeDirection = -1.0 * vVoronoiEdgeDirection;
+						std::swap(vEdgeA, vEdgeB);
 					}
+
+					auto vAlongEdge = vEdgeB - vEdgeA;
+					auto vVoronoiEdgeDirection = vAlongEdge.Perpendicular();
 
 					Ray<T, 2> ray(vFaceCircumcenter, vVoronoiEdgeDirection);
 
