@@ -9,63 +9,68 @@ using namespace Math;
 
 int main()
 {
-	Strawberry::Core::Math::UndirectedGraph<int> graphA;
+	{
+		UndirectedGraph<int> graphA;
 
-	graphA.AddNode(0);
-	graphA.AddNode(1);
-	graphA.AddNode(2);
+		graphA.AddNode(0);
+		graphA.AddNode(1);
+		graphA.AddNode(2);
 
-	graphA.AddEdge({0, 1});
-	graphA.AddEdge({1, 2});
-	graphA.AddEdge({2, 0});
+		graphA.AddEdge({0, 1});
+		graphA.AddEdge({1, 2});
+		graphA.AddEdge({2, 0});
 
-	Assert(graphA.IsConnected(0, 1));
-	Assert(graphA.IsConnected(1, 0));
-	Assert(graphA.IsConnected(1, 2));
-	Assert(graphA.IsConnected(2, 1));
-	Assert(graphA.IsConnected(0, 2));
-	Assert(graphA.IsConnected(2, 0));
+		Assert(graphA.IsConnected(0, 1));
+		Assert(graphA.IsConnected(1, 0));
+		Assert(graphA.IsConnected(1, 2));
+		Assert(graphA.IsConnected(2, 1));
+		Assert(graphA.IsConnected(0, 2));
+		Assert(graphA.IsConnected(2, 0));
 
-	AssertEQ(graphA.GetNeighbours(0), std::set<unsigned int>{1, 2});
-	AssertEQ(graphA.GetNeighbours(1), std::set<unsigned int>{0, 2});
-	AssertEQ(graphA.GetNeighbours(2), std::set<unsigned int>{0, 1});
+		AssertEQ(graphA.GetNeighbours(0), std::set<unsigned int>{1, 2});
+		AssertEQ(graphA.GetNeighbours(1), std::set<unsigned int>{0, 2});
+		AssertEQ(graphA.GetNeighbours(2), std::set<unsigned int>{0, 1});
 
-	graphA.AddNode(3);
-	graphA.AddEdge({1, 3});
-	graphA.AddEdge({2, 3});
+		graphA.AddNode(3);
+		graphA.AddEdge({1, 3});
+		graphA.AddEdge({2, 3});
 
-	Assert(graphA.IsConnected(1, 3));
-	Assert(graphA.IsConnected(2, 3));
+		Assert(graphA.IsConnected(1, 3));
+		Assert(graphA.IsConnected(2, 3));
 
-	graphA.RemoveNode(0);
+		graphA.RemoveNode(0);
+	}
 
 
-	Strawberry::Core::Math::DirectedGraph<int> graphB;
+	{
+		DirectedGraph<int> graphB;
+		graphB.AddNode(0);
+		graphB.AddNode(1);
+		graphB.AddNode(2);
 
-	graphB.AddNode(0);
-	graphB.AddNode(1);
-	graphB.AddNode(2);
+		graphB.AddEdge({0, 1});
+		graphB.AddEdge({1, 2});
+		graphB.AddEdge({2, 0});
 
-	graphB.AddEdge({0, 1});
-	graphB.AddEdge({1, 2});
-	graphB.AddEdge({2, 0});
+		Assert(graphB.IsConnected(0, 1));
+		Assert(!graphB.IsConnected(1, 0));
+		Assert(graphB.IsConnected(1, 2));
+		Assert(!graphB.IsConnected(2, 1));
+		Assert(!graphB.IsConnected(0, 2));
+		Assert(graphB.IsConnected(2, 0));
 
-	Assert(graphB.IsConnected(0, 1));
-	Assert(!graphB.IsConnected(1, 0));
-	Assert(graphB.IsConnected(1, 2));
-	Assert(!graphB.IsConnected(2, 1));
-	Assert(!graphB.IsConnected(0, 2));
-	Assert(graphB.IsConnected(2, 0));
+		AssertEQ(graphB.GetOutgoingNeighbours(0), std::set<unsigned int>{1});
+		AssertEQ(graphB.GetOutgoingNeighbours(1), std::set<unsigned int>{2});
+		AssertEQ(graphB.GetOutgoingNeighbours(2), std::set<unsigned int>{0});
+	}
 
-	AssertEQ(graphB.GetOutgoingNeighbours(0), std::set<unsigned int>{1});
-	AssertEQ(graphB.GetOutgoingNeighbours(1), std::set<unsigned int>{2});
-	AssertEQ(graphB.GetOutgoingNeighbours(2), std::set<unsigned int>{0});
-
-	WeightedGraph<DirectedGraph<int>> weightedGraph;
-	weightedGraph.AddNode(0);
-	weightedGraph.AddNode(1);
-	weightedGraph.AddEdge({0, 1, 5});
-	AssertEQ(weightedGraph.GetEdge(0, 1).Weight(), 5);
+	{
+		WeightedGraph<DirectedGraph<int>> weightedGraph;
+		weightedGraph.AddNode(0);
+		weightedGraph.AddNode(1);
+		weightedGraph.AddEdge({0, 1, 5});
+		AssertEQ(weightedGraph.GetEdge(0, 1).Weight(), 5);
+	}
 
 	return 0;
 }
