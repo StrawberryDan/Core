@@ -14,13 +14,13 @@ int main()
 	Logging::Info("Testing line {} against {}", lineA, lineB);
 	auto intA = lineA.Intersection(lineB);
 	Assert(intA.HasValue());
-	AssertEQ(intA.Value(), Vector{0.0, 0.0});
+	AssertEQ(intA.Value().position, Vector{0.0, 0.0});
 
 
 	Logging::Info("Testing line {} against {}", lineA, lineC);
 	auto intB = lineA.Intersection(lineC);
 	Assert(intB.HasValue());
-	AssertEQ(intB.Value(), Vector{1.0, 1.0});
+	AssertEQ(intB.Value().position, Vector{1.0, 1.0});
 
 	return 0;
 }
