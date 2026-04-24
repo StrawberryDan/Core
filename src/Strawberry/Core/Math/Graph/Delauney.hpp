@@ -64,7 +64,7 @@ namespace Strawberry::Core::Math
 		/// Gets the number of triangular faces in the graph.
 		[[nodiscard]] unsigned int FaceCount() const { return mFaces.size(); }
 
-		/// Returns the selected face as a Triangle with the values as vertices..
+		/// Returns the selected face as a Triangle with the values as vertices.
 		Triangle<T, 2> GetFaceAsTriangle(const Face& face) const noexcept
 		{
 			Assert(mFaces.contains(face),
@@ -77,7 +77,7 @@ namespace Strawberry::Core::Math
 				}};
 		}
 
-		/// Shorthand for getting the circumcircle center for the result of GetFaceASTriangle().
+		/// Shorthand for getting the circumcircle centre for the result of GetFaceASTriangle().
 		Vector<T, 2> GetFaceCircumcenter(const Face& face) const noexcept
 		{
 			return GetFaceAsTriangle(face).GetCircumsphere().Unwrap().Center();
@@ -260,7 +260,7 @@ namespace Strawberry::Core::Math
 			// Do for each walker
 			for (auto& walker : walkers)
 			{
-				// Keep trying to walk counter clockwise until we can't.
+				// Keep trying to walk counter-clockwise until we can't.
 				while (walker.TryWalkCCW())
 				{
 					// We never let the path exceed 4 nodes.
@@ -328,7 +328,7 @@ namespace Strawberry::Core::Math
 
 		/// The bounding box of this graph.
 		AABB<T, 2> mBounds;
-		/// The graph of the delauney triangulation.
+		/// The graph of the Delaunay triangulation.
 		UndirectedVectorGraph<Vector<T, 2>> mGraph;
 		/// The set of triangular faces contained in this graph.
 		std::set<Face> mFaces;
@@ -345,7 +345,7 @@ namespace Strawberry::Core::Math
 			: mNodes{a, b, c}
 		{
 			/// Nodes are stored in sorted order for normalisation.
-			std::sort(mNodes.begin(), mNodes.end());
+			std::ranges::sort(mNodes);
 			AssertNEQ(a, b, "Attempt to create a degenerate face!");
 			AssertNEQ(a, c, "Attempt to create a degenerate face!");
 			AssertNEQ(b, c, "Attempt to create a degenerate face!");
@@ -366,14 +366,14 @@ namespace Strawberry::Core::Math
 
 
 		/// Check if this face includes the given edge.
-		bool ContainsEdge(Edge e) const noexcept
+		bool ContainsEdge(const Edge& e) const noexcept
 		{
 			return Edges().contains(e);
 		}
 
 
 		// Returns whether this face has another edge in common with this other face.
-		bool SharesEdgeWith(Face other) const noexcept
+		bool SharesEdgeWith(const Face& other) const noexcept
 		{
 			std::set<unsigned int> u;
 			std::ranges::set_intersection(Nodes(), other.Nodes(), std::inserter(u, u.begin()));
@@ -393,7 +393,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		/// Default comparision for use in sorted data structures.
+		/// Default comparison for use in sorted data structures.
 		auto operator<=>(const Face&) const = default;
 
 
@@ -430,7 +430,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		/// Adds a node to this triangulaiton.
+		/// Adds a node to this triangulation.
 		Builder&& AddNode(const Vector<T, 2>& value)
 		{
 			ZoneScoped;
@@ -516,8 +516,8 @@ namespace Strawberry::Core::Math
 
 		/// Returns the set of faces that conflict with the point being added 'value'.
 		///
-		/// Edges are defined to be conflicinging if their circumspheres
-		std::set<Delaunay<Vector<T, 2>>::Face> GetConflictingFaces(const Vector<T, 2>& value) const
+		/// Edges are defined to be conflictingly if their circumspheres
+		std::set<Face> GetConflictingFaces(const Vector<T, 2>& value) const
 		{
 			std::set<Face> conflictingFaces;
 			for (const auto& face : mResult.mFaces)
@@ -531,22 +531,22 @@ namespace Strawberry::Core::Math
 		}
 
 
-		/// Returns the set of nodes that outline the set of conflicing faces.
+		/// Returns the set of nodes that outline the set of conflicting faces.
 		std::set<unsigned int> GetOuterNodes(const std::set<Face>& faces) const
 		{
 			// Count how often each edge occurs in these faces.
-			std::map<Edge, unsigned int> edgeOccurences;
+			std::map<Edge, unsigned int> edgeOccurrences;
 			for (const auto& face : faces)
 			{
 				for (const auto& edge : face.Edges())
 				{
-					edgeOccurences[edge] += 1;
+					edgeOccurrences[edge] += 1;
 				}
 			}
 
 			// Filter for the edges that occur twice, meaning that they are inner edges.
 			std::set<Delaunay<Vector<T, 2>>::Edge> outerEdges;
-			for (const auto& [edge, count] : edgeOccurences)
+			for (const auto& [edge, count] : edgeOccurrences)
 			{
 				Core::Assert(count == 1 || count == 2);
 				if (count == 1)
@@ -567,21 +567,21 @@ namespace Strawberry::Core::Math
 
 
 		/// Returns the set of edges that are shared amongst the input faces.
-		std::set<Delaunay<Vector<T, 2>>::Edge> GetInnerEdges(const std::set<Delaunay<Vector<T, 2>>::Face>& faces) const
+		std::set<Edge> GetInnerEdges(const std::set<Delaunay<Vector<T, 2>>::Face>& faces) const
 		{
 			// Count how often each edge occurs in these faces.
-			std::map<Delaunay<Vector<T, 2>>::Edge, unsigned int> edgeOccurences;
+			std::map<Edge, unsigned int> edgeOccurrences;
 			for (const auto& face : faces)
 			{
 				for (const auto& edge : face.Edges())
 				{
-					edgeOccurences[edge] += 1;
+					edgeOccurrences[edge] += 1;
 				}
 			}
 
 			// Filter for the edges that occur twice, meaning that they are inner edges.
 			std::set<Delaunay<Vector<T, 2>>::Edge> innerEdges;
-			for (const auto& [edge, count] : edgeOccurences)
+			for (const auto& [edge, count] : edgeOccurrences)
 			{
 				Core::Assert(count == 1 || count == 2);
 				if (count == 2)
@@ -646,16 +646,16 @@ namespace Strawberry::Core::Math
 		{
 #ifdef STRAWBERRY_DEBUG
 			if (graph == nullptr) graph = &mResult;
-			std::map<Edge, unsigned int> edgeOccurences;
+			std::map<Edge, unsigned int> edgeOccurrences;
 			for (auto face : graph->Faces())
 			{
 				for (auto edge : face.Edges())
 				{
-					edgeOccurences[edge] += 1;
+					edgeOccurrences[edge] += 1;
 				}
 			}
 
-			for (const auto& [edge, count] : edgeOccurences)
+			for (const auto& [edge, count] : edgeOccurrences)
 			{
 				Core::Assert(count > 0);
 				Core::Assert(count < 3);
@@ -671,7 +671,7 @@ namespace Strawberry::Core::Math
 		Delaunay<Vector<T, 2>>                 mResult;
 		/// A cache of the triangle representation of faces from our delaunay.
 		mutable std::map<Face, Triangle<T, 2>> mTriangleCache;
-		/// A cache of the circumpheres of the faces from our delaunay.
+		/// A cache of the circumspheres of the faces from our delaunay.
 		mutable std::map<Face, Sphere<T, 2>>   mCircumsphereCache;
 		/// Bool for whether the resulting graph should be pruned.
 		bool mShouldPrune = true;
