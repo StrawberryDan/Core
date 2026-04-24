@@ -195,36 +195,43 @@ namespace Strawberry::Core::Math
 		/// This is also the graph of the voronoi diagram of the points in this triangulation.
 		void MakeDual() noexcept
 		{
-			auto bounds = mTriangulation.GetBoundingBox();
-			auto boundsOutline = bounds.GetOutline();
+			MakeEdgesFromDelaunayFaces();
+			ClipEdgesToBoundingBox();
+			CreateOuterEdges();
+		}
 
-			UndirectedVectorGraph<Vector<T, 2>> dual;
 
-			std::map<typename Delaunay::Face, unsigned int> faceNodeMapping;
-
+		void MakeEdgesFromDelaunayFaces()
+		{
 			for (const auto& face : mTriangulation.Faces())
 			{
 				auto centroid = mTriangulation.GetFaceCircumcenter(face);
-				auto centroidNode = dual.AddNode(centroid);
-				faceNodeMapping.emplace(face, centroidNode);
+				auto centroidNode = mGraph.AddNode(centroid);
+				mTriangleToNodeMapping.emplace(face, centroidNode);
 
-				for (const auto& [otherFace, otherCentroidIndex] : faceNodeMapping)
+				for (const auto& [otherFace, otherCentroidIndex] : mTriangleToNodeMapping)
 				{
 					if (face != otherFace && face.SharesEdgeWith(otherFace))
 					{
-						dual.AddEdge({centroidNode, otherCentroidIndex});
+						mGraph.AddEdge({centroidNode, otherCentroidIndex});
 					}
 				}
 			}
+		}
 
+
+		void ClipEdgesToBoundingBox()
+		{
+			const auto& bounds = mTriangulation.GetBoundingBox();
+			const auto boundsOutline = bounds.GetOutline();
 			/// Record edges that overlap the bounds of the mTriangulation
 			/// and adjust them so that they are clipped by the bounds.
 			std::vector<Edge> edgesToRemove;
 			std::vector<Edge> edgesToAdd;
-			for (auto edge : dual.Edges())
+			for (auto edge : mGraph.Edges())
 			{
-				auto a = dual.GetValue(edge.A());
-				auto b = dual.GetValue(edge.B());
+				auto a = mGraph.GetValue(edge.A());
+				auto b = mGraph.GetValue(edge.B());
 
 				bool containsA = bounds.Contains(a);
 				bool containsB = bounds.Contains(b);
@@ -241,12 +248,12 @@ namespace Strawberry::Core::Math
 					auto intersections = ray.Intersection(boundsOutline);
 					auto intersection = *std::ranges::min_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
 
-					if (dual.Degree(edge.B()) == 1)
+					if (mGraph.Degree(edge.B()) == 1)
 					{
 						edgesToRemove.emplace_back(edge);
 					}
 
-					auto newNode = dual.AddNode(intersection.position);
+					auto newNode = mGraph.AddNode(intersection.position);
 					edgesToAdd.emplace_back(edge.A(), newNode);
 				}
 				else if (containsB)
@@ -256,12 +263,12 @@ namespace Strawberry::Core::Math
 					auto intersections = ray.Intersection(boundsOutline);
 					auto intersection = *std::ranges::min_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
 
-					if (dual.Degree(edge.A()) == 1)
+					if (mGraph.Degree(edge.A()) == 1)
 					{
 						edgesToRemove.emplace_back(edge);
 					}
 
-					auto newNode = dual.AddNode(intersection.position);
+					auto newNode = mGraph.AddNode(intersection.position);
 					edgesToAdd.emplace_back(edge.B(), newNode);
 				}
 				else
@@ -272,14 +279,20 @@ namespace Strawberry::Core::Math
 
 			for (auto&& edge : edgesToAdd)
 			{
-				dual.AddEdge(edge);
+				mGraph.AddEdge(edge);
 			}
 
 			for (auto&& edge : edgesToRemove)
 			{
-				dual.RemoveEdge(edge);
+				mGraph.RemoveEdge(edge);
 			}
+		}
 
+
+		void CreateOuterEdges()
+		{
+			const auto bounds = mTriangulation.GetBoundingBox();
+			const auto boundsOutline = bounds.GetOutline();
 			// Take each outer edge A and extend an edge B from
 			// the circumcentre of A to the boundary of the graph,
 			// intersecting the midpoint of edge A.
@@ -303,19 +316,19 @@ namespace Strawberry::Core::Math
 					Line<T, 2> line(vMidPoint, vMidPoint + vEdgeDir);
 					auto intersections = line.Intersection(boundsOutline);
 					AssertEQ(intersections.size(), 2);
-					std::array<typename decltype(dual)::NodeID, 2> newNodes{
-						dual.AddNode(intersections[0].position),
-						dual.AddNode(intersections[1].position)};
+					std::array<typename decltype(mGraph)::NodeID, 2> newNodes{
+						mGraph.AddNode(intersections[0].position),
+						mGraph.AddNode(intersections[1].position)};
 
-					dual.AddEdge({newNodes[0], newNodes[1]});
+					mGraph.AddEdge({newNodes[0], newNodes[1]});
 				}
 				else if (faces.size() == 1)
 				{
 					auto face = faces[0];
 					auto vMean = mTriangulation.GetFaceAsTriangle(face).GetMean();
 
-					auto centerNode = faceNodeMapping.at(face);
-					auto vFaceCircumcenter = dual.GetValue(centerNode);
+					auto centerNode = mTriangleToNodeMapping.at(face);
+					auto vFaceCircumcenter = mGraph.GetValue(centerNode);
 
 					// Make sure edges are in CW order, so they all point outwards from the face.
 					if ((vEdgeA - vMean).DotPerp(vEdgeB - vMean) > 0.0)
@@ -332,14 +345,11 @@ namespace Strawberry::Core::Math
 					if (intersections.size() > 0)
 					{
 						auto intersection = *std::ranges::max_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
-						auto newNode = dual.AddNode(intersection.position);
-						dual.AddEdge({centerNode, newNode});
+						auto newNode = mGraph.AddNode(intersection.position);
+						mGraph.AddEdge({centerNode, newNode});
 					}
 				}
 			}
-
-			mGraph = std::move(dual);
-			mTriangleToNodeMapping = faceNodeMapping;
 		}
 
 
