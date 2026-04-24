@@ -89,11 +89,8 @@ namespace Strawberry::Core::Math
 		/// Creates the corresponding voronoi diagram for a delaunay triangulation.
 		static Voronoi<Vector<T, 2>> From(const Delaunay& delaunay) noexcept
 		{
-			const auto [voronoiEdges, faceNodeMapping] = delaunay.GetDual();
-
 			Voronoi voronoi(delaunay);
-			voronoi.mGraph = voronoiEdges;
-			voronoi.mTriangleToNodeMapping = faceNodeMapping;
+			voronoi.MakeDual();
 			voronoi.GenerateCellMap();
 			return voronoi;
 		}
@@ -183,11 +180,6 @@ namespace Strawberry::Core::Math
 		void GenerateCellMap()
 		{
 			Assert(mCellMap.empty(), "Second call to GenerateCellMap in Voronoi when mCellMap already populated");
-			/// Add the cell for each node
-			for (const auto node : mTriangulation.GetGraph().NodeIndices())
-			{
-				mCellMap.emplace(node, CalculateNodeVoronoiCell(node));
-			}
 #if STRAWBERRY_DEBUG
 			for (const auto node : mTriangulation.GetGraph().NodeIndices())
 			{
@@ -197,55 +189,157 @@ namespace Strawberry::Core::Math
 #endif
 		}
 
-		/// Calculates the voronoi cell at the given index.
-		Cell CalculateNodeVoronoiCell(Delaunay::NodeID triangulationNode) const noexcept
+
+		/// Return the dual graph of this delaunay triangulation.
+		///
+		/// This is also the graph of the voronoi diagram of the points in this triangulation.
+		void MakeDual() noexcept
 		{
-			Vector<T, 2> triangulationNodeValue = mTriangulation.GetGraph().GetValue(triangulationNode);
+			auto bounds = mTriangulation.GetBoundingBox();
+			auto boundsOutline = bounds.GetOutline();
 
-			/// Table of edges mapped to the neighbour with which it shares that edge.
-			std::map<DirectedEdge, Optional<unsigned int>> edges;
-			/// Get this cell's neighbours in CCW order.
-			auto neighbours = VectorGraphWalker(PathGraphWalker(BasicGraphWalker(mTriangulation.GetGraph(), triangulationNode)))
-				.GetNeighboursCCW();
+			UndirectedVectorGraph<Vector<T, 2>> dual;
 
-			/// For each neighbour, find the shared edge.
-			for (auto neighbour : neighbours)
+			std::map<typename Delaunay::Face, unsigned int> faceNodeMapping;
+
+			for (const auto& face : mTriangulation.Faces())
 			{
-				Vector<T, 2> neighbourValue = mTriangulation.GetGraph().GetValue(neighbour);
+				auto centroid = mTriangulation.GetFaceCircumcenter(face);
+				auto centroidNode = dual.AddNode(centroid);
+				faceNodeMapping.emplace(face, centroidNode);
 
-				typename Delaunay::Edge edge (triangulationNode, neighbour);
-				auto faces = mTriangulation.FindFacesWithEdge(edge) | std::ranges::to<std::vector>();
-				Assert(faces.size() <= 2);
-
-				if (faces.size() == 2)
+				for (const auto& [otherFace, otherCentroidIndex] : faceNodeMapping)
 				{
-					/// Get voronoi vertices.
-					DirectedEdge voronoiEdge {
-						mTriangleToNodeMapping.at(faces[0]),
-						mTriangleToNodeMapping.at(faces[1]) };
-
-					Vector<T, 2> voronoiEdgeStart = mTriangulation.GetFaceCircumcenter(faces[0]);
-					Vector<T, 2> voronoiEdgeEnd = mTriangulation.GetFaceCircumcenter(faces[1]);
-
-					// Make sure edges are all CCW.
-					if ((neighbourValue - triangulationNodeValue).DotPerp(voronoiEdgeStart - triangulationNodeValue) >
-						(neighbourValue - triangulationNodeValue).DotPerp(voronoiEdgeEnd   - triangulationNodeValue))
+					if (face != otherFace && face.SharesEdgeWith(otherFace))
 					{
-						voronoiEdge.Reverse();
+						dual.AddEdge({centroidNode, otherCentroidIndex});
 					}
-
-					// Store
-					edges.emplace(voronoiEdge, neighbour);
 				}
 			}
 
+			/// Record edges that overlap the bounds of the mTriangulation
+			/// and adjust them so that they are clipped by the bounds.
+			std::vector<Edge> edgesToRemove;
+			std::vector<Edge> edgesToAdd;
+			for (auto edge : dual.Edges())
+			{
+				auto a = dual.GetValue(edge.A());
+				auto b = dual.GetValue(edge.B());
 
-			Cell cell;
-			cell.edges = edges;
-			Assert(cell.edges.size() > 0);
+				bool containsA = bounds.Contains(a);
+				bool containsB = bounds.Contains(b);
 
-			Assert(CellContainsPoint(cell, GetCellMeanVertex(cell)));
-			return cell;
+				if (containsA && containsB) [[likely]]
+				{
+					continue;
+				}
+
+				if (containsA)
+				{
+					Vector<T, 2> edgeDir = b - a;
+					Ray<T, 2> ray(a, edgeDir);
+					auto intersections = ray.Intersection(boundsOutline);
+					auto intersection = *std::ranges::min_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
+
+					if (dual.Degree(edge.B()) == 1)
+					{
+						edgesToRemove.emplace_back(edge);
+					}
+
+					auto newNode = dual.AddNode(intersection.position);
+					edgesToAdd.emplace_back(edge.A(), newNode);
+				}
+				else if (containsB)
+				{
+					Vector<T, 2> edgeDir = a - b;
+					Ray<T, 2> ray(b, edgeDir);
+					auto intersections = ray.Intersection(boundsOutline);
+					auto intersection = *std::ranges::min_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
+
+					if (dual.Degree(edge.A()) == 1)
+					{
+						edgesToRemove.emplace_back(edge);
+					}
+
+					auto newNode = dual.AddNode(intersection.position);
+					edgesToAdd.emplace_back(edge.B(), newNode);
+				}
+				else
+				{
+					edgesToRemove.emplace_back(edge);
+				}
+			}
+
+			for (auto&& edge : edgesToAdd)
+			{
+				dual.AddEdge(edge);
+			}
+
+			for (auto&& edge : edgesToRemove)
+			{
+				dual.RemoveEdge(edge);
+			}
+
+			// Take each outer edge A and extend an edge B from
+			// the circumcentre of A to the boundary of the graph,
+			// intersecting the midpoint of edge A.
+			//
+			// If an edge doesn't have a face at all,
+			// then we extend in both directions a ray,
+			// from the centre of the edge to the boundary,
+			// in the two directions perpendicular to the edge.
+			for (const auto edge : mTriangulation.GetOuterEdges())
+			{
+				auto vEdgeA = mTriangulation.GetGraph().GetValue(edge.A());
+				auto vEdgeB = mTriangulation.GetGraph().GetValue(edge.B());
+
+				auto faces = mTriangulation.FindFacesWithEdge(edge);
+
+				if (faces.size() == 0)
+				{
+					auto vMidPoint = 0.5 * (vEdgeA + vEdgeB);
+					auto vEdgeDir = (vEdgeB - vEdgeA).Perpendicular();
+
+					Line<T, 2> line(vMidPoint, vMidPoint + vEdgeDir);
+					auto intersections = line.Intersection(boundsOutline);
+					AssertEQ(intersections.size(), 2);
+					std::array<typename decltype(dual)::NodeID, 2> newNodes{
+						dual.AddNode(intersections[0].position),
+						dual.AddNode(intersections[1].position)};
+
+					dual.AddEdge({newNodes[0], newNodes[1]});
+				}
+				else if (faces.size() == 1)
+				{
+					auto face = faces[0];
+					auto vMean = mTriangulation.GetFaceAsTriangle(face).GetMean();
+
+					auto centerNode = faceNodeMapping.at(face);
+					auto vFaceCircumcenter = dual.GetValue(centerNode);
+
+					// Make sure edges are in CW order, so they all point outwards from the face.
+					if ((vEdgeA - vMean).DotPerp(vEdgeB - vMean) > 0.0)
+					{
+						std::swap(vEdgeA, vEdgeB);
+					}
+
+					auto vAlongEdge = vEdgeB - vEdgeA;
+					auto vVoronoiEdgeDirection = vAlongEdge.Perpendicular();
+
+					Ray<T, 2> ray(vFaceCircumcenter, vVoronoiEdgeDirection);
+
+					auto intersections = ray.Intersection(boundsOutline);
+					if (intersections.size() > 0)
+					{
+						auto intersection = *std::ranges::max_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
+						auto newNode = dual.AddNode(intersection.position);
+						dual.AddEdge({centerNode, newNode});
+					}
+				}
+			}
+
+			mGraph = std::move(dual);
+			mTriangleToNodeMapping = faceNodeMapping;
 		}
 
 
