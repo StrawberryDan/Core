@@ -61,7 +61,7 @@ namespace Strawberry::Core::Math
 
 
 		/// String formatter
-		std::string ToString() const
+		[[nodiscard]] std::string ToString() const
 		{
 			if constexpr (Config::Directed::value)
 			{
@@ -120,7 +120,7 @@ namespace Strawberry::Core::Math
 
 		const auto& Weight() const { return mWeight; }
 
-		void SetWeight(typename Config::WeightType weight) { mWeight = weight; }
+		void SetWeight(Config::WeightType weight) { mWeight = weight; }
 
 	private:
 		Config::WeightType mWeight;
@@ -152,29 +152,29 @@ namespace Strawberry::Core::Math
 	};
 
 
-	template <typename _Value, GraphConfig _Config>
+	template <typename _value, GraphConfig _config>
 	class Graph
 	{
 	public:
-		using Value = _Value;
-		using Config = _Config;
+		using Value = _value;
+		using Config = _config;
 		using NodeID = unsigned int;
 		using Edge = Edge<Config>;
 
 
-		_Value& GetValue(NodeID nodeIndex)
+		Value& GetValue(NodeID nodeIndex)
 		{
 			return mNodes.at(nodeIndex);
 		}
 
 
-		const _Value& GetValue(NodeID nodeIndex) const
+		const Value& GetValue(NodeID nodeIndex) const
 		{
 			return mNodes.at(nodeIndex);
 		}
 
 
-		unsigned int NodeCount() const
+		[[nodiscard]] unsigned int NodeCount() const
 		{
 			return mNodes.size();
 		}
@@ -186,7 +186,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		unsigned int InDegree(NodeID node) const requires (Config::Directed)
+		[[nodiscard]] unsigned int InDegree(NodeID node) const requires (Config::Directed)
 		{
 			unsigned int result = 0;
 			for (auto edge : mEdgeStorage.mEdges)
@@ -197,7 +197,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		unsigned int OutDegree(NodeID node) const requires (Config::Directed)
+		[[nodiscard]] unsigned int OutDegree(NodeID node) const requires (Config::Directed)
 		{
 			unsigned int result = 0;
 			for (auto edge : mEdgeStorage.mEdges)
@@ -208,7 +208,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		unsigned int Degree(NodeID node) const
+		[[nodiscard]] unsigned int Degree(NodeID node) const
 		{
 			if constexpr (Config::Directed)
 			{
@@ -238,7 +238,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		bool ContainsValue(const _Value& value) const noexcept
+		[[nodiscard]] bool ContainsValue(const Value& value) const noexcept
 		{
 			return std::ranges::find_if(
 				mNodes,
@@ -246,7 +246,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		template <typename T> requires (std::same_as<_Value, std::decay_t<T>>)
+		template <typename T> requires (std::same_as<Value, std::decay_t<T>>)
 		NodeID AddNode(T&& node)
 		{
 			mNodes.insert({mNextID++, std::forward<T>(node)});
@@ -308,7 +308,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		unsigned int EdgeCount() const
+		[[nodiscard]] unsigned int EdgeCount() const
 		{
 			std::set<Edge> edgeSet;
 			for (auto edge : Edges())
@@ -345,7 +345,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		bool IsConnected(NodeID nodeAIndex, NodeID nodeBIndex) const
+		[[nodiscard]] bool IsConnected(NodeID nodeAIndex, NodeID nodeBIndex) const
 		{
 			Edge edge(nodeAIndex, nodeBIndex);
 			return mEdgeStorage.mEdges[edge.A()].contains(edge.B());
@@ -358,14 +358,14 @@ namespace Strawberry::Core::Math
 		}
 
 
-		std::set<NodeID> GetNeighbours(NodeID node) const
+		[[nodiscard]] std::set<NodeID> GetNeighbours(NodeID node) const
 		{
 			std::set<NodeID> neighbours = mEdgeStorage.mEdges[node];
 			return neighbours;
 		}
 
 
-		std::set<NodeID> GetIncomingNeighbours(NodeID node) const requires (Config::Directed)
+		[[nodiscard]] std::set<NodeID> GetIncomingNeighbours(NodeID node) const requires (Config::Directed)
 		{
 			std::set<NodeID> incomingNeighbours;
 
@@ -378,7 +378,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		std::set<NodeID> GetOutgoingNeighbours(NodeID node) const requires (Config::Directed)
+		[[nodiscard]] std::set<NodeID> GetOutgoingNeighbours(NodeID node) const requires (Config::Directed)
 		{
 			return mEdgeStorage.mEdges[node];
 		}
@@ -388,7 +388,7 @@ namespace Strawberry::Core::Math
 		/// Incrementing counter for generating node IDs
 		NodeID mNextID = 0;
 		/// The map of nodes, associates node ids to values.
-		std::map<NodeID, _Value> mNodes;
+		std::map<NodeID, Value> mNodes;
 		/// The set of edges in this graph.
 		GraphEdgeStorage<Config> mEdgeStorage;
 	};
@@ -410,8 +410,8 @@ namespace Strawberry::Core::Math
 	};
 
 
-	template <typename _Graph>
-	using WeightedGraph = Graph<typename _Graph::Value, WeightedGraphConfig<typename _Graph::Config>>;
+	template <typename _graph>
+	using WeightedGraph = Graph<typename _graph::Value, WeightedGraphConfig<typename _graph::Config>>;
 
 
 	template <typename T, GraphConfig Config>
