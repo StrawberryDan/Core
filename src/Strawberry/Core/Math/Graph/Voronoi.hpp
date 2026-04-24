@@ -11,6 +11,8 @@
 #include <ranges>
 #include <tuple>
 
+#include "Strawberry/Core/Types/Variant.hpp"
+
 
 namespace Strawberry::Core::Math
 {
@@ -34,46 +36,6 @@ namespace Strawberry::Core::Math
 		/// Structure representing a cell in a voronoi diagram.
 		struct Cell
 		{
-			std::map<DirectedEdge, Optional<unsigned int>> edges;
-
-
-			/// Gets the set of nodes in counter-clockwise order.
-			auto Nodes() const
-			{
-				/// Get the ordered set of all nodes.
-				auto edgeNodes = edges
-					| std::views::keys
-					| std::views::transform([] (DirectedEdge edge) { return edge.Nodes(); })
-					| std::views::join
-					| std::ranges::to<std::vector>();
-
-				/// Remove duplicates from the list whilst preserving the order
-				/// of first appearence
-				for (int i = 0; i < edges.size(); i++)
-				{
-					auto v = edgeNodes[i];
-					for (int j = edgeNodes.size() - 1; j > i; j--)
-					{
-						if (edgeNodes[i] == edgeNodes[j])
-						{
-							edgeNodes.erase(edgeNodes.begin() + j);
-						}
-					}
-				}
-
-				return edgeNodes;
-			}
-
-
-			/// Returns the IDs for the neighbouring cells.
-			std::set<unsigned int> Neighbours() const noexcept
-			{
-				return edges
-					| std::views::values
-					| std::views::filter([] (const auto& x) { return static_cast<bool>(x); })
-					| std::views::transform([] (const auto& x) { return x.Value(); })
-					| std::ranges::to<std::set>();
-			};
 
 
 			/// Default comparisons for use in ordered structures.
@@ -87,11 +49,10 @@ namespace Strawberry::Core::Math
 		}
 
 		/// Creates the corresponding voronoi diagram for a delaunay triangulation.
-		static Voronoi<Vector<T, 2>> From(const Delaunay& delaunay) noexcept
+		static Voronoi<Vector<T, 2>> From(const Delaunay& delaunay)
 		{
 			Voronoi voronoi(delaunay);
 			voronoi.MakeDual();
-			voronoi.GenerateCellMap();
 			return voronoi;
 		}
 
@@ -114,61 +75,25 @@ namespace Strawberry::Core::Math
 		/// Gets the set of vertices for this Cell in CCW order.
 		std::vector<Vector<T, 2>> CellVertices(Cell cell) const noexcept
 		{
-			return cell.Nodes()
-				| std::views::transform([this] (unsigned int x) { return mGraph.GetValue(x); })
-				| std::ranges::to<std::vector>();
+
 		}
 
 		/// Returns the mean vertex position of the vertices in this cell.
 		Vector<T, 2> GetCellMeanVertex(Cell cell) const noexcept
 		{
-			Vector<T, 2> center;
-			auto values = CellVertices(cell);
-			for (auto v : values)
-			{
-				center = center + v;
-			}
 
-			return center * (1.0 / values.size());
 		}
 
 		/// Returns whether the given point is contained by the given cell.
 		bool CellContainsPoint(const Cell& cell, Vector<T, 2> point) const
 		{
-			for (auto edge : cell.edges | std::views::keys)
-			{
-				LineSegment<T, 2> asLine(
-					mGraph.GetValue(edge.A()),
-					mGraph.GetValue(edge.B())
-				);
 
-				if (asLine.Direction().DotPerp(point - asLine.A()) < 0.0)
-				{
-					return false;
-				}
-			}
-
-			return true;
 		}
 
 		/// Finds the cell that contains given point.
 		std::pair<typename Delaunay::NodeID, Cell> GetContainingCell(const Vector<T, 2>& point)
 		{
-			typename Delaunay::NodeID currentNode = mCellMap.begin()->first;
-			Cell currentCell = GetCell(currentNode);
 
-			while (!CellContainsPoint(currentCell, point))
-			{
-				auto neighbouringCells = currentCell.Neighbours();
-				currentNode = *std::ranges::min_element(neighbouringCells, std::less{},
-												[this, point] (Delaunay::NodeID node)
-												{
-													return (mTriangulation.GetGraph().GetValue(node) - point).SquareMagnitude();
-												});
-				currentCell = GetCell(currentNode);
-			}
-
-			return {currentNode, currentCell};
 		}
 
 
@@ -176,18 +101,6 @@ namespace Strawberry::Core::Math
 		Voronoi(const Delaunay& delaunay)
 			: mTriangulation(delaunay)
 		{}
-
-		void GenerateCellMap()
-		{
-			Assert(mCellMap.empty(), "Second call to GenerateCellMap in Voronoi when mCellMap already populated");
-#if STRAWBERRY_DEBUG
-			for (const auto node : mTriangulation.GetGraph().NodeIndices())
-			{
-				auto cell = GetCell(node);
-				Assert(GetContainingCell(GetCellMeanVertex(cell)).first == node);
-			}
-#endif
-		}
 
 
 		/// Return the dual graph of this delaunay triangulation.
@@ -289,18 +202,19 @@ namespace Strawberry::Core::Math
 		}
 
 
+		// Take each outer edge A and extend an edge B from
+		// the circumcentre of A to the boundary of the graph,
+		// intersecting the midpoint of edge A.
+		//
+		// If an edge doesn't have a face at all,
+		// then we extend in both directions a ray,
+		// from the centre of the edge to the boundary,
+		// in the two directions perpendicular to the edge.
 		void CreateOuterEdges()
 		{
 			const auto bounds = mTriangulation.GetBoundingBox();
 			const auto boundsOutline = bounds.GetOutline();
-			// Take each outer edge A and extend an edge B from
-			// the circumcentre of A to the boundary of the graph,
-			// intersecting the midpoint of edge A.
-			//
-			// If an edge doesn't have a face at all,
-			// then we extend in both directions a ray,
-			// from the centre of the edge to the boundary,
-			// in the two directions perpendicular to the edge.
+
 			for (const auto edge : mTriangulation.GetOuterEdges())
 			{
 				auto vEdgeA = mTriangulation.GetGraph().GetValue(edge.A());
