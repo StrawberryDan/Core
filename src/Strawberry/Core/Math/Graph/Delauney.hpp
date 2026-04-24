@@ -359,7 +359,7 @@ namespace Strawberry::Core::Math
 
 
 		/// Check if this node is a part of this face.
-		bool ContainsNode(unsigned int n) const noexcept
+		[[nodiscard]] bool ContainsNode(unsigned int n) const noexcept
 		{
 			return std::ranges::contains(mNodes, n);
 		}
