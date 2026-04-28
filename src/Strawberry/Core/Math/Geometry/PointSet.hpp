@@ -1,7 +1,9 @@
 #pragma once
-
-
+// Strawberry Core
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Math/Graph/Voronoi.hpp"
+#include "Strawberry/Core/Math/Graph/Delauney.hpp"
+// Standard Library
 #include <algorithm>
 #include <random>
 #include <set>
@@ -82,6 +84,29 @@ namespace Strawberry::Core::Math
 				}
 			}
 			return max;
+		}
+
+
+		PointSet Relaxed(unsigned int iterationCount = 1, double strength = 1.0)
+		{
+			PointSet result = *this;
+			for (int i = 0; i < iterationCount; i++)
+			{
+				auto delaunay = Delaunay<Vector<T, 2>>::From(*this, {10, 10});
+				auto voronoi = typename Voronoi<Vector<T, 2>>::Builder(delaunay).Build();
+
+				PointSet next;
+				for (auto node : delaunay.GetGraph().NodeIndices())
+				{
+					auto p0 = delaunay.GetGraph().GetValue(node);
+					auto cell = voronoi.GetCell(node);
+					auto point = strength * voronoi.GetCellAsPolygon(cell).CenterOfMass()
+						+ (1.0 - strength) * p0;
+					next.Add(point);
+				}
+				result = next;
+			}
+			return result;
 		}
 
 
