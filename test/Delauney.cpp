@@ -11,7 +11,6 @@ using namespace Math;
 
 static Vector<double, 2> MIN{0.0, 0.0};
 static Vector<double, 2> MAX{1000.0, 1000.0};
-static double            PADDING = 20.0;
 
 struct GraphColoring
 {
@@ -29,8 +28,8 @@ static PointSet<double, 2> GeneratePointSet()
 	PointSet<double, 2> points;
 
 	std::random_device rng;
-	std::uniform_real_distribution<double> distX(MIN[0] + PADDING, MAX[0] - PADDING);
-	std::uniform_real_distribution<double> distY(MIN[1] + PADDING, MAX[1] - PADDING);
+	std::uniform_real_distribution<double> distX(MIN[0], MAX[0]);
+	std::uniform_real_distribution<double> distY(MIN[1], MAX[1]);
 
 	for (int i = 0; i < POINT_COUNT; i++)
 	{
@@ -83,7 +82,7 @@ int main()
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
-	auto builder = Delaunay<Vector<double, 2>>::Builder(MIN, MAX);
+	auto builder = Delaunay<Vector<double, 2>>::Builder({MIN, MAX});
 	for (const auto& point : pointSet)
 	{
 		builder.AddNode(point);
