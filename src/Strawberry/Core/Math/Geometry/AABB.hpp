@@ -29,8 +29,9 @@ namespace Strawberry::Core::Math
 
 		const auto&  Min() const { return mMin; }
 		const auto&  Max() const { return mMax; }
-		auto        Size() const { return Max() - Min(); }
+		auto        Size() const { Assert(IsNormal()); return Max() - Min(); }
 		auto        Center() const { return (Min() + Max()).Piecewise(std::divides{}, 2); }
+		auto        Span() const { Assert(IsNormal()); return Max() - Min();}
 
 		std::vector<Vector<T, D>> Corners() const
 		{
