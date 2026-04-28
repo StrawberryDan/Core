@@ -43,20 +43,6 @@ namespace Strawberry::Core::Math
 		class Builder;
 		friend class Builder;
 
-
-		/// Constructs a delaunay triangulation from a set of points.
-		static Delaunay From(const PointSet<T, 2>& points)
-		{
-			Builder builder({
-				points.MinExtreme(),
-				points.MaxExtreme()});
-			for (const auto& point : points)
-			{
-				builder.AddNode(point);
-			}
-			return builder.Build();
-		}
-
 		const auto& GetBoundingBox() const noexcept { return mBounds; }
 
 		/// Accessor for the edge of the voronoi cell boundaries.
@@ -348,6 +334,17 @@ namespace Strawberry::Core::Math
 
 			Validate();
 
+			return std::move(*this);
+		}
+
+
+		template <std::ranges::range Range>
+		Builder&& WithNodes(Range&& range)
+		{
+			for (const auto& x : std::forward<Range>(range))
+			{
+				AddNode(x);
+			}
 			return std::move(*this);
 		}
 
