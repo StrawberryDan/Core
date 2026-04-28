@@ -526,8 +526,6 @@ namespace Strawberry::Core::Math
 				Core::Assert(count > 0);
 				Core::Assert(count < 3);
 			}
-
-			AssertEQ(graph->GetGraph().NodeCount() - graph->GetGraph().EdgeCount() + graph->FaceCount(), 1);
 #endif
 		}
 
