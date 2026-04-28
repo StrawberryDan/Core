@@ -45,10 +45,11 @@ namespace Strawberry::Core::Math
 
 
 		/// Constructs a delaunay triangulation from a set of points.
-		static Delaunay From(const PointSet<T, 2>& points, Vector<T, 2> padding)
+		static Delaunay From(const PointSet<T, 2>& points)
 		{
-			Builder builder(points.MinExtreme() - padding
-							, points.MaxExtreme() + padding);
+			Builder builder({
+				points.MinExtreme(),
+				points.MaxExtreme()});
 			for (const auto& point : points)
 			{
 				builder.AddNode(point);
@@ -276,17 +277,17 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		/// Create a builder with the given AABB extent.
-		Builder(const Vector<T, 2>& min, const Vector<T, 2>& max)
-			: mBoundingBox(min, max)
+		Builder(const AABB<T, 2> bounds)
+			: mBoundingBox(bounds)
 		{
-			auto span = max - min;
+			auto span = bounds.Span();;
 
 			// Store min and max;
 			mResult.mBounds = mBoundingBox;
 			// Create the supporting nodes.
-			mResult.mGraph.AddNode(min);
-			mResult.mGraph.AddNode(Vector{2 * span[0], min[1]});
-			mResult.mGraph.AddNode(Vector{min[0], 2 * span[1]});
+			mResult.mGraph.AddNode(mBoundingBox.Min());
+			mResult.mGraph.AddNode(Vector{2 * span[0], mBoundingBox.Min()[1]});
+			mResult.mGraph.AddNode(Vector{mBoundingBox.Min()[0], 2 * span[1]});
 			// Create the edges between supporting nodes.
 			mResult.mGraph.AddEdge({0, 1});
 			mResult.mGraph.AddEdge({1, 2});
