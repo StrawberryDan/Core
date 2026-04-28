@@ -61,6 +61,7 @@ namespace Strawberry::Core::Math
 			return set;
 		}
 
+
 		PointSet() = default;
 
 
@@ -109,12 +110,12 @@ namespace Strawberry::Core::Math
 		}
 
 
-		PointSet Relaxed(const AABB<T, 2>& bounds, unsigned int iterationCount = 1, double strength = 1.0)
+		PointSet Relaxed(const ConvexPolygon<T>& bounds, unsigned int iterationCount = 1, double strength = 1.0)
 		{
 			PointSet result = *this;
 			for (int i = 0; i < iterationCount; i++)
 			{
-				auto delaunay = typename Delaunay<Vector<T, 2>>::Builder(bounds.AsPolygon())
+				auto delaunay = typename Delaunay<Vector<T, 2>>::Builder(bounds)
 					.WithNodes(result)
 					.Build();
 				auto voronoi = typename Voronoi<Vector<T, 2>>::Builder(delaunay).Build();
