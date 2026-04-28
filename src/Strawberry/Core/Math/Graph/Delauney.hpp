@@ -333,8 +333,6 @@ namespace Strawberry::Core::Math
 				mResult.mFaces.insert_range(faces);
 			}
 
-			Validate();
-
 			return std::move(*this);
 		}
 
