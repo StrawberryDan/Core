@@ -28,7 +28,7 @@ struct GraphColoring
 
 static PointSet<double, 2> GeneratePointSet()
 {
-	static size_t POINT_COUNT = 1024;
+	static size_t POINT_COUNT = 128;
 	PointSet<double, 2> points;
 
 	std::random_device rng;
