@@ -14,6 +14,7 @@ namespace Strawberry::Core::Math
 {
 	template <typename T>
 	class ConvexPolygon
+		: public Intersectable
 	{
 	public:
 		ConvexPolygon() = default;
