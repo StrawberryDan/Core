@@ -71,7 +71,7 @@ int main()
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
-	auto builder = Delaunay<Vector<double, 2>>::Builder({MIN, MAX});
+	auto builder = Delaunay<Vector<double, 2>>::Builder(AABB<double, 2>{MIN, MAX}.AsPolygon());
 	for (const auto& point : pointSet)
 	{
 		builder.AddNode(point);

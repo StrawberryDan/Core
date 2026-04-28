@@ -1,5 +1,7 @@
 #include "Strawberry/Core/Math/Geometry/AABB.hpp"
 
+#include "Strawberry/Core/Math/Geometry/ConvexPolygon.hpp"
+
 using namespace Strawberry;
 using namespace Core;
 using namespace Math;
