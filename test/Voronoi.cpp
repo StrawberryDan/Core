@@ -81,7 +81,7 @@ static void DrawCellCenters(canvas_ity::canvas& canvas, Voronoi<Vector<double, 2
 {
 	for (auto cell : graph.Cells())
 	{
-		auto center = graph.GetCellAsPolygon(cell).Mean();
+		auto center = graph.GetCellAsPolygon(cell).Mean() - MIN;
 		canvas.set_color(canvas_ity::fill_style, 0.2, 0.5, 0.8, 1.0);
 		canvas.begin_path();
 		canvas.arc(center[0], center[1], 2.0, 0, 360);
