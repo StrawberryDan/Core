@@ -39,6 +39,28 @@ namespace Strawberry::Core::Math
 			return points;
 		}
 
+
+		static PointSet UniformDistribution(unsigned int count, const Triangle<T, 2> simplex) requires (D == 2)
+		{
+			std::default_random_engine rng;
+			rng.seed(std::random_device{}());
+
+			PointSet set;
+			for (int pointIndex = 0; pointIndex < count; pointIndex++)
+			{
+				static std::uniform_real_distribution<T> dist(0.0, 1.0);
+
+				double r1 = dist(rng);
+				double r2 = dist(rng);
+
+				set.Add(
+					(1 - std::sqrt(r1)) * simplex.Point(0) +
+					std::sqrt(r1) * (1 - r2) * simplex.Point(1) +
+					std::sqrt(r1) * r2 * simplex.Point(2));
+			}
+			return set;
+		}
+
 		PointSet() = default;
 
 
