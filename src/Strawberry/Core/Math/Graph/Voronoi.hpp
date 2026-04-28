@@ -141,35 +141,34 @@ namespace Strawberry::Core::Math
 
 				if (containsA)
 				{
+					Assert(!containsB);
+
 					Vector<T, 2> edgeDir = b - a;
 					Ray<T, 2> ray(a, edgeDir);
 					auto intersections = ray.Intersection(boundsOutline);
 					auto intersection = *std::ranges::min_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
 
-					if (mResult.mGraph.Degree(edge.B()) == 1)
-					{
-						edgesToRemove.emplace_back(edge);
-					}
+					AssertEQ(mResult.mGraph.Degree(edge.B()), 1);
+					edgesToRemove.emplace_back(edge);
 
 					auto newNode = mResult.mGraph.AddNode(intersection.position);
 					edgesToAdd.emplace_back(edge.A(), newNode);
 				}
 				else if (containsB)
 				{
+					Assert(!containsA);
+
 					Vector<T, 2> edgeDir = a - b;
 					Ray<T, 2> ray(b, edgeDir);
 					auto intersections = ray.Intersection(boundsOutline);
 					auto intersection = *std::ranges::min_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
 
-					if (mResult.mGraph.Degree(edge.A()) == 1)
-					{
-						edgesToRemove.emplace_back(edge);
-					}
+					AssertEQ(mResult.mGraph.Degree(edge.A()), 1);
+					edgesToRemove.emplace_back(edge);
 
 					auto newNode = mResult.mGraph.AddNode(intersection.position);
 					edgesToAdd.emplace_back(edge.B(), newNode);
 				}
-
 				// Edges where neither point is inside the bounds are removed.
 				else
 				{
