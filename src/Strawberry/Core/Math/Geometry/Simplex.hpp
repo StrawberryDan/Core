@@ -10,6 +10,10 @@
 
 namespace Strawberry::Core::Math
 {
+	template <typename T>
+	class ConvexPolygon;
+
+
 	template <typename T, unsigned Dimension, unsigned Order> requires (Order <= Dimension + 1)
 	class Simplex
 	{
@@ -50,6 +54,12 @@ namespace Strawberry::Core::Math
 			}
 
 			return (1.0 / Order) * mean;
+		}
+
+
+		[[nodiscard]] ConvexPolygon<T> AsPolygon() const requires (Dimension == 2)
+		{
+			return ConvexPolygon<T>::From(mPoints);
 		}
 
 
