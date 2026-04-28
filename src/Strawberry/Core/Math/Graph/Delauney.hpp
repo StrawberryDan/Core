@@ -387,7 +387,7 @@ namespace Strawberry::Core::Math
 			std::set<Face> conflictingFaces;
 			for (const auto& face : mResult.mFaces)
 			{
-				if (GetCircumcircle(face).Contains(value))
+				if (auto c = GetCircumcircle(face); c && c->Contains(value))
 				{
 					conflictingFaces.emplace(face);
 				}
