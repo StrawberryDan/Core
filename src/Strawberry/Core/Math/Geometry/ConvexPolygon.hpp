@@ -1,26 +1,28 @@
 #pragma once
-#include "Strawberry/Core/Math/Geometry/LineSegment.hpp"
-#include "Strawberry/Core/Math/Geometry/Line.hpp"
-#include "Strawberry/Core/Math/Geometry/Ray.hpp"
-#include <ranges>
-#include <vector>
 
+
+#include <concepts>
+#include <vector>
+#include "Ray.hpp"
+#include "Intersection.hpp"
+#include "Simplex.hpp"
 
 
 namespace Strawberry::Core::Math
 {
 	template <typename T>
-	class PolygonOutline
-		: public Intersectable
+	class ConvexPolygon
 	{
 	public:
-		template <std::ranges::range Range>
-		static PolygonOutline From(Range&& range) requires (std::convertible_to<std::ranges::range_value_t<Range>, Vector<T, 2>>)
+		template <std::ranges::range Range> requires (std::convertible_to<std::ranges::range_value_t<Range>, Vector<T, 2>>)
+		static ConvexPolygon From(Range&& range) noexcept
 		{
-			PolygonOutline outline;
-			outline.mPoints = std::forward<Range>(range) | std::ranges::to<std::vector>();
-			return outline;
+			auto outline = range | std::views::transform([] (const auto& x) { return Vector<T, 2>(x); });
+			ConvexPolygon polygon;
+			polygon.mPoints = outline | std::ranges::to<std::vector>();
+			return polygon;
 		}
+
 
 		Vector<T, 2> GetPoint(unsigned int index) const noexcept
 		{
@@ -46,8 +48,61 @@ namespace Strawberry::Core::Math
 		}
 
 
+		Vector<T, 2> CenterOfMass() const
+		{
+			std::vector<std::pair<double, Vector<T, 2>>> components;
+
+			auto mean = Mean();
+			for (int i = 0; i < LineCount(); i++)
+			{
+				auto           line = GetLine(i);
+				Triangle<T, 2> tri({line.A(), line.B(), mean});
+				components.emplace_back(tri.Area(), tri.GetMean());
+			}
+
+			Vector<T, 2> center;
+			double totalWeight = 0.0;
+			for (const auto& [weight, triMean] : components)
+			{
+				center = center + (weight * triMean);
+				totalWeight += weight;
+			}
+			return (1.0 / totalWeight) * center;
+		}
+
+
+		Vector<T, 2> Mean() const
+		{
+			Vector<T, 2> mean;
+
+			for (int i = 0; i < PointCount(); i++)
+			{
+				mean = mean + GetPoint(i);
+			}
+
+			return mean * (1.0 / PointCount());
+		}
+
 	private:
-		PolygonOutline() = default;
+		ConvexPolygon() = default;
+
+
+		bool IsConvex() const noexcept
+		{
+			for (int i = 0; i < mPoints.size(); i++)
+			{
+				const auto& a = mPoints[(i + 0) % mPoints.size()];
+				const auto& b = mPoints[(i + 1) % mPoints.size()];
+				const auto& c = mPoints[(i + 2) % mPoints.size()];
+
+				if ((b - a).DotPerp(c - a) < 0.0)
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
 
 
 		std::vector<Vector<T, 2>> mPoints;
@@ -55,7 +110,7 @@ namespace Strawberry::Core::Math
 
 
 	template <typename T>
-	struct IntersectionTest<PolygonOutline<T>, Line<T, 2>>
+	struct IntersectionTest<ConvexPolygon<T>, Line<T, 2>>
 	{
 		using Base = IntersectionTest<LineSegment<T, 2>, Line<T, 2>>::Result::Inner;
 		struct Data : Base
@@ -70,7 +125,7 @@ namespace Strawberry::Core::Math
 
 		using Result = std::vector<Data>;
 
-		constexpr Result operator()(const PolygonOutline<T>& a, const Line<T, 2>& b) const noexcept
+		constexpr Result operator()(const ConvexPolygon<T>& a, const Line<T, 2>& b) const noexcept
 		{
 			Result result;
 			result.reserve(2);
@@ -93,7 +148,7 @@ namespace Strawberry::Core::Math
 
 
 	template <typename T>
-	struct IntersectionTest<PolygonOutline<T>, Ray<T, 2>>
+	struct IntersectionTest<ConvexPolygon<T>, Ray<T, 2>>
 	{
 		using Base = IntersectionTest<LineSegment<T, 2>, Ray<T, 2>>::Result::Inner;
 		struct Data : Base
@@ -107,7 +162,7 @@ namespace Strawberry::Core::Math
 
 		using Result = std::vector<Data>;
 
-		constexpr Result operator()(const PolygonOutline<T>& a, const Ray<T, 2>& b) const noexcept
+		constexpr Result operator()(const ConvexPolygon<T>& a, const Ray<T, 2>& b) const noexcept
 		{
 			Result result;
 			result.reserve(2);
@@ -129,7 +184,7 @@ namespace Strawberry::Core::Math
 
 
 	template <typename T>
-	struct IntersectionTest<PolygonOutline<T>, LineSegment<T, 2>>
+	struct IntersectionTest<ConvexPolygon<T>, LineSegment<T, 2>>
 	{
 		using Base = IntersectionTest<LineSegment<T, 2>, LineSegment<T, 2>>::Result::Inner;
 
@@ -144,7 +199,7 @@ namespace Strawberry::Core::Math
 
 		using Result = std::vector<Data>;
 
-		constexpr Result operator()(const PolygonOutline<T>& a, const LineSegment<T, 2>& b) const noexcept
+		constexpr Result operator()(const ConvexPolygon<T>& a, const LineSegment<T, 2>& b) const noexcept
 		{
 			Result result;
 			result.reserve(2);

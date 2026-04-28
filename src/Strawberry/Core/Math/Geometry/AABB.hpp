@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "PolygonOutline.hpp"
+#include "ConvexPolygon.hpp"
 #include "Ray.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 
@@ -97,10 +97,10 @@ namespace Strawberry::Core::Math
 
 		/// Returns the edges of the AABB as line segments in CCW order,
 		/// starting from the bottom left.
-		PolygonOutline<T> GetOutline() const noexcept
+		ConvexPolygon<T> AsPolygon() const noexcept
 		{
 			Assert(IsNormal());
-			return PolygonOutline<T>::From(std::array{
+			return ConvexPolygon<T>::From(std::array{
 				mMin,
 				Vector{mMax[0], mMin[1]},
 				mMax,
