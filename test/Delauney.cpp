@@ -9,9 +9,9 @@
 using namespace Strawberry::Core;
 using namespace Math;
 
-static Vector<double, 2> MIN{0.0, 0.0};
-static Vector<double, 2> MAX{1000.0, 1000.0};
-
+static const Vector<double, 2> MIN{0.0, 0.0};
+static const Vector<double, 2> MAX{1000.0, 1000.0};
+static const AABB<double, 2>   BOUNDS(MIN, MAX);
 struct GraphColoring
 {
 	bool drawNodes = true;
@@ -25,19 +25,8 @@ struct GraphColoring
 static PointSet<double, 2> GeneratePointSet()
 {
 	static size_t POINT_COUNT = 128;
-	PointSet<double, 2> points;
-
-	std::random_device rng;
-	std::uniform_real_distribution<double> distX(MIN[0], MAX[0]);
-	std::uniform_real_distribution<double> distY(MIN[1], MAX[1]);
-
-	for (int i = 0; i < POINT_COUNT; i++)
-	{
-		Vector<double, 2> v(distX(rng), distY(rng));
-		v = v.AsType<int>().AsType<double>();
-		points.Add(v);
-	}
-	return points;
+	PointSet<double, 2> points = PointSet<double, 2>::UniformDistribution(POINT_COUNT, MIN, MAX);
+	return points.Relaxed(BOUNDS, 1);
 }
 
 
