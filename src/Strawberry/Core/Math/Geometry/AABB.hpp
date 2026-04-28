@@ -32,6 +32,29 @@ namespace Strawberry::Core::Math
 		auto        Size() const { return Max() - Min(); }
 		auto        Center() const { return (Min() + Max()).Piecewise(std::divides{}, 2); }
 
+		std::vector<Vector<T, D>> Corners() const
+		{
+			size_t c = 1;
+			for (unsigned int d = 0; d < D; d++) c *= 2;
+
+			std::vector<Vector<T, D>> corners;
+			corners.reserve(c);
+
+			for (size_t i = 0; i < c; i++)
+			{
+				auto& corner = corners.emplace_back(mMin);
+				for (size_t d = 0; d < D; d++)
+				{
+					if (i & 1 << d)
+					{
+						corner[d] = mMax[d];
+					}
+				}
+			}
+
+			return corners;
+		}
+
 		void SetMin(const Vector<T, D>& min) noexcept { mMin = min; Assert(IsNormal()); }
 		void SetMax(const Vector<T, D>& max) noexcept { mMax = max; Assert(IsNormal());  }
 

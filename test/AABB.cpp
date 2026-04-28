@@ -17,6 +17,12 @@ int main()
 	Assert(!aabb.Contains({-1, -1}));
 
 
+	auto corners = aabb.Corners();
+	AssertEQ(corners.size(), 4);
+	AssertEQ(corners[0], aabb.Min());
+	AssertEQ(corners[3], aabb.Max());
+
+
 	auto outline = aabb.GetOutline();
 
 	Assert(outline.GetLine(0).A().SquareMagnitude() < std::numeric_limits<double>::epsilon());
