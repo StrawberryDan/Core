@@ -41,7 +41,9 @@ namespace Strawberry::Core
 			}
 #endif
 			DebugBreak();
+#if STRAWBERRY_CORE_ASSERTIONS_FATAL
 			std::terminate();
+#endif
 		}
 #endif // STRAWBERRY_DEBUG
 	}

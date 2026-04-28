@@ -16,6 +16,7 @@ endif ()
 
 if (NOT TARGET StrawberryCore)
   option(STRAWBERRY_CORE_ENABLE_ASSERTIONS "" OFF)
+  option(STRAWBERRY_CORE_ASSERTIONS_FATAL "" OFF)
   option(STRAWBERRY_CORE_ENABLE_LOGGING_STACKTRACE "" OFF)
   option(STRAWBERRY_CORE_ENABLE_LOGGING_TIMESTAMPS "" OFF)
 
@@ -166,6 +167,10 @@ if (NOT TARGET StrawberryCore)
   )
 
   if (${STRAWBERRY_CORE_ENABLE_ASSERTIONS})
+    target_compile_definitions(StrawberryCore PUBLIC "STRAWBERRY_CORE_ENABLE_ASSERTIONS=1")
+  endif()
+
+  if (${STRAWBERRY_CORE_ASSERTIONS_FATAL})
     target_compile_definitions(StrawberryCore PUBLIC "STRAWBERRY_CORE_ENABLE_ASSERTIONS=1")
   endif()
 
