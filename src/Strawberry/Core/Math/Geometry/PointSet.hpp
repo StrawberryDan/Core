@@ -110,6 +110,17 @@ namespace Strawberry::Core::Math
 		}
 
 
+		decltype(auto) begin(this auto self)
+		{
+			return self.mPoints.begin();
+		}
+
+		decltype(auto) end(this auto self)
+		{
+			return self.mPoints.end();
+		}
+
+
 	private:
 		std::set<Vector<T, D>> mPoints;
 	};
