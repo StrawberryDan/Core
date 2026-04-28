@@ -28,7 +28,7 @@ struct GraphColoring
 
 static PointSet<double, 2> GeneratePointSet()
 {
-	static size_t POINT_COUNT = 16;
+	static size_t POINT_COUNT = 128;
 	PointSet<double, 2> points;
 
 	std::random_device rng;
@@ -92,7 +92,7 @@ static void DrawCellCenters(canvas_ity::canvas& canvas, Voronoi<Vector<double, 2
 {
 	for (auto cell : graph.Cells())
 	{
-		auto center = graph.GetCellMeanVertex(cell);
+		auto center = graph.GetCellAsPolygon(cell).Mean();
 		canvas.set_color(canvas_ity::fill_style, 0.2, 0.5, 0.8, 1.0);
 		canvas.begin_path();
 		canvas.arc(center[0], center[1], 2.0, 0, 360);

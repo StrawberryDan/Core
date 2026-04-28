@@ -23,7 +23,7 @@ int main()
 	AssertEQ(corners[3], aabb.Max());
 
 
-	auto outline = aabb.GetOutline();
+	auto outline = aabb.AsPolygon();
 
 	Assert(outline.GetLine(0).A().SquareMagnitude() < std::numeric_limits<double>::epsilon());
 	Assert((outline.GetLine(0).B() - Vector{10., 0.}).SquareMagnitude() < std::numeric_limits<double>::epsilon());

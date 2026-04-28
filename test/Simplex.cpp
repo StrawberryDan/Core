@@ -13,6 +13,8 @@ int main()
 			Vector{0., 1.}
 		});
 
+	AssertEQ(s1.Area(), 0.5);
+
 	Assert(s1.Contains(Vector{0.25, 0.25}));
 	Assert(!s1.Contains(Vector{0.75, 0.75}));
 	Assert(!s1.Contains(Vector{-1., -1.}));
