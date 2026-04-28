@@ -48,8 +48,8 @@ static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColori
 		for (auto edge : graph.Edges())
 		{
 			canvas.set_line_width(config.edgeWidth);
-			Vector<double, 2> posA = graph.GetValue(edge.nodes[0]);
-			Vector<double, 2> posB = graph.GetValue(edge.nodes[1]);
+			Vector<double, 2> posA = graph.GetValue(edge.nodes[0]) - MIN;
+			Vector<double, 2> posB = graph.GetValue(edge.nodes[1]) - MIN;
 			canvas.set_color(canvas_ity::brush_type::stroke_style, config.mEdgeColor[0], config.mEdgeColor[1], config.mEdgeColor[2], config.mEdgeColor[3]);
 			canvas.begin_path();
 			canvas.move_to(posA[0], posA[1]);
@@ -63,7 +63,7 @@ static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColori
 	{
 		for (auto node : graph.NodeIndices())
 		{
-			auto pos = graph.GetValue(node);
+			auto pos = graph.GetValue(node) - MIN;
 			canvas.set_line_width(8.0);
 			canvas.set_color(canvas_ity::brush_type::fill_style, config.mNodeColor[0], config.mNodeColor[1], config.mNodeColor[2], config.mNodeColor[3]);
 			canvas.begin_path();

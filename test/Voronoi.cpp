@@ -61,8 +61,8 @@ static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColori
 				canvas.set_line_dash(nullptr, 0);
 			}
 			canvas.set_line_width(config.edgeWidth);
-			Vector<double, 2> posA = graph.GetValue(edge.nodes[0]);
-			Vector<double, 2> posB = graph.GetValue(edge.nodes[1]);
+			Vector<double, 2> posA = graph.GetValue(edge.nodes[0]) - MIN;
+			Vector<double, 2> posB = graph.GetValue(edge.nodes[1]) - MIN;
 			canvas.set_color(canvas_ity::brush_type::stroke_style, config.mEdgeColor[0], config.mEdgeColor[1], config.mEdgeColor[2], config.mEdgeColor[3]);
 			canvas.begin_path();
 			canvas.move_to(posA[0], posA[1]);
@@ -99,8 +99,8 @@ static void DrawCellCenters(canvas_ity::canvas& canvas, Voronoi<Vector<double, 2
 
 		for (auto edge : cell.Edges())
 		{
-			auto a = graph.GetGraph().GetValue(edge.A());
-			auto b = graph.GetGraph().GetValue(edge.B());
+			auto a = graph.GetGraph().GetValue(edge.A()) - MIN;
+			auto b = graph.GetGraph().GetValue(edge.B()) - MIN;
 
 			a = a + (center - a).WithLength(8.0);
 			b = b + (center - b).WithLength(8.0);
