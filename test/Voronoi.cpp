@@ -14,7 +14,7 @@ using namespace Math;
 static const Triangle<double, 2>   BOUNDS({
 	Vector{0.0, 0.0},
 	Vector{1000.0, 0.0},
-	Vector{0.0, 1000.0}});
+	Vector{500.0, 1000.0}});
 static const Vector<double, 2> MIN = BOUNDS.AsPolygon().GetBoundingBox().Min();
 static const Vector<double, 2> MAX = BOUNDS.AsPolygon().GetBoundingBox().Max();
 
