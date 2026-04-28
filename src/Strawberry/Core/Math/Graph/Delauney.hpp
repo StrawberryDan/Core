@@ -273,8 +273,8 @@ namespace Strawberry::Core::Math
 			auto boundingBox = mOutline.GetBoundingBox();
 			// Create the supporting nodes.
 			mResult.mGraph.AddNode(boundingBox.Min());
-			mResult.mGraph.AddNode(Vector{2 * span[0], boundingBox.Min()[1]});
-			mResult.mGraph.AddNode(Vector{boundingBox.Min()[0], 2 * span[1]});
+			mResult.mGraph.AddNode(Vector{boundingBox.Min()[0] + 2 * span[0], boundingBox.Min()[1]});
+			mResult.mGraph.AddNode(Vector{boundingBox.Min()[0], boundingBox.Min()[1] + 2 * span[1]});
 			// Create the edges between supporting nodes.
 			mResult.mGraph.AddEdge({0, 1});
 			mResult.mGraph.AddEdge({1, 2});
