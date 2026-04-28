@@ -11,8 +11,8 @@
 using namespace Strawberry::Core;
 using namespace Math;
 
-static Vector<double, 2> MIN{0.0, 0.0};
-static Vector<double, 2> MAX{2000.0, 2000.0};
+static Vector<double, 2> MIN{-1000.0, -1000.0};
+static Vector<double, 2> MAX{1000.0, 1000.0};
 static AABB<double, 2>   BOUNDS(MIN, MAX);
 
 struct GraphColoring
@@ -30,7 +30,7 @@ static PointSet<double, 2> GeneratePointSet()
 {
 	static size_t POINT_COUNT = 128;
 	PointSet<double, 2> points = PointSet<double, 2>::UniformDistribution(POINT_COUNT, MIN, MAX);
-	return points.Relaxed(BOUNDS, 1);
+	return points.Relaxed(BOUNDS, 4);
 }
 
 
