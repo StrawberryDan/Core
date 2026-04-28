@@ -13,6 +13,7 @@ using namespace Math;
 
 static Vector<double, 2> MIN{0.0, 0.0};
 static Vector<double, 2> MAX{2000.0, 2000.0};
+static AABB<double, 2>   BOUNDS(MIN, MAX);
 
 struct GraphColoring
 {
@@ -40,7 +41,7 @@ static PointSet<double, 2> GeneratePointSet()
 		// v = v.AsType<int>().AsType<double>();
 		points.Add(v);
 	}
-	return points.Relaxed(4, 0.66);
+	return points.Relaxed(BOUNDS, 4);
 }
 
 
