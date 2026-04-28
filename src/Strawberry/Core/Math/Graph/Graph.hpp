@@ -50,13 +50,13 @@ namespace Strawberry::Core::Math
 	{
 		EdgeCommon(Config::NodeID a, Config::NodeID b) : nodes{ a, b }
 		{
+			AssertNEQ(a, b);
+
 			// Puts edges in normalised order for undirected graphs
 			if constexpr (!Config::Directed)
 			{
 				if (nodes[0] > nodes[1]) std::swap(nodes[0], nodes[1]);
 			}
-
-			AssertNEQ(a, b);
 		}
 
 
