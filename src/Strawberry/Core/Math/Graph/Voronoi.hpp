@@ -327,10 +327,41 @@ namespace Strawberry::Core::Math
 
 				mResult.mCellMap.emplace(id, std::move(cellList));
 			}
+
+			for (auto corner : mResult.mTriangulation.GetBoundingBox().Corners())
+			{
+				auto nearest = *std::ranges::min_element(
+					mResult.mTriangulation.GetGraph().NodeIndices(),
+					std::less{},
+					[&] (const auto& v) { return (corner - mResult.mTriangulation.GetGraph().GetValue(v)).SquareMagnitude(); });
+
+				auto cornerNode = mResult.mGraph.AddNode(corner);
+				mResult.mCellMap[nearest].mNodeIDs.emplace_back(cornerNode);
+
+				Vector<T, 2> mean;
+				for (const auto& node : mResult.mCellMap[nearest].mNodeIDs)
+				{
+					mean = mean + mResult.mGraph.GetValue(node);
+				}
+				mean = (1.0 / mResult.mCellMap[nearest].mNodeIDs.size()) * mean;
+
+				std::ranges::sort(
+					mResult.mCellMap[nearest].mNodeIDs,
+					std::greater{},
+					[&] (const auto& x) { return (mResult.mGraph.GetValue(x) - mean).ATan2(); });
+			}
+
+			for (auto& [id, cell] : mResult.mCellMap)
+			{
+				for (auto& edge : cell.Edges())
+				{
+					if (!mResult.mGraph.IsConnected(edge.A(), edge.B()))
+					{
+						mResult.mGraph.AddEdge({edge.A(), edge.B()});
+					}
+				}
+			}
 		}
-
-
-
 
 
 		Voronoi mResult;
