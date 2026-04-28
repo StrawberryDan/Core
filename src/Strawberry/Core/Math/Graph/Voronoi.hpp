@@ -95,10 +95,6 @@ namespace Strawberry::Core::Math
 	class Voronoi<Vector<T, 2>>::Builder
 	{
 	public:
-		Builder(const PointSet<T, 2>& points)
-			: Builder(Delaunay::From(points))
-		{}
-
 		Builder (const Delaunay& triangulation)
 			: mResult(triangulation)
 		{}
