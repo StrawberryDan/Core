@@ -1,13 +1,15 @@
 #pragma once
 
 
-#include "ConvexPolygon.hpp"
 #include "Ray.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 
 
 namespace Strawberry::Core::Math
 {
+	template <typename T>
+	class ConvexPolygon;
+
 	template <typename T, unsigned int D>
 	class AABB
 		: public Intersectable

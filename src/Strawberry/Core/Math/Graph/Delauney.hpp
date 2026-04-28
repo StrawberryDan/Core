@@ -43,7 +43,7 @@ namespace Strawberry::Core::Math
 		class Builder;
 		friend class Builder;
 
-		const auto& GetBoundingBox() const noexcept { return mBounds; }
+		const auto& GetOutline() const noexcept { return mOutline; }
 
 		/// Accessor for the edge of the voronoi cell boundaries.
 		const auto& GetGraph() const noexcept { return mGraph; }
@@ -169,7 +169,7 @@ namespace Strawberry::Core::Math
 
 
 		/// The bounding box of this graph.
-		AABB<T, 2> mBounds;
+		ConvexPolygon<T> mOutline;
 		/// The graph of the Delaunay triangulation.
 		UndirectedVectorGraph<Vector<T, 2>> mGraph;
 		/// The set of triangular faces contained in this graph.
@@ -263,17 +263,18 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		/// Create a builder with the given AABB extent.
-		Builder(const AABB<T, 2> bounds)
-			: mBoundingBox(bounds)
+		Builder(const ConvexPolygon<T> outline)
+			: mOutline(outline)
 		{
-			auto span = bounds.Span();;
+			auto span = outline.GetBoundingBox().Span();;
 
 			// Store min and max;
-			mResult.mBounds = mBoundingBox;
+			mResult.mOutline = mOutline;
+			auto boundingBox = mOutline.GetBoundingBox();
 			// Create the supporting nodes.
-			mResult.mGraph.AddNode(mBoundingBox.Min());
-			mResult.mGraph.AddNode(Vector{2 * span[0], mBoundingBox.Min()[1]});
-			mResult.mGraph.AddNode(Vector{mBoundingBox.Min()[0], 2 * span[1]});
+			mResult.mGraph.AddNode(boundingBox.Min());
+			mResult.mGraph.AddNode(Vector{2 * span[0], boundingBox.Min()[1]});
+			mResult.mGraph.AddNode(Vector{boundingBox.Min()[0], 2 * span[1]});
 			// Create the edges between supporting nodes.
 			mResult.mGraph.AddEdge({0, 1});
 			mResult.mGraph.AddEdge({1, 2});
@@ -289,7 +290,7 @@ namespace Strawberry::Core::Math
 		{
 			ZoneScoped;
 
-			Assert(mBoundingBox.Contains(value),
+			Assert(mOutline.Contains(value),
 				   "Attempted to add an out-of-bounds node to Delaunay graph.");
 			Assert(!mResult.mGraph.ContainsValue(value),
 				   "Attempted to add duplicate node to Delaunay graph.");
@@ -529,8 +530,8 @@ namespace Strawberry::Core::Math
 #endif
 		}
 
-		/// Bounds
-		AABB<T, 2> mBoundingBox;
+		/// Outline
+		ConvexPolygon<T> mOutline;
 		/// The delaunay graph we are creating.
 		Delaunay<Vector<T, 2>>                 mResult;
 		/// A cache of the triangle representation of faces from our delaunay.

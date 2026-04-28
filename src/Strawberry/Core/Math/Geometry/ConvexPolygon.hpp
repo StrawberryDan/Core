@@ -6,6 +6,8 @@
 #include "Ray.hpp"
 #include "Intersection.hpp"
 #include "Simplex.hpp"
+#include "AABB.hpp"
+#include "PointSet.hpp"
 
 
 namespace Strawberry::Core::Math
@@ -14,6 +16,9 @@ namespace Strawberry::Core::Math
 	class ConvexPolygon
 	{
 	public:
+		ConvexPolygon() = default;
+
+
 		template <std::ranges::range Range> requires (std::convertible_to<std::ranges::range_value_t<Range>, Vector<T, 2>>)
 		static ConvexPolygon From(Range&& range) noexcept
 		{
@@ -28,6 +33,11 @@ namespace Strawberry::Core::Math
 		{
 			Assert(index < mPoints.size());
 			return mPoints[index];
+		}
+
+		decltype(auto) Points() const
+		{
+			return mPoints | std::views::all;
 		}
 
 		decltype(auto) PointCount() const noexcept
@@ -83,8 +93,41 @@ namespace Strawberry::Core::Math
 			return mean * (1.0 / PointCount());
 		}
 
+
+		[[nodiscard]] AABB<T, 2> GetBoundingBox() const noexcept
+		{
+			PointSet<T, 2> points;
+			for (auto p : mPoints)
+			{
+				points.Add(p);
+			}
+
+			return AABB<T, 2>{points.MinExtreme(), points.MaxExtreme()};
+		}
+
+
+		bool Contains(const Vector<T, 2>& v) const noexcept
+		{
+			auto boundingBox = GetBoundingBox();
+			if (!boundingBox.Contains(v))
+			{
+				return false;
+			}
+
+			for (int i = 0; i < LineCount(); i++)
+			{
+				auto line = GetLine(i);
+				if ((line.B() - line.A()).DotPerp(v - line.A()) < 0.0)
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+
 	private:
-		ConvexPolygon() = default;
 
 
 		bool IsConvex() const noexcept

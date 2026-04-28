@@ -92,7 +92,7 @@ namespace Strawberry::Core::Math
 			PointSet result = *this;
 			for (int i = 0; i < iterationCount; i++)
 			{
-				auto delaunay = typename Delaunay<Vector<T, 2>>::Builder(bounds)
+				auto delaunay = typename Delaunay<Vector<T, 2>>::Builder(bounds.AsPolygon())
 					.WithNodes(result)
 					.Build();
 				auto voronoi = typename Voronoi<Vector<T, 2>>::Builder(delaunay).Build();
