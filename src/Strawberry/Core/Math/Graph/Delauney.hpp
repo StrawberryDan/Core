@@ -227,10 +227,22 @@ namespace Strawberry::Core::Math
 		// Returns whether this face has another edge in common with this other face.
 		bool SharesEdgeWith(const Face& other) const noexcept
 		{
-			std::set<unsigned int> u;
+			return GetSharedEdge(other).HasValue();
+		}
+
+		// Returns the edge shared between two faces if there is one.
+		Optional<Edge> GetSharedEdge(const Face& other) const noexcept
+		{
+			std::vector<unsigned int> u;
 			std::ranges::set_intersection(Nodes(), other.Nodes(), std::inserter(u, u.begin()));
 			Assert(u.size() < 3);
-			return u.size() == 2;
+
+			if (u.size() == 2)
+			{
+				return Edge{u[0], u[1]};
+			}
+
+			return NullOpt;
 		}
 
 
