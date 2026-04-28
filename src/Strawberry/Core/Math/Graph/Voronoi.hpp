@@ -1,10 +1,8 @@
 #pragma once
 // Strawberry Core
-#include "Strawberry/Core/Math/Geometry/Plane.hpp"
 #include "Strawberry/Core/Math/Geometry/Ray.hpp"
 #include "Strawberry/Core/Math/Graph/Delauney.hpp"
 #include "Strawberry/Core/Math/Graph/Graph.hpp"
-#include "Strawberry/Core/Math/Graph/GraphWalker.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 // Standard Library
 #include <algorithm>
@@ -61,21 +59,22 @@ namespace Strawberry::Core::Math
 		const auto& GetGraph() const noexcept { return mGraph; }
 
 
+		const Cell& GetCell(CellID id) const
+		{
+			return mCellMap.at(id);
+		}
+
+
 		decltype(auto) Cells(this auto&& self)
 		{
 			return self.mCellMap | std::views::values;
 		}
 
-		Vector<T, 2> GetCellMeanVertex(const Cell& cell) const
+		ConvexPolygon<T> GetCellAsPolygon(const Cell& cell)
 		{
-			Assert(cell.mNodeIDs.size() > 0);
-
-			Vector<T, 2> mean;
-			for (auto n : cell.mNodeIDs)
-			{
-				mean = mean + mGraph.GetValue(n);
-			}
-			return (1.0 / cell.mNodeIDs.size()) * mean;
+			auto points = cell.mNodeIDs | std::views::transform(
+				[&] (const auto& x) { return mGraph.GetValue(x); });
+			return ConvexPolygon<T>::From(std::move(points));
 		}
 
 	private:
@@ -152,7 +151,7 @@ namespace Strawberry::Core::Math
 		void ClipEdgesToBoundingBox()
 		{
 			const auto& bounds = mResult.mTriangulation.GetBoundingBox();
-			const auto boundsOutline = bounds.GetOutline();
+			const auto boundsPolygon = bounds.AsPolygon();
 			/// Record edges that overlap the bounds of the mTriangulation
 			/// and adjust them so that they are clipped by the bounds.
 			std::vector<Edge> edgesToRemove;
@@ -179,7 +178,7 @@ namespace Strawberry::Core::Math
 
 					Vector<T, 2> edgeDir = b - a;
 					Ray<T, 2> ray(a, edgeDir);
-					auto intersections = ray.Intersection(boundsOutline);
+					auto intersections = ray.Intersection(boundsPolygon);
 					auto intersection = *std::ranges::min_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
 
 					AssertEQ(mResult.mGraph.Degree(edge.B()), 1);
@@ -196,7 +195,7 @@ namespace Strawberry::Core::Math
 
 					Vector<T, 2> edgeDir = a - b;
 					Ray<T, 2> ray(b, edgeDir);
-					auto intersections = ray.Intersection(boundsOutline);
+					auto intersections = ray.Intersection(boundsPolygon);
 					auto intersection = *std::ranges::min_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
 
 					AssertEQ(mResult.mGraph.Degree(edge.A()), 1);
@@ -238,7 +237,7 @@ namespace Strawberry::Core::Math
 		void CreateOuterEdges()
 		{
 			const auto bounds = mResult.mTriangulation.GetBoundingBox();
-			const auto boundsOutline = bounds.GetOutline();
+			const auto boundsOutline = bounds.AsPolygon();
 
 			for (const auto edge : mResult.mTriangulation.GetOuterEdges())
 			{
