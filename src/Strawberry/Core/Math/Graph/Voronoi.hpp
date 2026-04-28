@@ -115,8 +115,8 @@ namespace Strawberry::Core::Math
 		void MakeDual() 
 		{
 			MakeEdgesFromDelaunayFaces();
-			ClipEdgesToBoundingBox();
 			CreateOuterEdges();
+			ClipEdgesToBoundingBox();
 		}
 
 
@@ -149,6 +149,7 @@ namespace Strawberry::Core::Math
 			const auto& bounds = mResult.mTriangulation.GetOutline();
 			/// Record edges that overlap the bounds of the mTriangulation
 			/// and adjust them so that they are clipped by the bounds.
+			std::set<CellNodeID> nodesToRemove;
 			std::vector<Edge> edgesToRemove;
 			std::vector<Edge> edgesToAdd;
 			for (auto edge : mResult.mGraph.Edges())
@@ -178,6 +179,7 @@ namespace Strawberry::Core::Math
 
 					AssertEQ(mResult.mGraph.Degree(edge.B()), 1);
 					edgesToRemove.emplace_back(edge);
+					nodesToRemove.emplace(edge.B());
 
 					auto newNode = mResult.mGraph.AddNode(intersection.position);
 					Edge newEdge(edge.A(), newNode);
@@ -195,6 +197,7 @@ namespace Strawberry::Core::Math
 
 					AssertEQ(mResult.mGraph.Degree(edge.A()), 1);
 					edgesToRemove.emplace_back(edge);
+					nodesToRemove.emplace(edge.A());
 
 					auto newNode = mResult.mGraph.AddNode(intersection.position);
 					Edge newEdge(edge.B(), newNode);
@@ -205,6 +208,8 @@ namespace Strawberry::Core::Math
 				else
 				{
 					edgesToRemove.emplace_back(edge);
+					nodesToRemove.emplace(edge.A());
+					nodesToRemove.emplace(edge.B());
 				}
 			}
 
@@ -217,6 +222,11 @@ namespace Strawberry::Core::Math
 			{
 				mResult.mGraph.RemoveEdge(edge);
 				mEdgeOwnership.erase(edge);
+			}
+
+			for (auto&& node : nodesToRemove)
+			{
+				mResult.mGraph.RemoveNode(node);
 			}
 		}
 
