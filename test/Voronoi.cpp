@@ -28,7 +28,7 @@ struct GraphColoring
 
 static PointSet<double, 2> GeneratePointSet()
 {
-	static size_t POINT_COUNT = 256;
+	static size_t POINT_COUNT = 16;
 	PointSet<double, 2> points;
 
 	std::random_device rng;
@@ -98,7 +98,7 @@ static void DrawCellCenters(canvas_ity::canvas& canvas, Voronoi<Vector<double, 2
 		canvas.arc(center[0], center[1], 2.0, 0, 360);
 		canvas.fill();
 
-		for (auto edge : cell.edges | std::views::keys)
+		for (auto edge : cell.Edges())
 		{
 			auto a = graph.GetGraph().GetValue(edge.A());
 			auto b = graph.GetGraph().GetValue(edge.B());
@@ -143,7 +143,7 @@ int main()
 	}
 
 	auto delaunay = builder.Build();
-	auto voronoi = Voronoi<Vector<double, 2>>::From(delaunay);
+	auto voronoi = Voronoi<Vector<double, 2>>::Builder(delaunay).Build();
 	auto span = MAX - MIN;
 
 	canvas_ity::canvas context(span[0], span[1]);

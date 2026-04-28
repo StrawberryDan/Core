@@ -41,14 +41,42 @@ namespace Strawberry::Core::Math
 		/// Structure representing a cell in a voronoi diagram.
 		struct Cell
 		{
-
-
 			/// Default comparisons for use in ordered structures.
 			auto operator<=>(const Cell& other) const = default;
+
+			std::vector<DirectedEdge> Edges() const
+			{
+				std::vector<DirectedEdge> edges;
+				for (int i = 0; mNodeIDs.size() >= 2 && i < mNodeIDs.size(); i++)
+				{
+					edges.emplace_back(DirectedEdge{mNodeIDs[i], mNodeIDs[(i + 1) % mNodeIDs.size()]});
+				}
+				return edges;
+			}
+
+			std::vector<CellNodeID> mNodeIDs;
 		};
 
 		/// Returns the graph containing the boundaries of the voronoi.
 		const auto& GetGraph() const noexcept { return mGraph; }
+
+
+		decltype(auto) Cells(this auto&& self)
+		{
+			return self.mCellMap | std::views::values;
+		}
+
+		Vector<T, 2> GetCellMeanVertex(const Cell& cell) const
+		{
+			Assert(cell.mNodeIDs.size() > 0);
+
+			Vector<T, 2> mean;
+			for (auto n : cell.mNodeIDs)
+			{
+				mean = mean + mGraph.GetValue(n);
+			}
+			return (1.0 / cell.mNodeIDs.size()) * mean;
+		}
 
 	private:
 		Voronoi(const Delaunay& delaunay)
@@ -60,7 +88,7 @@ namespace Strawberry::Core::Math
 		Delaunay                                        mTriangulation;
 		std::map<typename Delaunay::Face, unsigned int> mTriangleToNodeMapping;
 		/// Maps the IDs of nodes from the triangulation to their respective cells.
-		std::map<unsigned int, Cell>                    mCellMap;
+		std::map<CellID, Cell>                          mCellMap;
 	};
 
 
@@ -79,6 +107,7 @@ namespace Strawberry::Core::Math
 		Voronoi Build()
 		{
 			MakeDual();
+			Normalise();
 			return mResult;
 		}
 
@@ -108,7 +137,12 @@ namespace Strawberry::Core::Math
 				{
 					if (face != otherFace && face.SharesEdgeWith(otherFace))
 					{
-						mResult.mGraph.AddEdge({centroidNode, otherCentroidIndex});
+						Edge edge{centroidNode, otherCentroidIndex};
+						mResult.mGraph.AddEdge(edge);
+
+						auto sharedEdge = face.GetSharedEdge(otherFace).Value();
+						mEdgeOwnership[edge].emplace(sharedEdge.A());
+						mEdgeOwnership[edge].emplace(sharedEdge.B());
 					}
 				}
 			}
@@ -152,7 +186,9 @@ namespace Strawberry::Core::Math
 					edgesToRemove.emplace_back(edge);
 
 					auto newNode = mResult.mGraph.AddNode(intersection.position);
+					Edge newEdge(edge.A(), newNode);
 					edgesToAdd.emplace_back(edge.A(), newNode);
+					mEdgeOwnership[newEdge] = mEdgeOwnership[edge];
 				}
 				else if (containsB)
 				{
@@ -167,7 +203,9 @@ namespace Strawberry::Core::Math
 					edgesToRemove.emplace_back(edge);
 
 					auto newNode = mResult.mGraph.AddNode(intersection.position);
+					Edge newEdge(edge.B(), newNode);
 					edgesToAdd.emplace_back(edge.B(), newNode);
+					mEdgeOwnership[newEdge] = mEdgeOwnership[edge];
 				}
 				// Edges where neither point is inside the bounds are removed.
 				else
@@ -184,6 +222,7 @@ namespace Strawberry::Core::Math
 			for (auto&& edge : edgesToRemove)
 			{
 				mResult.mGraph.RemoveEdge(edge);
+				mEdgeOwnership.erase(edge);
 			}
 		}
 
@@ -220,7 +259,10 @@ namespace Strawberry::Core::Math
 						mResult.mGraph.AddNode(intersections[0].position),
 						mResult.mGraph.AddNode(intersections[1].position)};
 
-					mResult.mGraph.AddEdge({newNodes[0], newNodes[1]});
+					Edge newEdge{newNodes[0], newNodes[1]};
+					mResult.mGraph.AddEdge(newEdge);
+					mEdgeOwnership[newEdge].emplace(edge.A());
+					mEdgeOwnership[newEdge].emplace(edge.B());
 				}
 				else if (faces.size() == 1)
 				{
@@ -246,13 +288,52 @@ namespace Strawberry::Core::Math
 					{
 						auto intersection = *std::ranges::max_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
 						auto newNode = mResult.mGraph.AddNode(intersection.position);
-						mResult.mGraph.AddEdge({centerNode, newNode});
+						Edge newEdge{centerNode, newNode};
+						mResult.mGraph.AddEdge(newEdge);
+
+						mEdgeOwnership[newEdge].emplace(edge.A());
+						mEdgeOwnership[newEdge].emplace(edge.B());
 					}
 				}
 			}
 		}
 
 
+		void Normalise()
+		{
+			std::map<CellID, std::set<CellNodeID>> cellSets;
+			for (auto& [edge, cells] : mEdgeOwnership)
+			{
+				AssertEQ(cells.size(), 2);
+				for (auto& cell : cells)
+				{
+					cellSets[cell].emplace(edge.A());
+					cellSets[cell].emplace(edge.B());
+				}
+			}
+
+			for (auto& [id, cellSet] : cellSets)
+			{
+				std::vector<CellNodeID> cellList = cellSet | std::ranges::to<std::vector>();
+
+				Vector<T, 2> mean;
+				for (const auto& node : cellList)
+				{
+					mean = mean + mResult.mGraph.GetValue(node);
+				}
+				mean = (1.0 / cellList.size()) * mean;
+
+				std::ranges::sort(cellList, std::greater{}, [&] (const auto& x) { return (mResult.mGraph.GetValue(x) - mean).ATan2(); });
+
+				mResult.mCellMap.emplace(id, std::move(cellList));
+			}
+		}
+
+
+
+
+
 		Voronoi mResult;
+		std::map<Edge, std::set<CellID>> mEdgeOwnership;
 	};
 }
