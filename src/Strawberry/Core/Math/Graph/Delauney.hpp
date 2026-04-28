@@ -1,7 +1,6 @@
 #pragma once
 // Strawberry Core
 #include "Strawberry/Core/Math/Geometry/AABB.hpp"
-#include "Strawberry/Core/Math/Geometry/PointSet.hpp"
 #include "Strawberry/Core/Math/Geometry/Simplex.hpp"
 #include "Strawberry/Core/Math/Geometry/Sphere.hpp"
 #include "Strawberry/Core/Math/Graph/Graph.hpp"
@@ -16,6 +15,10 @@
 
 namespace Strawberry::Core::Math
 {
+	template <typename T, unsigned int D>
+	class PointSet;
+
+
 	/// Base Template.
 	template <typename T>
 	class Delaunay;
