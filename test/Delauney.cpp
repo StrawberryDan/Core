@@ -25,7 +25,7 @@ struct GraphColoring
 static PointSet<double, 2> GeneratePointSet()
 {
 	static size_t POINT_COUNT = 128;
-	PointSet<double, 2> points = PointSet<double, 2>::UniformDistribution(POINT_COUNT, MIN, MAX);
+	PointSet<double, 2> points = PointSet<double, 2>::UniformDistribution(POINT_COUNT, BOUNDS);
 	return points.Relaxed(BOUNDS, 1);
 }
 

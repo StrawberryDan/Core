@@ -15,7 +15,7 @@ namespace Strawberry::Core::Math
 	class PointSet
 	{
 	public:
-		static PointSet UniformDistribution(unsigned int count, Vector<T, D> min, Vector<T, D> max)
+		static PointSet UniformDistribution(unsigned int count, const AABB<T, 2> aabb)
 		{
 			std::default_random_engine rng;
 			rng.seed(std::random_device{}());
@@ -23,7 +23,7 @@ namespace Strawberry::Core::Math
 			std::array<std::uniform_real_distribution<T>, D> distibutions;
 			for (int d  = 0; d < D; d++)
 			{
-				distibutions[d] = std::uniform_real_distribution<T>(min[d], max[d]);
+				distibutions[d] = std::uniform_real_distribution<T>(aabb.Min()[d], aabb.Max()[d]);
 			}
 
 			PointSet points;
