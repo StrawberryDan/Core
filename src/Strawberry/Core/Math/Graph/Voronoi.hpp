@@ -116,7 +116,7 @@ namespace Strawberry::Core::Math
 		{
 			MakeEdgesFromDelaunayFaces();
 			CreateOuterEdges();
-			ClipEdgesToBoundingBox();
+			ClipToOutline();
 		}
 
 
@@ -144,7 +144,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		void ClipEdgesToBoundingBox()
+		void ClipToOutline()
 		{
 			const auto& bounds = mResult.mTriangulation.GetOutline();
 			/// Record edges that overlap the bounds of the mTriangulation

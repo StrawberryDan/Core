@@ -9,9 +9,12 @@
 using namespace Strawberry::Core;
 using namespace Math;
 
-static const Vector<double, 2> MIN{0.0, 0.0};
-static const Vector<double, 2> MAX{1000.0, 1000.0};
-static const AABB<double, 2>   BOUNDS(MIN, MAX);
+static const Triangle<double, 2>   BOUNDS({
+	Vector{0.0, 0.0},
+	Vector{1000.0, 0.0},
+	Vector{0.0, 1000.0}});
+static const Vector<double, 2> MIN = BOUNDS.AsPolygon().GetBoundingBox().Min();
+static const Vector<double, 2> MAX = BOUNDS.AsPolygon().GetBoundingBox().Max();
 struct GraphColoring
 {
 	bool drawNodes = true;
@@ -26,7 +29,7 @@ static PointSet<double, 2> GeneratePointSet()
 {
 	static size_t POINT_COUNT = 128;
 	PointSet<double, 2> points = PointSet<double, 2>::UniformDistribution(POINT_COUNT, BOUNDS);
-	return points.Relaxed(BOUNDS, 1);
+	return points;
 }
 
 
@@ -71,7 +74,7 @@ int main()
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
-	auto builder = Delaunay<Vector<double, 2>>::Builder(AABB<double, 2>{MIN, MAX}.AsPolygon());
+	auto builder = Delaunay<Vector<double, 2>>::Builder(BOUNDS.AsPolygon());
 	for (const auto& point : pointSet)
 	{
 		builder.AddNode(point);
