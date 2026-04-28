@@ -482,13 +482,14 @@ namespace Strawberry::Core::Math
 
 
 		/// Gets the given face's circumcircle.
-		Sphere<T, 2> GetCircumcircle(Face face) const noexcept
+		Optional<Sphere<T, 2>> GetCircumcircle(Face face) const noexcept
 		{
 			auto iter = mCircumsphereCache.find(face);
 			if (iter == mCircumsphereCache.end())
 			{
-				auto sphere = GetFaceAsTriangle(face).GetCircumsphere().Unwrap();
-				iter = mCircumsphereCache.emplace(face, sphere).first;
+				auto sphere = GetFaceAsTriangle(face).GetCircumsphere();
+				if (!sphere) return NullOpt;
+				iter = mCircumsphereCache.emplace(face, sphere.Unwrap()).first;
 			}
 
 			return iter->second;
