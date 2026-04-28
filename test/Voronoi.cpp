@@ -76,7 +76,7 @@ static void DrawGraph(canvas_ity::canvas& canvas, const auto& graph, GraphColori
 	{
 		for (auto node : graph.NodeIndices())
 		{
-			auto pos = graph.GetValue(node);
+			auto pos = graph.GetValue(node) - MIN;
 			canvas.set_line_width(8.0);
 			canvas.set_color(canvas_ity::brush_type::fill_style, config.mNodeColor[0], config.mNodeColor[1], config.mNodeColor[2], config.mNodeColor[3]);
 			canvas.begin_path();
