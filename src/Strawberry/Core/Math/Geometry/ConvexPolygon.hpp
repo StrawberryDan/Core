@@ -12,6 +12,9 @@
 
 namespace Strawberry::Core::Math
 {
+	template <typename T, unsigned int D>
+	class PointSet;
+
 	template <typename T>
 	class ConvexPolygon
 		: public Intersectable
