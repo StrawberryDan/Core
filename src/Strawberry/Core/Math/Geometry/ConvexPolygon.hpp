@@ -7,7 +7,6 @@
 #include "Intersection.hpp"
 #include "Simplex.hpp"
 #include "AABB.hpp"
-#include "PointSet.hpp"
 
 
 namespace Strawberry::Core::Math
