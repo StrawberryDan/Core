@@ -1,16 +1,17 @@
 #pragma once
 // Strawberry Core
+#include "Strawberry/Core/Math/Geometry/ConvexPolygon.hpp"
+#include "Strawberry/Core/Math/Geometry/Line.hpp"
+#include "Strawberry/Core/Math/Geometry/LineSegment.hpp"
 #include "Strawberry/Core/Math/Geometry/Ray.hpp"
 #include "Strawberry/Core/Math/Graph/Delauney.hpp"
 #include "Strawberry/Core/Math/Graph/Graph.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Types/Variant.hpp"
 // Standard Library
 #include <algorithm>
 #include <ranges>
 #include <tuple>
-
-#include "Strawberry/Core/Math/Geometry/ConvexPolygon.hpp"
-#include "Strawberry/Core/Types/Variant.hpp"
 
 
 namespace Strawberry::Core::Math
@@ -204,9 +205,19 @@ namespace Strawberry::Core::Math
 					edgesToAdd.emplace_back(edge.B(), newNode);
 					mEdgeOwnership[newEdge] = mEdgeOwnership[edge];
 				}
-				// Edges where neither point is inside the bounds are removed.
 				else
 				{
+					auto intersections = bounds.Intersection(LineSegment<T, 2>(a, b));
+					if (intersections.size() == 2)
+					{
+						auto n1 = mResult.mGraph.AddNode(intersections[0].position);
+						auto n2 = mResult.mGraph.AddNode(intersections[1].position);
+
+						Edge e1(n1, n2);
+						edgesToAdd.emplace_back(e1);
+						mEdgeOwnership[e1] = mEdgeOwnership[edge];
+					}
+
 					edgesToRemove.emplace_back(edge);
 					nodesToRemove.emplace(edge.A());
 					nodesToRemove.emplace(edge.B());
