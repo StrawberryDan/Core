@@ -60,9 +60,13 @@ namespace Strawberry::Core::Math
 		const auto& GetGraph() const noexcept { return mGraph; }
 
 
-		const Cell& GetCell(CellID id) const
+		Optional<Cell> GetCell(CellID id) const
 		{
-			return mCellMap.at(id);
+			auto search = mCellMap.find(id);
+			if (search == mCellMap.end())
+				return NullOpt;
+
+			return search->second;
 		}
 
 

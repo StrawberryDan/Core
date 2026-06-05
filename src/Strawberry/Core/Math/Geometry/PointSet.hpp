@@ -124,7 +124,7 @@ namespace Strawberry::Core::Math
 				for (auto node : delaunay.GetGraph().NodeIndices())
 				{
 					auto p0 = delaunay.GetGraph().GetValue(node);
-					auto cell = voronoi.GetCell(node);
+					auto cell = voronoi.GetCell(node).Unwrap();
 					auto point = strength * voronoi.GetCellAsPolygon(cell).CenterOfMass()
 						+ (1.0 - strength) * p0;
 					next.Add(point);
