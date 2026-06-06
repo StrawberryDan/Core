@@ -112,10 +112,8 @@ namespace Strawberry::Core::Math
 
 
 	private:
-		/// Return the dual graph of this delaunay triangulation.
-		///
-		/// This is also the graph of the voronoi diagram of the points in this triangulation.
-		void MakeDual() 
+		/// Creates the dual graph of the delaunay triangulation used to create this builder.
+		void MakeDual()
 		{
 			MakeEdgesFromDelaunayFaces();
 			CreateOuterEdges();
