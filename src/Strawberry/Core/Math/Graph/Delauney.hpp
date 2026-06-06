@@ -264,6 +264,7 @@ namespace Strawberry::Core::Math
 		/// Create a builder with the given AABB extent.
 		Builder(const AABB<T, 2> boundingBox)
 			: mBoundingBox(boundingBox)
+			, mClampingBox(CreateNodeClampingBox())
 		{
 			auto span = boundingBox.Span();;
 
@@ -288,10 +289,10 @@ namespace Strawberry::Core::Math
 		{
 			ZoneScoped;
 
-			Assert(mBoundingBox.Contains(value),
-				   "Attempted to add an out-of-bounds node to Delaunay graph.");
 			Assert(!mResult.mGraph.ContainsValue(value),
 				   "Attempted to add duplicate node to Delaunay graph.");
+
+			value = mClampingBox.Clamp(value);
 
 			/// Get the set of faces that conflic with the value being added.
 			std::set conflictingFaces = GetConflictingFaces(value);
@@ -505,6 +506,22 @@ namespace Strawberry::Core::Math
 
 
 	private:
+		/// Creates a clamping box from the bounding box of this builder.
+		///
+		/// The returned clamping box is just barely smaller than the bounding box.
+		AABB<T, 2> CreateNodeClampingBox()
+		{
+			Vector<T, 2> min, max;
+
+			for (unsigned int i = 0; i < 2; i++)
+			{
+				min[i] = std::nextafter(mBoundingBox.Min()[i], mBoundingBox.Max()[i]);
+				max[i] = std::nextafter(mBoundingBox.Max()[i], mBoundingBox.Min()[i]);
+			}
+
+			return AABB<T, 2>(min, max);
+		}
+
 		void Validate(const Delaunay* graph = nullptr) const
 		{
 #ifdef STRAWBERRY_DEBUG
@@ -526,8 +543,10 @@ namespace Strawberry::Core::Math
 #endif
 		}
 
-		/// Outline
+		/// Bounding box for the delaunay graph. Required for the graph to be well defined.
 		AABB<T, 2> mBoundingBox;
+		/// The box to which input points are clamped.
+		AABB<T, 2> mClampingBox;
 		/// The delaunay graph we are creating.
 		Delaunay<Vector<T, 2>>                 mResult;
 		/// A cache of the triangle representation of faces from our delaunay.
