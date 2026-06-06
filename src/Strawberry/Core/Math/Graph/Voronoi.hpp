@@ -102,6 +102,7 @@ namespace Strawberry::Core::Math
 			: mResult(triangulation)
 		{}
 
+
 		Voronoi Build()
 		{
 			MakeDual();
