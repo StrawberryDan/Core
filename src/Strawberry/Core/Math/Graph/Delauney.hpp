@@ -5,7 +5,6 @@
 #include "Strawberry/Core/Math/Geometry/Sphere.hpp"
 #include "Strawberry/Core/Math/Graph/Graph.hpp"
 #include "Strawberry/Core/Math/Graph/GraphWalker.hpp"
-#include "Strawberry/Core/Math/Math.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 // Standard library
 #include <algorithm>

@@ -5,7 +5,6 @@
 #include "Strawberry/Core/Util/Image.hpp"
 #include "canvas_ity.hpp"
 #include <numbers>
-#include <random>
 
 
 using namespace Strawberry::Core;

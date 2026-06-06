@@ -2,6 +2,7 @@
 
 
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Math/Geometry/Intersection.hpp"
 
 
 namespace Strawberry::Core::Math
