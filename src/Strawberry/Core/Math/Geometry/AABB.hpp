@@ -1,7 +1,6 @@
 #pragma once
 
 
-#include "Ray.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 
 
