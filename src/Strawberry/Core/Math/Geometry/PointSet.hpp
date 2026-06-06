@@ -109,7 +109,7 @@ namespace Strawberry::Core::Math
 		}
 
 
-		PointSet Relaxed(const ConvexPolygon<T>& bounds, unsigned int iterationCount = 1, double strength = 1.0)
+		PointSet Relaxed(const ConvexPolygon<T>& bounds, unsigned int iterationCount = 1, double strength = 1.0) requires (D == 2)
 		{
 			PointSet result = *this;
 			for (int i = 0; i < iterationCount; i++)
