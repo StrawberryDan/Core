@@ -37,8 +37,7 @@ namespace Strawberry::Core::Math
 
 		std::vector<Vector<T, D>> Corners() const
 		{
-			size_t c = 1;
-			for (unsigned int d = 0; d < D; d++) c *= 2;
+			size_t c = 1 << D;
 
 			std::vector<Vector<T, D>> corners;
 			corners.reserve(c);
