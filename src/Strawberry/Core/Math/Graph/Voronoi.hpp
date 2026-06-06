@@ -264,6 +264,8 @@ namespace Strawberry::Core::Math
 				auto vEdgeB = mResult.mTriangulation.GetGraph().GetValue(edge.B());
 
 				auto faces = mResult.mTriangulation.FindFacesWithEdge(edge);
+				Assert(faces.size() < 2,
+					   "FindFacesWithEdge returns more than 1 face when using outer edges. This should never happen!");
 
 				if (faces.size() == 0)
 				{
