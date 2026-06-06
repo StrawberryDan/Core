@@ -65,8 +65,7 @@ namespace Strawberry::Core::Math
 		PointSet() = default;
 
 
-		const Vector<T, D> Get(unsigned int i) const { return mPoints[i]; }
-		Vector<T, D>& Get(unsigned int i) { return mPoints[i]; }
+		const Vector<T, D> Get(unsigned int i) const { return *std::next(mPoints.begin(), i); }
 
 
 		auto begin() const noexcept { return mPoints.cbegin(); }
