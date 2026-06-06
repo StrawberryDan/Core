@@ -9,10 +9,9 @@
 using namespace Strawberry::Core;
 using namespace Math;
 
-static const Triangle<double, 2>   BOUNDS({
+static const AABB<double, 2>   BOUNDS(
 	Vector{0.0, 0.0},
-	Vector{1000.0, 0.0},
-	Vector{0.0, 1000.0}});
+	Vector{1000.0, 1000.0});
 static const Vector<double, 2> MIN = BOUNDS.AsPolygon().GetBoundingBox().Min();
 static const Vector<double, 2> MAX = BOUNDS.AsPolygon().GetBoundingBox().Max();
 struct GraphColoring
@@ -74,7 +73,7 @@ int main()
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
-	auto builder = Delaunay<Vector<double, 2>>::Builder(BOUNDS.AsPolygon());
+	auto builder = Delaunay<Vector<double, 2>>::Builder(BOUNDS);
 	for (const auto& point : pointSet)
 	{
 		builder.AddNode(point);

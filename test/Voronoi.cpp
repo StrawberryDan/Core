@@ -10,10 +10,9 @@
 using namespace Strawberry::Core;
 using namespace Math;
 
-static const Triangle<double, 2>   BOUNDS({
+static const AABB<double, 2>   BOUNDS(
 	Vector{0.0, 0.0},
-	Vector{1000.0, 0.0},
-	Vector{500.0, 1000.0}});
+	Vector{1000.0, 1000.0});
 static const Vector<double, 2> MIN = BOUNDS.AsPolygon().GetBoundingBox().Min();
 static const Vector<double, 2> MAX = BOUNDS.AsPolygon().GetBoundingBox().Max();
 
@@ -32,7 +31,7 @@ static PointSet<double, 2> GeneratePointSet()
 {
 	static size_t POINT_COUNT = 128;
 	PointSet<double, 2> points = PointSet<double, 2>::UniformDistribution(POINT_COUNT, BOUNDS);
-	return points.Relaxed(BOUNDS.AsPolygon(), 4);
+	return points.Relaxed(BOUNDS, 4);
 }
 
 
@@ -127,7 +126,7 @@ int main()
 
 	PointSet<double, 2> pointSet = GeneratePointSet();
 
-	auto builder = Delaunay<Vector<double, 2>>::Builder(BOUNDS.AsPolygon());
+	auto builder = Delaunay<Vector<double, 2>>::Builder(BOUNDS);
 	for (const auto& point : pointSet)
 	{
 		builder.AddNode(point);

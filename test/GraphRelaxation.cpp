@@ -11,7 +11,7 @@ int main()
 	AABB<float, 2> box({-1000, -1000}, {1000, 1000});
 	PointSet pointSet = PointSet<float, 2>::UniformDistribution(POINT_COUNT, box);
 
-	PointSet relaxed = pointSet.Relaxed(box.AsPolygon(), ITERATION_COUNT);
+	PointSet relaxed = pointSet.Relaxed(box, ITERATION_COUNT);
 
 	return 0;
 }

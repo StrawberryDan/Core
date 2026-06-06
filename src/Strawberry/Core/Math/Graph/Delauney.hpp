@@ -42,7 +42,7 @@ namespace Strawberry::Core::Math
 		class Builder;
 		friend class Builder;
 
-		const auto& GetOutline() const noexcept { return mOutline; }
+		const auto& GetBoundingBox() const noexcept { return mBoundingBox; }
 
 		/// Accessor for the edge of the voronoi cell boundaries.
 		const auto& GetGraph() const noexcept { return mGraph; }
@@ -168,7 +168,7 @@ namespace Strawberry::Core::Math
 
 
 		/// The bounding box of this graph.
-		ConvexPolygon<T> mOutline;
+		AABB<T, 2> mBoundingBox;
 		/// The graph of the Delaunay triangulation.
 		UndirectedVectorGraph<Vector<T, 2>> mGraph;
 		/// The set of triangular faces contained in this graph.
@@ -262,14 +262,13 @@ namespace Strawberry::Core::Math
 	{
 	public:
 		/// Create a builder with the given AABB extent.
-		Builder(const ConvexPolygon<T> outline)
-			: mOutline(outline)
+		Builder(const AABB<T, 2> boundingBox)
+			: mBoundingBox(boundingBox)
 		{
-			auto span = outline.GetBoundingBox().Span();;
+			auto span = boundingBox.Span();;
 
 			// Store min and max;
-			mResult.mOutline = mOutline;
-			auto boundingBox = mOutline.GetBoundingBox();
+			mResult.mBoundingBox = mBoundingBox;
 			// Create the supporting nodes.
 			mResult.mGraph.AddNode(boundingBox.Min());
 			mResult.mGraph.AddNode(Vector{boundingBox.Min()[0] + 2 * span[0], boundingBox.Min()[1]});
@@ -285,11 +284,11 @@ namespace Strawberry::Core::Math
 
 
 		/// Adds a node to this triangulation.
-		Builder&& AddNode(const Vector<T, 2>& value)
+		Builder&& AddNode(Vector<T, 2> value)
 		{
 			ZoneScoped;
 
-			Assert(mOutline.Contains(value),
+			Assert(mBoundingBox.Contains(value),
 				   "Attempted to add an out-of-bounds node to Delaunay graph.");
 			Assert(!mResult.mGraph.ContainsValue(value),
 				   "Attempted to add duplicate node to Delaunay graph.");
@@ -528,7 +527,7 @@ namespace Strawberry::Core::Math
 		}
 
 		/// Outline
-		ConvexPolygon<T> mOutline;
+		AABB<T, 2> mBoundingBox;
 		/// The delaunay graph we are creating.
 		Delaunay<Vector<T, 2>>                 mResult;
 		/// A cache of the triangle representation of faces from our delaunay.
