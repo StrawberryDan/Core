@@ -123,10 +123,14 @@ namespace Strawberry::Core::Math
 				PointSet next;
 				for (auto node : delaunay.GetGraph().NodeIndices())
 				{
-					auto p0 = delaunay.GetGraph().GetValue(node);
 					auto cell = voronoi.GetCell(node).Unwrap();
-					auto point = strength * voronoi.GetCellAsPolygon(cell).CenterOfMass()
+
+					auto p0 = delaunay.GetGraph().GetValue(node);
+					auto p1 = voronoi.GetCellAsPolygon(cell).CenterOfMass();
+
+					auto point = strength * p1
 						+ (1.0 - strength) * p0;
+
 					next.Add(point);
 				}
 				result = next;
