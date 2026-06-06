@@ -98,6 +98,17 @@ namespace Strawberry::Core::Math
 		}
 
 
+		Vector<T, D> Clamp(const Vector<T, D>& v) const
+		{
+			Vector<T, D> result = v;
+			for (unsigned int i = 0; i < D; i++)
+			{
+				result[i] = std::clamp(v[i], mMin[i], mMax[i]);
+			}
+			return result;
+		}
+
+
 		/// Returns the edges of the AABB as line segments in CCW order,
 		/// starting from the bottom left.
 		ConvexPolygon<T> AsPolygon() const noexcept
