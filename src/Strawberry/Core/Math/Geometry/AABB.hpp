@@ -57,6 +57,19 @@ namespace Strawberry::Core::Math
 			return corners;
 		}
 
+
+		AABB Inset(T distance) const
+		{
+			AABB copy = *this;
+			for (unsigned int i = 0; i < D; i++)
+			{
+				copy.mMin[i] += distance;
+				copy.mMax[i] -= distance;
+			}
+			return copy;
+		}
+
+
 		void SetMin(const Vector<T, D>& min) noexcept { mMin = min; Assert(IsNormal()); }
 		void SetMax(const Vector<T, D>& max) noexcept { mMax = max; Assert(IsNormal());  }
 
