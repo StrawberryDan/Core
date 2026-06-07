@@ -15,6 +15,7 @@ namespace Strawberry::Core::Math
 	class PointSet
 	{
 	public:
+		/// Returns a set of 'count' points over a random uniform distibution within the given bounding box.
 		static PointSet UniformDistribution(unsigned int count, const AABB<T, 2> aabb)
 		{
 			std::default_random_engine rng;
@@ -40,6 +41,7 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Returns a set of 'count' points over a random uniform distribution within the given simplex.
 		static PointSet UniformDistribution(unsigned int count, const Triangle<T, 2> simplex) requires (D == 2)
 		{
 			std::default_random_engine rng;
@@ -62,26 +64,41 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Constructs an empty point set.
 		PointSet() = default;
 
 
+		/// Returns a copy of the ith point in this set.
 		const Vector<T, D> Get(unsigned int i) const { return *std::next(mPoints.begin(), i); }
 
 
-		auto begin() const noexcept { return mPoints.cbegin(); }
-		auto end() const noexcept { return mPoints.cend(); }
-
-
+		/// Returns the number of points in this set.
 		unsigned int Size() const { return mPoints.size(); }
 
 
+		/// Adds a point to this point set.
 		void Add(const Vector<T, D>& point)
 		{
 			mPoints.insert(point);
 		}
 
 
-		Vector<T, D> MinExtreme() const
+		/// Removes the given point from the set.
+		void Remove(const Vector<T, D>& point)
+		{
+			mPoints.erase(point);
+		}
+
+
+		/// Returns whether the given pointis contained in this set.
+		bool Contains(const Vector<T, D>& point) const
+		{
+			return mPoints.contains(point);
+		}
+
+
+		/// Return the minimum point of the minimum bounding box of these points.
+		Vector<T, D> BoundingBoxMin() const
 		{
 			Vector<T, D> min;
 			for (auto point : mPoints)
@@ -95,7 +112,8 @@ namespace Strawberry::Core::Math
 		}
 
 
-		Vector<T, D> MaxExtreme() const
+		/// Return the maximum point of the minimum bounding box of these points.
+		Vector<T, D> BoundingBoxMax() const
 		{
 			Vector<T, D> max;
 			for (auto point : mPoints)
@@ -109,6 +127,20 @@ namespace Strawberry::Core::Math
 		}
 
 
+		// Return the minimum bounding box for this pointset.
+		AABB<T, D> BoundingBox() const
+		{
+			return AABB<T, D>(BoundingBoxMin(), BoundingBoxMax());
+		}
+
+
+		/// Applies Lloyd Relaxation to the given set of points.
+		///
+		/// Lloyd Relaxation repeatedly transforms the point set into
+		/// it's voronoi diagram. Each point is them moved towards its
+		/// containing cell's center of mass (relative to the strength parameter).
+		/// Increasing the iteration count will result in more uniform distributions
+		/// of points. The extreme result of this is a set of evenly spaces points.
 		PointSet Relaxed(const AABB<T, 2>& bounds, unsigned int iterationCount = 1, double strength = 1.0) requires (D == 2)
 		{
 			PointSet result = *this;
@@ -137,15 +169,30 @@ namespace Strawberry::Core::Math
 			return result;
 		}
 
-
-		decltype(auto) begin(this auto self)
+		/// Begin method to make class iterable.
+		decltype(auto) begin(this auto&& self)
 		{
-			return self.mPoints.begin();
+			if constexpr (std::is_const_v<decltype(self)>)
+			{
+				return self.mPoints.cbegin();
+			}
+			else
+			{
+				return self.mPoints.begin();
+			}
 		}
 
-		decltype(auto) end(this auto self)
+		/// End method to make class iterable.
+		decltype(auto) end(this auto&& self)
 		{
-			return self.mPoints.end();
+			if constexpr (std::is_const_v<decltype(self)>)
+			{
+				return self.mPoints.cend();
+			}
+			else
+			{
+				return self.mPoints.end();
+			}
 		}
 
 

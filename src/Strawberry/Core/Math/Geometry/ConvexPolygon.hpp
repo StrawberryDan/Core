@@ -105,7 +105,7 @@ namespace Strawberry::Core::Math
 				points.Add(p);
 			}
 
-			return AABB<T, 2>{points.MinExtreme(), points.MaxExtreme()};
+			return AABB<T, 2>{points.BoundingBoxMin(), points.BoundingBoxMax()};
 		}
 
 
