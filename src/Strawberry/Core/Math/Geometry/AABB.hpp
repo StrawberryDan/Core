@@ -60,6 +60,13 @@ namespace Strawberry::Core::Math
 		}
 
 
+		constexpr T Width(unsigned int d) const noexcept
+		{
+			Assert(IsNormal());
+			return mMax[d] - mMin[d];
+		}
+
+
 		AABB Inset(T distance) const
 		{
 			AABB copy = *this;
