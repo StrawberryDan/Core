@@ -162,6 +162,15 @@ namespace Strawberry::Core::Math
 					auto point = strength * p1
 						+ (1.0 - strength) * p0;
 
+					// If we've gone out of bounds, use the intersection of the
+					// ray defined by p0-p1 and the bounding box.
+					if (!bounds.Contains(point)) [[unlikely]]
+					{
+						Ray<T, 2> ray(p0, p1 - p0);
+						auto intersections = ray.Intersection(bounds.AsPolygon());
+						point = intersections[0].position;
+					}
+
 					next.Add(point);
 				}
 				result = next;
