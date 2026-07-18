@@ -3,6 +3,8 @@
 
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Math/Geometry/Intersection.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
+#include <algorithm>
 
 
 namespace Strawberry::Core::Math
@@ -137,5 +139,53 @@ namespace Strawberry::Core::Math
 	private:
 		Vector<T, D> mMin;
 		Vector<T, D> mMax;
+	};
+
+
+	template <typename T, unsigned int D>
+	struct IntersectionTest<AABB<T, D>, AABB<T, D>>
+	{
+		struct Data
+		{
+			AABB<T, D> a;
+			AABB<T, D> b;
+			AABB<T, D> overlap;
+			AABB<T, D> minkowskiDifference;
+		};
+
+		using Result = Optional<Data>;
+
+		constexpr Result operator()(const AABB<T, D>& a, const AABB<T, D>& b) noexcept
+		{
+			Assert(a.IsNormal());
+			Assert(b.IsNormal());
+
+			AABB<T, D> minkowskiDifference(
+				a.Min() - b.Max(),
+				a.Max() - b.Min());
+
+
+			if (!minkowskiDifference.Contains(Vector<T, D>()))
+			{
+				return NullOpt;
+			}
+
+
+			AABB<T, D> overlap(
+				a.Min().Piecewise([] (double a, double b) { return (a > b) ? a : b; }, b.Min()),
+				a.Max().Piecewise([] (double a, double b) { return (a < b) ? a : b; }, b.Max()));
+
+
+
+			Data data
+			{
+				.a = a,
+				.b = b,
+				.overlap = overlap,
+				.minkowskiDifference = minkowskiDifference,
+			};
+
+			return data;
+		}
 	};
 }

@@ -1,5 +1,6 @@
 #include "Strawberry/Core/Math/Geometry/AABB.hpp"
 
+#include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Math/Geometry/ConvexPolygon.hpp"
 
 using namespace Strawberry;
@@ -35,6 +36,17 @@ int main()
 	Assert((outline.GetLine(2).B() - Vector{0., 10.}).SquareMagnitude() < std::numeric_limits<double>::epsilon());
 	Assert((outline.GetLine(3).A() - Vector{0., 10.}).SquareMagnitude() < std::numeric_limits<double>::epsilon());
 	Assert((outline.GetLine(3).B() - Vector{0., 0.}).SquareMagnitude() < std::numeric_limits<double>::epsilon());
+
+	AABB<double, 2> aabb2({-5, -5}, {5, 5});
+
+	auto intersection = aabb.Intersection(aabb2);
+	Assert(intersection.HasValue());
+	AssertEQ(intersection->overlap.Min(),Vector<double, 2>(0, 0));
+	AssertEQ(intersection->overlap.Max(), Vector<double, 2>(5, 5));
+
+	AABB<double, 2> aabb3({20, 20}, {25, 30});
+	auto intersection2 = aabb.Intersection(aabb3);
+	Assert(!intersection2.HasValue());
 
 	return 0;
 }
