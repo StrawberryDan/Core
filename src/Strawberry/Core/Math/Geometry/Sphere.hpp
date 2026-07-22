@@ -1,13 +1,22 @@
 #pragma once
 
+#include "Strawberry/Core/IO/Logging.hpp"
+#include "Strawberry/Core/Math/Geometry/Intersection.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
+#include "Strawberry/Core/Math/Geometry/AABB.hpp"
 #include "fmt/format.h"
 
 
 namespace Strawberry::Core::Math
 {
-	template <typename T, unsigned D>
+	template <typename T, unsigned int D>
+	class AABB;
+
+
+	template <typename T, unsigned D = 3>
 	class Sphere
+		: public Intersectable
 	{
 	public:
 		Sphere() = default;
@@ -34,6 +43,58 @@ namespace Strawberry::Core::Math
 	private:
 		Vector<T, D> mCenter;
 		T            mRadius;
+	};
+
+
+	template <typename T>
+	using Circle = Sphere<T, 2>;
+
+
+	template <typename T, unsigned D>
+	struct IntersectionTest<Sphere<T, D>, Sphere<T, D>>
+	{
+		struct Data
+		{
+			Sphere<T, D> a;
+			Sphere<T, D> b;
+		};
+
+		using Result = Core::Optional<Data>;
+
+
+		Result operator()(const Sphere<T, D>& a, const Sphere<T, D>& b) noexcept
+		{
+			bool collided = (a.Center() - b.Center()).SquareMagnitude() < std::pow(a.Radius() + b.Radius(), 2);
+			if (!collided)
+			{
+				return NullOpt;
+			}
+
+			return Data {
+				.a = a,
+				.b = b,
+			};
+		}
+	};
+
+
+	template <typename T, unsigned D>
+	struct IntersectionTest<AABB<T, D>, Sphere<T, D>>
+	{
+		struct Data
+		{
+			AABB<T, D> a;
+			Sphere<T, D> b;
+		};
+
+		using Result = Core::Optional<Data>;
+
+
+		Result operator()(const AABB<T, D>& a, const Sphere<T, D>& b) noexcept
+		{
+			STRAWBERRY_LOG_UNIMPLEMENTED;
+			return NullOpt;
+		}
 	};
 }
 
