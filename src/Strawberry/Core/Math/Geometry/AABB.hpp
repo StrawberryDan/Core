@@ -179,8 +179,8 @@ namespace Strawberry::Core::Math
 
 
 			AABB<T, D> overlap(
-				a.Min().Piecewise([] (double a, double b) { return (a > b) ? a : b; }, b.Min()),
-				a.Max().Piecewise([] (double a, double b) { return (a < b) ? a : b; }, b.Max()));
+				a.Min().Piecewise([] (T a, T b) { return (a > b) ? a : b; }, b.Min()),
+				a.Max().Piecewise([] (T a, T b) { return (a < b) ? a : b; }, b.Max()));
 
 
 
