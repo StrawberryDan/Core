@@ -264,5 +264,8 @@ namespace Strawberry::Core
 
 
 		static void LogRaw(Level level, const std::string& message);
+
+
+		#define STRAWBERRY_LOG_UNIMPLEMENTED Logging::Error("Unimplemented function called! {} in {}:{}", __FUNCTION__, __FILE_NAME__, __LINE__)
 	};
 } // namespace Strawberry::Core
