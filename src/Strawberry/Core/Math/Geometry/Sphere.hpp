@@ -6,6 +6,7 @@
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/Math/Geometry/AABB.hpp"
 #include "fmt/format.h"
+#include <limits>
 
 
 namespace Strawberry::Core::Math
@@ -55,8 +56,19 @@ namespace Strawberry::Core::Math
 	{
 		struct Data
 		{
-			Sphere<T, D> a;
-			Sphere<T, D> b;
+			const Sphere<T, D> a;
+			const Sphere<T, D> b;
+
+
+			Vector<T, D> MinumumTranslationVector() const
+			{
+				auto vectorBetweenCenters = (b.Center() - a.Center());
+				auto distanceBetweenCenters = vectorBetweenCenters.Magnitude();
+
+				auto penetrationDepth = (a.Radius() + b.Radius()) - distanceBetweenCenters;
+
+				return vectorBetweenCenters.WithLength(penetrationDepth);
+			}
 		};
 
 		using Result = Core::Optional<Data>;
@@ -83,8 +95,58 @@ namespace Strawberry::Core::Math
 	{
 		struct Data
 		{
-			AABB<T, D>  a;
-			Sphere<T, D> b;
+			const AABB<T, D>  a;
+			const Sphere<T, D> b;
+
+			T GetPenetrationDepth(unsigned int d) const
+			{
+				auto c = b.Center()[d];
+
+				auto min = a.Min()[d];
+				auto max = a.Max()[d];
+
+				auto mid = 0.5 * (min + max);
+
+				if (c < mid)
+				{
+					return c - min;
+				}
+				else
+				{
+					return max - c;
+				}
+			}
+
+			Vector<T, D> MinimumTranslationVector() const
+			{
+				if (a.Contains(b.Center())) [[unlikely]]
+				{
+					unsigned int minPenetrationDimension = 0;
+					T minPenetrationDepth = std::numeric_limits<T>::max();
+
+					for (int d = 0; d < D; d++)
+					{
+						T penetrationDepth = GetPenetrationDepth(d);
+						if (penetrationDepth < minPenetrationDepth)
+						{
+							minPenetrationDepth = penetrationDepth;
+							minPenetrationDimension = d;
+						}
+					}
+
+					Vector<T, D> MTV;
+					MTV[minPenetrationDimension] = std::signbit(b.Center()[minPenetrationDimension] - a.Center()[minPenetrationDimension]) * minPenetrationDepth;
+					return MTV;
+				}
+				else
+				{
+					auto closestPoint = a.Clamp(b.Center());
+
+					auto distance = (b.Center() - closestPoint).Magnitude();
+
+					return (b.Center() - closestPoint).WithLength(b.Radius() - distance);
+				}
+			}
 		};
 
 		using Result = Core::Optional<Data>;
