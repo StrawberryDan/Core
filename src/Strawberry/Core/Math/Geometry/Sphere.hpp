@@ -41,6 +41,12 @@ namespace Strawberry::Core::Math
 		auto operator<=>(const Sphere& other) const noexcept = default;
 
 
+		Sphere Translated(const Vector<T, D>& translation) const
+		{
+			return Sphere(mCenter + translation, mRadius);
+		}
+
+
 	private:
 		Vector<T, D> mCenter;
 		T            mRadius;

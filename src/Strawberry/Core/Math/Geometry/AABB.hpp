@@ -143,6 +143,11 @@ namespace Strawberry::Core::Math
 			});
 		}
 
+		AABB Translated(const Vector<T, D> translation) const
+		{
+			return AABB(mMin + translation, mMax + translation);
+		}
+
 	private:
 		Vector<T, D> mMin;
 		Vector<T, D> mMax;
