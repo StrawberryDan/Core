@@ -158,6 +158,26 @@ namespace Strawberry::Core::Math
 			AABB<T, D> b;
 			AABB<T, D> overlap;
 			AABB<T, D> minkowskiDifference;
+
+
+			Vector<T, D> MinimumTranslationVector() const
+			{
+				unsigned int minimumAxis = 0;
+				unsigned int minumumOverlap = std::numeric_limits<unsigned int>::max();
+
+				for (int i = 0; i < D; i++)
+				{
+					if (minumumOverlap > overlap.Width(i))
+					{
+						minimumAxis = i;
+						minumumOverlap = overlap.Width(i);
+					}
+				}
+
+				Vector<T, D> MTV;
+				MTV[minimumAxis] = std::signbit(b.Center()[minimumAxis] - a.Center()[minimumAxis]) * minumumOverlap;
+				return MTV;
+			}
 		};
 
 		using Result = Optional<Data>;
