@@ -83,7 +83,7 @@ namespace Strawberry::Core::Math
 	{
 		struct Data
 		{
-			AABB<T, D> a;
+			AABB<T, D>  a;
 			Sphere<T, D> b;
 		};
 
@@ -92,8 +92,21 @@ namespace Strawberry::Core::Math
 
 		Result operator()(const AABB<T, D>& a, const Sphere<T, D>& b) noexcept
 		{
-			STRAWBERRY_LOG_UNIMPLEMENTED;
-			return NullOpt;
+			auto clamped = a.Clamp(b.Center());
+
+			auto distance = (clamped - b.Center()).SquareMagnitude();
+
+			bool collision = distance <= (b.Radius() * b.Radius());
+			if (!collision)
+			{
+				return NullOpt;
+			}
+
+			return Data
+			{
+				.a = a,
+				.b = b,
+			};
 		}
 	};
 }
