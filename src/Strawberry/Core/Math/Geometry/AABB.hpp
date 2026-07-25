@@ -22,6 +22,11 @@ namespace Strawberry::Core::Math
 			return AABB(origin, origin + extent);
 		}
 
+		static AABB FromCenterAndExtent(const Vector<T, D>& center, const Vector<T, D>& extent)
+		{
+			return AABB(center - 0.5 * extent, center + 0.5 * extent);
+		}
+
 		AABB(const Vector<T, D>& min, const Vector<T, D>& max)
 			: mMin(min)
 			, mMax(max)
