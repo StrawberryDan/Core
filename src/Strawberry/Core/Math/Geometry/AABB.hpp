@@ -163,29 +163,6 @@ namespace Strawberry::Core::Math
 			AABB<T, D> b;
 			AABB<T, D> overlap;
 			AABB<T, D> minkowskiDifference;
-
-
-			Vector<T, D> MTV() const
-			{
-				unsigned int minimumAxis = 0;
-				unsigned int minumumOverlap = std::numeric_limits<unsigned int>::max();
-
-				for (int i = 0; i < D; i++)
-				{
-					if (minumumOverlap > overlap.Width(i))
-					{
-						minimumAxis = i;
-						minumumOverlap = overlap.Width(i);
-					}
-				}
-
-				Vector<T, D> MTV;
-
-				double centerDist = b.Center()[minimumAxis] - a.Center()[minimumAxis];
-				MTV[minimumAxis] = minumumOverlap;
-				if (centerDist < 0.0) MTV[minimumAxis] = -1 * MTV[minimumAxis];
-				return MTV;
-			}
 		};
 
 		using Result = Optional<Data>;
@@ -221,6 +198,37 @@ namespace Strawberry::Core::Math
 			};
 
 			return data;
+		}
+	};
+
+
+	template <typename T, unsigned int D>
+	struct MTVCalculator<AABB<T, D>, AABB<T, D>>
+	{
+		using Result = Vector<T, D>;
+
+
+		Result operator()(const AABB<T, D>& a, const AABB<T, D>& b) noexcept
+		{
+			auto overlap = a.Intersection(b)->overlap;
+			unsigned int minimumAxis = 0;
+			unsigned int minumumOverlap = std::numeric_limits<unsigned int>::max();
+
+			for (int i = 0; i < D; i++)
+			{
+				if (minumumOverlap > overlap.Width(i))
+				{
+					minimumAxis = i;
+					minumumOverlap = overlap.Width(i);
+				}
+			}
+
+			Vector<T, D> MTV;
+
+			double centerDist = b.Center()[minimumAxis] - a.Center()[minimumAxis];
+			MTV[minimumAxis] = minumumOverlap;
+			if (centerDist < 0.0) MTV[minimumAxis] = -1 * MTV[minimumAxis];
+			return MTV;
 		}
 	};
 }

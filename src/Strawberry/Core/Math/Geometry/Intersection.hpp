@@ -7,6 +7,29 @@
 
 namespace Strawberry::Core::Math
 {
+	template <typename A, typename B>
+	struct MTVCalculator;
+
+
+	template <typename A, typename B>
+	concept HasMTVCalculator = requires()
+	{
+		sizeof(MTVCalculator<A, B>);
+	};
+
+
+	template <typename A, typename B> requires requires { sizeof(MTVCalculator<B, A>); }
+	struct MTVCalculator<A, B>
+	{
+		using Result = MTVCalculator<B, A>::Result;
+
+		constexpr Result operator()(const A& a, const B& b) const noexcept
+		{
+			return -1 * MTVCalculator<B, A>(b, a);
+		}
+	};
+
+
 	/// Base template delcaration for collision tests.
 	template <typename A, typename B>
 	struct IntersectionTest;
@@ -52,6 +75,15 @@ namespace Strawberry::Core::Math
 				std::decay_t<decltype(other)>>;
 
 			return TestType{}(self, other);
+		}
+
+		auto MTV(this const auto& a, const auto& b) noexcept requires HasMTVCalculator<std::decay_t<decltype(a)>, std::decay_t<decltype(b)>>
+		{
+			using Calculator = MTVCalculator<
+				std::decay_t<decltype(a)>,
+				std::decay_t<decltype(b)>>;
+
+			return Calculator{}(a, b);
 		}
 	};
 }
