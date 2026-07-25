@@ -44,9 +44,10 @@ namespace Strawberry::Core::Math
 	{
 		struct Data
 		{
+			Line<T, 2> a;
+			Line<T, 2> b;
 			Vector<T, 2> position;
 			double lineDistance[2];
-			Line<T, 2> lines[2];
 		};
 
 		using Result = Optional<Data>;
@@ -74,9 +75,10 @@ namespace Strawberry::Core::Math
 
 			return Data
 			{
+				.a = a,
+				.b = b,
 				.position = p1 + t1 * v1,
 				.lineDistance { t1, t2 },
-				.lines { a, b }
 			};
 		}
 	};

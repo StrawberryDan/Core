@@ -75,6 +75,8 @@ namespace Strawberry::Core::Math
 	{
 		struct Data
 		{
+			Core::Variant<Ray<T, 2>, Line<T, 2>> a;
+			Core::Variant<Ray<T, 2>, Line<T, 2>> b;
 			Vector<T, 2> position;
 			double rayDistance;
 		};
@@ -107,7 +109,7 @@ namespace Strawberry::Core::Math
 				return NullOpt;
 			}
 
-			return Data { .position = p1 + t1 * v1, .rayDistance = t1 };
+			return Data { .a = a, .b = b, .position = p1 + t1 * v1, .rayDistance = t1 };
 		}
 	};
 
@@ -117,11 +119,11 @@ namespace Strawberry::Core::Math
 	{
 		struct Data
 		{
+			Core::Variant<Ray<T, 2>, LineSegment<T, 2>> a;
+			Core::Variant<Ray<T, 2>, LineSegment<T, 2>> b;
 			Vector<T, 2>      position;
 			double            rayDistance;
 			double            segmentDistance;
-			Ray<T, 2>         ray;
-			LineSegment<T, 2> lineSegment;
 		};
 
 		using Result = Optional<Data>;
@@ -154,11 +156,11 @@ namespace Strawberry::Core::Math
 
 			return Data
 			{
+				.a = a,
+				.b = b,
 				.position = p1 + t1 * v1,
 				.rayDistance = t1,
 				.segmentDistance = t2,
-				.ray = a,
-				.lineSegment = b
 			};
 		}
 	};
@@ -169,9 +171,10 @@ namespace Strawberry::Core::Math
 	{
 		struct Data
 		{
+			Ray<T, 2> a;
+			Ray<T, 2> b;
 			Vector<T, 2> position;
 			double       rayDistance[2];
-			Ray<T, 2>    rays[2];
 		};
 
 		using Result = Optional<Data>;
@@ -203,9 +206,10 @@ namespace Strawberry::Core::Math
 
 			return Data
 			{
+				.a = a,
+				.b = b,
 				.position = p1 + t1 * v1,
 				.rayDistance { t1, t2 },
-				.rays { a, b }
 			};
 		}
 	};

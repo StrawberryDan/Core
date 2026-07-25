@@ -2,6 +2,7 @@
 
 
 #include "Strawberry/Core/Math/Geometry/Line.hpp"
+#include "Strawberry/Core/Types/Variant.hpp"
 
 
 namespace Strawberry::Core::Math
@@ -41,10 +42,10 @@ namespace Strawberry::Core::Math
 	{
 		struct Data
 		{
+			Core::Variant<LineSegment<T, 2>, Line<T, 2>> a;
+			Core::Variant<LineSegment<T, 2>, Line<T, 2>> b;
 			Vector<T, 2> position;
 			double segmentDistance;
-			LineSegment<T, 2> lineSegment;
-			Line<T, 2> line;
 		};
 
 		using Result = Optional<Data>;
@@ -77,10 +78,10 @@ namespace Strawberry::Core::Math
 
 			return Data
 			{
+				.a = a,
+				.b = b,
 				.position = p1 + t1 * v1,
 				.segmentDistance = t1,
-				.lineSegment = a,
-				.line = b
 			};
 		}
 	};
@@ -91,9 +92,10 @@ namespace Strawberry::Core::Math
 	{
 		struct Data
 		{
+			LineSegment<T, 2> a;
+			LineSegment<T, 2> b;
 			Vector<T, 2> position;
 			double segmentDistance[2];
-			LineSegment<T, 2> lines[2];
 		};
 
 		using Result = Optional<Data>;
@@ -126,9 +128,10 @@ namespace Strawberry::Core::Math
 
 			return Data
 			{
+				.a = a,
+				.b = b,
 				.position = p1 + t1 * v1,
 				.segmentDistance { t1, t2 },
-				.lines{ a, b }
 			};
 		}
 	};
