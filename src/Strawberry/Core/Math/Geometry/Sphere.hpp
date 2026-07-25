@@ -141,7 +141,9 @@ namespace Strawberry::Core::Math
 					}
 
 					Vector<T, D> MTV;
-					MTV[minPenetrationDimension] = std::signbit(b.Center()[minPenetrationDimension] - a.Center()[minPenetrationDimension]) * minPenetrationDepth;
+					auto centerDist = b.Center()[minPenetrationDimension] - a.Center()[minPenetrationDimension];
+					MTV[minPenetrationDimension] = minPenetrationDepth;
+					if (centerDist < 0) MTV[minPenetrationDimension] = MTV[minPenetrationDimension] * -1;
 					return MTV;
 				}
 				else

@@ -180,7 +180,10 @@ namespace Strawberry::Core::Math
 				}
 
 				Vector<T, D> MTV;
-				MTV[minimumAxis] = std::signbit(b.Center()[minimumAxis] - a.Center()[minimumAxis]) * minumumOverlap;
+
+				double centerDist = b.Center()[minimumAxis] - a.Center()[minimumAxis];
+				MTV[minimumAxis] = minumumOverlap;
+				if (centerDist < 0.0) MTV[minimumAxis] = -1 * MTV[minimumAxis];
 				return MTV;
 			}
 		};
