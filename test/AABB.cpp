@@ -43,10 +43,17 @@ int main()
 	Assert(intersection.HasValue());
 	AssertEQ(intersection->overlap.Min(),Vector<double, 2>(0, 0));
 	AssertEQ(intersection->overlap.Max(), Vector<double, 2>(5, 5));
+	AssertEQ(intersection->MTV(), Vec2(-5, 0));
 
 	AABB<double, 2> aabb3({20, 20}, {25, 30});
 	auto intersection2 = aabb.Intersection(aabb3);
 	Assert(!intersection2.HasValue());
+
+	AABB<double, 2> aabb4({21, 18}, {24, 21});
+	auto intersection3 = aabb3.Intersection(aabb4);
+	Assert(intersection3.HasValue());
+	Core::Logging::Info("{}", intersection3->MTV());
+	AssertEQ(intersection3->MTV(), Vec2(0, -1));
 
 	return 0;
 }
