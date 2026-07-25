@@ -66,7 +66,7 @@ namespace Strawberry::Core::Math
 			const Sphere<T, D> b;
 
 
-			Vector<T, D> MinumumTranslationVector() const
+			Vector<T, D> MTV() const
 			{
 				auto vectorBetweenCenters = (b.Center() - a.Center());
 				auto distanceBetweenCenters = vectorBetweenCenters.Magnitude();
@@ -123,7 +123,7 @@ namespace Strawberry::Core::Math
 				}
 			}
 
-			Vector<T, D> MinimumTranslationVector() const
+			Vector<T, D> MTV() const
 			{
 				if (a.Contains(b.Center())) [[unlikely]]
 				{

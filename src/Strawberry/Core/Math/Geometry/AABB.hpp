@@ -165,7 +165,7 @@ namespace Strawberry::Core::Math
 			AABB<T, D> minkowskiDifference;
 
 
-			Vector<T, D> MinimumTranslationVector() const
+			Vector<T, D> MTV() const
 			{
 				unsigned int minimumAxis = 0;
 				unsigned int minumumOverlap = std::numeric_limits<unsigned int>::max();
