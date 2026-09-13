@@ -17,13 +17,13 @@ namespace Strawberry::Core::Math
 			: mPoints{a, b} {}
 
 
-		Vector<T, D>& A() { return mPoints[0]; }
-		const Vector<T, D>& A() const { return mPoints[0]; }
-		Vector<T, D>& B() { return mPoints[1]; }
-		const Vector<T, D>& B() const { return mPoints[1]; }
 
-		Vector<T, D> Direction() const noexcept { return B() - A(); }
+        Vector<T, D>& A() { return mPoints[0]; }
+        const Vector<T, D>& A() const { return mPoints[0]; }
+        Vector<T, D>& B() { return mPoints[1]; }
+        const Vector<T, D>& B() const { return mPoints[1]; }
 
+        Vector<T, D> Direction() const noexcept { return B() - A(); }
 
 		auto operator<=>(const Line& line) const = default;
 
@@ -63,7 +63,14 @@ namespace Strawberry::Core::Math
 			auto  v2 = b.Direction();
 
 			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-			if (std::abs(determinant) <= std::numeric_limits<T>::epsilon())
+			// determinant == |v1| * |v2| * sin(angle between them), so comparing
+			// its absolute magnitude against a fixed epsilon is only valid when
+			// v1 and v2 are close to unit length. World-space direction vectors
+			// can be arbitrarily large, so scale the tolerance by the magnitudes
+			// of v1 and v2 to get a scale-invariant "are these parallel?" test.
+			double scale = v1.Magnitude() * v2.Magnitude();
+			if (scale <= std::numeric_limits<T>::epsilon() ||
+				std::abs(determinant) <= std::numeric_limits<T>::epsilon() * scale)
 			{
 				return NullOpt;
 			}

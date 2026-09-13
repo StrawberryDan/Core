@@ -260,9 +260,9 @@ namespace Strawberry::Core::Math
 				auto vEdgeA = mResult.mTriangulation.GetGraph().GetValue(edge.A());
 				auto vEdgeB = mResult.mTriangulation.GetGraph().GetValue(edge.B());
 
-				auto faces = mResult.mTriangulation.FindFacesWithEdge(edge);
+				auto faces = mResult.mTriangulation.GetFacesContainingEdge(edge);
 				Assert(faces.size() < 2,
-					   "FindFacesWithEdge returns more than 1 face when using outer edges. This should never happen!");
+					   "GetFacesContainingEdge returns more than 1 face when using outer edges. This should never happen!");
 
 				if (faces.size() == 0)
 				{
@@ -303,7 +303,7 @@ namespace Strawberry::Core::Math
 					auto intersections = ray.Intersection(bounds.AsPolygon());
 					if (intersections.size() > 0)
 					{
-						auto intersection = *std::ranges::max_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
+						auto intersection = *std::ranges::min_element(intersections, {}, [] (const auto& x) { return x.rayDistance; });
 						auto newNode = mResult.mGraph.AddNode(intersection.position);
 						Edge newEdge{centerNode, newNode};
 						mResult.mGraph.AddEdge(newEdge);

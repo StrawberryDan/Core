@@ -4,7 +4,6 @@
 #include "Strawberry/Core/Math/Geometry/Simplex.hpp"
 #include "Strawberry/Core/Math/Geometry/Sphere.hpp"
 #include "Strawberry/Core/Math/Graph/Graph.hpp"
-#include "Strawberry/Core/Math/Graph/GraphWalker.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 // Standard library
 #include <algorithm>
@@ -81,59 +80,20 @@ namespace Strawberry::Core::Math
 				| std::ranges::to<std::set>();
 		}
 
-		/// Looks for the faces on either side of this edge.
-		std::vector<Face> FindFacesWithEdge(Edge edge) const
+		/// Returns the faces registered in this triangulation that contain the given edge.
+		std::vector<Face> GetFacesContainingEdge(Edge edge) const
 		{
-			// Type for vector path walkers.
-			using WalkerType = VectorGraphWalker<PathGraphWalker<BasicGraphWalker<Graph>>>;
-			// Create two walkers on each side of the edge.
-			WalkerType walkers[2] {
-				WalkerType(mGraph, edge.A()),
-				WalkerType(mGraph, edge.B())
-			};
-
-			// Have the walkers swap places so that they
-			// end up going in opposite directions.
-			walkers[0].WalkTo(edge.B());
-			walkers[1].WalkTo(edge.A());
-
 			std::vector<Face> faces;
-			// Do for each walker
-			for (auto& walker : walkers)
+			for (const auto& face : mFaces)
 			{
-				// Keep trying to walk counter-clockwise until we can't.
-				while (walker.TryWalkCCW())
+				if (face.ContainsEdge(edge))
 				{
-					// We never let the path exceed 4 nodes.
-					Assert(walker.PathLength() <= 4);
-					// If the path is at the length to encapsulate a triangle.
-					if (walker.PathLength() == 4)
-					{
-						// If our first and current node are the same, we've walked a triangle.
-						if (walker.CurrentNode() == walker.GetPreviousNode(walker.PathLength() - 1))
-						{
-							/// Create the new face.
-							Face face(
-								walker.GetPreviousNode(0),
-								walker.GetPreviousNode(1),
-								walker.GetPreviousNode(2));
-							/// Put the face in our set.
-							faces.emplace_back(face);
-						}
-						// No need to keep going now.
-						break;
-					}
+					faces.emplace_back(face);
 				}
 			}
 
 			// A valid triangulation edge cannot be shared by more than 2 faces.
 			Assert(faces.size() <= 2);
-
-			// It's possible to have the same face twice so we check here.
-			if (faces.size() == 2 && faces[0] == faces[1])
-			{
-				faces.pop_back();
-			}
 
 			return faces;
 		}
@@ -298,10 +258,9 @@ namespace Strawberry::Core::Math
 			std::set conflictingFaces = GetConflictingFaces(value);
 			/// Get the set of edges that are shared by 2 of these conflicting faces.
 			std::set innerEdges       = GetInnerEdges(conflictingFaces);
-			/// The set of edges nodes defining the face of the created by
-			/// the deletion of the inner edges.
-			/// I.e. the hole torn in the graph.
-			std::set outerNodes       = GetOuterNodes(conflictingFaces);
+			/// The boundary edges of the polygonal hole torn in the graph by the
+			/// deletion of the conflicting faces (and their shared inner edges).
+			std::set outerEdges       = GetOuterEdges(conflictingFaces);
 
 			/// Add the new node to the graph.
 			unsigned int newNodeHandle = mResult.mGraph.AddNode(value);
@@ -311,7 +270,6 @@ namespace Strawberry::Core::Math
 			{
 				mResult.mFaces.erase(face);
 				mTriangleCache.erase(face);
-				mCircumsphereCache.erase(face);
 			}
 
 			/// Erase the innerEdges fo the conflicting faces.
@@ -320,16 +278,19 @@ namespace Strawberry::Core::Math
 				mResult.mGraph.RemoveEdge(innerEdge);
 			}
 
-			/// Join the new node into the hole by joining it to
-			/// the outer points.
-			for (unsigned int outerNode : outerNodes)
+			/// Re-triangulate the hole by fanning the new node out to every edge
+			/// on the hole's boundary: each boundary edge unambiguously forms
+			/// exactly one new triangular face with the new node. This builds
+			/// the new faces directly from known geometry, rather than
+			/// rediscovering them by walking the graph's topology (which can't
+			/// distinguish a genuine face from the (differently-shaped) outer
+			/// boundary of the triangulation, and so can silently fail to
+			/// retriangulate part of the hole).
+			for (const Edge& outerEdge : outerEdges)
 			{
-				/// Add edge to the graph.
-				Edge newEdge(outerNode, newNodeHandle);
-				mResult.mGraph.AddEdge(newEdge);
-				/// Look for new triangular faces.
-				auto faces = mResult.FindFacesWithEdge(newEdge);
-				mResult.mFaces.insert_range(faces);
+				mResult.mGraph.AddEdge(Edge(outerEdge.A(), newNodeHandle));
+				mResult.mGraph.AddEdge(Edge(outerEdge.B(), newNodeHandle));
+				mResult.mFaces.emplace(newNodeHandle, outerEdge.A(), outerEdge.B());
 			}
 
 			return std::move(*this);
@@ -379,13 +340,22 @@ namespace Strawberry::Core::Math
 
 		/// Returns the set of faces that conflict with the point being added 'value'.
 		///
-		/// Edges are defined to be conflictingly if their circumspheres
+		/// A face conflicts if 'value' lies within its circumcircle, tested via
+		/// Triangle::CircumcircleContains -- see that method's doc comment for
+		/// why this is preferable to going via GetCircumsphere(). In short: a
+		/// "no circumcircle" fallback has no principled local answer here --
+		/// treating it as unconditionally conflicting makes every future
+		/// insertion anywhere in the domain attempt to retriangulate that
+		/// unrelated face (corrupting the star-shaped-hole invariant this
+		/// incremental algorithm depends on), while treating it as never
+		/// conflicting can strand a genuinely nearby point with no conflicting
+		/// face at all. CircumcircleContains needs no such fallback.
 		std::set<Face> GetConflictingFaces(const Vector<T, 2>& value) const
 		{
 			std::set<Face> conflictingFaces;
 			for (const auto& face : mResult.mFaces)
 			{
-				if (auto c = GetCircumcircle(face); !c || c->Contains(value))
+				if (GetFaceAsTriangle(face).CircumcircleContains(value))
 				{
 					conflictingFaces.emplace(face);
 				}
@@ -394,8 +364,10 @@ namespace Strawberry::Core::Math
 		}
 
 
-		/// Returns the set of nodes that outline the set of conflicting faces.
-		std::set<unsigned int> GetOuterNodes(const std::set<Face>& faces) const
+		/// Returns the set of edges that outline the set of conflicting faces,
+		/// i.e. the boundary of the polygonal "hole" torn out of the
+		/// triangulation by removing these faces.
+		std::set<Edge> GetOuterEdges(const std::set<Face>& faces) const
 		{
 			// Count how often each edge occurs in these faces.
 			std::map<Edge, unsigned int> edgeOccurrences;
@@ -407,7 +379,8 @@ namespace Strawberry::Core::Math
 				}
 			}
 
-			// Filter for the edges that occur twice, meaning that they are inner edges.
+			// Filter for the edges that occur once; edges occurring twice are
+			// shared between two conflicting faces (i.e. interior to the hole).
 			std::set<Delaunay<Vector<T, 2>>::Edge> outerEdges;
 			for (const auto& [edge, count] : edgeOccurrences)
 			{
@@ -418,14 +391,7 @@ namespace Strawberry::Core::Math
 				}
 			}
 
-			std::set<unsigned int> outerNodes;
-			for (const auto& edge : outerEdges)
-			{
-				outerNodes.emplace(edge.A());
-				outerNodes.emplace(edge.B());
-			}
-
-			return outerNodes;
+			return outerEdges;
 		}
 
 
@@ -470,21 +436,6 @@ namespace Strawberry::Core::Math
 					});
 
 				iter = mTriangleCache.emplace(face, triangle).first;
-			}
-
-			return iter->second;
-		}
-
-
-		/// Gets the given face's circumcircle.
-		Optional<Sphere<T, 2>> GetCircumcircle(Face face) const noexcept
-		{
-			auto iter = mCircumsphereCache.find(face);
-			if (iter == mCircumsphereCache.end())
-			{
-				auto sphere = GetFaceAsTriangle(face).GetCircumsphere();
-				if (!sphere) return NullOpt;
-				iter = mCircumsphereCache.emplace(face, sphere.Unwrap()).first;
 			}
 
 			return iter->second;
@@ -551,8 +502,6 @@ namespace Strawberry::Core::Math
 		Delaunay<Vector<T, 2>>                 mResult;
 		/// A cache of the triangle representation of faces from our delaunay.
 		mutable std::map<Face, Triangle<T, 2>> mTriangleCache;
-		/// A cache of the circumspheres of the faces from our delaunay.
-		mutable std::map<Face, Sphere<T, 2>>   mCircumsphereCache;
 		/// Bool for whether the resulting graph should be pruned.
 		bool mShouldPrune = true;
 	};

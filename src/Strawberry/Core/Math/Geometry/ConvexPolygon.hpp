@@ -68,7 +68,18 @@ namespace Strawberry::Core::Math
 			auto mean = Mean();
 			for (int i = 0; i < LineCount(); i++)
 			{
-				auto           line = GetLine(i);
+				auto line = GetLine(i);
+
+				// Skip degenerate (near-zero-length) edges: they contribute no
+				// area to this fan triangulation, and building a Triangle from
+				// one can trip its CCW-orientation assertion, since floating
+				// point noise can push a true zero-area result to either side
+				// of that check.
+				if ((line.B() - line.A()).SquareMagnitude() <= 1e-12)
+				{
+					continue;
+				}
+
 				Triangle<T, 2> tri({line.A(), line.B(), mean});
 				components.emplace_back(tri.Area(), tri.GetMean());
 			}

@@ -43,6 +43,32 @@ namespace Strawberry::Core::Math
 		}
 
 
+		/// Robust test for whether 'point' lies inside this (counter-clockwise
+		/// ordered, guaranteed by the constructor) triangle's circumcircle,
+		/// using the standard incircle determinant. Unlike going via
+		/// GetCircumsphere(), this never needs to construct an explicit
+		/// circumcenter: that requires intersecting two perpendicular
+		/// bisectors, which is numerically fragile for thin/obtuse triangles
+		/// (the true circumcenter of a near-degenerate triangle is unbounded),
+		/// and has no principled answer at all for an exactly degenerate one.
+		/// This determinant needs no such fallback: for an exactly degenerate
+		/// (collinear, zero-area) triangle it evaluates to exactly zero, so it
+		/// correctly reports "not contained" rather than being undefined.
+		bool CircumcircleContains(const Vector<T, Dimension>& point) const noexcept requires (Dimension == 2 && Order == 3)
+		{
+			double ax = Point(0)[0] - point[0], ay = Point(0)[1] - point[1];
+			double bx = Point(1)[0] - point[0], by = Point(1)[1] - point[1];
+			double cx = Point(2)[0] - point[0], cy = Point(2)[1] - point[1];
+
+			double det =
+				(ax * ax + ay * ay) * (bx * cy - by * cx) -
+				(bx * bx + by * by) * (ax * cy - ay * cx) +
+				(cx * cx + cy * cy) * (ax * by - ay * bx);
+
+			return det > 0.0;
+		}
+
+
 		/// Calculates the mean of the vertices of this Simplex.
 		Vector<T, Dimension> GetMean() const noexcept
 		{
