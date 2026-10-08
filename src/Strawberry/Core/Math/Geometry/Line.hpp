@@ -6,7 +6,7 @@
 #include "Strawberry/Core/Types/Optional.hpp"
 
 
-namespace Strawberry::Core::Math
+namespace Strawberry::Core::Math::Geometry
 {
 	template <typename T, unsigned int D>
 	class Line : public Intersectable
@@ -95,11 +95,11 @@ namespace Strawberry::Core::Math
 namespace fmt
 {
 	template <typename T, size_t D>
-	struct formatter<Strawberry::Core::Math::Line<T, D>> : formatter<std::string>
+	struct formatter<Strawberry::Core::Math::Geometry::Line<T, D>> : formatter<std::string>
 	{
 		using formatter<std::string>::parse;
 
-		auto format(const Strawberry::Core::Math::Line<T, D>& l, format_context& ctx) const -> format_context::iterator
+		auto format(const Strawberry::Core::Math::Geometry::Line<T, D>& l, format_context& ctx) const -> format_context::iterator
 		{
 			return fmt::format_to(ctx.out(), "Line({} -> {})", l.A(), l.B());
 		}

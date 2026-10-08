@@ -1,9 +1,13 @@
 #include "Strawberry/Core/Math/Geometry/Simplex.hpp"
-#include "Strawberry/Core/Math/Geometry/Sphere.hpp"
 #include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/Math/Geometry/Sphere.hpp"
 #include <limits>
+
+
 using namespace Strawberry::Core;
 using namespace Math;
+using namespace Geometry;
+
 
 int main()
 {

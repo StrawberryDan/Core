@@ -3,6 +3,7 @@
 
 using namespace Strawberry::Core;
 using namespace Math;
+using namespace Geometry;
 
 int main()
 {

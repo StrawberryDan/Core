@@ -12,7 +12,7 @@
 #include <ranges>
 
 
-namespace Strawberry::Core::Math
+namespace Strawberry::Core::Math::Geometry
 {
 	/// Base template.
 	template <typename T>

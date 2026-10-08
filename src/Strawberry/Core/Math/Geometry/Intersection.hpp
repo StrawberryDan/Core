@@ -1,11 +1,11 @@
 #pragma once
 
 
-#include <type_traits>
 #include <compare>
+#include <type_traits>
 
 
-namespace Strawberry::Core::Math
+namespace Strawberry::Core::Math::Geometry
 {
 	template <typename A, typename B>
 	struct MTVCalculator;

@@ -6,10 +6,9 @@
 #include "Ray.hpp"
 #include "Intersection.hpp"
 #include "Simplex.hpp"
-#include "AABB.hpp"
 
 
-namespace Strawberry::Core::Math
+namespace Strawberry::Core::Math::Geometry
 {
 	template <typename T, unsigned int D>
 	class PointSet;

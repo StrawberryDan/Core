@@ -8,7 +8,7 @@
 #include <set>
 
 
-namespace Strawberry::Core::Math
+namespace Strawberry::Core::Math::Geometry
 {
 	template <typename T>
 	class ConvexPolygon;
@@ -177,13 +177,13 @@ namespace Strawberry::Core::Math
 namespace fmt
 {
 	template <typename T, unsigned int D, unsigned int O>
-	struct formatter<Strawberry::Core::Math::Simplex<T, D, O>>
+	struct formatter<Strawberry::Core::Math::Geometry::Simplex<T, D, O>>
 		: public formatter<std::string>
 	{
 		using formatter<std::string>::parse;
 
 
-		auto format(const Strawberry::Core::Math::Simplex<T, D, O>& s, format_context& ctx) const -> format_context::iterator
+		auto format(const Strawberry::Core::Math::Geometry::Simplex<T, D, O>& s, format_context& ctx) const -> format_context::iterator
 		{
 			auto out = ctx.out();
 			out = fmt::format_to(out, "Simplex(");

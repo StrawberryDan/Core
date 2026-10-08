@@ -1,6 +1,7 @@
 #include "Strawberry/Core/Math/Geometry/PointSet.hpp"
 
 using namespace Strawberry::Core::Math;
+using namespace Geometry;
 
 int main()
 {

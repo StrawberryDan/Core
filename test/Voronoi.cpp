@@ -9,6 +9,7 @@
 
 using namespace Strawberry::Core;
 using namespace Math;
+using namespace Geometry;
 
 static const AABB<double, 2>   BOUNDS(
 	Vector{0.0, 0.0},

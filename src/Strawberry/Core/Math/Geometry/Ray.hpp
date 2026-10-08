@@ -8,7 +8,7 @@
 #include "Strawberry/Core/Math/Geometry/Intersection.hpp"
 
 
-namespace Strawberry::Core::Math
+namespace Strawberry::Core::Math::Geometry
 {
 	template <typename T, unsigned D>
 	class Ray : public Intersectable

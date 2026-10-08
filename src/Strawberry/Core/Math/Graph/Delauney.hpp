@@ -1,6 +1,5 @@
 #pragma once
 // Strawberry Core
-#include "Strawberry/Core/Math/Geometry/ConvexPolygon.hpp"
 #include "Strawberry/Core/Math/Geometry/Simplex.hpp"
 #include "Strawberry/Core/Math/Geometry/Sphere.hpp"
 #include "Strawberry/Core/Math/Graph/Graph.hpp"
@@ -11,7 +10,7 @@
 #include <ranges>
 
 
-namespace Strawberry::Core::Math
+namespace Strawberry::Core::Math::Geometry
 {
 	template <typename T, unsigned int D>
 	class PointSet;

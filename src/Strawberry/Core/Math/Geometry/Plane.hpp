@@ -4,7 +4,7 @@
 #include "Strawberry/Core/Math/Vector.hpp"
 
 
-namespace Strawberry::Core::Math
+namespace Strawberry::Core::Math::Geometry
 {
 	template <typename T, unsigned D>
 	class Plane

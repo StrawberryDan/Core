@@ -2,8 +2,8 @@
 #include "Strawberry/Core/Math/Vector.hpp"
 
 using namespace Strawberry::Core;
-using namespace Strawberry::Core::Math;
-
+using namespace Math;
+using namespace Geometry;
 
 int main()
 {

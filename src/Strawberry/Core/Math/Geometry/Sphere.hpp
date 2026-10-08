@@ -9,7 +9,7 @@
 #include <limits>
 
 
-namespace Strawberry::Core::Math
+namespace Strawberry::Core::Math::Geometry
 {
 	template <typename T, unsigned int D>
 	class AABB;
@@ -201,11 +201,11 @@ namespace Strawberry::Core::Math
 namespace fmt
 {
 	template <typename T, unsigned D>
-	struct formatter<Strawberry::Core::Math::Sphere<T, D>> : formatter<std::string>
+	struct formatter<Strawberry::Core::Math::Geometry::Sphere<T, D>> : formatter<std::string>
 	{
 		using formatter<std::string>::parse;
 
-		auto format(const Strawberry::Core::Math::Sphere<T, D>& s, format_context& ctx) -> format_context::iterator
+		auto format(const Strawberry::Core::Math::Geometry::Sphere<T, D>& s, format_context& ctx) -> format_context::iterator
 		{
 			return fmt::format_to(ctx.out(), "Sphere({} -- {})", s.Center(), s.Radius());
 		}

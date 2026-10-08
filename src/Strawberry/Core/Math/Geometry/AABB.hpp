@@ -7,7 +7,7 @@
 #include <algorithm>
 
 
-namespace Strawberry::Core::Math
+namespace Strawberry::Core::Math::Geometry
 {
 	template <typename T>
 	class ConvexPolygon;
