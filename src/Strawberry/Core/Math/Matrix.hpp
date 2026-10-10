@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Core::Math
 {
-	template<typename T, size_t W, size_t H> requires (std::signed_integral<T> || std::floating_point<T>)
+	template<typename T, size_t W, size_t H = W> requires (std::signed_integral<T> || std::floating_point<T>)
 	class Matrix
 	{
 	public:

@@ -1,8 +1,10 @@
 #pragma once
 
 
+#include "Strawberry/Core/Math/Matrix.hpp"
+#include "Strawberry/Core/Math/Transformations.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
-#include "Strawberry/Core/Math/Geometry/Intersection.hpp"
+#include "Strawberry/Core/Math/Geometry/Shape.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 #include <algorithm>
 
@@ -14,7 +16,7 @@ namespace Strawberry::Core::Math::Geometry
 
 	template <typename T, unsigned int D>
 	class AABB
-		: public Intersectable
+		: public Shape
 	{
 	public:
 		static AABB FromOriginAndExtent(const Vector<T, D>& origin, const Vector<T, D>& extent)
@@ -140,23 +142,77 @@ namespace Strawberry::Core::Math::Geometry
 		ConvexPolygon<T> AsPolygon() const noexcept
 		{
 			Assert(IsNormal());
-			return ConvexPolygon<T>::From(std::array{
+			return ConvexPolygon<T>(
 				mMin,
 				Vector{mMax[0], mMin[1]},
 				mMax,
-				Vector(mMin[0], mMax[1]),
-			});
+				Vector(mMin[0], mMax[1])
+			);
 		}
 
-		AABB Translated(const Vector<T, D> translation) const
-		{
-			return AABB(mMin + translation, mMax + translation);
-		}
 
 	private:
 		Vector<T, D> mMin;
 		Vector<T, D> mMax;
 	};
+
+
+    template <typename T, unsigned int D>
+    struct Translation<AABB<T, D>>
+    {
+        Translation(auto&& x)
+            : parameter(std::forward<decltype(x)>(x))
+        {}
+
+
+        AABB<T, D> operator()(const AABB<T, D>& x) const
+        {
+            return AABB<T, D>(x.Min() + parameter, x.Max() + parameter);
+        }
+
+
+        Vector<T, D> parameter;
+    };
+
+
+    template <typename T> requires std::floating_point<T>
+    struct Rotation<AABB<T, 2>>
+    {
+        Rotation(auto&& x)
+            : parameter(std::forward<decltype(x)>(x))
+        {}
+
+
+        AABB<T, 2> operator()(const AABB<T, 2>& x) const
+        {
+            Matrix<T, 2> rotMat = Rotate2D<T>(parameter);
+
+            return AABB<T, 2>(rotMat * x.Min(), rotMat * x.Max());
+        }
+
+
+        double parameter;
+    };
+
+
+    template <typename T, unsigned int D>
+    struct Scale<AABB<T, D>>
+    {
+        Scale(auto&& x)
+            : parameter(std::forward<decltype(x)>(x))
+        {}
+
+
+        AABB<T, D> operator()(const AABB<T, D>& x) const
+        {
+            Matrix<T, D> scaleMat = Scale(parameter);
+
+            return AABB<T, D>(scaleMat * x.Min(), scaleMat * x.Max());
+        }
+
+
+        Vector<T, D> parameter;
+    };
 
 
 	template <typename T, unsigned int D>

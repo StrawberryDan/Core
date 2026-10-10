@@ -57,11 +57,11 @@ namespace Strawberry::Core::Math::Geometry
 			Assert(mFaces.contains(face),
 				   "Delaunay::GetFaceAsTriangle called with face not "
 				   "already in the triangulation!");
-			return Triangle<T, 2>{{
+			return Triangle<T, 2>{
 					GetGraph().GetValue(face.Node(0)),
 					GetGraph().GetValue(face.Node(1)),
 					GetGraph().GetValue(face.Node(2))
-				}};
+				};
 		}
 
 		/// Shorthand for getting the circumcircle centre for the result of GetFaceASTriangle().

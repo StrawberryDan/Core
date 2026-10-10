@@ -109,8 +109,10 @@ if (NOT TARGET StrawberryCore)
     src/Strawberry/Core/Math/Geometry/PointSet.hpp
     src/Strawberry/Core/Math/Geometry/Polygon.hpp
     src/Strawberry/Core/Math/Geometry/Ray.hpp
+    src/Strawberry/Core/Math/Geometry/Shape.hpp
     src/Strawberry/Core/Math/Geometry/Simplex.hpp
     src/Strawberry/Core/Math/Geometry/Sphere.hpp
+    src/Strawberry/Core/Math/Geometry/Transformation.hpp
     src/Strawberry/Core/Math/Graph/Delauney.hpp
     src/Strawberry/Core/Math/Graph/Graph.hpp
     src/Strawberry/Core/Math/Graph/GraphWalker.hpp

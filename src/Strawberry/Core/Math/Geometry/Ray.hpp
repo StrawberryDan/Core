@@ -5,227 +5,245 @@
 #include "Strawberry/Core/Math/Geometry/Plane.hpp"
 #include "Strawberry/Core/Math/Geometry/LineSegment.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
-#include "Strawberry/Core/Math/Geometry/Intersection.hpp"
+#include "Strawberry/Core/Math/Geometry/Shape.hpp"
 
 
 namespace Strawberry::Core::Math::Geometry
 {
-	template <typename T, unsigned D>
-	class Ray : public Intersectable
-	{
-	public:
-		Ray() = default;
+    template <typename T, unsigned D>
+    class Ray : public Shape
+    {
+    public:
+        Ray() = default;
 
-		Ray(const Vector<T, D>& origin, const Vector<T, D>& direction)
-			: mOrigin(origin)
-		{
-			SetDirection(direction);
-		}
+        Ray(const Vector<T, D>& origin, const Vector<T, D>& direction)
+            : mOrigin(origin)
+        {
+            SetDirection(direction);
+        }
 
-		/// Create a Ray starting at line.A(), and going in the same direction.
-		explicit Ray(const Line<T, D>& line)
-			: mOrigin(line.A())
-		{
-			SetDirection(line.Direction());
-		}
+        /// Create a Ray starting at line.A(), and going in the same direction.
+        explicit Ray(const Line<T, D>& line)
+            : mOrigin(line.A())
+        {
+            SetDirection(line.Direction());
+        }
 
-		/// Construct a Ray starting at point A of the line segment, and going in its direction.
-		explicit Ray(const LineSegment<T, D>& lineSegment)
-			: mOrigin(lineSegment.A())
-		{
-			SetDirection(lineSegment.Direction());
-		}
-
-
-		Vector<T, D>& Origin() { return mOrigin; }
-		const Vector<T, D>& Origin() const { return mOrigin; }
+        /// Construct a Ray starting at point A of the line segment, and going in its direction.
+        explicit Ray(const LineSegment<T, D>& lineSegment)
+            : mOrigin(lineSegment.A())
+        {
+            SetDirection(lineSegment.Direction());
+        }
 
 
-		void SetDirection(const Vector<T, D>& direction) { mDirection = direction.Normalised(); }
-		const Vector<T, D>& Direction() const { Assert(mDirection.IsNormal()); return mDirection; }
+        Vector<T, D>& Origin() { return mOrigin; }
+        const Vector<T, D>& Origin() const { return mOrigin; }
 
 
-		/// Transforms this Ray into a Line that is parallel.
-		Line<T, D> IntoLine() const
-		{
-			return Line(mOrigin, mOrigin + mDirection);
-		}
+        void SetDirection(const Vector<T, D>& direction) { mDirection = direction.Normalised(); }
+        const Vector<T, D>& Direction() const { Assert(mDirection.IsNormal()); return mDirection; }
 
 
-		Plane<T, D> IntoPlane() const
-		{
-			return Plane<T, D>::FromNormalAndPoint(mDirection, mOrigin);
-		}
+        /// Transforms this Ray into a Line that is parallel.
+        Line<T, D> IntoLine() const
+        {
+            return Line(mOrigin, mOrigin + mDirection);
+        }
 
 
-		std::string ToString() const noexcept
-		{
-			return fmt::format("Ray(from {} direction {})", Origin().ToString(), Direction().ToString());
-		}
+        Plane<T, D> IntoPlane() const
+        {
+            return Plane<T, D>::FromNormalAndPoint(mDirection, mOrigin);
+        }
 
 
-	private:
-		Vector<T, D> mOrigin;
-		Vector<T, D> mDirection;
-	};
+        std::string ToString() const noexcept
+        {
+            return fmt::format("Ray(from {} direction {})", Origin().ToString(), Direction().ToString());
+        }
 
 
-	template <typename T>
-	struct IntersectionTest<Ray<T, 2>, Line<T, 2>>
-	{
-		struct Data
-		{
-			Core::Variant<Ray<T, 2>, Line<T, 2>> a;
-			Core::Variant<Ray<T, 2>, Line<T, 2>> b;
-			Vector<T, 2> position;
-			double rayDistance;
-		};
-
-		using Result = Optional<Data>;
+    private:
+        Vector<T, D> mOrigin;
+        Vector<T, D> mDirection;
+    };
 
 
-		Result operator()(const Ray<T, 2>& a, const Line<T, 2>& b) const noexcept
-		{
-			// Solve using Cramer's rule
-			auto& p1 = a.Origin();
-			auto& p2 = b.A();
-			auto   c = p2 - p1;
-			auto& v1 = a.Direction();
-			auto  v2 = b.Direction();
-
-			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-			// Scale the "are these parallel?" tolerance by the magnitudes of v1/v2
-			// (determinant == |v1| * |v2| * sin(angle)), since a fixed epsilon is
-			// only meaningful for near-unit-length vectors.
-			double scale = v1.Magnitude() * v2.Magnitude();
-			if (scale <= std::numeric_limits<T>::epsilon() ||
-				std::abs(determinant) <= std::numeric_limits<T>::epsilon() * scale)
-			{
-				return NullOpt;
-			}
-
-			auto t1Num = c[0] * v2[1] - v2[0] * c[1];
-			auto t1 = t1Num / determinant;
-			auto t2Num = -(v1[0] * c[1] - c[0] * v1[1]);
-			auto t2 = t2Num / determinant;
-
-			if (t1 < 0.0)
-			{
-				return NullOpt;
-			}
-
-			return Data { .a = a, .b = b, .position = p1 + t1 * v1, .rayDistance = t1 };
-		}
-	};
+    template <typename T, unsigned int D>
+    struct Translation<Ray<T, D>>
+    {
+        Translation(auto&& x)
+            : parameter(std::forward<decltype(x)>(x))
+        {}
 
 
-	template <typename T>
-	struct IntersectionTest<Ray<T, 2>, LineSegment<T, 2>>
-	{
-		struct Data
-		{
-			Core::Variant<Ray<T, 2>, LineSegment<T, 2>> a;
-			Core::Variant<Ray<T, 2>, LineSegment<T, 2>> b;
-			Vector<T, 2>      position;
-			double            rayDistance;
-			double            segmentDistance;
-		};
-
-		using Result = Optional<Data>;
+        Ray<T, D> operator()(const Ray<T, D>& x) const
+        {
+            return Ray<T, D>(x.Origin() + parameter, x.Direction());
+        }
 
 
-		Result operator()(const Ray<T, 2>& a, const LineSegment<T, 2>& b) const noexcept
-		{
-			// Solve using Cramer's rule
-			auto& p1 = a.Origin();
-			auto& p2 = b.A();
-			auto   c = p2 - p1;
-			auto& v1 = a.Direction();
-			auto  v2 = b.Direction();
-
-			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-			// Scale the "are these parallel?" tolerance by the magnitudes of v1/v2
-			// (determinant == |v1| * |v2| * sin(angle)), since a fixed epsilon is
-			// only meaningful for near-unit-length vectors.
-			double scale = v1.Magnitude() * v2.Magnitude();
-			if (scale <= std::numeric_limits<T>::epsilon() ||
-				std::abs(determinant) <= std::numeric_limits<T>::epsilon() * scale)
-			{
-				return NullOpt;
-			}
-
-			auto t1Num = c[0] * v2[1] - v2[0] * c[1];
-			auto t1 = t1Num / determinant;
-			auto t2Num = -(v1[0] * c[1] - c[0] * v1[1]);
-			auto t2 = t2Num / determinant;
-
-			if (t1 < 0.0 || t2 < 0.0 || t2 > 1.0)
-			{
-				return NullOpt;
-			}
-
-			return Data
-			{
-				.a = a,
-				.b = b,
-				.position = p1 + t1 * v1,
-				.rayDistance = t1,
-				.segmentDistance = t2,
-			};
-		}
-	};
+        Vector<T, D> parameter;
+    };
 
 
-	template <typename T>
-	struct IntersectionTest<Ray<T, 2>, Ray<T, 2>>
-	{
-		struct Data
-		{
-			Ray<T, 2> a;
-			Ray<T, 2> b;
-			Vector<T, 2> position;
-			double       rayDistance[2];
-		};
+    template <typename T>
+    struct IntersectionTest<Ray<T, 2>, Line<T, 2>>
+    {
+        struct Data
+        {
+            Core::Variant<Ray<T, 2>, Line<T, 2>> a;
+            Core::Variant<Ray<T, 2>, Line<T, 2>> b;
+            Vector<T, 2> position;
+            double rayDistance;
+        };
 
-		using Result = Optional<Data>;
+        using Result = Optional<Data>;
 
-		Result operator()(const Ray<T, 2>& a, const Ray<T, 2>& b) const noexcept
-		{
-			// Solve using Cramer's rule
-			auto& p1 = a.Origin();
-			auto& p2 = b.Origin();
-			auto   c = p2 - p1;
-			auto& v1 = a.Direction();
-			auto& v2 = b.Direction();
 
-			double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-			// Scale the "are these parallel?" tolerance by the magnitudes of v1/v2
-			// (determinant == |v1| * |v2| * sin(angle)), since a fixed epsilon is
-			// only meaningful for near-unit-length vectors.
-			double scale = v1.Magnitude() * v2.Magnitude();
-			if (scale <= std::numeric_limits<T>::epsilon() ||
-				std::abs(determinant) <= std::numeric_limits<T>::epsilon() * scale)
-			{
-				return NullOpt;
-			}
+        Result operator()(const Ray<T, 2>& a, const Line<T, 2>& b) const noexcept
+        {
+            // Solve using Cramer's rule
+            auto& p1 = a.Origin();
+            auto& p2 = b.A();
+            auto   c = p2 - p1;
+            auto& v1 = a.Direction();
+            auto  v2 = b.Direction();
 
-			auto t1Num = c[0] * v2[1] - v2[0] * c[1];
-			auto t1 = t1Num / determinant;
-			auto t2Num = -(v1[0] * c[1] - c[0] * v1[1]);
-			auto t2 = t2Num / determinant;
+            double determinant = v1[0] * v2[1] - v2[0] * v1[1];
+            // Scale the "are these parallel?" tolerance by the magnitudes of v1/v2
+            // (determinant == |v1| * |v2| * sin(angle)), since a fixed epsilon is
+            // only meaningful for near-unit-length vectors.
+            double scale = v1.Magnitude() * v2.Magnitude();
+            if (scale <= std::numeric_limits<T>::epsilon() ||
+                std::abs(determinant) <= std::numeric_limits<T>::epsilon() * scale)
+            {
+                return NullOpt;
+            }
 
-			if (t1 < 0.0 || t2 < 0.0)
-			{
-				return NullOpt;
-			}
+            auto t1Num = c[0] * v2[1] - v2[0] * c[1];
+            auto t1 = t1Num / determinant;
+            auto t2Num = -(v1[0] * c[1] - c[0] * v1[1]);
+            auto t2 = t2Num / determinant;
 
-			return Data
-			{
-				.a = a,
-				.b = b,
-				.position = p1 + t1 * v1,
-				.rayDistance { t1, t2 },
-			};
-		}
-	};
+            if (t1 < 0.0)
+            {
+                return NullOpt;
+            }
+
+            return Data { .a = a, .b = b, .position = p1 + t1 * v1, .rayDistance = t1 };
+        }
+    };
+
+
+    template <typename T>
+    struct IntersectionTest<Ray<T, 2>, LineSegment<T, 2>>
+    {
+        struct Data
+        {
+            Core::Variant<Ray<T, 2>, LineSegment<T, 2>> a;
+            Core::Variant<Ray<T, 2>, LineSegment<T, 2>> b;
+            Vector<T, 2>      position;
+            double            rayDistance;
+            double            segmentDistance;
+        };
+
+        using Result = Optional<Data>;
+
+
+        Result operator()(const Ray<T, 2>& a, const LineSegment<T, 2>& b) const noexcept
+        {
+            // Solve using Cramer's rule
+            auto& p1 = a.Origin();
+            auto& p2 = b.A();
+            auto   c = p2 - p1;
+            auto& v1 = a.Direction();
+            auto  v2 = b.Direction();
+
+            double determinant = v1[0] * v2[1] - v2[0] * v1[1];
+            // Scale the "are these parallel?" tolerance by the magnitudes of v1/v2
+            // (determinant == |v1| * |v2| * sin(angle)), since a fixed epsilon is
+            // only meaningful for near-unit-length vectors.
+            double scale = v1.Magnitude() * v2.Magnitude();
+            if (scale <= std::numeric_limits<T>::epsilon() ||
+                std::abs(determinant) <= std::numeric_limits<T>::epsilon() * scale)
+            {
+                return NullOpt;
+            }
+
+            auto t1Num = c[0] * v2[1] - v2[0] * c[1];
+            auto t1 = t1Num / determinant;
+            auto t2Num = -(v1[0] * c[1] - c[0] * v1[1]);
+            auto t2 = t2Num / determinant;
+
+            if (t1 < 0.0 || t2 < 0.0 || t2 > 1.0)
+            {
+                return NullOpt;
+            }
+
+            return Data
+            {
+                .a = a,
+                .b = b,
+                .position = p1 + t1 * v1,
+                .rayDistance = t1,
+                .segmentDistance = t2,
+            };
+        }
+    };
+
+
+    template <typename T>
+    struct IntersectionTest<Ray<T, 2>, Ray<T, 2>>
+    {
+        struct Data
+        {
+            Ray<T, 2> a;
+            Ray<T, 2> b;
+            Vector<T, 2> position;
+            double       rayDistance[2];
+        };
+
+        using Result = Optional<Data>;
+
+        Result operator()(const Ray<T, 2>& a, const Ray<T, 2>& b) const noexcept
+        {
+            // Solve using Cramer's rule
+            auto& p1 = a.Origin();
+            auto& p2 = b.Origin();
+            auto   c = p2 - p1;
+            auto& v1 = a.Direction();
+            auto& v2 = b.Direction();
+
+            double determinant = v1[0] * v2[1] - v2[0] * v1[1];
+            // Scale the "are these parallel?" tolerance by the magnitudes of v1/v2
+            // (determinant == |v1| * |v2| * sin(angle)), since a fixed epsilon is
+            // only meaningful for near-unit-length vectors.
+            double scale = v1.Magnitude() * v2.Magnitude();
+            if (scale <= std::numeric_limits<T>::epsilon() ||
+                std::abs(determinant) <= std::numeric_limits<T>::epsilon() * scale)
+            {
+                return NullOpt;
+            }
+
+            auto t1Num = c[0] * v2[1] - v2[0] * c[1];
+            auto t1 = t1Num / determinant;
+            auto t2Num = -(v1[0] * c[1] - c[0] * v1[1]);
+            auto t2 = t2Num / determinant;
+
+            if (t1 < 0.0 || t2 < 0.0)
+            {
+                return NullOpt;
+            }
+
+            return Data
+            {
+                .a = a,
+                .b = b,
+                .position = p1 + t1 * v1,
+                .rayDistance { t1, t2 },
+            };
+        }
+    };
 }

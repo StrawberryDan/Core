@@ -77,7 +77,7 @@ namespace Strawberry::Core::Math::Geometry
 		{
 			auto points = cell.mNodeIDs | std::views::transform(
 				[&] (const auto& x) { return mGraph.GetValue(x); });
-			return ConvexPolygon<T>::From(std::move(points));
+			return ConvexPolygon<T>(std::move(points));
 		}
 
 	private:

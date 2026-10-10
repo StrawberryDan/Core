@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Strawberry/Core/IO/Logging.hpp"
-#include "Strawberry/Core/Math/Geometry/Intersection.hpp"
+#include "Strawberry/Core/Math/Geometry/AABB.hpp"
+#include "Strawberry/Core/Math/Geometry/Shape.hpp"
+#include "Strawberry/Core/Math/Geometry/Transformation.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
-#include "Strawberry/Core/Math/Geometry/AABB.hpp"
 #include "fmt/format.h"
 #include <limits>
 
@@ -17,7 +17,7 @@ namespace Strawberry::Core::Math::Geometry
 
 	template <typename T, unsigned D = 3>
 	class Sphere
-		: public Intersectable
+		: public Shape
 	{
 	public:
 		Sphere() = default;
@@ -41,12 +41,6 @@ namespace Strawberry::Core::Math::Geometry
 		auto operator<=>(const Sphere& other) const noexcept = default;
 
 
-		Sphere Translated(const Vector<T, D>& translation) const
-		{
-			return Sphere(mCenter + translation, mRadius);
-		}
-
-
 	private:
 		Vector<T, D> mCenter;
 		T            mRadius;
@@ -55,6 +49,42 @@ namespace Strawberry::Core::Math::Geometry
 
 	template <typename T>
 	using Circle = Sphere<T, 2>;
+
+
+    template <typename T, unsigned D>
+    struct Translation<Sphere<T, D>>
+    {
+        Translation(auto&& x)
+            : parameter(std::forward<decltype(x)>(x))
+        {}
+
+
+        Sphere<T, D> operator()(const Sphere<T, D>& x) const
+        {
+            return Sphere<T, D>(x.Center() + parameter, x.Radius());
+        }
+
+
+        Vector<T, D> parameter;
+    };
+
+
+    template <typename T>
+    struct Rotation<Sphere<T, 2>>
+    {
+        Rotation(auto&& x)
+            : parameter(std::forward<decltype(x)>(x))
+        {}
+
+
+        Sphere<T, 2> operator()(const Sphere<T, 2>& x) const
+        {
+            return x;
+        }
+
+
+        double parameter;
+    };
 
 
 	template <typename T, unsigned D>
