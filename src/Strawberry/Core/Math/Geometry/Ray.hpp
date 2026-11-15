@@ -112,9 +112,6 @@ namespace Strawberry::Core::Math::Geometry
             auto  v2 = b.Direction();
 
             double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-            // Scale the "are these parallel?" tolerance by the magnitudes of v1/v2
-            // (determinant == |v1| * |v2| * sin(angle)), since a fixed epsilon is
-            // only meaningful for near-unit-length vectors.
             double scale = v1.Magnitude() * v2.Magnitude();
             if (scale <= std::numeric_limits<T>::epsilon() ||
                 std::abs(determinant) <= std::numeric_limits<T>::epsilon() * scale)
@@ -162,9 +159,6 @@ namespace Strawberry::Core::Math::Geometry
             auto  v2 = b.Direction();
 
             double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-            // Scale the "are these parallel?" tolerance by the magnitudes of v1/v2
-            // (determinant == |v1| * |v2| * sin(angle)), since a fixed epsilon is
-            // only meaningful for near-unit-length vectors.
             double scale = v1.Magnitude() * v2.Magnitude();
             if (scale <= std::numeric_limits<T>::epsilon() ||
                 std::abs(determinant) <= std::numeric_limits<T>::epsilon() * scale)
@@ -217,9 +211,6 @@ namespace Strawberry::Core::Math::Geometry
             auto& v2 = b.Direction();
 
             double determinant = v1[0] * v2[1] - v2[0] * v1[1];
-            // Scale the "are these parallel?" tolerance by the magnitudes of v1/v2
-            // (determinant == |v1| * |v2| * sin(angle)), since a fixed epsilon is
-            // only meaningful for near-unit-length vectors.
             double scale = v1.Magnitude() * v2.Magnitude();
             if (scale <= std::numeric_limits<T>::epsilon() ||
                 std::abs(determinant) <= std::numeric_limits<T>::epsilon() * scale)
